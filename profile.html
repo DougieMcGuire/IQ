@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #1a6bc4;
+      --bg: #F2EBD9;
       --card: #EDE5CF;
       --tan: #C4AD8A;
       --tan-dark: #A08C6E;
@@ -75,19 +75,16 @@
     }
     .share-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
 
-    /* Profile header: avatar+IQ on left, stats on right */
+    /* Profile header */
     .profile-header-layout {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      position: relative;
       margin-bottom: 16px;
     }
     .profile-top {
       display: flex;
       flex-direction: column;
       align-items: center;
-      flex: 1;
+      width: 100%;
     }
 
     .avatar-wrap { position: relative; margin-bottom: 12px; }
@@ -142,15 +139,18 @@
       margin-bottom: 16px;
     }
 
-    /* Vertical Stats Column (side panel) */
+    /* Vertical Stats Column (absolutely positioned right) */
     .stats-side {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
       display: flex;
       flex-direction: column;
       background: var(--card);
       border: 2px solid var(--tan);
       border-radius: 16px;
-      padding: 12px 14px;
-      gap: 0;
+      padding: 10px 14px;
     }
     .stat-item {
       display: flex;
