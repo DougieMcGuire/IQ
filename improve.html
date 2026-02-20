@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>IQ Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F2EBD9;
+      --card: #EDE5CF;
+      --tan: #C4AD8A;
+      --tan-dark: #A08C6E;
+      --ink: #2A2018;
+      --ink-light: #6B5740;
+      --bar-bg: #D5C8AD;
+      --green: #5EB85E;
+      --red: #D64545;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { 
+      width: 100%; height: 100%; 
+      overflow: hidden;
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    body { display: flex; flex-direction: column; }
+
+    nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 70px;
+      background: #E4D9BF;
+      border-top: 2px solid var(--tan);
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      z-index: 100;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .nav-btn {
+      padding: 10px 36px;
+      background: none; border: none;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      color: var(--ink-light);
+      font-family: 'Patrick Hand', cursive;
+      font-size: 12px;
+      text-decoration: none;
+      border-radius: 14px;
+    }
+    .nav-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .nav-btn.active { color: var(--ink); background: var(--card); }
+    .nav-divider { width: 2px; height: 30px; background: var(--tan); }
+
+    main {
+      flex: 1;
+      padding-bottom: 70px;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    main::-webkit-scrollbar { display: none; }
+
+    .slide {
+      min-height: 100%; height: 100%;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 2px solid var(--tan);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 360px;
+      padding: 22px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 6px 30px rgba(0,0,0,0.08);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .card.pop { animation: cardPop 0.4s ease; }
+    @keyframes cardPop {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.03); box-shadow: 0 0 30px rgba(94,184,94,0.4); }
+      100% { transform: scale(1); }
+    }
+
+    .category {
+      font-family: 'Patrick Hand', cursive;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 20px;
+      border: 1.5px solid var(--tan);
+      color: var(--tan-dark);
+      background: rgba(196,173,138,0.15);
+    }
+
+    .question {
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.45;
+    }
+
+    .sequence {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Verdana', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 4px 0;
+    }
+    .sequence .dot { color: var(--tan); opacity: 0.6; }
+    .sequence .blank {
+      background: var(--bar-bg);
+      padding: 4px 12px;
+      border-radius: 8px;
+      border: 2px dashed var(--tan);
+      color: var(--tan-dark);
+    }
+
+    .matrix {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      width: 140px;
+    }
+    .matrix-cell {
+      aspect-ratio: 1;
+      background: var(--bar-bg);
+      border-radius: 8px;
+      border: 1.5px solid var(--tan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Verdana', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .matrix-cell.blank {
+      background: rgba(196,173,138,0.2);
+      border-style: dashed;
+      font-size: 18px;
+      color: var(--tan-dark);
+    }
+
+    .visual-box {
+      font-size: 48px;
+      margin: 8px 0;
+      padding: 12px 24px;
+      background: var(--bar-bg);
+      border-radius: 12px;
+      border: 2px solid var(--tan);
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      width: 100%;
+    }
+    .options.single { grid-template-columns: 1fr; }
+
+    .opt {
+      background: var(--bg);
+      border: 2px solid var(--tan);
+      border-radius: 12px;
+      padding: 11px 8px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+    .opt:active { transform: scale(0.97); }
+    .opt.correct { 
+      background: var(--green) !important;
+      border-color: #4a9a4a !important;
+      color: #fff !important;
+      animation: correctBounce 0.4s ease;
+    }
+    @keyframes correctBounce {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+    .opt.wrong { 
+      background: var(--red) !important;
+      border-color: #b33 !important;
+      color: #fff !important;
+      animation: wrongShake 0.4s ease;
+    }
+    @keyframes wrongShake {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+    .opt.dim { opacity: 0.4; }
+    .opt.reveal { 
+      background: var(--green) !important;
+      border-color: #4a9a4a !important;
+      color: #fff !important;
+      opacity: 1 !important;
+    }
+
+    .explain {
+      background: rgba(0,0,0,0.04);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 11px;
+      color: var(--ink-light);
+      text-align: center;
+      line-height: 1.4;
+      display: none;
+    }
+    .explain.show { display: block; animation: fadeSlide 0.3s ease; }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .scroll-hint {
+      margin-top: 14px;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 13px;
+      color: var(--ink-light);
+      opacity: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: opacity 0.3s;
+    }
+    .scroll-hint.show { opacity: 0.6; }
+    .scroll-hint svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; animation: bounce 1.5s infinite; }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(5px)} }
+
+    .stats-bar {
+      position: fixed;
+      top: 12px; right: 12px;
+      background: var(--card);
+      border: 2px solid var(--tan);
+      border-radius: 16px;
+      padding: 8px 14px;
+      display: flex;
+      gap: 16px;
+      z-index: 50;
+    }
+    .stats-bar.bump { animation: bump 0.3s ease; }
+    @keyframes bump { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+    .stat-item { display: flex; flex-direction: column; align-items: center; }
+    .stat-val {
+      font-family: 'Verdana', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      transition: color 0.3s, transform 0.3s;
+    }
+    .stat-val.up { color: var(--green); transform: scale(1.2); }
+    .stat-label { font-family: 'Patrick Hand', cursive; font-size: 10px; color: var(--ink-light); }
+
+    .streak-popup {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .streak-popup.show { opacity: 1; }
+    .streak-popup .flame { font-size: 80px; animation: flameDance 0.4s infinite; }
+    @keyframes flameDance { 
+      0%,100% { transform: scale(1) rotate(-5deg); }
+      50% { transform: scale(1.15) rotate(5deg); }
+    }
+    .streak-popup .num {
+      font-family: 'Verdana', sans-serif;
+      font-size: 56px;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    .streak-popup .txt {
+      font-family: 'Patrick Hand', cursive;
+      font-size: 22px;
+      color: #fff;
+    }
+
+    .flash { 
+      position: fixed; inset: 0;
+      background: radial-gradient(circle, rgba(94,184,94,0.35) 0%, transparent 70%);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 150;
+    }
+    .flash.show { animation: flashAnim 0.3s ease; }
+    @keyframes flashAnim { 0%{opacity:1} 100%{opacity:0} }
+
+    .confetti {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 160;
+      overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute;
+      width: 10px; height: 10px;
+      opacity: 0;
+    }
+    .confetti-piece.fall { animation: confettiFall 1.2s ease-out forwards; }
+    @keyframes confettiFall {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+    }
+
+    .xp-float {
+      position: fixed;
+      top: 45%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Verdana', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--green);
+      text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 170;
+    }
+    .xp-float.show { animation: xpFloat 1s ease-out forwards; }
+    @keyframes xpFloat {
+      0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+      30% { transform: translate(-50%, -80%) scale(1.3); }
+      100% { opacity: 0; transform: translate(-50%, -150%) scale(1); }
+    }
+
+    .modal {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 300;
+      padding: 20px;
+    }
+    .modal.show { display: flex; }
+    .modal-box {
+      background: var(--bg);
+      border-radius: 24px;
+      padding: 32px 24px;
+      width: 100%;
+      max-width: 340px;
+      text-align: center;
+    }
+    .modal-emoji { font-size: 56px; margin-bottom: 16px; }
+    .modal-title { font-family: 'Patrick Hand', cursive; font-size: 26px; margin-bottom: 12px; }
+    .modal-text { font-size: 14px; color: var(--ink-light); line-height: 1.5; margin-bottom: 20px; }
+    .age-num { font-family: 'Verdana', sans-serif; font-size: 48px; font-weight: 700; margin: 16px 0; }
+    .age-slider {
+      width: 100%; height: 8px;
+      -webkit-appearance: none;
+      background: var(--bar-bg);
+      border-radius: 4px;
+      outline: none;
+      margin-bottom: 24px;
+    }
+    .age-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 28px; height: 28px;
+      background: var(--ink);
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid var(--card);
+    }
+    .btn {
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      padding: 14px 40px;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    /* Word Search Styles */
+    .ws-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .ws-timer {
+      width: 100%; height: 8px;
+      background: var(--bar-bg);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .ws-timer-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), #4AAA4A);
+      transition: width 0.1s linear;
+    }
+    .ws-timer-fill.warn { background: linear-gradient(90deg, #E5A835, #D96A28); }
+    .ws-timer-fill.danger { background: linear-gradient(90deg, var(--red), #b33); }
+    .ws-grid {
+      display: grid;
+      gap: 4px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .ws-cell {
+      width: 38px; height: 38px;
+      background: var(--bg);
+      border: 2px solid var(--tan);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Verdana', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .ws-cell.hidden { 
+      color: transparent;
+      background: var(--bar-bg);
+    }
+    .ws-cell.sel { 
+      background: var(--tan); 
+      color: #fff;
+      transform: scale(1.05);
+    }
+    .ws-cell.found { 
+      background: var(--green); 
+      border-color: #4a9a4a; 
+      color: #fff;
+    }
+    .ws-info {
+      font-family: 'Verdana', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .ws-found {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+      min-height: 28px;
+    }
+    .ws-word {
+      background: var(--green);
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      animation: wordPop 0.3s ease;
+    }
+    @keyframes wordPop {
+      0% { transform: scale(0); }
+      60% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .ws-start {
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 12px 32px;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .ws-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(237, 229, 207, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      gap: 12px;
+    }
+    .ws-overlay.hidden { display: none; }
+    .ws-wrapper {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+
+<div class="stats-bar" id="stats-bar">
+  <div class="stat-item">
+    <span class="stat-val" id="iq-val">--</span>
+    <span class="stat-label">IQ</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-val" id="streak-val">0</span>
+    <span class="stat-label">🔥</span>
+  </div>
+</div>
+
+<main id="feed"></main>
+
+<nav>
+  <a class="nav-btn active" href="improve.html">
+    <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+    Improve
+  </a>
+  <div class="nav-divider"></div>
+  <a class="nav-btn" href="profile.html">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </a>
+</nav>
+
+<div class="streak-popup" id="streak-popup">
+  <div class="flame">🔥</div>
+  <div class="num" id="streak-num">5</div>
+  <div class="txt">STREAK!</div>
+</div>
+
+<div class="flash" id="flash"></div>
+<div class="confetti" id="confetti"></div>
+<div class="xp-float" id="xp-float">+1</div>
+
+<div class="modal" id="onboard-modal">
+  <div class="modal-box">
+    <div class="modal-emoji">🧠</div>
+    <div class="modal-title">Welcome to IQ Profile</div>
+    <div class="modal-text">Train your brain with personalized challenges.<br>First, tell us your age to tailor difficulty.</div>
+    <div class="age-num" id="age-display">25</div>
+    <input type="range" class="age-slider" id="age-slider" min="8" max="80" value="25">
+    <button class="btn" onclick="startApp()">Let's Go!</button>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="questions.js"></script>
+<script>
+const feed = document.getElementById('feed');
+const iqVal = document.getElementById('iq-val');
+const streakVal = document.getElementById('streak-val');
+const streakPopup = document.getElementById('streak-popup');
+const streakNum = document.getElementById('streak-num');
+const onboardModal = document.getElementById('onboard-modal');
+const ageSlider = document.getElementById('age-slider');
+const ageDisplay = document.getElementById('age-display');
+const flash = document.getElementById('flash');
+const confetti = document.getElementById('confetti');
+const xpFloat = document.getElementById('xp-float');
+const statsBar = document.getElementById('stats-bar');
+
+let totalSlides = 0;
+let answerTime = 0;
+let lastIQ = null;
+
+function init() {
+  if (IQData.needsOnboarding()) {
+    onboardModal.classList.add('show');
+  } else {
+    loadQuestions();
+  }
+  ageSlider.oninput = () => ageDisplay.textContent = ageSlider.value;
+}
+
+function startApp() {
+  IQData.setAge(parseInt(ageSlider.value));
+  onboardModal.classList.remove('show');
+  QuestionGenerator.setAge(parseInt(ageSlider.value));
+  loadQuestions();
+}
+
+function loadQuestions() {
+  const data = IQData.load();
+  QuestionGenerator.setAge(data.age);
+  lastIQ = data.iq;
+  updateUI();
+  
+  for (let i = 0; i < 5; i++) addSlide();
+  
+  feed.addEventListener('scroll', checkAddMore, { passive: true });
+  feed.addEventListener('touchend', checkAddMore, { passive: true });
+  setInterval(checkAddMore, 300);
+  
+  feed.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const dir = e.deltaY > 0 ? 1 : -1;
+    const h = feed.clientHeight;
+    const curr = Math.round(feed.scrollTop / h);
+    const next = Math.max(0, Math.min(totalSlides - 1, curr + dir));
+    feed.scrollTo({ top: next * h, behavior: 'smooth' });
+    setTimeout(checkAddMore, 100);
+  }, { passive: false });
+}
+
+function checkAddMore() {
+  const h = feed.clientHeight;
+  if (h === 0) return;
+  const currentIdx = Math.round(feed.scrollTop / h);
+  while (totalSlides < currentIdx + 6) addSlide();
+}
+
+function addSlide() {
+  const q = QuestionGenerator.generate();
+  const idx = totalSlides++;
+  
+  const div = document.createElement('div');
+  div.className = 'slide';
+  div.innerHTML = q.visual === 'wordSearch' ? renderWS(q, idx) : renderQ(q, idx);
+  feed.appendChild(div);
+  answerTime = Date.now();
+}
+
+function renderQ(q, idx) {
+  let visual = '';
+  if (q.visual === 'sequence' || q.visual === 'letterSequence') {
+    const items = q.sequence.map(n => n === '?' ? `<span class="blank">?</span>` : `<span>${n}</span><span class="dot">·</span>`);
+    if (q.sequence[0] !== '?') items.push(`<span class="blank">?</span>`);
+    visual = `<div class="sequence">${items.join('')}</div>`;
+  } else if (q.visual === 'matrix') {
+    visual = `<div class="matrix">${q.grid.map(c => `<div class="matrix-cell${c === '?' ? ' blank' : ''}">${c}</div>`).join('')}</div>`;
+  } else if (q.visual === 'spatial') {
+    visual = `<div class="visual-box">${q.startShape}</div>`;
+  }
+  
+  const long = q.options.some(o => o.length > 28);
+  const esc = s => s.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  
+  return `
+    <div class="card" id="card-${idx}">
+      <div class="category">${q.categoryLabel}</div>
+      <div class="question">${q.question}</div>
+      ${visual}
+      <div class="options${long ? ' single' : ''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">
+        ${q.options.map(o => `<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}
+      </div>
+      <div class="explain" id="exp-${idx}">${q.explanation || ''}</div>
+    </div>
+    <div class="scroll-hint" id="hint-${idx}">
+      <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      Swipe for next
+    </div>
+  `;
+}
+
+function renderWS(q, idx) {
+  const size = q.gridSize;
+  return `
+    <div class="card" id="card-${idx}">
+      <div class="category">${q.categoryLabel}</div>
+      <div class="question">${q.question}</div>
+      <div class="ws-container">
+        <div class="ws-timer"><div class="ws-timer-fill" id="wst-${idx}"></div></div>
+        <div class="ws-info">Found: <span id="wsc-${idx}">0</span>/${q.totalWords}</div>
+        <div class="ws-wrapper">
+          <div class="ws-grid" id="wsg-${idx}" style="grid-template-columns:repeat(${size},1fr)" 
+               data-idx="${idx}" data-size="${size}" data-cat="${q.category}" data-diff="${q.difficulty}"
+               data-words='${JSON.stringify(q.words)}' data-positions='${JSON.stringify(q.wordPositions)}'>
+            ${q.grid.map((l, i) => `<div class="ws-cell hidden" data-i="${i}">${l}</div>`).join('')}
+          </div>
+          <div class="ws-overlay" id="wso-${idx}">
+            <div style="font-size:32px">🔍</div>
+            <button class="ws-start" onclick="startWS(${idx})">TAP TO START</button>
+          </div>
+        </div>
+        <div class="ws-found" id="wsf-${idx}"></div>
+      </div>
+      <div class="explain" id="exp-${idx}"></div>
+    </div>
+    <div class="scroll-hint" id="hint-${idx}">
+      <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      Swipe for next
+    </div>
+  `;
+}
+
+// Word Search Logic
+let wsData = {};
+
+function startWS(idx) {
+  // Hide overlay, reveal letters
+  document.getElementById(`wso-${idx}`).classList.add('hidden');
+  document.querySelectorAll(`#wsg-${idx} .ws-cell`).forEach(c => c.classList.remove('hidden'));
+  
+  const grid = document.getElementById(`wsg-${idx}`);
+  const words = JSON.parse(grid.dataset.words);
+  const positions = JSON.parse(grid.dataset.positions);
+  const size = parseInt(grid.dataset.size);
+  
+  wsData[idx] = { 
+    found: [], 
+    timer: null, 
+    timeLeft: 15000,
+    selection: [],
+    words,
+    positions,
+    size,
+    finished: false
+  };
+  
+  // Timer
+  const timerEl = document.getElementById(`wst-${idx}`);
+  wsData[idx].timer = setInterval(() => {
+    wsData[idx].timeLeft -= 100;
+    const pct = (wsData[idx].timeLeft / 15000) * 100;
+    timerEl.style.width = pct + '%';
+    timerEl.classList.toggle('warn', pct < 50 && pct >= 25);
+    timerEl.classList.toggle('danger', pct < 25);
+    if (wsData[idx].timeLeft <= 0) endWS(idx);
+  }, 100);
+  
+  // Touch/click handlers
+  const cells = grid.querySelectorAll('.ws-cell');
+  
+  cells.forEach(cell => {
+    cell.addEventListener('click', () => handleWSClick(idx, cell));
+  });
+}
+
+function handleWSClick(idx, cell) {
+  if (wsData[idx].finished) return;
+  if (cell.classList.contains('found')) return;
+  
+  const cellIdx = parseInt(cell.dataset.i);
+  const data = wsData[idx];
+  const size = data.size;
+  
+  // If clicking on already selected cell, try to submit
+  if (cell.classList.contains('sel')) {
+    checkWSWord(idx);
+    return;
+  }
+  
+  // Check if this cell is adjacent and in line with current selection
+  if (data.selection.length > 0) {
+    const last = data.selection[data.selection.length - 1];
+    const lastRow = Math.floor(last / size);
+    const lastCol = last % size;
+    const cellRow = Math.floor(cellIdx / size);
+    const cellCol = cellIdx % size;
+    
+    const rowDiff = cellRow - lastRow;
+    const colDiff = cellCol - lastCol;
+    
+    // Must be adjacent (including diagonal)
+    const isAdjacent = Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1;
+    
+    // Check if in line with existing selection
+    let inLine = true;
+    if (data.selection.length >= 2) {
+      const first = data.selection[0];
+      const firstRow = Math.floor(first / size);
+      const firstCol = first % size;
+      const dirRow = Math.sign(lastRow - firstRow) || 0;
+      const dirCol = Math.sign(lastCol - firstCol) || 0;
+      
+      // New cell must continue same direction
+      if (data.selection.length > 1) {
+        inLine = (rowDiff === dirRow || dirRow === 0) && (colDiff === dirCol || dirCol === 0);
+        if (dirRow === 0 && rowDiff !== 0) inLine = false;
+        if (dirCol === 0 && colDiff !== 0) inLine = false;
+      }
+    }
+    
+    if (!isAdjacent || !inLine || data.selection.includes(cellIdx)) {
+      // Clear selection and start fresh
+      clearWSSelection(idx);
+    }
+  }
+  
+  // Add to selection
+  data.selection.push(cellIdx);
+  cell.classList.add('sel');
+  
+  // Auto-check if 3+ letters
+  if (data.selection.length >= 2) {
+    checkWSWord(idx);
+  }
+}
+
+function clearWSSelection(idx) {
+  const grid = document.getElementById(`wsg-${idx}`);
+  grid.querySelectorAll('.ws-cell.sel').forEach(c => c.classList.remove('sel'));
+  wsData[idx].selection = [];
+}
+
+function checkWSWord(idx) {
+  const data = wsData[idx];
+  const grid = document.getElementById(`wsg-${idx}`);
+  
+  // Get selected word
+  const selectedWord = data.selection.map(i => {
+    return grid.querySelector(`[data-i="${i}"]`).textContent;
+  }).join('');
+  
+  const selectedWordRev = selectedWord.split('').reverse().join('');
+  
+  // Check if matches any unfound word
+  let foundWord = null;
+  let foundPositions = null;
+  
+  for (const wp of data.positions) {
+    if (data.found.includes(wp.word)) continue;
+    
+    if (wp.word === selectedWord || wp.word === selectedWordRev) {
+      // Check if cells match word position
+      const selSorted = [...data.selection].sort((a,b) => a-b);
+      const posSorted = [...wp.cells].sort((a,b) => a-b);
+      
+      if (selSorted.length === posSorted.length && 
+          selSorted.every((v, i) => v === posSorted[i])) {
+        foundWord = wp.word;
+        foundPositions = wp.cells;
+        break;
+      }
+    }
+  }
+  
+  if (foundWord) {
+    // Mark as found
+    data.found.push(foundWord);
+    foundPositions.forEach(i => {
+      const cell = grid.querySelector(`[data-i="${i}"]`);
+      cell.classList.remove('sel');
+      cell.classList.add('found');
+    });
+    data.selection = [];
+    
+    // Update UI
+    document.getElementById(`wsc-${idx}`).textContent = data.found.length;
+    document.getElementById(`wsf-${idx}`).innerHTML += `<span class="ws-word">${foundWord}</span>`;
+    
+    doCorrectFX();
+    
+    // Check if all found
+    if (data.found.length >= data.words.length) {
+      endWS(idx, true);
+    }
+  }
+}
+
+function endWS(idx, allFound = false) {
+  if (wsData[idx].finished) return;
+  wsData[idx].finished = true;
+  
+  clearInterval(wsData[idx].timer);
+  clearWSSelection(idx);
+  
+  const data = wsData[idx];
+  const grid = document.getElementById(`wsg-${idx}`);
+  const found = data.found.length;
+  const total = data.words.length;
+  const score = found / total;
+  
+  // Disable further interaction
+  grid.querySelectorAll('.ws-cell').forEach(c => c.style.pointerEvents = 'none');
+  
+  // Score it
+  IQData.recordAnswer(grid.dataset.cat, score >= 0.5, parseFloat(grid.dataset.diff) * Math.max(0.5, score));
+  
+  if (allFound) doBigCorrectFX();
+  updateUI();
+  
+  const exp = document.getElementById(`exp-${idx}`);
+  exp.textContent = allFound ? `Perfect! Found all ${total} words!` : `Found ${found}/${total} words`;
+  setTimeout(() => exp.classList.add('show'), 200);
+  setTimeout(() => document.getElementById(`hint-${idx}`)?.classList.add('show'), 500);
+}
+
+// Answer clicks for normal questions
+document.addEventListener('click', function(e) {
+  if (!e.target.classList.contains('opt')) return;
+  const btn = e.target;
+  const opts = btn.parentElement;
+  if (opts.dataset.done) return;
+  opts.dataset.done = '1';
+  
+  const idx = parseInt(opts.dataset.idx);
+  const correct = opts.dataset.ans;
+  const val = btn.dataset.v;
+  const isCorrect = val === correct;
+  
+  opts.querySelectorAll('.opt').forEach(o => {
+    if (o.dataset.v === correct) o.classList.add(isCorrect ? 'correct' : 'reveal');
+    else if (o === btn) o.classList.add('wrong');
+    else o.classList.add('dim');
+    o.style.pointerEvents = 'none';
+  });
+  
+  const data = IQData.recordAnswer(opts.dataset.cat, isCorrect, parseFloat(opts.dataset.diff), Date.now() - answerTime);
+  
+  if (isCorrect) {
+    doCorrectFX();
+    document.getElementById(`card-${idx}`)?.classList.add('pop');
+    if (data.iq && lastIQ && data.iq > lastIQ) showXP('+' + (data.iq - lastIQ) + ' IQ');
+    lastIQ = data.iq;
+  }
+  
+  setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'), 200);
+  
+  if (isCorrect && data.streak > 0 && data.streak % 5 === 0) {
+    setTimeout(() => {
+      streakNum.textContent = data.streak;
+      streakPopup.classList.add('show');
+      spawnConfetti(30);
+      setTimeout(() => streakPopup.classList.remove('show'), 2500);
+    }, 300);
+  }
+  
+  updateUI();
+  setTimeout(() => document.getElementById(`hint-${idx}`)?.classList.add('show'), 400);
+  answerTime = Date.now();
+});
+
+function doCorrectFX() {
+  flash.classList.add('show');
+  setTimeout(() => flash.classList.remove('show'), 300);
+  statsBar.classList.add('bump');
+  setTimeout(() => statsBar.classList.remove('bump'), 300);
+  spawnConfetti(10);
+}
+
+function doBigCorrectFX() {
+  flash.classList.add('show');
+  setTimeout(() => flash.classList.remove('show'), 400);
+  spawnConfetti(30);
+}
+
+function spawnConfetti(n) {
+  const colors = ['#5EB85E', '#FFD700', '#FF6B6B', '#4ECDC4', '#A855F7', '#F59E0B'];
+  for (let i = 0; i < n; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.top = '-10px';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    p.style.animationDelay = Math.random() * 0.2 + 's';
+    confetti.appendChild(p);
+    setTimeout(() => p.classList.add('fall'), 10);
+    setTimeout(() => p.remove(), 1500);
+  }
+}
+
+function showXP(txt) {
+  xpFloat.textContent = txt;
+  xpFloat.classList.add('show');
+  setTimeout(() => xpFloat.classList.remove('show'), 1000);
+}
+
+function updateUI() {
+  const data = IQData.load();
+  const newIQ = data.iq || '--';
+  if (iqVal.textContent !== String(newIQ)) {
+    iqVal.textContent = newIQ;
+    if (data.iq && lastIQ && data.iq > lastIQ) {
+      iqVal.classList.add('up');
+      setTimeout(() => iqVal.classList.remove('up'), 500);
+    }
+  }
+  streakVal.textContent = data.streak;
+}
+
+init();
+</script>
+</body>
+</html>
