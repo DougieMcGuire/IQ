@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Profile | IQ Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F2EBD9;
+      --card: #EDE5CF;
+      --tan: #C4AD8A;
+      --tan-dark: #A08C6E;
+      --ink: #2A2018;
+      --ink-light: #6B5740;
+      --bar-bg: #D5C8AD;
+      --green: #5EB85E;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { 
+      width: 100%; height: 100%; 
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    body { display: flex; flex-direction: column; }
+
+    nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 70px;
+      background: #E4D9BF;
+      border-top: 2px solid var(--tan);
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      z-index: 100;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .nav-btn {
+      padding: 10px 36px;
+      background: none; border: none;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      color: var(--ink-light);
+      font-family: 'Patrick Hand', cursive;
+      font-size: 12px;
+      text-decoration: none;
+      border-radius: 14px;
+    }
+    .nav-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .nav-btn.active { color: var(--ink); background: var(--card); }
+    .nav-divider { width: 2px; height: 30px; background: var(--tan); }
+
+    main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px 85px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+    }
+    .share-btn {
+      background: var(--card);
+      border: 2px solid var(--tan);
+      border-radius: 30px;
+      padding: 8px 16px;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 14px;
+      color: var(--ink);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .share-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    /* Centered Profile Section */
+    .profile-top {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .avatar-wrap { position: relative; margin-bottom: 12px; }
+    .avatar {
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 3px solid var(--tan);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .avatar svg { width: 44px; height: 44px; stroke: var(--tan-dark); fill: none; stroke-width: 1.5; }
+    .avatar-edit {
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 26px; height: 26px;
+      background: var(--ink);
+      border-radius: 50%;
+      border: 2px solid var(--card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .avatar-edit svg { width: 11px; height: 11px; stroke: #fff; fill: none; stroke-width: 2; }
+    #avatar-input { display: none; }
+
+    .iq-num {
+      font-family: 'Verdana', sans-serif;
+      font-size: 64px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .iq-label {
+      font-family: 'Verdana', sans-serif;
+      font-size: 16px;
+      color: var(--ink-light);
+      letter-spacing: 4px;
+      margin-bottom: 6px;
+    }
+    .pct-badge {
+      background: var(--tan-dark);
+      color: #F5EDD8;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 13px;
+      padding: 5px 14px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* Horizontal Stats Row */
+    .stats-row {
+      background: var(--card);
+      border: 2px solid var(--tan);
+      border-radius: 16px;
+      padding: 14px 8px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 8px;
+    }
+    .stat-item:not(:last-child) {
+      border-right: 1.5px solid var(--tan);
+      padding-right: 16px;
+    }
+    .stat-val {
+      font-family: 'Verdana', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .stat-lbl {
+      font-family: 'Patrick Hand', cursive;
+      font-size: 11px;
+      color: var(--ink-light);
+      margin-top: 2px;
+    }
+
+    .section-title {
+      font-family: 'Patrick Hand', cursive;
+      font-size: 13px;
+      color: var(--ink-light);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1.5px solid var(--tan);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .stat-name {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--ink-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .stat-bar-bg {
+      background: var(--bar-bg);
+      border-radius: 6px;
+      height: 24px;
+      overflow: hidden;
+    }
+    .stat-bar {
+      height: 100%;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+      min-width: 28px;
+      transition: width 0.6s ease;
+    }
+    .stat-bar span {
+      font-family: 'Verdana', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .bar-pr { background: linear-gradient(90deg, #C43820, #E86858); }
+    .bar-ps { background: linear-gradient(90deg, #D96A28, #F09560); }
+    .bar-ma { background: linear-gradient(90deg, #4AAA4A, #82CC82); }
+    .bar-mem { background: linear-gradient(90deg, #8A5BAF, #B48FD4); }
+    .bar-vr { background: linear-gradient(90deg, #6366F1, #A5B4FC); }
+    .bar-cs { background: linear-gradient(90deg, #2A96B8, #65C4DA); }
+    .bar-ei { background: linear-gradient(90deg, #C44878, #E888A8); }
+    .bar-sa { background: linear-gradient(90deg, #059669, #34D399); }
+
+    .reset-btn {
+      margin-top: 24px;
+      background: none;
+      border: none;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 12px;
+      color: var(--ink-light);
+      cursor: pointer;
+      opacity: 0.5;
+      display: block;
+      width: 100%;
+      text-align: center;
+    }
+
+    .modal {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 16px;
+    }
+    .modal.show { display: flex; }
+    .modal-box {
+      background: var(--bg);
+      border-radius: 20px;
+      padding: 20px;
+      width: 100%;
+      max-width: 360px;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: none; border: none;
+      cursor: pointer; opacity: 0.5;
+    }
+    .modal-close svg { width: 18px; height: 18px; stroke: var(--ink); stroke-width: 2; }
+    .modal-title {
+      font-family: 'Patrick Hand', cursive;
+      font-size: 18px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .share-preview {
+      background: var(--card);
+      border: 2px solid var(--tan);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .share-preview canvas { width: 100%; display: block; }
+    .share-btns { display: flex; gap: 8px; margin-top: 14px; }
+    .share-btns button {
+      flex: 1;
+      background: var(--card);
+      border: 2px solid var(--tan);
+      border-radius: 10px;
+      padding: 10px;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .share-btns button svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .share-btns button.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+    .toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--ink);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 300;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<main>
+  <div class="header">
+    <button class="share-btn" onclick="openShare()">
+      <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      Share
+    </button>
+  </div>
+
+  <div class="profile-top">
+    <div class="avatar-wrap">
+      <div class="avatar" onclick="document.getElementById('avatar-input').click()">
+        <img id="avatar-img" src="" alt="">
+        <svg id="avatar-icon" viewBox="0 0 64 64"><circle cx="32" cy="22" r="12"/><path d="M8 58 C8 44 18 36 32 36 C46 36 56 44 56 58"/></svg>
+      </div>
+      <div class="avatar-edit" onclick="document.getElementById('avatar-input').click()">
+        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+      </div>
+      <input type="file" id="avatar-input" accept="image/*" onchange="uploadAvatar(this)">
+    </div>
+    <div class="iq-num" id="iq-num">--</div>
+    <div class="iq-label">IQ</div>
+    <div class="pct-badge" id="pct-badge" style="display:none;"></div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-val" id="q-answered">0</div>
+      <div class="stat-lbl">Answered</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" id="q-accuracy">0%</div>
+      <div class="stat-lbl">Accuracy</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" id="q-streak">0 🔥</div>
+      <div class="stat-lbl">Best</div>
+    </div>
+  </div>
+
+  <div class="section-title">Abilities</div>
+  <div class="stats-grid" id="stats-grid"></div>
+
+  <button class="reset-btn" onclick="resetData()">Reset Progress</button>
+</main>
+
+<nav>
+  <a class="nav-btn" href="improve.html">
+    <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+    Improve
+  </a>
+  <div class="nav-divider"></div>
+  <a class="nav-btn active" href="profile.html">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </a>
+</nav>
+
+<div class="modal" id="share-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeShare()">
+      <svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="modal-title">Share Your Stats</div>
+    <div class="share-preview" id="share-preview"></div>
+    <div class="share-btns">
+      <button onclick="copyImg()"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button>
+      <button class="primary" onclick="downloadImg()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script>
+function loadProfile() {
+  const data = IQData.load();
+  
+  if (data.iq) {
+    document.getElementById('iq-num').textContent = data.iq;
+    const pct = iqToPercentile(data.iq);
+    document.getElementById('pct-badge').textContent = 'Top ' + formatPercentile(pct);
+    document.getElementById('pct-badge').style.display = 'inline-block';
+  }
+  
+  document.getElementById('q-answered').textContent = data.questionsAnswered;
+  document.getElementById('q-accuracy').textContent = IQData.getAccuracy() + '%';
+  document.getElementById('q-streak').textContent = data.bestStreak + ' 🔥';
+  
+  if (data.profilePic) {
+    document.getElementById('avatar-img').src = data.profilePic;
+    document.getElementById('avatar-img').style.display = 'block';
+    document.getElementById('avatar-icon').style.display = 'none';
+  }
+  
+  const grid = document.getElementById('stats-grid');
+  const cats = [
+    { key: 'patternRecognition', name: 'Pattern', bar: 'pr' },
+    { key: 'problemSolving', name: 'Problem Solving', bar: 'ps' },
+    { key: 'mentalAgility', name: 'Mental Agility', bar: 'ma' },
+    { key: 'memory', name: 'Memory', bar: 'mem' },
+    { key: 'verbalReasoning', name: 'Verbal', bar: 'vr' },
+    { key: 'commonSense', name: 'Common Sense', bar: 'cs' },
+    { key: 'emotionalIntelligence', name: 'Emotional', bar: 'ei' },
+    { key: 'spatialAwareness', name: 'Spatial', bar: 'sa' }
+  ];
+  
+  cats.forEach(c => {
+    const pct = IQData.getStatPercent(c.key);
+    const card = document.createElement('div');
+    card.className = 'stat-card';
+    card.innerHTML = `<div class="stat-name">${c.name}</div><div class="stat-bar-bg"><div class="stat-bar bar-${c.bar}" style="width:0%"><span>${pct}</span></div></div>`;
+    grid.appendChild(card);
+  });
+  
+  setTimeout(() => {
+    document.querySelectorAll('.stat-bar').forEach(bar => {
+      bar.style.width = Math.max(22, parseInt(bar.querySelector('span').textContent)) + '%';
+    });
+  }, 100);
+}
+
+function uploadAvatar(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = 200;
+      const ctx = canvas.getContext('2d');
+      const min = Math.min(img.width, img.height);
+      ctx.drawImage(img, (img.width - min) / 2, (img.height - min) / 2, min, min, 0, 0, 200, 200);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      IQData.setProfilePic(dataUrl);
+      document.getElementById('avatar-img').src = dataUrl;
+      document.getElementById('avatar-img').style.display = 'block';
+      document.getElementById('avatar-icon').style.display = 'none';
+      toast('Photo updated!');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+let shareCanvas = null;
+
+function openShare() {
+  document.getElementById('share-modal').classList.add('show');
+  genShareImg();
+}
+function closeShare() { document.getElementById('share-modal').classList.remove('show'); }
+
+function genShareImg() {
+  const data = IQData.load();
+  const canvas = document.createElement('canvas');
+  const W = 540, H = 720;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  
+  ctx.fillStyle = '#F2EBD9';
+  ctx.fillRect(0, 0, W, H);
+  
+  ctx.fillStyle = '#EDE5CF';
+  roundRect(ctx, 24, 24, W - 48, H - 48, 28);
+  ctx.fill();
+  ctx.strokeStyle = '#C4AD8A';
+  ctx.lineWidth = 3;
+  roundRect(ctx, 24, 24, W - 48, H - 48, 28);
+  ctx.stroke();
+  
+  const draw = () => {
+    ctx.font = '700 96px Verdana';
+    ctx.fillStyle = '#2A2018';
+    ctx.textAlign = 'center';
+    ctx.fillText(data.iq || '--', W/2, 200);
+    
+    ctx.font = '700 18px Verdana';
+    ctx.fillStyle = '#A08C6E';
+    ctx.fillText('IQ', W/2, 230);
+    
+    if (data.iq) {
+      ctx.fillStyle = '#A08C6E';
+      roundRect(ctx, W/2 - 70, 250, 140, 32, 16);
+      ctx.fill();
+      ctx.font = '600 14px Nunito';
+      ctx.fillStyle = '#F5EDD8';
+      ctx.fillText('Top ' + formatPercentile(iqToPercentile(data.iq)), W/2, 271);
+    }
+    
+    // Stats row
+    const stats3 = [{ val: data.questionsAnswered, lbl: 'Answered' }, { val: IQData.getAccuracy() + '%', lbl: 'Accuracy' }, { val: data.bestStreak + '🔥', lbl: 'Best' }];
+    ctx.fillStyle = '#D5C8AD';
+    roundRect(ctx, 50, 310, W - 100, 70, 16);
+    ctx.fill();
+    
+    const colW = (W - 100) / 3;
+    stats3.forEach((s, i) => {
+      const x = 50 + colW * i + colW / 2;
+      ctx.font = '700 24px Verdana';
+      ctx.fillStyle = '#2A2018';
+      ctx.fillText(s.val, x, 345);
+      ctx.font = '400 11px Patrick Hand';
+      ctx.fillStyle = '#6B5740';
+      ctx.fillText(s.lbl, x, 365);
+    });
+    
+    ctx.font = '600 12px Patrick Hand';
+    ctx.fillStyle = '#A08C6E';
+    ctx.textAlign = 'left';
+    ctx.fillText('ABILITIES', 60, 420);
+    
+    const bars = [
+      { name: 'Pattern', color: '#C43820', key: 'patternRecognition' },
+      { name: 'Problem Solving', color: '#D96A28', key: 'problemSolving' },
+      { name: 'Mental Agility', color: '#4AAA4A', key: 'mentalAgility' },
+      { name: 'Memory', color: '#8A5BAF', key: 'memory' },
+      { name: 'Verbal', color: '#6366F1', key: 'verbalReasoning' },
+      { name: 'Common Sense', color: '#2A96B8', key: 'commonSense' }
+    ];
+    
+    let y = 440;
+    bars.forEach(b => {
+      const val = IQData.getStatPercent(b.key);
+      ctx.font = '700 10px Nunito';
+      ctx.fillStyle = '#6B5740';
+      ctx.textAlign = 'left';
+      ctx.fillText(b.name.toUpperCase(), 60, y);
+      ctx.fillStyle = '#D5C8AD';
+      roundRect(ctx, 60, y + 6, W - 120, 22, 5);
+      ctx.fill();
+      ctx.fillStyle = b.color;
+      roundRect(ctx, 60, y + 6, Math.max(35, (val / 100) * (W - 120)), 22, 5);
+      ctx.fill();
+      ctx.font = '700 11px Verdana';
+      ctx.fillStyle = '#fff';
+      ctx.fillText(val, 68, y + 21);
+      y += 36;
+    });
+    
+    ctx.font = '600 16px Patrick Hand';
+    ctx.fillStyle = '#A08C6E';
+    ctx.textAlign = 'center';
+    ctx.fillText('🧠 IQ Profile', W/2, H - 50);
+    
+    shareCanvas = canvas;
+    document.getElementById('share-preview').innerHTML = '';
+    document.getElementById('share-preview').appendChild(canvas);
+  };
+  
+  if (data.profilePic) {
+    const img = new Image();
+    img.onload = () => {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(W/2, 85, 45, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(img, W/2 - 45, 40, 90, 90);
+      ctx.restore();
+      ctx.strokeStyle = '#C4AD8A';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(W/2, 85, 45, 0, Math.PI * 2);
+      ctx.stroke();
+      draw();
+    };
+    img.src = data.profilePic;
+  } else {
+    ctx.fillStyle = '#D5C8AD';
+    ctx.beginPath();
+    ctx.arc(W/2, 85, 45, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#C4AD8A';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    draw();
+  }
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+async function copyImg() {
+  if (!shareCanvas) return;
+  try {
+    const blob = await new Promise(r => shareCanvas.toBlob(r, 'image/png'));
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+    toast('Copied!');
+  } catch (e) { toast('Copy failed'); }
+}
+
+function downloadImg() {
+  if (!shareCanvas) return;
+  const link = document.createElement('a');
+  link.download = 'iq-profile.png';
+  link.href = shareCanvas.toDataURL('image/png');
+  link.click();
+  toast('Saved!');
+}
+
+function resetData() {
+  if (confirm('Reset all progress?')) { IQData.reset(); location.reload(); }
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+document.getElementById('share-modal').onclick = (e) => { if (e.target.id === 'share-modal') closeShare(); };
+loadProfile();
+</script>
+</body>
+</html>
