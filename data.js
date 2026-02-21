@@ -55,7 +55,6 @@ const IQData = {
     const c = d.ratings[cat];
     if (!c) return d;
     
-    // ELO update
     const exp = 1 / (1 + Math.pow(10, (diff * 400 - (c.r - 1000)) / 400));
     const k = Math.max(16, 40 - c.n);
     c.r = Math.round(c.r + k * ((correct ? 1 : 0) - exp));
@@ -71,7 +70,6 @@ const IQData = {
       d.streak = 0;
     }
     
-    // XP
     let xp = correct ? 10 : 3;
     if (correct && ms < 4000) xp += 5;
     if (correct && d.streak >= 3) xp += Math.min(d.streak * 2, 15);
@@ -80,7 +78,6 @@ const IQData = {
     const oldLvl = d.level;
     d.level = Math.floor(d.xp / 150) + 1;
     
-    // IQ calc
     d.iq = this.calcIQ(d);
     
     this.save(d);
@@ -114,8 +111,6 @@ const IQData = {
     
     const avg = sum / wt;
     let iq = 100 + ((avg - 1000) / 100) * 15;
-    
-    // Confidence regression to mean
     const conf = Math.min(1, games / 40);
     iq = 100 + (iq - 100) * conf;
     
@@ -147,7 +142,7 @@ function iqToPercentile(iq) {
 
 function formatPercentile(p) {
   if (p <= 1) return '1%';
-  if (p >= 99) return '1%';
+  if (p >= 99) return '99%';
   return p + '%';
 }
 
