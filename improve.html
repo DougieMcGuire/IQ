@@ -51,7 +51,7 @@
       gap: 6px;
       font-family: 'Patrick Hand', cursive;
     }
-    .stat-pill .icon { font-size: 16px; }
+    .stat-pill .icon { font-size: 14px; }
     .stat-pill .val {
       font-family: 'Verdana', sans-serif;
       font-size: 16px;
@@ -70,15 +70,15 @@
     }
     .xp-bar-outer {
       flex: 1;
-      height: 10px;
+      height: 8px;
       background: var(--tan-dark);
-      border-radius: 5px;
+      border-radius: 4px;
       overflow: hidden;
     }
     .xp-bar-inner {
       height: 100%;
       background: var(--green);
-      border-radius: 5px;
+      border-radius: 4px;
       transition: width 0.4s ease;
     }
     .xp-label {
@@ -116,7 +116,7 @@
     /* Feed */
     main {
       flex: 1;
-      padding: 90px 0 70px;
+      padding: 85px 0 70px;
       overflow-y: auto;
       scroll-snap-type: y mandatory;
       -webkit-overflow-scrolling: touch;
@@ -134,7 +134,7 @@
       padding: 20px 16px;
     }
 
-    /* Card */
+    /* Card - Clean, no tab */
     .card {
       background: var(--card);
       border: 2.5px solid var(--tan);
@@ -145,18 +145,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 18px;
-      position: relative;
-    }
-    .card::before {
-      content: '';
-      position: absolute;
-      top: -8px; left: 20px;
-      width: 40px; height: 16px;
-      background: var(--bg);
-      border: 2.5px solid var(--tan);
-      border-bottom: none;
-      border-radius: 8px 8px 0 0;
+      gap: 16px;
     }
 
     .category {
@@ -183,18 +172,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 8px;
       flex-wrap: wrap;
       font-family: 'Verdana', sans-serif;
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 700;
       margin: 4px 0;
     }
     .sequence span { padding: 4px 2px; }
     .sequence .arrow { 
-      color: var(--tan); 
-      font-size: 18px;
-      font-family: sans-serif;
+      color: var(--tan-dark); 
+      font-size: 16px;
     }
     .sequence .blank {
       background: var(--bg);
@@ -225,7 +213,7 @@
     }
     .matrix-cell.blank {
       border-style: dashed;
-      font-size: 22px;
+      font-size: 20px;
       color: var(--tan-dark);
     }
 
@@ -348,48 +336,16 @@
       transition: opacity 0.3s;
     }
     .streak-popup.show { opacity: 1; }
-    .streak-popup .fire { font-size: 72px; animation: dance 0.3s infinite alternate; }
-    @keyframes dance { from{transform:scale(1) rotate(-5deg)} to{transform:scale(1.1) rotate(5deg)} }
     .streak-popup .num {
       font-family: 'Verdana', sans-serif;
-      font-size: 64px;
+      font-size: 72px;
       font-weight: 700;
       color: #fff;
       text-shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
     .streak-popup .txt {
       font-family: 'Patrick Hand', cursive;
-      font-size: 24px;
-      color: #fff;
-    }
-
-    /* Level Up Popup */
-    .levelup-popup {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,0.7);
-      z-index: 210;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-    }
-    .levelup-popup.show { opacity: 1; }
-    .levelup-popup .star { font-size: 64px; animation: spin 0.6s ease; }
-    @keyframes spin { from{transform:scale(0) rotate(-180deg)} to{transform:scale(1) rotate(0)} }
-    .levelup-popup .title {
-      font-family: 'Patrick Hand', cursive;
       font-size: 28px;
-      color: #FFD700;
-      margin-top: 8px;
-    }
-    .levelup-popup .lvl {
-      font-family: 'Verdana', sans-serif;
-      font-size: 56px;
-      font-weight: 700;
       color: #fff;
     }
 
@@ -442,7 +398,6 @@
       text-align: center;
       border: 3px solid var(--tan);
     }
-    .modal-emoji { font-size: 56px; margin-bottom: 12px; }
     .modal-title { 
       font-family: 'Patrick Hand', cursive; 
       font-size: 26px; 
@@ -492,13 +447,12 @@
 <div class="top-bar">
   <div class="stats-row">
     <div class="stat-pill">
-      <span class="icon">🧠</span>
       <span class="val" id="iq-val">--</span>
       <span class="lbl">IQ</span>
     </div>
     <div class="stat-pill" id="streak-pill" style="display:none;">
-      <span class="icon">🔥</span>
       <span class="val" id="streak-val">0</span>
+      <span class="lbl">streak</span>
     </div>
   </div>
   <div class="xp-wrap">
@@ -525,15 +479,8 @@
 </nav>
 
 <div class="streak-popup" id="streak-popup">
-  <div class="fire">🔥</div>
   <div class="num" id="streak-num">5</div>
   <div class="txt">Streak!</div>
-</div>
-
-<div class="levelup-popup" id="levelup-popup">
-  <div class="star">⭐</div>
-  <div class="title">Level Up!</div>
-  <div class="lvl" id="new-level">2</div>
 </div>
 
 <div class="flash" id="flash"></div>
@@ -541,12 +488,11 @@
 
 <div class="modal" id="onboard">
   <div class="modal-box">
-    <div class="modal-emoji">🧠</div>
     <div class="modal-title">Welcome to IQ Profile</div>
     <div class="modal-text">Train your brain with personalized challenges.<br>First, how old are you?</div>
     <div class="age-num" id="age-display">25</div>
     <input type="range" class="age-slider" id="age-slider" min="8" max="80" value="25">
-    <button class="btn" onclick="startApp()">Let's Go!</button>
+    <button class="btn" onclick="startApp()">Let's Go</button>
   </div>
 </div>
 
@@ -559,8 +505,6 @@ const streakVal = document.getElementById('streak-val');
 const streakPill = document.getElementById('streak-pill');
 const streakPopup = document.getElementById('streak-popup');
 const streakNum = document.getElementById('streak-num');
-const levelupPopup = document.getElementById('levelup-popup');
-const newLevelEl = document.getElementById('new-level');
 const onboard = document.getElementById('onboard');
 const ageSlider = document.getElementById('age-slider');
 const ageDisplay = document.getElementById('age-display');
@@ -624,10 +568,10 @@ function render(q, idx) {
   if (q.visual === 'sequence' || q.visual === 'letterSequence') {
     const parts = q.sequence.map((n, i) => {
       if (n === '?') return `<span class="blank">?</span>`;
-      const arrow = i < q.sequence.length - 1 ? `<span class="arrow">→</span>` : '';
+      const arrow = i < q.sequence.length - 1 ? `<span class="arrow">-</span>` : '';
       return `<span>${n}</span>${arrow}`;
     });
-    if (q.sequence[0] !== '?') parts.push(`<span class="arrow">→</span><span class="blank">?</span>`);
+    if (q.sequence[0] !== '?') parts.push(`<span class="arrow">-</span><span class="blank">?</span>`);
     visual = `<div class="sequence">${parts.join('')}</div>`;
   } else if (q.visual === 'matrix') {
     visual = `<div class="matrix">${q.grid.map(c => 
@@ -636,7 +580,7 @@ function render(q, idx) {
   }
   
   const wide = q.options.some(o => String(o).length > 18);
-  const esc = s => String(s).replace(/"/g, '&quot;');
+  const esc = s => String(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   
   return `
     <div class="card">
@@ -669,7 +613,6 @@ document.addEventListener('click', e => {
   const isCorrect = val === correct;
   const ms = Date.now() - answerStart;
   
-  // Update buttons
   opts.querySelectorAll('.opt').forEach(o => {
     if (o.dataset.v === correct) {
       o.classList.add(isCorrect ? 'correct' : 'show-correct');
@@ -680,15 +623,12 @@ document.addEventListener('click', e => {
     }
   });
   
-  // Record
   const result = IQData.recordAnswer(opts.dataset.cat, isCorrect, parseFloat(opts.dataset.diff), ms);
   
-  // Feedback
   const fb = document.getElementById(`fb-${idx}`);
   fb.textContent = getEncouragement(result.streak, isCorrect);
   fb.className = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
   
-  // Effects
   if (isCorrect) {
     flash.className = 'flash green show';
     spawnConfetti(8);
@@ -697,17 +637,6 @@ document.addEventListener('click', e => {
   }
   setTimeout(() => flash.className = 'flash', 300);
   
-  // Level up
-  if (result.leveledUp) {
-    setTimeout(() => {
-      newLevelEl.textContent = result.level;
-      levelupPopup.classList.add('show');
-      spawnConfetti(30);
-      setTimeout(() => levelupPopup.classList.remove('show'), 2000);
-    }, 400);
-  }
-  
-  // Streak milestone (only show popup, not duplicate in top bar)
   if (isCorrect && result.streak > 0 && result.streak % 5 === 0) {
     setTimeout(() => {
       streakNum.textContent = result.streak;
@@ -719,10 +648,7 @@ document.addEventListener('click', e => {
   
   updateUI(result);
   
-  // Show explanation
   setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'), 250);
-  
-  // Show scroll hint
   setTimeout(() => document.getElementById(`hint-${idx}`)?.classList.add('show'), 400);
   
   answerStart = Date.now();
@@ -744,10 +670,8 @@ function spawnConfetti(n) {
 }
 
 function updateUI(d) {
-  // IQ
   iqVal.textContent = d.iq || '--';
   
-  // Streak - only show pill if streak > 0
   if (d.streak > 0) {
     streakPill.style.display = 'flex';
     streakVal.textContent = d.streak;
@@ -755,7 +679,6 @@ function updateUI(d) {
     streakPill.style.display = 'none';
   }
   
-  // XP
   const xpInLevel = d.xp % 150;
   xpBar.style.width = (xpInLevel / 150 * 100) + '%';
   levelLabel.textContent = 'Lvl ' + d.level;
