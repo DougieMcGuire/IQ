@@ -25,7 +25,6 @@
     }
     body { display: flex; flex-direction: column; }
 
-    /* Navigation */
     nav {
       position: fixed; bottom: 0; left: 0; right: 0;
       height: 70px;
@@ -56,7 +55,6 @@
       padding: 20px 16px 85px;
     }
 
-    /* Header with Share */
     .header {
       display: flex;
       justify-content: flex-end;
@@ -77,8 +75,9 @@
     }
     .share-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
 
-    /* Profile Section - Centered */
-    .profile-section {
+    /* Profile hero area - avatar/IQ centered, stats on side */
+    .profile-hero {
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -137,42 +136,52 @@
       font-size: 14px;
       padding: 5px 16px;
       border-radius: 14px;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
 
-    /* Stats Row - Horizontal, matching screenshot */
-    .stats-row {
+    /* Side stats - vertical column on the right */
+    .side-stats {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
       display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .side-stat {
       background: var(--card);
       border: 2px solid var(--tan);
-      border-radius: 16px;
-      overflow: hidden;
-      width: 100%;
-      max-width: 340px;
-    }
-    .stat-item {
-      flex: 1;
+      border-radius: 14px;
+      padding: 10px 14px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 14px 8px;
+      min-width: 80px;
     }
-    .stat-item:not(:last-child) {
-      border-right: 2px solid var(--tan);
-    }
-    .stat-val {
+    .side-stat .s-val {
       font-family: 'Verdana', sans-serif;
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 700;
+      line-height: 1.2;
     }
-    .stat-lbl {
+    .side-stat .s-lbl {
       font-family: 'Patrick Hand', cursive;
-      font-size: 12px;
+      font-size: 11px;
       color: var(--ink-light);
       margin-top: 2px;
     }
+    .side-stat .s-icon {
+      width: 14px; height: 14px;
+      margin-bottom: 2px;
+    }
+    .side-stat .s-icon svg {
+      width: 100%; height: 100%;
+      stroke: var(--ink-light); fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
 
-    /* Abilities Section */
+    /* Abilities */
     .section-title {
       font-family: 'Patrick Hand', cursive;
       font-size: 14px;
@@ -235,8 +244,7 @@
 
     .reset-btn {
       margin-top: 28px;
-      background: none;
-      border: none;
+      background: none; border: none;
       font-family: 'Patrick Hand', cursive;
       font-size: 13px;
       color: var(--ink-light);
@@ -247,38 +255,28 @@
       text-align: center;
     }
 
-    /* Share Modal */
     .modal {
       position: fixed; inset: 0;
       background: rgba(0,0,0,0.6);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 200;
-      padding: 16px;
+      display: none; align-items: center; justify-content: center;
+      z-index: 200; padding: 16px;
     }
     .modal.show { display: flex; }
     .modal-box {
       background: var(--bg);
       border-radius: 20px;
       border: 3px solid var(--tan);
-      padding: 20px;
-      width: 100%;
-      max-width: 340px;
+      padding: 20px; width: 100%; max-width: 340px;
       position: relative;
     }
     .modal-close {
-      position: absolute;
-      top: 12px; right: 12px;
-      background: none; border: none;
-      cursor: pointer; opacity: 0.5;
+      position: absolute; top: 12px; right: 12px;
+      background: none; border: none; cursor: pointer; opacity: 0.5;
     }
     .modal-close svg { width: 18px; height: 18px; stroke: var(--ink); stroke-width: 2; }
     .modal-title {
       font-family: 'Patrick Hand', cursive;
-      font-size: 18px;
-      text-align: center;
-      margin-bottom: 14px;
+      font-size: 18px; text-align: center; margin-bottom: 14px;
     }
     .share-preview {
       background: var(--card);
@@ -297,28 +295,18 @@
       font-family: 'Patrick Hand', cursive;
       font-size: 14px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
     }
     .share-btns button svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
     .share-btns button.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
 
     .toast {
-      position: fixed;
-      bottom: 90px;
-      left: 50%;
+      position: fixed; bottom: 90px; left: 50%;
       transform: translateX(-50%);
-      background: var(--ink);
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 20px;
-      font-family: 'Patrick Hand', cursive;
-      font-size: 14px;
-      opacity: 0;
-      transition: opacity 0.3s;
-      z-index: 300;
+      background: var(--ink); color: #fff;
+      padding: 10px 20px; border-radius: 20px;
+      font-family: 'Patrick Hand', cursive; font-size: 14px;
+      opacity: 0; transition: opacity 0.3s; z-index: 300;
     }
     .toast.show { opacity: 1; }
   </style>
@@ -333,7 +321,8 @@
     </button>
   </div>
 
-  <div class="profile-section">
+  <div class="profile-hero">
+    <!-- Centered content -->
     <div class="avatar-wrap">
       <div class="avatar" onclick="document.getElementById('avatar-input').click()">
         <img id="avatar-img" src="" alt="">
@@ -349,18 +338,22 @@
     <div class="iq-label">I Q</div>
     <div class="pct-badge" id="pct-badge" style="display:none;"></div>
 
-    <div class="stats-row">
-      <div class="stat-item">
-        <div class="stat-val" id="answered">0</div>
-        <div class="stat-lbl">Answered</div>
+    <!-- Side stats - vertical, right side -->
+    <div class="side-stats">
+      <div class="side-stat">
+        <div class="s-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+        <div class="s-val" id="answered">0</div>
+        <div class="s-lbl">Answered</div>
       </div>
-      <div class="stat-item">
-        <div class="stat-val" id="accuracy">0%</div>
-        <div class="stat-lbl">Accuracy</div>
+      <div class="side-stat">
+        <div class="s-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <div class="s-val" id="accuracy">0%</div>
+        <div class="s-lbl">Accuracy</div>
       </div>
-      <div class="stat-item">
-        <div class="stat-val" id="best-streak">0</div>
-        <div class="stat-lbl">Best</div>
+      <div class="side-stat">
+        <div class="s-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <div class="s-val" id="best-streak">0</div>
+        <div class="s-lbl">Best</div>
       </div>
     </div>
   </div>
@@ -501,7 +494,6 @@ function genShareImg() {
   
   ctx.fillStyle = '#F2EBD9';
   ctx.fillRect(0, 0, W, H);
-  
   roundRect(ctx, 20, 20, W-40, H-40, 24, '#EDE5CF', '#C4AD8A', 3);
   
   const draw = () => {
@@ -556,10 +548,8 @@ function genShareImg() {
       ctx.font = '600 10px Patrick Hand';
       ctx.fillStyle = '#6B5740';
       ctx.fillText(b.n, 50, y);
-      
       roundRect(ctx, 50, y+5, W-100, 20, 4, '#C4AD8A', null);
       roundRect(ctx, 50, y+5, Math.max(30, (v/100)*(W-100)), 20, 4, b.c, null);
-      
       ctx.font = '700 10px Verdana';
       ctx.fillStyle = '#fff';
       ctx.fillText(v, 58, y+19);
