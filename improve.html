@@ -5,20 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>IQ Profile</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #F2EBD9;
       --card: #EDE5CF;
       --tan: #C4AD8A;
-      --tan-dark: #A08C6E;
+      --tan-dark: #A89872;
       --ink: #2A2018;
       --ink-light: #6B5740;
-      --bar-bg: #D5C8AD;
       --green: #5EB85E;
       --red: #D64545;
-      --gold: #FFD700;
-      --purple: #A855F7;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { 
@@ -30,11 +27,72 @@
     }
     body { display: flex; flex-direction: column; }
 
+    /* Top Stats */
+    .top-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      padding: 12px 16px 8px;
+      z-index: 50;
+      background: var(--bg);
+    }
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .stat-pill {
+      background: var(--card);
+      border: 2px solid var(--tan);
+      border-radius: 20px;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Patrick Hand', cursive;
+    }
+    .stat-pill .icon { font-size: 16px; }
+    .stat-pill .val {
+      font-family: 'Verdana', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .stat-pill .lbl {
+      font-size: 12px;
+      color: var(--ink-light);
+    }
+    
+    /* XP Bar */
+    .xp-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .xp-bar-outer {
+      flex: 1;
+      height: 10px;
+      background: var(--tan-dark);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .xp-bar-inner {
+      height: 100%;
+      background: var(--green);
+      border-radius: 5px;
+      transition: width 0.4s ease;
+    }
+    .xp-label {
+      font-family: 'Patrick Hand', cursive;
+      font-size: 12px;
+      color: var(--ink-light);
+      white-space: nowrap;
+    }
+
     /* Navigation */
     nav {
       position: fixed; bottom: 0; left: 0; right: 0;
       height: 70px;
-      background: #E4D9BF;
+      background: var(--card);
       border-top: 2px solid var(--tan);
       display: flex; justify-content: center; align-items: center; gap: 8px;
       z-index: 100;
@@ -46,18 +104,19 @@
       display: flex; flex-direction: column; align-items: center; gap: 4px;
       color: var(--ink-light);
       font-family: 'Patrick Hand', cursive;
-      font-size: 12px;
+      font-size: 13px;
       text-decoration: none;
       border-radius: 14px;
+      transition: all 0.2s;
     }
     .nav-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; }
-    .nav-btn.active { color: var(--ink); background: var(--card); }
+    .nav-btn.active { color: var(--ink); background: rgba(196,173,138,0.3); }
     .nav-divider { width: 2px; height: 30px; background: var(--tan); }
 
-    /* Main feed */
+    /* Feed */
     main {
       flex: 1;
-      padding-bottom: 70px;
+      padding: 90px 0 70px;
       overflow-y: auto;
       scroll-snap-type: y mandatory;
       -webkit-overflow-scrolling: touch;
@@ -65,159 +124,96 @@
     main::-webkit-scrollbar { display: none; }
 
     .slide {
-      min-height: 100%; height: 100%;
+      min-height: 100%;
       scroll-snap-align: start;
       scroll-snap-stop: always;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 16px;
-    }
-
-    /* Stats bar */
-    .stats-bar {
-      position: fixed;
-      top: 12px; left: 12px; right: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 50;
-    }
-    .stat-box {
-      background: var(--card);
-      border: 2px solid var(--tan);
-      border-radius: 16px;
-      padding: 8px 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .stat-box.bump { animation: bump 0.3s ease; }
-    @keyframes bump { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
-    .stat-icon { font-size: 18px; }
-    .stat-val {
-      font-family: 'Verdana', sans-serif;
-      font-size: 18px;
-      font-weight: 700;
-    }
-    .stat-val.up { color: var(--green); animation: valUp 0.5s ease; }
-    @keyframes valUp { 0%{transform:scale(1)} 50%{transform:scale(1.3)} 100%{transform:scale(1)} }
-    .stat-label {
-      font-family: 'Patrick Hand', cursive;
-      font-size: 10px;
-      color: var(--ink-light);
-    }
-
-    /* Level/XP bar */
-    .xp-bar-wrap {
-      position: fixed;
-      top: 60px; left: 12px; right: 12px;
-      z-index: 50;
-    }
-    .xp-bar-bg {
-      background: var(--bar-bg);
-      border-radius: 6px;
-      height: 8px;
-      overflow: hidden;
-      border: 1px solid var(--tan);
-    }
-    .xp-bar {
-      height: 100%;
-      background: linear-gradient(90deg, var(--purple), #C084FC);
-      border-radius: 6px;
-      transition: width 0.5s ease;
-    }
-    .xp-label {
-      display: flex;
-      justify-content: space-between;
-      font-family: 'Patrick Hand', cursive;
-      font-size: 10px;
-      color: var(--ink-light);
-      margin-top: 2px;
+      padding: 20px 16px;
     }
 
     /* Card */
     .card {
       background: var(--card);
-      border: 2px solid var(--tan);
+      border: 2.5px solid var(--tan);
       border-radius: 24px;
       width: 100%;
-      max-width: 360px;
+      max-width: 340px;
       padding: 24px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
-      box-shadow: 0 6px 30px rgba(0,0,0,0.08);
-      transition: transform 0.3s, box-shadow 0.3s;
-      margin-top: 40px;
+      gap: 18px;
+      position: relative;
     }
-    .card.pop { animation: cardPop 0.4s ease; }
-    @keyframes cardPop {
-      0% { transform: scale(1); box-shadow: 0 6px 30px rgba(0,0,0,0.08); }
-      50% { transform: scale(1.03); box-shadow: 0 0 40px rgba(94,184,94,0.5); }
-      100% { transform: scale(1); box-shadow: 0 6px 30px rgba(0,0,0,0.08); }
-    }
-    .card.shake { animation: cardShake 0.4s ease; }
-    @keyframes cardShake {
-      0%,100% { transform: translateX(0); }
-      20% { transform: translateX(-8px); }
-      40% { transform: translateX(8px); }
-      60% { transform: translateX(-5px); }
-      80% { transform: translateX(5px); }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: -8px; left: 20px;
+      width: 40px; height: 16px;
+      background: var(--bg);
+      border: 2.5px solid var(--tan);
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
     }
 
     .category {
       font-family: 'Patrick Hand', cursive;
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
+      font-size: 13px;
+      letter-spacing: 1px;
+      color: var(--ink-light);
+      background: rgba(196,173,138,0.2);
       padding: 4px 14px;
-      border-radius: 20px;
+      border-radius: 12px;
       border: 1.5px solid var(--tan);
-      color: var(--tan-dark);
-      background: rgba(196,173,138,0.15);
     }
 
     .question {
       font-size: 17px;
       font-weight: 700;
       text-align: center;
-      line-height: 1.45;
+      line-height: 1.5;
+      padding: 0 4px;
     }
 
-    /* Sequence visual */
+    /* Sequence */
     .sequence {
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
       font-family: 'Verdana', sans-serif;
       font-size: 26px;
       font-weight: 700;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin: 8px 0;
+      margin: 4px 0;
     }
-    .sequence .dot { color: var(--tan); opacity: 0.5; font-size: 16px; }
+    .sequence span { padding: 4px 2px; }
+    .sequence .arrow { 
+      color: var(--tan); 
+      font-size: 18px;
+      font-family: sans-serif;
+    }
     .sequence .blank {
-      background: var(--bar-bg);
-      padding: 8px 16px;
-      border-radius: 10px;
+      background: var(--bg);
       border: 2px dashed var(--tan);
+      border-radius: 8px;
+      padding: 6px 14px;
       color: var(--tan-dark);
     }
 
-    /* Matrix visual */
+    /* Matrix */
     .matrix {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 6px;
-      width: 160px;
+      width: 150px;
     }
     .matrix-cell {
       aspect-ratio: 1;
-      background: var(--bar-bg);
+      background: var(--bg);
       border-radius: 10px;
       border: 2px solid var(--tan);
       display: flex;
@@ -228,20 +224,9 @@
       font-weight: 700;
     }
     .matrix-cell.blank {
-      background: rgba(196,173,138,0.2);
       border-style: dashed;
       font-size: 22px;
       color: var(--tan-dark);
-    }
-
-    /* Spatial visual */
-    .visual-box {
-      font-size: 56px;
-      margin: 10px 0;
-      padding: 16px 32px;
-      background: var(--bar-bg);
-      border-radius: 16px;
-      border: 2px solid var(--tan);
     }
 
     /* Options */
@@ -251,13 +236,13 @@
       gap: 10px;
       width: 100%;
     }
-    .options.single { grid-template-columns: 1fr; }
+    .options.wide { grid-template-columns: 1fr; }
 
     .opt {
       background: var(--bg);
       border: 2.5px solid var(--tan);
       border-radius: 14px;
-      padding: 14px 10px;
+      padding: 14px 12px;
       font-family: 'Nunito', sans-serif;
       font-size: 15px;
       font-weight: 700;
@@ -268,75 +253,68 @@
     }
     .opt:active { transform: scale(0.97); }
     .opt.correct { 
-      background: var(--green) !important;
-      border-color: #4a9a4a !important;
-      color: #fff !important;
-      animation: correctBounce 0.5s ease;
-    }
-    @keyframes correctBounce {
-      0% { transform: scale(1); }
-      30% { transform: scale(1.1); }
-      100% { transform: scale(1); }
+      background: var(--green);
+      border-color: #4a9a4a;
+      color: #fff;
+      animation: pop 0.4s ease;
     }
     .opt.wrong { 
-      background: var(--red) !important;
-      border-color: #b33 !important;
-      color: #fff !important;
-      animation: wrongShake 0.5s ease;
+      background: var(--red);
+      border-color: #b33;
+      color: #fff;
+      animation: shake 0.4s ease;
     }
-    @keyframes wrongShake {
-      0%,100% { transform: translateX(0); }
-      20% { transform: translateX(-8px); }
-      40% { transform: translateX(8px); }
-      60% { transform: translateX(-5px); }
-      80% { transform: translateX(5px); }
+    .opt.dim { opacity: 0.3; }
+    .opt.show-correct { 
+      background: var(--green);
+      border-color: #4a9a4a;
+      color: #fff;
+      opacity: 1;
     }
-    .opt.dim { opacity: 0.35; pointer-events: none; }
-    .opt.reveal { 
-      background: var(--green) !important;
-      border-color: #4a9a4a !important;
-      color: #fff !important;
-      opacity: 1 !important;
+    
+    @keyframes pop {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
     }
-
-    /* Explanation */
-    .explain {
-      background: rgba(0,0,0,0.05);
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 13px;
-      color: var(--ink-light);
-      text-align: center;
-      line-height: 1.4;
-      display: none;
-      width: 100%;
-    }
-    .explain.show { display: block; animation: fadeSlide 0.3s ease; }
-    @keyframes fadeSlide {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
     }
 
-    /* Feedback text */
+    /* Feedback */
     .feedback {
       font-family: 'Patrick Hand', cursive;
-      font-size: 20px;
-      font-weight: 600;
-      min-height: 28px;
-      display: none;
+      font-size: 18px;
+      min-height: 24px;
+      opacity: 0;
+      transition: opacity 0.3s;
     }
-    .feedback.show { display: block; animation: feedbackPop 0.4s ease; }
-    @keyframes feedbackPop {
-      0% { opacity: 0; transform: scale(0.5); }
-      50% { transform: scale(1.1); }
-      100% { opacity: 1; transform: scale(1); }
-    }
+    .feedback.show { opacity: 1; }
     .feedback.correct { color: var(--green); }
     .feedback.wrong { color: var(--red); }
 
+    /* Explanation */
+    .explain {
+      background: rgba(0,0,0,0.04);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 13px;
+      color: var(--ink-light);
+      line-height: 1.5;
+      text-align: center;
+      display: none;
+      width: 100%;
+    }
+    .explain.show { display: block; animation: slideUp 0.3s ease; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     /* Scroll hint */
     .scroll-hint {
-      margin-top: 16px;
+      margin-top: 20px;
       font-family: 'Patrick Hand', cursive;
       font-size: 14px;
       color: var(--ink-light);
@@ -347,11 +325,15 @@
       gap: 4px;
       transition: opacity 0.3s;
     }
-    .scroll-hint.show { opacity: 0.6; }
-    .scroll-hint svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; animation: bounce 1.5s infinite; }
-    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+    .scroll-hint.show { opacity: 0.5; }
+    .scroll-hint svg { 
+      width: 20px; height: 20px; 
+      stroke: currentColor; fill: none; stroke-width: 2; 
+      animation: bounce 1.5s infinite;
+    }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
 
-    /* Streak popup */
+    /* Streak Popup */
     .streak-popup {
       position: fixed;
       inset: 0;
@@ -366,26 +348,22 @@
       transition: opacity 0.3s;
     }
     .streak-popup.show { opacity: 1; }
-    .streak-popup .flame { font-size: 90px; animation: flameDance 0.3s infinite; }
-    @keyframes flameDance { 
-      0%,100% { transform: scale(1) rotate(-5deg); }
-      50% { transform: scale(1.2) rotate(5deg); }
-    }
+    .streak-popup .fire { font-size: 72px; animation: dance 0.3s infinite alternate; }
+    @keyframes dance { from{transform:scale(1) rotate(-5deg)} to{transform:scale(1.1) rotate(5deg)} }
     .streak-popup .num {
       font-family: 'Verdana', sans-serif;
-      font-size: 72px;
+      font-size: 64px;
       font-weight: 700;
       color: #fff;
-      text-shadow: 0 4px 30px rgba(0,0,0,0.5);
+      text-shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
     .streak-popup .txt {
       font-family: 'Patrick Hand', cursive;
-      font-size: 28px;
+      font-size: 24px;
       color: #fff;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
     }
 
-    /* Level up popup */
+    /* Level Up Popup */
     .levelup-popup {
       position: fixed;
       inset: 0;
@@ -400,37 +378,32 @@
       transition: opacity 0.3s;
     }
     .levelup-popup.show { opacity: 1; }
-    .levelup-popup .icon { font-size: 80px; animation: levelSpin 0.6s ease; }
-    @keyframes levelSpin {
-      0% { transform: scale(0) rotate(-180deg); }
-      100% { transform: scale(1) rotate(0deg); }
-    }
+    .levelup-popup .star { font-size: 64px; animation: spin 0.6s ease; }
+    @keyframes spin { from{transform:scale(0) rotate(-180deg)} to{transform:scale(1) rotate(0)} }
     .levelup-popup .title {
       font-family: 'Patrick Hand', cursive;
-      font-size: 36px;
-      color: var(--gold);
-      text-shadow: 0 2px 20px rgba(255,215,0,0.5);
-      margin-top: 10px;
+      font-size: 28px;
+      color: #FFD700;
+      margin-top: 8px;
     }
-    .levelup-popup .level {
+    .levelup-popup .lvl {
       font-family: 'Verdana', sans-serif;
-      font-size: 64px;
+      font-size: 56px;
       font-weight: 700;
       color: #fff;
-      text-shadow: 0 4px 30px rgba(0,0,0,0.5);
     }
 
     /* Effects */
-    .flash { 
+    .flash {
       position: fixed; inset: 0;
-      background: radial-gradient(circle, rgba(94,184,94,0.4) 0%, transparent 70%);
       pointer-events: none;
       opacity: 0;
       z-index: 150;
     }
-    .flash.show { animation: flashAnim 0.35s ease; }
-    .flash.red { background: radial-gradient(circle, rgba(214,69,69,0.3) 0%, transparent 70%); }
-    @keyframes flashAnim { 0%{opacity:1} 100%{opacity:0} }
+    .flash.green { background: radial-gradient(circle, rgba(94,184,94,0.3) 0%, transparent 70%); }
+    .flash.red { background: radial-gradient(circle, rgba(214,69,69,0.25) 0%, transparent 70%); }
+    .flash.show { animation: flash 0.3s ease; }
+    @keyframes flash { 0%{opacity:1} 100%{opacity:0} }
 
     .confetti {
       position: fixed; inset: 0;
@@ -438,68 +411,21 @@
       z-index: 160;
       overflow: hidden;
     }
-    .confetti-piece {
+    .confetti i {
       position: absolute;
-      width: 12px; height: 12px;
+      width: 10px; height: 10px;
       opacity: 0;
     }
-    .confetti-piece.fall { animation: confettiFall 1.3s ease-out forwards; }
+    .confetti i.fall { animation: confettiFall 1.2s ease-out forwards; }
     @keyframes confettiFall {
-      0% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
-      100% { opacity: 0; transform: translateY(100vh) rotate(720deg) scale(0.5); }
+      0% { opacity: 1; transform: translateY(0) rotate(0); }
+      100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
     }
 
-    .xp-float {
-      position: fixed;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-family: 'Verdana', sans-serif;
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--purple);
-      text-shadow: 0 2px 15px rgba(168,85,247,0.4);
-      opacity: 0;
-      pointer-events: none;
-      z-index: 170;
-    }
-    .xp-float.show { animation: xpFloat 1.2s ease-out forwards; }
-    .xp-float.iq { color: var(--green); text-shadow: 0 2px 15px rgba(94,184,94,0.4); }
-    @keyframes xpFloat {
-      0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
-      20% { transform: translate(-50%, -70%) scale(1.2); }
-      100% { opacity: 0; transform: translate(-50%, -120%) scale(1); }
-    }
-
-    /* Combo indicator */
-    .combo {
-      position: fixed;
-      top: 85px;
-      right: 12px;
-      background: linear-gradient(135deg, #FF6B6B, #FFE66D);
-      color: #fff;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-family: 'Verdana', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-      opacity: 0;
-      transform: scale(0);
-      transition: all 0.3s ease;
-      z-index: 55;
-      box-shadow: 0 2px 10px rgba(255,107,107,0.4);
-    }
-    .combo.show { opacity: 1; transform: scale(1); }
-    .combo.big { animation: comboPulse 0.5s ease infinite; }
-    @keyframes comboPulse {
-      0%,100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-
-    /* Modal */
+    /* Onboarding Modal */
     .modal {
       position: fixed; inset: 0;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.6);
       display: none;
       align-items: center;
       justify-content: center;
@@ -509,74 +435,80 @@
     .modal.show { display: flex; }
     .modal-box {
       background: var(--bg);
-      border-radius: 28px;
-      padding: 36px 28px;
+      border-radius: 24px;
+      padding: 32px 24px;
       width: 100%;
-      max-width: 340px;
+      max-width: 320px;
       text-align: center;
+      border: 3px solid var(--tan);
     }
-    .modal-emoji { font-size: 64px; margin-bottom: 16px; }
-    .modal-title { font-family: 'Patrick Hand', cursive; font-size: 30px; margin-bottom: 12px; }
-    .modal-text { font-size: 15px; color: var(--ink-light); line-height: 1.5; margin-bottom: 24px; }
-    .age-num { font-family: 'Verdana', sans-serif; font-size: 56px; font-weight: 700; margin: 20px 0; }
+    .modal-emoji { font-size: 56px; margin-bottom: 12px; }
+    .modal-title { 
+      font-family: 'Patrick Hand', cursive; 
+      font-size: 26px; 
+      margin-bottom: 8px; 
+    }
+    .modal-text { 
+      font-size: 14px; 
+      color: var(--ink-light); 
+      line-height: 1.5; 
+      margin-bottom: 20px; 
+    }
+    .age-num { 
+      font-family: 'Verdana', sans-serif; 
+      font-size: 48px; 
+      font-weight: 700; 
+      margin: 16px 0; 
+    }
     .age-slider {
-      width: 100%; height: 12px;
+      width: 100%;
+      height: 10px;
       -webkit-appearance: none;
-      background: var(--bar-bg);
-      border-radius: 6px;
-      outline: none;
-      margin-bottom: 28px;
+      background: var(--tan-dark);
+      border-radius: 5px;
+      margin-bottom: 24px;
     }
     .age-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 32px; height: 32px;
+      width: 28px; height: 28px;
       background: var(--ink);
       border-radius: 50%;
       cursor: pointer;
-      border: 3px solid var(--card);
     }
     .btn {
       background: var(--ink);
       color: #fff;
       border: none;
-      border-radius: 30px;
-      padding: 16px 52px;
+      border-radius: 24px;
+      padding: 14px 40px;
       font-family: 'Patrick Hand', cursive;
-      font-size: 22px;
+      font-size: 20px;
       cursor: pointer;
-      transition: transform 0.2s;
     }
-    .btn:active { transform: scale(0.96); }
   </style>
 </head>
 <body>
 
-<div class="stats-bar">
-  <div class="stat-box" id="iq-box">
-    <span class="stat-icon">🧠</span>
-    <div>
-      <div class="stat-val" id="iq-val">--</div>
-      <div class="stat-label">IQ</div>
+<div class="top-bar">
+  <div class="stats-row">
+    <div class="stat-pill">
+      <span class="icon">🧠</span>
+      <span class="val" id="iq-val">--</span>
+      <span class="lbl">IQ</span>
+    </div>
+    <div class="stat-pill" id="streak-pill" style="display:none;">
+      <span class="icon">🔥</span>
+      <span class="val" id="streak-val">0</span>
     </div>
   </div>
-  <div class="stat-box" id="streak-box">
-    <span class="stat-icon">🔥</span>
-    <div>
-      <div class="stat-val" id="streak-val">0</div>
-      <div class="stat-label">Streak</div>
+  <div class="xp-wrap">
+    <span class="xp-label" id="level-label">Lvl 1</span>
+    <div class="xp-bar-outer">
+      <div class="xp-bar-inner" id="xp-bar" style="width:0%"></div>
     </div>
+    <span class="xp-label" id="xp-label">0/150</span>
   </div>
 </div>
-
-<div class="xp-bar-wrap">
-  <div class="xp-bar-bg"><div class="xp-bar" id="xp-bar"></div></div>
-  <div class="xp-label">
-    <span id="level-label">Level 1</span>
-    <span id="xp-label">0/100 XP</span>
-  </div>
-</div>
-
-<div class="combo" id="combo">🔥 x3</div>
 
 <main id="feed"></main>
 
@@ -593,22 +525,21 @@
 </nav>
 
 <div class="streak-popup" id="streak-popup">
-  <div class="flame">🔥</div>
+  <div class="fire">🔥</div>
   <div class="num" id="streak-num">5</div>
-  <div class="txt">STREAK!</div>
+  <div class="txt">Streak!</div>
 </div>
 
 <div class="levelup-popup" id="levelup-popup">
-  <div class="icon">⭐</div>
-  <div class="title">LEVEL UP!</div>
-  <div class="level" id="new-level">2</div>
+  <div class="star">⭐</div>
+  <div class="title">Level Up!</div>
+  <div class="lvl" id="new-level">2</div>
 </div>
 
 <div class="flash" id="flash"></div>
 <div class="confetti" id="confetti"></div>
-<div class="xp-float" id="xp-float">+10 XP</div>
 
-<div class="modal" id="onboard-modal">
+<div class="modal" id="onboard">
   <div class="modal-box">
     <div class="modal-emoji">🧠</div>
     <div class="modal-title">Welcome to IQ Profile</div>
@@ -624,118 +555,99 @@
 <script>
 const feed = document.getElementById('feed');
 const iqVal = document.getElementById('iq-val');
-const iqBox = document.getElementById('iq-box');
 const streakVal = document.getElementById('streak-val');
-const streakBox = document.getElementById('streak-box');
+const streakPill = document.getElementById('streak-pill');
 const streakPopup = document.getElementById('streak-popup');
 const streakNum = document.getElementById('streak-num');
 const levelupPopup = document.getElementById('levelup-popup');
 const newLevelEl = document.getElementById('new-level');
-const onboardModal = document.getElementById('onboard-modal');
+const onboard = document.getElementById('onboard');
 const ageSlider = document.getElementById('age-slider');
 const ageDisplay = document.getElementById('age-display');
 const flash = document.getElementById('flash');
 const confetti = document.getElementById('confetti');
-const xpFloat = document.getElementById('xp-float');
 const xpBar = document.getElementById('xp-bar');
 const levelLabel = document.getElementById('level-label');
 const xpLabel = document.getElementById('xp-label');
-const comboEl = document.getElementById('combo');
 
-let totalSlides = 0;
-let answerTime = 0;
-let lastIQ = null;
-let lastLevel = 1;
+let slides = 0;
+let answerStart = 0;
 
 function init() {
   if (IQData.needsOnboarding()) {
-    onboardModal.classList.add('show');
+    onboard.classList.add('show');
   } else {
-    loadQuestions();
+    load();
   }
   ageSlider.oninput = () => ageDisplay.textContent = ageSlider.value;
 }
 
 function startApp() {
   IQData.setAge(parseInt(ageSlider.value));
-  onboardModal.classList.remove('show');
-  QuestionGenerator.setAge(parseInt(ageSlider.value));
-  loadQuestions();
+  onboard.classList.remove('show');
+  Q.setAge(parseInt(ageSlider.value));
+  load();
 }
 
-function loadQuestions() {
-  const data = IQData.load();
-  QuestionGenerator.setAge(data.age);
-  lastIQ = data.iq;
-  lastLevel = data.level;
-  updateUI();
+function load() {
+  const d = IQData.load();
+  Q.setAge(d.age);
+  updateUI(d);
   
-  for (let i = 0; i < 5; i++) addSlide();
+  for (let i = 0; i < 4; i++) addSlide();
   
-  feed.addEventListener('scroll', checkAddMore, { passive: true });
-  feed.addEventListener('touchend', checkAddMore, { passive: true });
-  setInterval(checkAddMore, 300);
-  
-  feed.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    const dir = e.deltaY > 0 ? 1 : -1;
-    const h = feed.clientHeight;
-    const curr = Math.round(feed.scrollTop / h);
-    const next = Math.max(0, Math.min(totalSlides - 1, curr + dir));
-    feed.scrollTo({ top: next * h, behavior: 'smooth' });
-    setTimeout(checkAddMore, 100);
-  }, { passive: false });
+  feed.addEventListener('scroll', checkMore, { passive: true });
+  setInterval(checkMore, 500);
 }
 
-function checkAddMore() {
+function checkMore() {
   const h = feed.clientHeight;
-  if (h === 0) return;
-  const currentIdx = Math.round(feed.scrollTop / h);
-  while (totalSlides < currentIdx + 6) addSlide();
+  if (!h) return;
+  const idx = Math.round(feed.scrollTop / h);
+  while (slides < idx + 5) addSlide();
 }
 
 function addSlide() {
-  const q = QuestionGenerator.generate();
-  const idx = totalSlides++;
+  const q = Q.generate();
+  const idx = slides++;
   
   const div = document.createElement('div');
   div.className = 'slide';
-  div.innerHTML = renderQ(q, idx);
+  div.innerHTML = render(q, idx);
   feed.appendChild(div);
-  answerTime = Date.now();
+  answerStart = Date.now();
 }
 
-function renderQ(q, idx) {
+function render(q, idx) {
   let visual = '';
   
   if (q.visual === 'sequence' || q.visual === 'letterSequence') {
-    const items = q.sequence.map(n => n === '?' ? 
-      `<span class="blank">?</span>` : 
-      `<span>${n}</span><span class="dot">→</span>`
-    );
-    if (q.sequence[0] !== '?') items.push(`<span class="blank">?</span>`);
-    visual = `<div class="sequence">${items.join('')}</div>`;
+    const parts = q.sequence.map((n, i) => {
+      if (n === '?') return `<span class="blank">?</span>`;
+      const arrow = i < q.sequence.length - 1 ? `<span class="arrow">→</span>` : '';
+      return `<span>${n}</span>${arrow}`;
+    });
+    if (q.sequence[0] !== '?') parts.push(`<span class="arrow">→</span><span class="blank">?</span>`);
+    visual = `<div class="sequence">${parts.join('')}</div>`;
   } else if (q.visual === 'matrix') {
     visual = `<div class="matrix">${q.grid.map(c => 
       `<div class="matrix-cell${c === '?' ? ' blank' : ''}">${c}</div>`
     ).join('')}</div>`;
-  } else if (q.visual === 'spatial') {
-    visual = `<div class="visual-box">${q.startShape}</div>`;
   }
   
-  const long = q.options.some(o => String(o).length > 20);
-  const esc = s => String(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  const wide = q.options.some(o => String(o).length > 18);
+  const esc = s => String(s).replace(/"/g, '&quot;');
   
   return `
-    <div class="card" id="card-${idx}">
+    <div class="card">
       <div class="category">${q.categoryLabel}</div>
       <div class="question">${q.question}</div>
       ${visual}
-      <div class="options${long ? ' single' : ''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">
+      <div class="options${wide ? ' wide' : ''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">
         ${q.options.map(o => `<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}
       </div>
       <div class="feedback" id="fb-${idx}"></div>
-      <div class="explain" id="exp-${idx}">${q.explanation || ''}</div>
+      <div class="explain" id="exp-${idx}">${q.explanation}</div>
     </div>
     <div class="scroll-hint" id="hint-${idx}">
       <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
@@ -744,8 +656,7 @@ function renderQ(q, idx) {
   `;
 }
 
-// Handle answer clicks
-document.addEventListener('click', function(e) {
+document.addEventListener('click', e => {
   if (!e.target.classList.contains('opt')) return;
   const btn = e.target;
   const opts = btn.parentElement;
@@ -756,153 +667,99 @@ document.addEventListener('click', function(e) {
   const correct = opts.dataset.ans;
   const val = btn.dataset.v;
   const isCorrect = val === correct;
-  const timeMs = Date.now() - answerTime;
+  const ms = Date.now() - answerStart;
   
-  // Update button states
+  // Update buttons
   opts.querySelectorAll('.opt').forEach(o => {
-    if (o.dataset.v === correct) o.classList.add(isCorrect ? 'correct' : 'reveal');
-    else if (o === btn) o.classList.add('wrong');
-    else o.classList.add('dim');
-    o.style.pointerEvents = 'none';
+    if (o.dataset.v === correct) {
+      o.classList.add(isCorrect ? 'correct' : 'show-correct');
+    } else if (o === btn) {
+      o.classList.add('wrong');
+    } else {
+      o.classList.add('dim');
+    }
   });
   
-  // Record answer
-  const result = IQData.recordAnswer(opts.dataset.cat, isCorrect, parseFloat(opts.dataset.diff), timeMs);
+  // Record
+  const result = IQData.recordAnswer(opts.dataset.cat, isCorrect, parseFloat(opts.dataset.diff), ms);
   
-  // Show feedback
+  // Feedback
   const fb = document.getElementById(`fb-${idx}`);
   fb.textContent = getEncouragement(result.streak, isCorrect);
   fb.className = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
   
-  // Visual effects
+  // Effects
   if (isCorrect) {
-    doCorrectFX(result);
-    document.getElementById(`card-${idx}`)?.classList.add('pop');
+    flash.className = 'flash green show';
+    spawnConfetti(8);
   } else {
-    doWrongFX();
-    document.getElementById(`card-${idx}`)?.classList.add('shake');
+    flash.className = 'flash red show';
   }
-  
-  // Show XP gain
-  if (result.xpGain) {
-    showFloatingText(`+${result.xpGain} XP`, false);
-  }
-  
-  // IQ change
-  if (isCorrect && result.iq && lastIQ && result.iq > lastIQ) {
-    setTimeout(() => showFloatingText(`+${result.iq - lastIQ} IQ`, true), 600);
-  }
-  lastIQ = result.iq;
+  setTimeout(() => flash.className = 'flash', 300);
   
   // Level up
   if (result.leveledUp) {
     setTimeout(() => {
       newLevelEl.textContent = result.level;
       levelupPopup.classList.add('show');
-      spawnConfetti(50);
-      setTimeout(() => levelupPopup.classList.remove('show'), 2500);
+      spawnConfetti(30);
+      setTimeout(() => levelupPopup.classList.remove('show'), 2000);
     }, 400);
   }
-  lastLevel = result.level;
   
-  // Streak milestones
+  // Streak milestone (only show popup, not duplicate in top bar)
   if (isCorrect && result.streak > 0 && result.streak % 5 === 0) {
     setTimeout(() => {
       streakNum.textContent = result.streak;
       streakPopup.classList.add('show');
-      spawnConfetti(40);
-      setTimeout(() => streakPopup.classList.remove('show'), 2000);
+      spawnConfetti(25);
+      setTimeout(() => streakPopup.classList.remove('show'), 1800);
     }, 300);
   }
   
-  // Update combo indicator
-  updateCombo(result.streak);
+  updateUI(result);
   
   // Show explanation
-  setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'), 300);
-  
-  // Update UI
-  updateUI();
+  setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'), 250);
   
   // Show scroll hint
-  setTimeout(() => document.getElementById(`hint-${idx}`)?.classList.add('show'), 500);
-  answerTime = Date.now();
+  setTimeout(() => document.getElementById(`hint-${idx}`)?.classList.add('show'), 400);
+  
+  answerStart = Date.now();
 });
 
-function doCorrectFX(result) {
-  flash.classList.remove('red');
-  flash.classList.add('show');
-  setTimeout(() => flash.classList.remove('show'), 350);
-  
-  iqBox.classList.add('bump');
-  streakBox.classList.add('bump');
-  setTimeout(() => {
-    iqBox.classList.remove('bump');
-    streakBox.classList.remove('bump');
-  }, 300);
-  
-  spawnConfetti(result.streak >= 5 ? 20 : 10);
-}
-
-function doWrongFX() {
-  flash.classList.add('red', 'show');
-  setTimeout(() => flash.classList.remove('show', 'red'), 350);
-}
-
 function spawnConfetti(n) {
-  const colors = ['#5EB85E', '#FFD700', '#FF6B6B', '#4ECDC4', '#A855F7', '#F59E0B', '#EC4899'];
+  const colors = ['#5EB85E', '#FFD700', '#FF6B6B', '#4ECDC4', '#A855F7', '#F59E0B'];
   for (let i = 0; i < n; i++) {
-    const p = document.createElement('div');
-    p.className = 'confetti-piece';
+    const p = document.createElement('i');
     p.style.left = Math.random() * 100 + '%';
-    p.style.top = '-15px';
+    p.style.top = '-10px';
     p.style.background = colors[Math.floor(Math.random() * colors.length)];
-    p.style.borderRadius = Math.random() > 0.5 ? '50%' : '3px';
-    p.style.animationDelay = Math.random() * 0.3 + 's';
+    p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    p.style.animationDelay = Math.random() * 0.2 + 's';
     confetti.appendChild(p);
     setTimeout(() => p.classList.add('fall'), 10);
-    setTimeout(() => p.remove(), 1600);
+    setTimeout(() => p.remove(), 1400);
   }
 }
 
-function showFloatingText(text, isIQ) {
-  xpFloat.textContent = text;
-  xpFloat.className = `xp-float show ${isIQ ? 'iq' : ''}`;
-  setTimeout(() => xpFloat.classList.remove('show'), 1200);
-}
-
-function updateCombo(streak) {
-  if (streak >= 3) {
-    comboEl.textContent = `🔥 x${streak}`;
-    comboEl.classList.add('show');
-    comboEl.classList.toggle('big', streak >= 10);
-  } else {
-    comboEl.classList.remove('show', 'big');
-  }
-}
-
-function updateUI() {
-  const data = IQData.load();
-  
+function updateUI(d) {
   // IQ
-  const newIQ = data.iq || '--';
-  if (iqVal.textContent !== String(newIQ)) {
-    iqVal.textContent = newIQ;
-    if (data.iq && lastIQ && data.iq > lastIQ) {
-      iqVal.classList.add('up');
-      setTimeout(() => iqVal.classList.remove('up'), 500);
-    }
+  iqVal.textContent = d.iq || '--';
+  
+  // Streak - only show pill if streak > 0
+  if (d.streak > 0) {
+    streakPill.style.display = 'flex';
+    streakVal.textContent = d.streak;
+  } else {
+    streakPill.style.display = 'none';
   }
   
-  // Streak
-  streakVal.textContent = data.streak;
-  
-  // XP/Level
-  const xpInLevel = data.xp % 100;
-  const xpNeeded = 100;
-  xpBar.style.width = (xpInLevel / xpNeeded * 100) + '%';
-  levelLabel.textContent = `Level ${data.level}`;
-  xpLabel.textContent = `${xpInLevel}/${xpNeeded} XP`;
+  // XP
+  const xpInLevel = d.xp % 150;
+  xpBar.style.width = (xpInLevel / 150 * 100) + '%';
+  levelLabel.textContent = 'Lvl ' + d.level;
+  xpLabel.textContent = xpInLevel + '/150';
 }
 
 init();
