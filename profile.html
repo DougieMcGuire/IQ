@@ -25,26 +25,19 @@
     }
     body { display: flex; flex-direction: column; }
 
-    /* ── Nav ── */
     nav {
       position: fixed; bottom: 0; left: 0; right: 0;
       height: calc(60px + env(safe-area-inset-bottom, 0px));
       background: var(--card);
       border-top: 2px solid var(--tan);
       display: flex; justify-content: center; align-items: flex-start;
-      padding-top: 8px;
-      gap: 8px;
-      z-index: 100;
+      padding-top: 8px; gap: 8px; z-index: 100;
     }
     .nav-btn {
-      padding: 6px 30px;
-      background: none; border: none;
+      padding: 6px 30px; background: none; border: none;
       display: flex; flex-direction: column; align-items: center; gap: 3px;
-      color: var(--ink-light);
-      font-family: 'Patrick Hand', cursive;
-      font-size: 12px;
-      text-decoration: none;
-      border-radius: 12px;
+      color: var(--ink-light); font-family: 'Patrick Hand', cursive;
+      font-size: 12px; text-decoration: none; border-radius: 12px;
       transition: all 0.2s;
     }
     .nav-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; }
@@ -52,48 +45,35 @@
     .nav-divider { width: 2px; height: 28px; background: var(--tan); margin-top: 2px; }
 
     main {
-      flex: 1;
-      overflow-y: auto;
+      flex: 1; overflow-y: auto;
       padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(68px + env(safe-area-inset-bottom, 0px));
     }
 
-    /* ── Header ── */
-    .header {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 12px;
-    }
+    .header { display: flex; justify-content: flex-end; margin-bottom: 10px; }
     .share-btn {
-      background: var(--card);
-      border: 2px solid var(--tan);
-      border-radius: 18px;
-      padding: 6px 14px;
-      font-family: 'Patrick Hand', cursive;
-      font-size: 13px;
-      color: var(--ink);
-      cursor: pointer;
+      background: var(--card); border: 2px solid var(--tan);
+      border-radius: 18px; padding: 6px 14px;
+      font-family: 'Patrick Hand', cursive; font-size: 13px;
+      color: var(--ink); cursor: pointer;
       display: flex; align-items: center; gap: 5px;
     }
     .share-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
 
-    /* ── Profile Hero ── */
+    /* ── Profile Hero: avatar + IQ centered, stats on right side ── */
     .profile-hero {
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0 clamp(70px, 22vw, 100px) 0 0;
-      margin-bottom: 16px;
       min-height: 220px;
+      margin-bottom: 12px;
     }
 
-    .avatar-wrap { position: relative; margin-bottom: 8px; }
+    .avatar-wrap { position: relative; margin-bottom: 8px; z-index: 2; }
     .avatar {
       width: clamp(80px, 22vw, 100px); height: clamp(80px, 22vw, 100px);
-      border-radius: 50%;
-      background: var(--card);
-      border: 3px solid var(--tan);
-      overflow: hidden;
+      border-radius: 50%; background: var(--card);
+      border: 3px solid var(--tan); overflow: hidden;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
     }
@@ -113,48 +93,37 @@
     .iq-num {
       font-family: 'Verdana', sans-serif;
       font-size: clamp(56px, 16vw, 72px);
-      font-weight: 700;
-      line-height: 1;
+      font-weight: 700; line-height: 1;
     }
     .iq-label {
       font-family: 'Verdana', sans-serif;
       font-size: clamp(14px, 4vw, 18px);
       color: var(--ink-light);
-      letter-spacing: 4px;
-      margin-bottom: 6px;
+      letter-spacing: 4px; margin-bottom: 6px;
     }
     .pct-badge {
-      background: var(--tan-dark);
-      color: var(--bg);
-      font-family: 'Patrick Hand', cursive;
-      font-size: 13px;
-      padding: 4px 14px;
-      border-radius: 12px;
+      background: var(--tan-dark); color: var(--bg);
+      font-family: 'Patrick Hand', cursive; font-size: 13px;
+      padding: 4px 14px; border-radius: 12px;
     }
 
-    /* ── Side Stats ── */
+    /* Side stats — absolutely positioned so center content stays centered */
     .side-stats {
       position: absolute;
-      right: 0;
-      top: 50%;
+      right: 0; top: 50%;
       transform: translateY(-50%);
-      display: flex;
-      flex-direction: column;
-      gap: clamp(4px, 1vw, 6px);
+      display: flex; flex-direction: column;
+      gap: clamp(4px, 1.2vw, 6px);
+      z-index: 1;
     }
     .side-stat {
-      background: var(--card);
-      border: 2px solid var(--tan);
+      background: var(--card); border: 2px solid var(--tan);
       border-radius: 12px;
-      padding: clamp(6px, 1.5vw, 10px) clamp(8px, 2vw, 14px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-width: clamp(62px, 18vw, 80px);
+      padding: clamp(5px, 1.2vw, 8px) clamp(8px, 2vw, 12px);
+      display: flex; flex-direction: column; align-items: center;
+      min-width: clamp(58px, 16vw, 76px);
     }
-    .side-stat .s-icon {
-      width: 14px; height: 14px; margin-bottom: 1px;
-    }
+    .side-stat .s-icon { width: 13px; height: 13px; margin-bottom: 1px; }
     .side-stat .s-icon svg {
       width: 100%; height: 100%;
       stroke: var(--tan-dark); fill: none;
@@ -162,25 +131,21 @@
     }
     .side-stat .s-val {
       font-family: 'Verdana', sans-serif;
-      font-size: clamp(16px, 4.5vw, 20px);
-      font-weight: 700;
-      line-height: 1.2;
+      font-size: clamp(15px, 4.2vw, 19px);
+      font-weight: 700; line-height: 1.2;
     }
     .side-stat .s-lbl {
       font-family: 'Patrick Hand', cursive;
-      font-size: clamp(9px, 2.5vw, 11px);
-      color: var(--ink-light);
-      margin-top: 1px;
+      font-size: clamp(9px, 2.3vw, 11px);
+      color: var(--ink-light); margin-top: 1px;
     }
 
     /* ── Abilities ── */
     .section-title {
       font-family: 'Patrick Hand', cursive;
-      font-size: 13px;
-      color: var(--ink-light);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin: 20px 0 10px;
+      font-size: 13px; color: var(--ink-light);
+      letter-spacing: 2px; text-transform: uppercase;
+      margin: 16px 0 10px;
     }
     .abilities-grid {
       display: grid;
@@ -188,43 +153,30 @@
       gap: 8px;
     }
     .ability-card {
-      background: var(--card);
-      border: 2px solid var(--tan);
-      border-radius: 12px;
-      padding: 10px 12px;
+      background: var(--card); border: 2px solid var(--tan);
+      border-radius: 12px; padding: 10px 12px;
     }
     .ability-name {
       font-family: 'Patrick Hand', cursive;
-      font-size: clamp(10px, 2.8vw, 11px);
-      font-weight: 600;
-      color: var(--ink);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 6px;
+      font-size: clamp(10px, 2.6vw, 11px); font-weight: 600;
+      color: var(--ink); text-transform: uppercase;
+      letter-spacing: 0.5px; margin-bottom: 6px;
     }
     .ability-bar-outer {
-      height: clamp(24px, 6vw, 28px);
-      background: var(--tan);
-      border-radius: 6px;
-      overflow: hidden;
+      height: clamp(22px, 5.5vw, 28px);
+      background: var(--tan); border-radius: 6px; overflow: hidden;
     }
     .ability-bar-inner {
-      height: 100%;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      padding-left: 8px;
-      min-width: 28px;
+      height: 100%; border-radius: 6px;
+      display: flex; align-items: center;
+      padding-left: 8px; min-width: 28px;
       transition: width 0.5s ease;
     }
     .ability-bar-inner span {
       font-family: 'Verdana', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      color: #fff;
+      font-size: 11px; font-weight: 700; color: #fff;
     }
     
-    /* Flat colors - no gradients */
     .bar-pattern { background: #E07850; }
     .bar-problem { background: #D96A28; }
     .bar-mental { background: #5EB85E; }
@@ -235,20 +187,14 @@
     .bar-spatial { background: #059669; }
 
     .reset-btn {
-      margin-top: 24px;
-      background: none; border: none;
-      font-family: 'Patrick Hand', cursive;
-      font-size: 12px;
-      color: var(--ink-light);
-      cursor: pointer;
-      opacity: 0.35;
+      margin-top: 24px; background: none; border: none;
+      font-family: 'Patrick Hand', cursive; font-size: 12px;
+      color: var(--ink-light); cursor: pointer; opacity: 0.35;
       display: block; width: 100%; text-align: center;
     }
 
-    /* ── Modal ── */
     .modal {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.6);
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6);
       display: none; align-items: center; justify-content: center;
       z-index: 200; padding: 16px;
     }
@@ -256,8 +202,7 @@
     .modal-box {
       background: var(--bg); border-radius: 18px;
       border: 3px solid var(--tan);
-      padding: 18px; width: 100%; max-width: 340px;
-      position: relative;
+      padding: 18px; width: 100%; max-width: 340px; position: relative;
     }
     .modal-close {
       position: absolute; top: 10px; right: 10px;
@@ -278,8 +223,7 @@
       flex: 1; background: var(--card);
       border: 2px solid var(--tan); border-radius: 10px;
       padding: 10px; font-family: 'Patrick Hand', cursive; font-size: 13px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 5px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
     }
     .share-btns button svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
     .share-btns button.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
@@ -291,6 +235,7 @@
       padding: 8px 18px; border-radius: 18px;
       font-family: 'Patrick Hand', cursive; font-size: 13px;
       opacity: 0; transition: opacity 0.3s; z-index: 300;
+      white-space: nowrap;
     }
     .toast.show { opacity: 1; }
   </style>
@@ -306,6 +251,7 @@
   </div>
 
   <div class="profile-hero">
+    <!-- Center column: avatar + IQ -->
     <div class="avatar-wrap">
       <div class="avatar" onclick="document.getElementById('avatar-input').click()">
         <img id="avatar-img" src="" alt="">
@@ -321,6 +267,7 @@
     <div class="iq-label">I Q</div>
     <div class="pct-badge" id="pct-badge" style="display:none;"></div>
 
+    <!-- Side stats: absolutely positioned, won't shift center -->
     <div class="side-stats">
       <div class="side-stat">
         <div class="s-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
@@ -328,15 +275,12 @@
         <div class="s-lbl">Answered</div>
       </div>
       <div class="side-stat">
-        <div class="s-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z" fill="none"/><path d="M12 6v6l4 2"/></svg></div>
+        <div class="s-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none"/><path d="M12 6v6l4 2"/></svg></div>
         <div class="s-val" id="accuracy">0%</div>
         <div class="s-lbl">Accuracy</div>
       </div>
       <div class="side-stat">
-        <div class="s-icon">
-          <!-- Flame for best streak -->
-          <svg viewBox="0 0 24 24" fill="#F59E0B" fill-opacity="0.2" stroke="#F59E0B" stroke-width="2"><path d="M12 22c-4.97 0-8-3.58-8-7.5 0-3.07 1.74-5.25 3.53-7.28C9.18 5.38 10.34 3.7 10.34 2c0 0 1.77 2.18 2.34 4.18.27.94.5 1.82 1.32 1.82 0-2 1-3 1-3s1 1.5 1 3.5c.5-.5 1.5-1.5 1.5-1.5s1 2.5 1 5c0 3.92-3.03 7.5-8 7.5z"/></svg>
-        </div>
+        <div class="s-icon"><svg viewBox="0 0 24 24" fill="#F59E0B" fill-opacity="0.15" stroke="#F59E0B" stroke-width="2"><path d="M12 22c-4.97 0-8-3.58-8-7.5 0-3.07 1.74-5.25 3.53-7.28C9.18 5.38 10.34 3.7 10.34 2c0 0 1.77 2.18 2.34 4.18.27.94.5 1.82 1.32 1.82 0-2 1-3 1-3s1 1.5 1 3.5c.5-.5 1.5-1.5 1.5-1.5s1 2.5 1 5c0 3.92-3.03 7.5-8 7.5z"/></svg></div>
         <div class="s-val" id="best-streak">0</div>
         <div class="s-lbl">Best</div>
       </div>
@@ -380,14 +324,14 @@
 <script src="data.js"></script>
 <script>
 const abilities = [
-  { key: 'patternRecognition', name: 'Pattern', bar: 'pattern' },
-  { key: 'problemSolving', name: 'Problem Solving', bar: 'problem' },
-  { key: 'mentalAgility', name: 'Mental Agility', bar: 'mental' },
-  { key: 'workingMemory', name: 'Memory', bar: 'memory' },
-  { key: 'verbalReasoning', name: 'Verbal', bar: 'verbal' },
-  { key: 'logicalReasoning', name: 'Common Sense', bar: 'logic' },
-  { key: 'spatialAwareness', name: 'Emotional', bar: 'emotional' },
-  { key: 'numericalReasoning', name: 'Spatial', bar: 'spatial' }
+  { key:'patternRecognition', name:'Pattern', bar:'pattern' },
+  { key:'problemSolving', name:'Problem Solving', bar:'problem' },
+  { key:'mentalAgility', name:'Mental Agility', bar:'mental' },
+  { key:'workingMemory', name:'Memory', bar:'memory' },
+  { key:'verbalReasoning', name:'Verbal', bar:'verbal' },
+  { key:'logicalReasoning', name:'Common Sense', bar:'logic' },
+  { key:'spatialAwareness', name:'Emotional', bar:'emotional' },
+  { key:'numericalReasoning', name:'Spatial', bar:'spatial' }
 ];
 
 function load() {
@@ -430,18 +374,16 @@ function load() {
 }
 
 function uploadAvatar(input) {
-  const file = input.files[0];
-  if (!file) return;
+  const file = input.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = (e) => {
     const img = new Image();
     img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = canvas.height = 200;
-      const ctx = canvas.getContext('2d');
+      const c = document.createElement('canvas'); c.width=c.height=200;
+      const ctx = c.getContext('2d');
       const min = Math.min(img.width, img.height);
       ctx.drawImage(img, (img.width-min)/2, (img.height-min)/2, min, min, 0, 0, 200, 200);
-      const url = canvas.toDataURL('image/jpeg', 0.8);
+      const url = c.toDataURL('image/jpeg', 0.8);
       IQData.setProfilePic(url);
       document.getElementById('avatar-img').src = url;
       document.getElementById('avatar-img').style.display = 'block';
@@ -459,88 +401,45 @@ function closeShare() { document.getElementById('share-modal').classList.remove(
 
 function genShareImg() {
   const d = IQData.load();
-  const canvas = document.createElement('canvas');
-  const W = 480, H = 640;
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#F2EBD9'; ctx.fillRect(0,0,W,H);
-  roundRect(ctx,20,20,W-40,H-40,24,'#EDE5CF','#C4AD8A',3);
+  const cv = document.createElement('canvas');
+  const W=480, H=640; cv.width=W; cv.height=H;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle='#F2EBD9'; ctx.fillRect(0,0,W,H);
+  rr(ctx,20,20,W-40,H-40,24,'#EDE5CF','#C4AD8A',3);
   const draw = () => {
     ctx.font='700 80px Verdana'; ctx.fillStyle='#2A2018'; ctx.textAlign='center';
     ctx.fillText(d.iq||'--', W/2, 180);
     ctx.font='600 16px Verdana'; ctx.fillStyle='#A89872'; ctx.fillText('I Q', W/2, 205);
-    if (d.iq) {
-      roundRect(ctx, W/2-55, 220, 110, 28, 14, '#A89872', null);
-      ctx.font='600 13px Patrick Hand'; ctx.fillStyle='#F2EBD9';
-      ctx.fillText('Top '+formatPercentile(iqToPercentile(d.iq)), W/2, 239);
-    }
-    const stats=[{v:d.answered,l:'Answered'},{v:IQData.getAccuracy()+'%',l:'Accuracy'},{v:d.bestStreak,l:'Best'}];
-    const sw=(W-80)/3;
-    stats.forEach((s,i)=>{
-      const x=40+sw*i+sw/2;
-      ctx.font='700 24px Verdana'; ctx.fillStyle='#2A2018'; ctx.fillText(s.v,x,300);
-      ctx.font='400 12px Patrick Hand'; ctx.fillStyle='#6B5740'; ctx.fillText(s.l,x,320);
+    if(d.iq){rr(ctx,W/2-55,220,110,28,14,'#A89872',null);ctx.font='600 13px Patrick Hand';ctx.fillStyle='#F2EBD9';ctx.fillText('Top '+formatPercentile(iqToPercentile(d.iq)),W/2,239);}
+    [{v:d.answered,l:'Answered'},{v:IQData.getAccuracy()+'%',l:'Accuracy'},{v:d.bestStreak,l:'Best'}].forEach((s,i)=>{
+      const x=40+((W-80)/3)*i+(W-80)/6;
+      ctx.font='700 24px Verdana';ctx.fillStyle='#2A2018';ctx.fillText(s.v,x,300);
+      ctx.font='400 12px Patrick Hand';ctx.fillStyle='#6B5740';ctx.fillText(s.l,x,320);
     });
-    ctx.font='600 12px Patrick Hand'; ctx.fillStyle='#A89872'; ctx.textAlign='left';
-    ctx.fillText('ABILITIES',50,365);
-    const bars=[
-      {n:'Pattern',c:'#E07850',k:'patternRecognition'},
-      {n:'Problem Solving',c:'#D96A28',k:'problemSolving'},
-      {n:'Mental Agility',c:'#5EB85E',k:'mentalAgility'},
-      {n:'Verbal',c:'#5B8DEF',k:'verbalReasoning'},
-      {n:'Common Sense',c:'#2A96B8',k:'logicalReasoning'}
-    ];
-    let y=385;
-    bars.forEach(b=>{
-      const v=IQData.getStatPercent(b.k);
-      ctx.font='600 10px Patrick Hand'; ctx.fillStyle='#6B5740'; ctx.fillText(b.n,50,y);
-      roundRect(ctx,50,y+5,W-100,20,4,'#C4AD8A',null);
-      roundRect(ctx,50,y+5,Math.max(30,(v/100)*(W-100)),20,4,b.c,null);
-      ctx.font='700 10px Verdana'; ctx.fillStyle='#fff'; ctx.fillText(v,58,y+19);
-      y+=34;
+    ctx.font='600 12px Patrick Hand';ctx.fillStyle='#A89872';ctx.textAlign='left';ctx.fillText('ABILITIES',50,365);
+    [{n:'Pattern',c:'#E07850',k:'patternRecognition'},{n:'Problem Solving',c:'#D96A28',k:'problemSolving'},{n:'Mental Agility',c:'#5EB85E',k:'mentalAgility'},{n:'Memory',c:'#8A5BAF',k:'workingMemory'},{n:'Verbal',c:'#5B8DEF',k:'verbalReasoning'},{n:'Common Sense',c:'#2A96B8',k:'logicalReasoning'}].forEach((b,idx)=>{
+      const y=385+idx*34; const v=IQData.getStatPercent(b.k);
+      ctx.font='600 10px Patrick Hand';ctx.fillStyle='#6B5740';ctx.fillText(b.n,50,y);
+      rr(ctx,50,y+5,W-100,20,4,'#C4AD8A',null);
+      rr(ctx,50,y+5,Math.max(30,(v/100)*(W-100)),20,4,b.c,null);
+      ctx.font='700 10px Verdana';ctx.fillStyle='#fff';ctx.fillText(v,58,y+19);
     });
-    ctx.font='600 16px Patrick Hand'; ctx.fillStyle='#A89872'; ctx.textAlign='center';
-    ctx.fillText('IQ Profile',W/2,H-45);
-    shareCanvas=canvas;
-    document.getElementById('share-preview').innerHTML='';
-    document.getElementById('share-preview').appendChild(canvas);
+    ctx.font='600 16px Patrick Hand';ctx.fillStyle='#A89872';ctx.textAlign='center';ctx.fillText('IQ Profile',W/2,H-45);
+    shareCanvas=cv; document.getElementById('share-preview').innerHTML=''; document.getElementById('share-preview').appendChild(cv);
   };
-  if (d.pic) {
-    const img=new Image();
-    img.onload=()=>{
-      ctx.save(); ctx.beginPath(); ctx.arc(W/2,75,40,0,Math.PI*2); ctx.clip();
-      ctx.drawImage(img,W/2-40,35,80,80); ctx.restore();
-      ctx.strokeStyle='#C4AD8A'; ctx.lineWidth=3;
-      ctx.beginPath(); ctx.arc(W/2,75,40,0,Math.PI*2); ctx.stroke();
-      draw();
-    }; img.src=d.pic;
-  } else {
-    ctx.fillStyle='#D5C8AD'; ctx.beginPath(); ctx.arc(W/2,75,40,0,Math.PI*2); ctx.fill();
-    ctx.strokeStyle='#C4AD8A'; ctx.lineWidth=3; ctx.stroke(); draw();
-  }
+  if(d.pic){const img=new Image();img.onload=()=>{ctx.save();ctx.beginPath();ctx.arc(W/2,75,40,0,Math.PI*2);ctx.clip();ctx.drawImage(img,W/2-40,35,80,80);ctx.restore();ctx.strokeStyle='#C4AD8A';ctx.lineWidth=3;ctx.beginPath();ctx.arc(W/2,75,40,0,Math.PI*2);ctx.stroke();draw();};img.src=d.pic;}
+  else{ctx.fillStyle='#D5C8AD';ctx.beginPath();ctx.arc(W/2,75,40,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#C4AD8A';ctx.lineWidth=3;ctx.stroke();draw();}
 }
 
-function roundRect(ctx,x,y,w,h,r,fill,stroke,lw){
-  ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
-  ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r);
-  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);
-  ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r);
-  ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
-  if(fill){ctx.fillStyle=fill;ctx.fill();}
-  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw||2;ctx.stroke();}
+function rr(ctx,x,y,w,h,r,fill,stroke,lw){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+  if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw||2;ctx.stroke();}
 }
 
-async function copyImg(){
-  if(!shareCanvas)return;
-  try{const blob=await new Promise(r=>shareCanvas.toBlob(r,'image/png'));
-  await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);toast('Copied!');}
-  catch{toast('Copy failed');}
-}
-function downloadImg(){
-  if(!shareCanvas)return;
-  const a=document.createElement('a');a.download='iq-profile.png';
-  a.href=shareCanvas.toDataURL('image/png');a.click();toast('Saved!');
-}
+async function copyImg(){if(!shareCanvas)return;try{const b=await new Promise(r=>shareCanvas.toBlob(r,'image/png'));await navigator.clipboard.write([new ClipboardItem({'image/png':b})]);toast('Copied!');}catch{toast('Copy failed');}}
+function downloadImg(){if(!shareCanvas)return;const a=document.createElement('a');a.download='iq-profile.png';a.href=shareCanvas.toDataURL('image/png');a.click();toast('Saved!');}
 function resetData(){if(confirm('Reset all progress?')){IQData.reset();location.reload();}}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
 document.getElementById('share-modal').onclick=e=>{if(e.target.id==='share-modal')closeShare();};
