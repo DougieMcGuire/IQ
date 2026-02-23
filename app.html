@@ -5,10 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#111111">
+<meta name="theme-color" content="#F2EBD9">
+
+<link rel="manifest" href="manifest.json">
+
 <title>My App</title>
 
 <style>
+:root {
+    --bg: #F2EBD9;   /* header */
+    --tan: #C4AD8A;  /* footer */
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -17,51 +25,28 @@
 }
 
 body {
-    background: #111;
+    background: var(--bg);
     overflow: hidden;
 }
 
-/* iframe container */
+/* iframe full screen */
 .screen {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 60px;
+    inset: 0;
     width: 100%;
-    height: calc(100vh - 60px);
+    height: 100%;
     border: none;
     display: none;
+    background: var(--bg);
 }
 
-/* active screen */
 .screen.active {
     display: block;
 }
 
-/* bottom nav */
-.nav {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    height: 60px;
-    background: #1c1c1c;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    border-top: 1px solid #333;
-}
-
-.nav button {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.nav button.active {
-    color: #00ffcc;
+/* optional smooth fade */
+.screen {
+    transition: opacity 0.2s ease;
 }
 </style>
 </head>
@@ -70,27 +55,28 @@ body {
 <iframe src="improve.html" class="screen active" id="improve"></iframe>
 <iframe src="profile.html" class="screen" id="profile"></iframe>
 
-<div class="nav">
-    <button onclick="switchScreen('improve')" id="btnImprove" class="active">
-        Improve
-    </button>
-    <button onclick="switchScreen('profile')" id="btnProfile">
-        Profile
-    </button>
-</div>
-
 <script>
-function switchScreen(screen) {
+/*
+IMPORTANT:
+Instead of using a nav here,
+your existing navigator inside improve/profile
+should call this function to switch pages.
+*/
+
+function goTo(page) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
-
-    document.getElementById(screen).classList.add('active');
-    document.getElementById('btn' + capitalize(screen)).classList.add('active');
+    document.getElementById(page).classList.add('active');
 }
 
-function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
+/*
+Example usage from inside improve.html:
+
+parent.goTo('profile');
+
+And from profile.html:
+
+parent.goTo('improve');
+*/
 </script>
 
 </body>
