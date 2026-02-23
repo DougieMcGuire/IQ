@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#111111">
+<title>My App</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    background: #111;
+    overflow: hidden;
+}
+
+/* iframe container */
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 60px;
+    width: 100%;
+    height: calc(100vh - 60px);
+    border: none;
+    display: none;
+}
+
+/* active screen */
+.screen.active {
+    display: block;
+}
+
+/* bottom nav */
+.nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    background: #1c1c1c;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #333;
+}
+
+.nav button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.nav button.active {
+    color: #00ffcc;
+}
+</style>
+</head>
+<body>
+
+<iframe src="improve.html" class="screen active" id="improve"></iframe>
+<iframe src="profile.html" class="screen" id="profile"></iframe>
+
+<div class="nav">
+    <button onclick="switchScreen('improve')" id="btnImprove" class="active">
+        Improve
+    </button>
+    <button onclick="switchScreen('profile')" id="btnProfile">
+        Profile
+    </button>
+</div>
+
+<script>
+function switchScreen(screen) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+
+    document.getElementById(screen).classList.add('active');
+    document.getElementById('btn' + capitalize(screen)).classList.add('active');
+}
+
+function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+</script>
+
+</body>
+</html>
