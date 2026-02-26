@@ -399,6 +399,8 @@
 <script src="data.js"></script>
 <script src="questions.js"></script>
 <script>
+import { requireAuth } from './data.js';
+await requireAuth();
 const feed = document.getElementById('feed');
 const iqVal = document.getElementById('iq-val');
 const streakVal = document.getElementById('streak-val');
