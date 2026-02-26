@@ -1,6 +1,25 @@
-const IQData = {
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
+  authDomain: "braindeer-backend.firebaseapp.com",
+  projectId: "braindeer-backend",
+  storageBucket: "braindeer-backend.firebasestorage.app",
+  messagingSenderId: "331205139765",
+  appId: "1:331205139765:web:20cfef8194af63fc55c07c",
+  measurementId: "G-9B6885G0X0"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+export const IQData = {
   KEY: 'iq_profile_v5',
-  
+
   defaults() {
     return {
       age: null,
@@ -19,119 +38,132 @@ const IQData = {
       streak: 0,
       bestStreak: 0,
       iq: null,
-      pic: null,
       xp: 0,
       level: 1,
-      avgMs: 0,
-      fastAnswers: 0,
-      sessionStart: null,
       totalSessions: 0
     };
   },
-  
-  load() {
+
+  // local session info (kept in localStorage)
+  loadSession() {
     try {
       const s = localStorage.getItem(this.KEY);
-      if (!s) return this.defaults();
-      const d = JSON.parse(s);
-      // Migrate from v4 if needed
+      return s ? JSON.parse(s) : {};
+    } catch { return {}; }
+  },
+
+  saveSession(sessionData) {
+    try { localStorage.setItem(this.KEY, JSON.stringify(sessionData)); } catch {}
+  },
+
+  async load(uid) {
+    if (!uid) return this.defaults(); // fallback
+    try {
+      const docRef = doc(db, "users", uid);
+      const docSnap = await getDoc(docRef);
+      if (!docSnap.exists()) {
+        await setDoc(docRef, { ...this.defaults(), createdAt: serverTimestamp() });
+        return this.defaults();
+      }
+      const data = docSnap.data();
+      // Migrate missing fields if needed
       const def = this.defaults();
       for (const k of Object.keys(def.ratings)) {
-        if (!d.ratings[k]) d.ratings[k] = def.ratings[k];
-        if (d.ratings[k].history === undefined) d.ratings[k].history = [];
-        if (d.ratings[k].wins === undefined) d.ratings[k].wins = 0;
+        if (!data.ratings[k]) data.ratings[k] = def.ratings[k];
+        if (data.ratings[k].history === undefined) data.ratings[k].history = [];
+        if (data.ratings[k].wins === undefined) data.ratings[k].wins = 0;
       }
-      if (d.avgMs === undefined) d.avgMs = 0;
-      if (d.fastAnswers === undefined) d.fastAnswers = 0;
-      if (d.totalSessions === undefined) d.totalSessions = 0;
-      return { ...def, ...d };
-    } catch { return this.defaults(); }
+      return { ...def, ...data };
+    } catch (err) {
+      console.error("Failed to load user data:", err);
+      return this.defaults();
+    }
   },
-  
-  save(d) {
-    try { localStorage.setItem(this.KEY, JSON.stringify(d)); } catch {}
+
+  async save(uid, d) {
+    if (!uid) return;
+    try {
+      const docRef = doc(db, "users", uid);
+      await setDoc(docRef, { ...d, updatedAt: serverTimestamp() }, { merge: true });
+    } catch (err) {
+      console.error("Failed to save user data:", err);
+    }
   },
-  
-  needsOnboarding() { return !this.load().age; },
-  
-  setAge(age) { const d = this.load(); d.age = age; this.save(d); },
-  setProfilePic(url) { const d = this.load(); d.pic = url; this.save(d); },
-  
-  // Get adaptive difficulty for a category (0.5 = easy, 1.0 = medium, 1.5 = hard, 2.0 = expert)
-  getDifficulty(cat) {
-    const d = this.load();
-    const c = d.ratings[cat];
-    if (!c || c.n < 3) return 0.8; // Start slightly below medium
-    // Scale difficulty based on rating
-    const norm = (c.r - 600) / 800; // 0 to 1 range
-    return 0.5 + norm * 1.5; // 0.5 to 2.0
+
+  needsOnboarding(sessionData) {
+    return !(sessionData.age || this.loadSession().age);
   },
-  
-  // Get which category needs more questions (least answered)
-  getWeakestCategory() {
-    const d = this.load();
+
+  setAge(uid, age) {
+    const session = this.loadSession();
+    session.age = age;
+    this.saveSession(session);
+    if (uid) this.load(uid).then(d => { d.age = age; this.save(uid, d); });
+  },
+
+  // Adaptive difficulty
+  getDifficulty(cat, sessionData) {
+    const d = sessionData || this.loadSession();
+    const c = d.ratings?.[cat];
+    if (!c || c.n < 3) return 0.8;
+    const norm = (c.r - 600) / 800;
+    return 0.5 + norm * 1.5;
+  },
+
+  getWeakestCategory(sessionData) {
+    const d = sessionData || this.loadSession();
     let min = Infinity, weak = null;
-    for (const [k, v] of Object.entries(d.ratings)) {
+    for (const [k, v] of Object.entries(d.ratings || {})) {
       if (v.n < min) { min = v.n; weak = k; }
     }
     return weak;
   },
-  
-  // Recent accuracy for a category (last 10)
-  getRecentAccuracy(cat) {
-    const d = this.load();
+
+  recordAnswer(uid, cat, correct, diff, ms) {
+    const session = this.loadSession();
+    const d = { ...session };
+    if (!d.ratings) d.ratings = this.defaults().ratings;
     const c = d.ratings[cat];
-    if (!c || c.history.length === 0) return 0.5;
-    const recent = c.history.slice(-10);
-    return recent.filter(x => x).length / recent.length;
-  },
-  
-  recordAnswer(cat, correct, diff, ms) {
-    const d = this.load();
-    const c = d.ratings[cat];
-    if (!c) return d;
-    
-    // Elo update with dynamic K-factor
+    if (!c) return session;
+
+    // Elo update
     const exp = 1 / (1 + Math.pow(10, (diff * 400 - (c.r - 1000)) / 400));
-    const k = Math.max(16, 48 - c.n * 0.5); // Starts aggressive, settles
-    c.r = Math.round(c.r + k * ((correct ? 1 : 0) - exp));
+    const kFactor = Math.max(16, 48 - c.n * 0.5);
+    c.r = Math.round(c.r + kFactor * ((correct ? 1 : 0) - exp));
     c.r = Math.max(400, Math.min(1600, c.r));
     c.n++;
     if (correct) c.wins++;
-    
-    // Track history (keep last 50 per category)
+
     c.history.push(correct ? 1 : 0);
     if (c.history.length > 50) c.history = c.history.slice(-50);
-    
-    d.answered++;
+
+    d.answered = (d.answered || 0) + 1;
     if (correct) {
-      d.correct++;
-      d.streak++;
-      if (d.streak > d.bestStreak) d.bestStreak = d.streak;
+      d.correct = (d.correct || 0) + 1;
+      d.streak = (d.streak || 0) + 1;
+      d.bestStreak = Math.max(d.bestStreak || 0, d.streak);
     } else {
       d.streak = 0;
     }
-    
-    // Speed tracking
-    d.avgMs = d.answered === 1 ? ms : Math.round(d.avgMs * 0.95 + ms * 0.05);
-    if (correct && ms < 3500) d.fastAnswers = (d.fastAnswers || 0) + 1;
-    
-    // XP with bonuses
+
+    // XP
     let xp = correct ? 10 : 3;
-    if (correct && ms < 3000) xp += 7; // Speed bonus
+    if (correct && ms < 3000) xp += 7;
     else if (correct && ms < 5000) xp += 3;
     if (correct && d.streak >= 3) xp += Math.min(Math.floor(d.streak * 1.5), 20);
-    if (correct && diff >= 1.5) xp += 5; // Hard question bonus
-    d.xp += xp;
-    
-    const oldLvl = d.level;
+    if (correct && diff >= 1.5) xp += 5;
+    d.xp = (d.xp || 0) + xp;
+    const oldLvl = d.level || 1;
     d.level = Math.floor(d.xp / 150) + 1;
-    
+
     d.iq = this.calcIQ(d);
-    this.save(d);
+
+    this.saveSession(d); // save locally immediately
+    if (uid) this.save(uid, d); // push to Firebase async
+
     return { ...d, xpGain: xp, leveledUp: d.level > oldLvl };
   },
-  
+
   calcIQ(d) {
     const w = {
       patternRecognition: 0.15,
@@ -143,74 +175,25 @@ const IQData = {
       spatialAwareness: 0.09,
       numericalReasoning: 0.09
     };
-    
     let sum = 0, wt = 0, games = 0;
     for (const [k, v] of Object.entries(w)) {
       const r = d.ratings[k];
       if (r && r.n > 0) {
-        // Confidence ramps up with more questions
         const conf = Math.min(1, r.n / 10);
         sum += r.r * v * conf;
         wt += v * conf;
         games += r.n;
       }
     }
-    
     if (wt === 0 || games < 5) return null;
-    
     const avg = sum / wt;
     let iq = 100 + ((avg - 1000) / 100) * 15;
-    
-    // Confidence factor: IQ stabilizes as you answer more
     const conf = Math.min(1, games / 50);
     iq = 100 + (iq - 100) * conf;
-    
     return Math.round(Math.max(55, Math.min(160, iq)));
   },
-  
-  getAccuracy() {
-    const d = this.load();
-    return d.answered === 0 ? 0 : Math.round((d.correct / d.answered) * 100);
-  },
-  
-  getStatPercent(cat) {
-    const d = this.load();
-    const c = d.ratings[cat];
-    if (!c || c.n === 0) return 50;
-    return Math.round(Math.max(0, Math.min(100, ((c.r - 400) / 1200) * 100)));
-  },
-  
-  getCategoryRating(cat) {
-    const d = this.load();
-    const c = d.ratings[cat];
-    return c ? c.r : 1000;
-  },
-  
-  reset() { localStorage.removeItem(this.KEY); }
-};
 
-function iqToPercentile(iq) {
-  const z = (iq - 100) / 15;
-  const t = 1 / (1 + 0.2316419 * Math.abs(z));
-  const d = 0.3989423 * Math.exp(-z * z / 2);
-  const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
-  return z > 0 ? Math.round((1 - p) * 100) : Math.round(p * 100);
-}
-
-function formatPercentile(p) {
-  if (p <= 1) return '1%';
-  if (p >= 99) return '99%';
-  return p + '%';
-}
-
-function getEncouragement(streak, correct) {
-  if (!correct) {
-    const msgs = ['Keep going!', 'Next one!', 'Stay focused!', 'You got this!', 'Shake it off!', 'Almost!', 'Try again!', 'So close!'];
-    return msgs[Math.floor(Math.random() * msgs.length)];
+  reset() {
+    localStorage.removeItem(this.KEY);
   }
-  if (streak >= 15) return ['Legendary!', 'Unreal!', 'Machine!', 'Transcendent!', 'Flawless!'][Math.floor(Math.random() * 5)];
-  if (streak >= 10) return ['Unstoppable!', 'Genius!', 'Incredible!', 'Insane!', 'Dominant!'][Math.floor(Math.random() * 5)];
-  if (streak >= 5) return ['Amazing!', 'Brilliant!', 'Excellent!', 'Superb!', 'Crushed it!'][Math.floor(Math.random() * 5)];
-  if (streak >= 3) return ['Great!', 'Nice streak!', 'Well done!', 'Keep it up!', 'Smooth!'][Math.floor(Math.random() * 5)];
-  return ['Correct!', 'Right!', 'Got it!', 'Yes!', 'Nailed it!', 'Sharp!'][Math.floor(Math.random() * 6)];
-}
+};
