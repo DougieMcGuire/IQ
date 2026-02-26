@@ -1,86 +1,515 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IQ App - Login/Signup</title>
-<style>
-  body { font-family: Arial, sans-serif; padding: 2rem; background: #f0f0f0; }
-  .container { max-width: 400px; margin: auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-  h1 { text-align: center; margin-bottom: 1rem; }
-  input { width: 100%; padding: 0.5rem; margin: 0.5rem 0; }
-  button { width: 100%; padding: 0.5rem; margin-top: 0.5rem; }
-  #message { text-align: center; margin-top: 1rem; color: red; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sign In — BrainDeer</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --bg:       #E8E0D0;
+      --card:     #F0EAE0;
+      --border:   #C8BEA8;
+      --text:     #2C2416;
+      --muted:    #7A6E5E;
+      --accent:   #5B7B4E;
+      --accent2:  #8B6340;
+      --danger:   #B85450;
+      --radius:   18px;
+      --shadow:   0 2px 16px rgba(44,36,22,0.10);
+    }
+
+    body {
+      background: var(--bg);
+      min-height: 100dvh;
+      font-family: -apple-system, 'Segoe UI', sans-serif;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px;
+    }
+
+    /* ── Logo ── */
+    .logo {
+      text-align: center;
+      margin-bottom: 36px;
+      animation: fadeUp 0.5s ease both;
+    }
+    .logo-icon {
+      font-size: 52px;
+      line-height: 1;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .logo-name {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+    .logo-tag {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: var(--shadow);
+      animation: fadeUp 0.5s 0.1s ease both;
+    }
+
+    /* ── Tab switcher ── */
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 3px;
+      margin-bottom: 24px;
+      border: 1.5px solid var(--border);
+    }
+    .tab {
+      padding: 9px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .tab.active {
+      background: var(--card);
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(44,36,22,0.12);
+    }
+
+    /* ── Form ── */
+    .form-group {
+      margin-bottom: 14px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    input:focus { border-color: var(--accent); }
+    input::placeholder { color: var(--border); }
+
+    /* ── Buttons ── */
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      position: relative;
+    }
+    .btn:active { transform: scale(0.98); opacity: 0.85; }
+    .btn:disabled { opacity: 0.5; pointer-events: none; }
+
+    .btn-primary {
+      background: var(--text);
+      color: #F0EAE0;
+      margin-bottom: 12px;
+    }
+    .btn-google {
+      background: var(--card);
+      color: var(--text);
+      border: 1.5px solid var(--border);
+      margin-bottom: 12px;
+    }
+    .btn-guest {
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px;
+    }
+
+    /* Google logo */
+    .g-logo {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 4px 0 12px;
+      color: var(--border);
+      font-size: 12px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Error / success banner ── */
+    .banner {
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: none;
+    }
+    .banner.error   { background: #F5E0DF; color: var(--danger); display: block; }
+    .banner.success { background: #DFF0DC; color: var(--accent); display: block; }
+
+    /* ── Loading spinner ── */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .btn.loading .spinner { display: block; }
+    .btn.loading .btn-text { display: none; }
+
+    /* ── Forgot password ── */
+    .forgot {
+      text-align: right;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: -8px;
+      margin-bottom: 14px;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .forgot:hover { color: var(--text); }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.6;
+      animation: fadeUp 0.5s 0.2s ease both;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Password strength ── */
+    #strength-bar {
+      height: 3px;
+      border-radius: 2px;
+      margin-top: 6px;
+      background: var(--border);
+      overflow: hidden;
+      display: none;
+    }
+    #strength-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.3s, background 0.3s;
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-  <h1>IQ App</h1>
-  <input type="email" id="email" placeholder="Email" />
-  <input type="password" id="password" placeholder="Password" />
-  <button id="signupBtn">Sign Up</button>
-  <button id="loginBtn">Login</button>
-  <p id="message"></p>
-</div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+  <!-- Logo -->
+  <div class="logo">
+    <span class="logo-icon">🧠</span>
+    <div class="logo-name">BrainDeer</div>
+    <div class="logo-tag">Train your mind daily</div>
+  </div>
 
-// Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
-  authDomain: "braindeer-backend.firebaseapp.com",
-  projectId: "braindeer-backend",
-  storageBucket: "braindeer-backend.firebasestorage.app",
-  messagingSenderId: "331205139765",
-  appId: "1:331205139765:web:20cfef8194af63fc55c07c",
-  measurementId: "G-9B6885G0X0"
-};
+  <!-- Auth card -->
+  <div class="card">
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+    <!-- Tab switcher -->
+    <div class="tabs">
+      <div class="tab active" id="tab-login"  onclick="switchTab('login')">Sign In</div>
+      <div class="tab"        id="tab-signup" onclick="switchTab('signup')">Sign Up</div>
+    </div>
 
-// Elements
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const signupBtn = document.getElementById("signupBtn");
-const loginBtn = document.getElementById("loginBtn");
-const messageEl = document.getElementById("message");
+    <!-- Error / success banner -->
+    <div class="banner" id="banner"></div>
 
-// Signup
-signupBtn.addEventListener("click", async () => {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
-  if (!email || !password) return messageEl.textContent = "Enter email and password";
-  try {
-    await createUserWithEmailAndPassword(auth, email, password);
-    // Firebase automatically logs in the new user
-  } catch (err) {
-    messageEl.textContent = "Signup error: " + err.message;
-  }
-});
+    <!-- Google -->
+    <button class="btn btn-google" id="btn-google" onclick="signInWithGoogle()">
+      <svg class="g-logo" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+      <span class="btn-text">Continue with Google</span>
+      <div class="spinner"></div>
+    </button>
 
-// Login
-loginBtn.addEventListener("click", async () => {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
-  if (!email || !password) return messageEl.textContent = "Enter email and password";
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    // Successful login handled by onAuthStateChanged
-  } catch (err) {
-    messageEl.textContent = "Login error: " + err.message;
-  }
-});
+    <div class="divider">or</div>
 
-// Redirect on login
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // Redirect to main page
-    window.location.href = "improve.html";
-  }
-});
-</script>
+    <!-- Email form -->
+    <form id="auth-form" onsubmit="handleSubmit(event)">
+
+      <!-- Signup-only: username -->
+      <div class="form-group" id="field-username" style="display:none">
+        <label>Username</label>
+        <input type="text" id="input-username" placeholder="How you'll appear to others" autocomplete="username" maxlength="24">
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="input-email" placeholder="you@example.com" autocomplete="email" required>
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="input-password" placeholder="••••••••" autocomplete="current-password" required oninput="checkStrength(this.value)">
+        <div id="strength-bar"><div id="strength-fill"></div></div>
+      </div>
+
+      <div class="forgot" id="forgot-link" onclick="forgotPassword()">Forgot password?</div>
+
+      <button type="submit" class="btn btn-primary" id="btn-submit">
+        <span class="btn-text" id="submit-label">Sign In</span>
+        <div class="spinner"></div>
+      </button>
+
+    </form>
+
+    <div class="divider">or</div>
+
+    <!-- Guest -->
+    <button class="btn btn-guest" onclick="continueAsGuest()">
+      Continue without an account →
+    </button>
+
+  </div>
+
+  <div class="footer">
+    By continuing you agree to our terms.<br>
+    Progress is saved to your account across devices.
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithPopup,
+      GoogleAuthProvider,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      sendPasswordResetEmail,
+      updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, serverTimestamp }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey:            "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
+      authDomain:        "braindeer-backend.firebaseapp.com",
+      projectId:         "braindeer-backend",
+      storageBucket:     "braindeer-backend.firebasestorage.app",
+      messagingSenderId: "331205139765",
+      appId:             "1:331205139765:web:20cfef8194af63fc55c07c",
+    };
+
+    const app      = initializeApp(firebaseConfig);
+    const auth     = getAuth(app);
+    const db       = getFirestore(app);
+    const gProvider = new GoogleAuthProvider();
+
+    // ── Already logged in? Skip this page ─────────
+    onAuthStateChanged(auth, user => {
+      if (user) window.location.href = '/improve.html';
+    });
+
+    // ── State ─────────────────────────────────────
+    let mode = 'login'; // 'login' | 'signup'
+
+    window.switchTab = function(m) {
+      mode = m;
+      document.getElementById('tab-login').classList.toggle('active',  m === 'login');
+      document.getElementById('tab-signup').classList.toggle('active', m === 'signup');
+      document.getElementById('field-username').style.display = m === 'signup' ? 'block' : 'none';
+      document.getElementById('forgot-link').style.display    = m === 'login'  ? 'block' : 'none';
+      document.getElementById('submit-label').textContent     = m === 'login'  ? 'Sign In' : 'Create Account';
+      document.getElementById('input-password').autocomplete  = m === 'signup' ? 'new-password' : 'current-password';
+      document.getElementById('strength-bar').style.display   = m === 'signup' ? 'block' : 'none';
+      clearBanner();
+    };
+
+    // ── Banner ────────────────────────────────────
+    function showError(msg)   { const b = document.getElementById('banner'); b.textContent = msg; b.className = 'banner error'; }
+    function showSuccess(msg) { const b = document.getElementById('banner'); b.textContent = msg; b.className = 'banner success'; }
+    window.clearBanner = () => { document.getElementById('banner').className = 'banner'; };
+
+    // ── Loading state ─────────────────────────────
+    function setLoading(btnId, on) {
+      const btn = document.getElementById(btnId);
+      btn.classList.toggle('loading', on);
+      btn.disabled = on;
+    }
+
+    // ── Password strength ─────────────────────────
+    window.checkStrength = function(val) {
+      if (mode !== 'signup') return;
+      const bar  = document.getElementById('strength-fill');
+      let score  = 0;
+      if (val.length >= 8)          score++;
+      if (/[A-Z]/.test(val))        score++;
+      if (/[0-9]/.test(val))        score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      const w = ['0%','30%','55%','80%','100%'][score];
+      const c = ['#C8BEA8','#E07040','#D4A020','#5B9940','#2E7D32'][score];
+      bar.style.width = w;
+      bar.style.background = c;
+    };
+
+    // ── Post-login setup ──────────────────────────
+    // Creates a Firestore document for new users, skips for existing ones
+    async function ensureUserDoc(user, extraData = {}) {
+      const ref  = doc(db, 'users', user.uid);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) {
+        await setDoc(ref, {
+          uid:       user.uid,
+          email:     user.email,
+          username:  extraData.username || user.displayName || null,
+          pic:       user.photoURL || null,
+          createdAt: serverTimestamp(),
+          lastSeen:  serverTimestamp(),
+          // Start with sensible defaults — data.js will handle full defaults
+          answered: 0, correct: 0, xp: 0, level: 1, iq: null,
+        });
+      } else {
+        // Existing user — just update lastSeen (cheap write)
+        // Note: using merge so we don't overwrite game data
+        setDoc(ref, { lastSeen: serverTimestamp() }, { merge: true });
+      }
+    }
+
+    // ── Google sign in ────────────────────────────
+    window.signInWithGoogle = async function() {
+      setLoading('btn-google', true);
+      clearBanner();
+      try {
+        const result = await signInWithPopup(auth, gProvider);
+        await ensureUserDoc(result.user);
+        window.location.href = '/improve.html';
+      } catch (e) {
+        setLoading('btn-google', false);
+        if (e.code !== 'auth/popup-closed-by-user') {
+          showError(friendlyError(e.code));
+        }
+      }
+    };
+
+    // ── Email submit ──────────────────────────────
+    window.handleSubmit = async function(e) {
+      e.preventDefault();
+      clearBanner();
+
+      const email    = document.getElementById('input-email').value.trim();
+      const password = document.getElementById('input-password').value;
+      const username = document.getElementById('input-username').value.trim();
+
+      if (mode === 'signup' && password.length < 6) {
+        showError('Password must be at least 6 characters.');
+        return;
+      }
+
+      setLoading('btn-submit', true);
+      try {
+        if (mode === 'login') {
+          const cred = await signInWithEmailAndPassword(auth, email, password);
+          await ensureUserDoc(cred.user);
+        } else {
+          const cred = await createUserWithEmailAndPassword(auth, email, password);
+          // Set display name right away so profile.html has something to show
+          if (username) {
+            await updateProfile(cred.user, { displayName: username });
+          }
+          await ensureUserDoc(cred.user, { username });
+        }
+        window.location.href = '/improve.html';
+      } catch (e) {
+        setLoading('btn-submit', false);
+        showError(friendlyError(e.code));
+      }
+    };
+
+    // ── Forgot password ───────────────────────────
+    window.forgotPassword = async function() {
+      const email = document.getElementById('input-email').value.trim();
+      if (!email) { showError('Enter your email address first.'); return; }
+      try {
+        await sendPasswordResetEmail(auth, email);
+        showSuccess('Reset email sent! Check your inbox.');
+      } catch (e) {
+        showError(friendlyError(e.code));
+      }
+    };
+
+    // ── Guest ─────────────────────────────────────
+    window.continueAsGuest = function() {
+      localStorage.setItem('iq_guest', '1');
+      window.location.href = '/improve.html';
+    };
+
+    // ── Friendly Firebase error messages ──────────
+    function friendlyError(code) {
+      const map = {
+        'auth/user-not-found':          "No account with that email.",
+        'auth/wrong-password':          "Incorrect password.",
+        'auth/email-already-in-use':    "That email is already registered. Sign in instead.",
+        'auth/invalid-email':           "Invalid email address.",
+        'auth/weak-password':           "Password is too weak — use 6+ characters.",
+        'auth/too-many-requests':       "Too many attempts. Try again later.",
+        'auth/network-request-failed':  "No internet connection.",
+        'auth/invalid-credential':      "Email or password is incorrect.",
+      };
+      return map[code] || "Something went wrong. Please try again.";
+    }
+
+  </script>
 </body>
 </html>
