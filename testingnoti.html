@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>iPhone Push Test</title>
+  <title>iPhone Push Auto Test</title>
   <link rel="manifest" href="manifest.json">
   <style>
     body { font-family: sans-serif; padding: 20px; }
@@ -21,28 +21,14 @@
 </head>
 <body>
 
-  <h1>iPhone Push Test</h1>
+  <h1>iPhone Push Auto Test</h1>
   <button onclick="enablePush()">Enable Push Notifications</button>
 
   <div id="log">Logs will appear here...</div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-messaging.js";
-
     const logDiv = document.getElementById("log");
     function log(msg) { logDiv.textContent += "\n" + msg; }
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDv3SpKBi_bS6hwfKABho55vA52VjwRZPE",
-      authDomain: "roblox-df2ad.firebaseapp.com",
-      projectId: "roblox-df2ad",
-      messagingSenderId: "323286791287",
-      appId: "1:323286791287:web:c895be3f1802017086c272"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const messaging = getMessaging(app);
 
     async function enablePush() {
       try {
@@ -51,18 +37,13 @@
         if (permission !== "granted") { log("❌ Permission denied"); return; }
         log("Permission granted ✅");
 
-        log("Registering service worker...");
-        const registration = await navigator.serviceWorker.register("/IQ/firebase-messaging-sw.js");
-        log("Service worker registered ✅");
-
-        log("Getting FCM token...");
-        const token = await getToken(messaging, {
-          vapidKey: "BE4vyGsiD6DgxdiLEfRHgaVgdBHmy2Ps6UFZLt3pql6ENGVKiRvRULNxIeQG16cyQmMGEa4StJpqx_ugg10-J3Y",
-          serviceWorkerRegistration: registration
-        });
-
-        if (token) { log("✅ TOKEN RECEIVED:"); log(token); }
-        else { log("⚠️ No token returned"); }
+        log("Waiting 5 seconds to send test notification...");
+        setTimeout(() => {
+          log("Sending test notification 🔔");
+          new Notification("Test Notification", {
+            body: "This is a fully automated test!",
+          });
+        }, 5000);
 
       } catch (err) {
         log("❌ ERROR:"); log(err.message);
