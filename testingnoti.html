@@ -1,32 +1,50 @@
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-messaging.js";
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>iPhone Push Test</title>
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <h1>iPhone Push Test</h1>
+  <button onclick="enablePush()">Enable Push Notifications</button>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDv3SpKBi_bS6hwfKABho55vA52VjwRZPE",
-    authDomain: "roblox-df2ad.firebaseapp.com",
-    projectId: "roblox-df2ad",
-    messagingSenderId: "323286791287",
-    appId: "1:323286791287:web:c895be3f1802017086c272"
-  };
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-messaging.js";
 
-  const app = initializeApp(firebaseConfig);
-  const messaging = getMessaging(app);
+    const firebaseConfig = {
+      apiKey: "AIzaSyDv3SpKBi_bS6hwfKABho55vA52VjwRZPE",
+      authDomain: "roblox-df2ad.firebaseapp.com",
+      projectId: "roblox-df2ad",
+      messagingSenderId: "323286791287",
+      appId: "1:323286791287:web:c895be3f1802017086c272"
+    };
 
-  async function enablePush() {
-    const permission = await Notification.requestPermission();
-    if (permission !== "granted") {
-      alert("Permission denied");
-      return;
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+
+    async function enablePush() {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+          alert("Permission denied");
+          return;
+        }
+
+        const token = await getToken(messaging, {
+          vapidKey: "BE4vyGsiD6DgxdiLEfRHgaVgdBHmy2Ps6UFZLt3pql6ENGVKiRvRULNxIeQG16cyQmMGEa4StJpqx_ugg10-J3Y"
+        });
+
+        console.log("FCM TOKEN:", token);
+        alert("Subscribed! Open console to copy your token.");
+      } catch (err) {
+        console.error("Error getting token:", err);
+        alert("Error — check console.");
+      }
     }
 
-    const token = await getToken(messaging, {
-      vapidKey: "BE4vyGsiD6DgxdiLEfRHgaVgdBHmy2Ps6UFZLt3pql6ENGVKiRvRULNxIeQG16cyQmMGEa4StJpqx_ugg10-J3Y"
-    });
-
-    console.log("FCM TOKEN:", token);
-    alert("Subscribed! Check console.");
-  }
-
-  window.enablePush = enablePush;
-</script>
+    window.enablePush = enablePush;
+  </script>
+</body>
+</html>
