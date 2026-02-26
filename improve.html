@@ -396,9 +396,24 @@
   </div>
 </div>
 
-<script src="data.js"></script>
-<script src="questions.js"></script>
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { IQData } from "./data.js"; // Make sure this supports load(uid) and recordAnswer(uid,...)
+import { Q, getEncouragement } from "./questions.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
+  authDomain: "braindeer-backend.firebaseapp.com",
+  projectId: "braindeer-backend",
+  storageBucket: "braindeer-backend.firebasestorage.app",
+  messagingSenderId: "331205139765",
+  appId: "1:331205139765:web:20cfef8194af63fc55c07c"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
 const feed = document.getElementById('feed');
 const iqVal = document.getElementById('iq-val');
 const streakVal = document.getElementById('streak-val');
@@ -417,7 +432,23 @@ const xpLabel = document.getElementById('xp-label');
 let slides = 0, answerStart = 0;
 const questionQueue = [];
 const QUEUE_TARGET = 25;
+let CURRENT_UID = null;
+let SESSION_DATA = null;
 
+// -------------------- Firebase auth + load user data --------------------
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "login.html"; // Not logged in, redirect
+    return;
+  }
+
+  CURRENT_UID = user.uid;
+  SESSION_DATA = await IQData.load(CURRENT_UID); // Load cloud data
+  IQData.saveSession(SESSION_DATA); // Restore local session
+  init(); // Start the app after data is ready
+});
+
+// -------------------- Question Queue --------------------
 function fillQueue() {
   while (questionQueue.length < QUEUE_TARGET) questionQueue.push(Q.generate());
 }
@@ -428,18 +459,26 @@ function nextQuestion() {
   return q;
 }
 
+// -------------------- App Initialization --------------------
 function init() {
-  if (IQData.needsOnboarding()) { onboard.classList.add('show'); } else { load(); }
   ageSlider.oninput = () => ageDisplay.textContent = ageSlider.value;
+  if (IQData.needsOnboarding()) {
+    onboard.classList.add('show');
+  } else {
+    loadApp();
+  }
 }
+
 function startApp() {
-  IQData.setAge(parseInt(ageSlider.value));
+  IQData.setAge(parseInt(ageSlider.value), CURRENT_UID);
   onboard.classList.remove('show');
   Q.setAge(parseInt(ageSlider.value));
-  load();
+  loadApp();
 }
-function load() {
-  const d = IQData.load();
+
+// -------------------- Load / UI --------------------
+function loadApp() {
+  const d = IQData.load(); // local session is already restored
   Q.setAge(d.age);
   updateUI(d);
   fillQueue();
@@ -448,23 +487,26 @@ function load() {
   feed.addEventListener('touchmove', checkMore, { passive: true });
   setInterval(checkMore, 150);
 }
+
 function checkMore() {
   const h = feed.clientHeight;
   if (!h) return;
   const idx = Math.round(feed.scrollTop / h);
   while (slides < idx + 10) addSlide();
 }
+
 function addSlide() {
   const q = nextQuestion();
   const idx = slides++;
   const div = document.createElement('div');
   div.className = 'slide';
-  div.innerHTML = render(q, idx);
+  div.innerHTML = renderQuestion(q, idx);
   feed.appendChild(div);
   answerStart = Date.now();
 }
 
-function render(q, idx) {
+// -------------------- Render --------------------
+function renderQuestion(q, idx) {
   let visual = '';
   if (q.visual === 'sequence' || q.visual === 'letterSequence') {
     const parts = q.sequence.map((n, i) => {
@@ -475,7 +517,7 @@ function render(q, idx) {
     if (q.sequence[0] !== '?') parts.push(`<span class="arrow">-</span><span class="blank">?</span>`);
     visual = `<div class="sequence">${parts.join('')}</div>`;
   } else if (q.visual === 'matrix') {
-    visual = `<div class="matrix">${q.grid.map(c => 
+    visual = `<div class="matrix">${q.grid.map(c =>
       `<div class="matrix-cell${c === '?' ? ' blank' : ''}">${c}</div>`
     ).join('')}</div>`;
   }
@@ -498,6 +540,7 @@ function render(q, idx) {
     </div>`;
 }
 
+// -------------------- Answer Handling --------------------
 document.addEventListener('click', e => {
   if (!e.target.classList.contains('opt')) return;
   const btn = e.target, opts = btn.parentElement;
@@ -507,22 +550,23 @@ document.addEventListener('click', e => {
   const correct = opts.dataset.ans, val = btn.dataset.v;
   const isCorrect = val === correct;
   const ms = Date.now() - answerStart;
-  
+
   opts.querySelectorAll('.opt').forEach(o => {
     if (o.dataset.v === correct) o.classList.add(isCorrect ? 'correct' : 'show-correct');
     else if (o === btn) o.classList.add('wrong');
     else o.classList.add('dim');
   });
-  
-  const result = IQData.recordAnswer(opts.dataset.cat, isCorrect, parseFloat(opts.dataset.diff), ms);
+
+  const result = IQData.recordAnswer(CURRENT_UID, opts.dataset.cat, isCorrect, parseFloat(opts.dataset.diff), ms);
+
   const fb = document.getElementById(`fb-${idx}`);
   fb.textContent = getEncouragement(result.streak, isCorrect);
   fb.className = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
-  
+
   if (isCorrect) { flash.className = 'flash green show'; spawnConfetti(8); }
   else { flash.className = 'flash red show'; }
   setTimeout(() => flash.className = 'flash', 300);
-  
+
   if (isCorrect && result.streak > 0 && result.streak % 5 === 0) {
     setTimeout(() => {
       streakNum.textContent = result.streak;
@@ -531,6 +575,7 @@ document.addEventListener('click', e => {
       setTimeout(() => streakPopup.classList.remove('show'), 1800);
     }, 300);
   }
+
   updateUI(result);
   checkMore();
   setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'), 250);
@@ -538,11 +583,13 @@ document.addEventListener('click', e => {
   answerStart = Date.now();
 });
 
+// -------------------- Confetti --------------------
 function spawnConfetti(n) {
   const colors = ['#5EB85E','#FFD700','#FF6B6B','#4ECDC4','#A855F7','#F59E0B'];
   for (let i = 0; i < n; i++) {
     const p = document.createElement('i');
-    p.style.left = Math.random()*100+'%'; p.style.top = '-10px';
+    p.style.left = Math.random()*100+'%';
+    p.style.top = '-10px';
     p.style.background = colors[Math.floor(Math.random()*colors.length)];
     p.style.borderRadius = Math.random()>0.5?'50%':'2px';
     p.style.animationDelay = Math.random()*0.2+'s';
@@ -551,6 +598,8 @@ function spawnConfetti(n) {
     setTimeout(() => p.remove(), 1400);
   }
 }
+
+// -------------------- UI Update --------------------
 function updateUI(d) {
   iqVal.textContent = d.iq || '--';
   if (d.streak > 0) { streakPill.style.display = 'flex'; streakVal.textContent = d.streak; }
@@ -560,7 +609,6 @@ function updateUI(d) {
   levelLabel.textContent = 'Lvl ' + d.level;
   xpLabel.textContent = xpInLevel + '/150';
 }
-init();
 </script>
 </body>
 </html>
