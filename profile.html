@@ -323,6 +323,8 @@
 
 <script src="data.js"></script>
 <script>
+import { requireAuth } from './data.js';
+await requireAuth();
 const abilities = [
   { key:'patternRecognition', name:'Pattern', bar:'pattern' },
   { key:'problemSolving', name:'Problem Solving', bar:'problem' },
