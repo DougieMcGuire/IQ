@@ -1,56 +1,186 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <title>iPhone Push Auto Test</title>
+  <meta charset="UTF-8">
+  <title>iPhone PWA Playground</title>
   <link rel="manifest" href="manifest.json">
   <style>
-    body { font-family: sans-serif; padding: 20px; }
-    button { padding: 10px 15px; font-size: 16px; }
+    body { font-family: sans-serif; padding: 20px; background: #f0f0f0; }
+    button { padding: 10px 15px; font-size: 16px; margin:5px; }
     #log {
-      margin-top: 20px;
-      padding: 10px;
-      background: #111;
-      color: #0f0;
-      font-family: monospace;
-      white-space: pre-wrap;
-      word-break: break-word;
+      margin-top: 20px; padding: 10px; background: #111; color: #0f0;
+      font-family: monospace; white-space: pre-wrap; word-break: break-word;
       border-radius: 6px;
     }
+    input { margin: 5px; }
+    video { width: 100%; max-width: 300px; margin-top: 10px; border: 1px solid #333; }
   </style>
 </head>
 <body>
-
-  <h1>iPhone Push Auto Test</h1>
-  <button onclick="enablePush()">Enable Push Notifications</button>
+  <h1>iPhone PWA Playground</h1>
+  
+  <button onclick="enablePush()">Enable Push</button>
+  <button onclick="testNotification()">Test Instant Notification</button>
+  <button onclick="vibrate()">Vibrate Device</button>
+  <button onclick="playAudio()">Play Sound</button>
+  <button onclick="getLocation()">Get Geolocation</button>
+  <button onclick="testStorage()">Test LocalStorage</button>
+  <button onclick="testIDB()">Test IndexedDB</button>
+  <button onclick="detectFullscreen()">Check Fullscreen</button>
+  <button onclick="getOrientation()">Get Device Orientation</button>
+  <button onclick="getCamera()">Test Camera</button>
 
   <div id="log">Logs will appear here...</div>
+  <video id="video" autoplay playsinline></video>
 
   <script type="module">
     const logDiv = document.getElementById("log");
-    function log(msg) { logDiv.textContent += "\n" + msg; }
+    const videoEl = document.getElementById("video");
+    function log(msg){ logDiv.textContent += "\n" + msg; }
 
-    async function enablePush() {
-      try {
+    // -------------------------
+    // PUSH (FCM + instant)
+    // -------------------------
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-messaging.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDv3SpKBi_bS6hwfKABho55vA52VjwRZPE",
+      authDomain: "roblox-df2ad.firebaseapp.com",
+      projectId: "roblox-df2ad",
+      messagingSenderId: "323286791287",
+      appId: "1:323286791287:web:c895be3f1802017086c272"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+
+    async function enablePush(){
+      try{
         log("Requesting permission...");
         const permission = await Notification.requestPermission();
-        if (permission !== "granted") { log("❌ Permission denied"); return; }
+        if(permission!=="granted"){ log("❌ Permission denied"); return; }
         log("Permission granted ✅");
 
-        log("Waiting 5 seconds to send test notification...");
-        setTimeout(() => {
-          log("Sending test notification 🔔");
-          new Notification("Test Notification", {
-            body: "This is a fully automated test!",
-          });
-        }, 5000);
+        const registration = await navigator.serviceWorker.register("/IQ/firebase-messaging-sw.js");
+        log("Service worker registered ✅");
 
-      } catch (err) {
-        log("❌ ERROR:"); log(err.message);
+        const token = await getToken(messaging, {
+          vapidKey: "BE4vyGsiD6DgxdiLEfRHgaVgdBHmy2Ps6UFZLt3pql6ENGVKiRvRULNxIeQG16cyQmMGEa4StJpqx_ugg10-J3Y",
+          serviceWorkerRegistration: registration
+        });
+        log("FCM TOKEN:");
+        log(token);
+      }catch(err){ log("❌ ERROR: "+err.message); }
+    }
+
+    function testNotification(){
+      if(Notification.permission==="granted"){
+        new Notification("Test Notification", { body:"Instant test!" });
+        log("Notification sent 🔔");
+      }else{
+        log("Permission not granted for notifications.");
       }
     }
 
+    // -------------------------
+    // VIBRATION
+    // -------------------------
+    function vibrate(){
+      if("vibrate" in navigator){
+        navigator.vibrate([300,100,300]);
+        log("Vibration triggered");
+      }else log("Vibration API not supported");
+    }
+
+    // -------------------------
+    // AUDIO
+    // -------------------------
+    let audioCtx;
+    function playAudio(){
+      if(!audioCtx) audioCtx = new AudioContext();
+      const o = audioCtx.createOscillator();
+      o.connect(audioCtx.destination);
+      o.type = "sine"; o.frequency.value = 440; // A4
+      o.start();
+      o.stop(audioCtx.currentTime + 0.5);
+      log("Played 0.5s beep");
+    }
+
+    // -------------------------
+    // GEOLOCATION
+    // -------------------------
+    function getLocation(){
+      if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(
+          pos => log(`Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`),
+          err => log("Error: "+err.message)
+        );
+      }else log("Geolocation not supported");
+    }
+
+    // -------------------------
+    // LOCALSTORAGE
+    // -------------------------
+    function testStorage(){
+      try{
+        localStorage.setItem("testKey","Hello LocalStorage");
+        log("Saved to LocalStorage: "+localStorage.getItem("testKey"));
+      }catch(e){ log("LocalStorage error: "+e.message); }
+    }
+
+    // -------------------------
+    // INDEXEDDB
+    // -------------------------
+    function testIDB(){
+      const req = indexedDB.open("TestDB",1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore("store");
+      req.onsuccess = e => log("IndexedDB opened successfully");
+      req.onerror = e => log("IndexedDB error: "+e.target.error);
+    }
+
+    // -------------------------
+    // FULLSCREEN DETECTION
+    // -------------------------
+    function detectFullscreen(){
+      const fs = window.matchMedia("(display-mode: standalone)").matches;
+      log("Standalone / fullscreen? "+fs);
+    }
+
+    // -------------------------
+    // DEVICE ORIENTATION
+    // -------------------------
+    function getOrientation(){
+      if(window.DeviceOrientationEvent){
+        window.addEventListener("deviceorientation", e=>{
+          log(`Alpha: ${e.alpha}, Beta: ${e.beta}, Gamma: ${e.gamma}`);
+        }, {once:true});
+        log("Listening for device orientation...");
+      }else log("DeviceOrientation not supported");
+    }
+
+    // -------------------------
+    // CAMERA
+    // -------------------------
+    async function getCamera(){
+      try{
+        const stream = await navigator.mediaDevices.getUserMedia({ video:true, audio:false });
+        videoEl.srcObject = stream;
+        log("Camera stream started ✅");
+      }catch(e){ log("Camera error: "+e.message); }
+    }
+
     window.enablePush = enablePush;
+    window.testNotification = testNotification;
+    window.vibrate = vibrate;
+    window.playAudio = playAudio;
+    window.getLocation = getLocation;
+    window.testStorage = testStorage;
+    window.testIDB = testIDB;
+    window.detectFullscreen = detectFullscreen;
+    window.getOrientation = getOrientation;
+    window.getCamera = getCamera;
+
   </script>
 
 </body>
