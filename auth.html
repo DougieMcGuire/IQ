@@ -1,112 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IQ App - Signup/Login</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 2rem; background: #f0f0f0; }
-    .container { max-width: 400px; margin: auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    h1 { text-align: center; margin-bottom: 1rem; }
-    input { width: 100%; padding: 0.5rem; margin: 0.5rem 0; }
-    button { width: 100%; padding: 0.5rem; margin-top: 0.5rem; }
-    #userInfo { margin-top: 1rem; text-align: center; }
-    .hidden { display: none; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IQ App - Login/Signup</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 2rem; background: #f0f0f0; }
+  .container { max-width: 400px; margin: auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  h1 { text-align: center; margin-bottom: 1rem; }
+  input { width: 100%; padding: 0.5rem; margin: 0.5rem 0; }
+  button { width: 100%; padding: 0.5rem; margin-top: 0.5rem; }
+  #message { text-align: center; margin-top: 1rem; color: red; }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>IQ App</h1>
-    <div id="authForms">
-      <input type="email" id="email" placeholder="Email" />
-      <input type="password" id="password" placeholder="Password" />
-      <button id="signupBtn">Sign Up</button>
-      <button id="loginBtn">Login</button>
-    </div>
-    <div id="userInfo" class="hidden">
-      <p id="welcome"></p>
-      <button id="logoutBtn">Logout</button>
-    </div>
-  </div>
+<div class="container">
+  <h1>IQ App</h1>
+  <input type="email" id="email" placeholder="Email" />
+  <input type="password" id="password" placeholder="Password" />
+  <button id="signupBtn">Sign Up</button>
+  <button id="loginBtn">Login</button>
+  <p id="message"></p>
+</div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
-      authDomain: "braindeer-backend.firebaseapp.com",
-      projectId: "braindeer-backend",
-      storageBucket: "braindeer-backend.firebasestorage.app",
-      messagingSenderId: "331205139765",
-      appId: "1:331205139765:web:20cfef8194af63fc55c07c",
-      measurementId: "G-9B6885G0X0"
-    };
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
+  authDomain: "braindeer-backend.firebaseapp.com",
+  projectId: "braindeer-backend",
+  storageBucket: "braindeer-backend.firebasestorage.app",
+  messagingSenderId: "331205139765",
+  appId: "1:331205139765:web:20cfef8194af63fc55c07c",
+  measurementId: "G-9B6885G0X0"
+};
 
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-    // Elements
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const signupBtn = document.getElementById("signupBtn");
-    const loginBtn = document.getElementById("loginBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const welcomeText = document.getElementById("welcome");
-    const authForms = document.getElementById("authForms");
-    const userInfo = document.getElementById("userInfo");
+// Elements
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const signupBtn = document.getElementById("signupBtn");
+const loginBtn = document.getElementById("loginBtn");
+const messageEl = document.getElementById("message");
 
-    // Signup
-    signupBtn.addEventListener("click", async () => {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value.trim();
-      if (!email || !password) return alert("Enter email and password");
-      try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        console.log("Signup success", userCredential.user.uid);
-      } catch (err) {
-        alert("Signup error: " + err.message);
-      }
-    });
+// Signup
+signupBtn.addEventListener("click", async () => {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+  if (!email || !password) return messageEl.textContent = "Enter email and password";
+  try {
+    await createUserWithEmailAndPassword(auth, email, password);
+    // Firebase automatically logs in the new user
+  } catch (err) {
+    messageEl.textContent = "Signup error: " + err.message;
+  }
+});
 
-    // Login
-    loginBtn.addEventListener("click", async () => {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value.trim();
-      if (!email || !password) return alert("Enter email and password");
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        console.log("Login success", userCredential.user.uid);
-      } catch (err) {
-        alert("Login error: " + err.message);
-      }
-    });
+// Login
+loginBtn.addEventListener("click", async () => {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+  if (!email || !password) return messageEl.textContent = "Enter email and password";
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    // Successful login handled by onAuthStateChanged
+  } catch (err) {
+    messageEl.textContent = "Login error: " + err.message;
+  }
+});
 
-    // Logout
-    logoutBtn.addEventListener("click", async () => {
-      await signOut(auth);
-    });
-
-    // Auth state listener
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // User logged in
-        authForms.classList.add("hidden");
-        userInfo.classList.remove("hidden");
-        welcomeText.textContent = `Welcome, ${user.email}! (UID: ${user.uid})`;
-
-        // Here you can now pass user.uid to IQData methods, e.g. IQData.load(user.uid)
-        // Example: IQData.load(user.uid).then(data => console.log(data));
-      } else {
-        // User logged out
-        authForms.classList.remove("hidden");
-        userInfo.classList.add("hidden");
-        emailInput.value = "";
-        passwordInput.value = "";
-      }
-    });
-  </script>
+// Redirect on login
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // Redirect to main page
+    window.location.href = "improve.html";
+  }
+});
+</script>
 </body>
 </html>
