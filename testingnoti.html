@@ -12,7 +12,6 @@
       font-family: monospace; white-space: pre-wrap; word-break: break-word;
       border-radius: 6px;
     }
-    input { margin: 5px; }
     video { width: 100%; max-width: 300px; margin-top: 10px; border: 1px solid #333; }
   </style>
 </head>
@@ -21,7 +20,7 @@
   
   <button onclick="enablePush()">Enable Push</button>
   <button onclick="testNotification()">Test Instant Notification</button>
-  <button onclick="vibrate()">Vibrate Device</button>
+  <button onclick="vibrate()">Simulate Haptic Feedback</button>
   <button onclick="playAudio()">Play Sound</button>
   <button onclick="getLocation()">Get Geolocation</button>
   <button onclick="testStorage()">Test LocalStorage</button>
@@ -78,19 +77,34 @@
       if(Notification.permission==="granted"){
         new Notification("Test Notification", { body:"Instant test!" });
         log("Notification sent 🔔");
-      }else{
-        log("Permission not granted for notifications.");
-      }
+      }else log("Permission not granted for notifications.");
     }
 
     // -------------------------
-    // VIBRATION
+    // HAPTIC FEEDBACK (simulated)
     // -------------------------
     function vibrate(){
+      const btn = document.querySelector("button[onclick='vibrate()']");
       if("vibrate" in navigator){
-        navigator.vibrate([300,100,300]);
-        log("Vibration triggered");
-      }else log("Vibration API not supported");
+        const success = navigator.vibrate([100,50,100]);
+        if(success){ log("Vibration triggered (native) ✅"); return; }
+      }
+      // Fallback: shake button + short beep
+      log("Simulating haptic feedback 🔔");
+      btn.style.transition = "transform 0.05s";
+      let i=0;
+      const interval = setInterval(()=>{
+        btn.style.transform = (i%2===0)?"translateX(3px)":"translateX(-3px)";
+        i++;
+        if(i>5){ clearInterval(interval); btn.style.transform="translateX(0)"; }
+      },50);
+      // short beep
+      if(!window.audioCtx) window.audioCtx = new AudioContext();
+      const o = window.audioCtx.createOscillator();
+      o.connect(window.audioCtx.destination);
+      o.type="square"; o.frequency.value=200;
+      o.start();
+      o.stop(window.audioCtx.currentTime + 0.05);
     }
 
     // -------------------------
@@ -101,7 +115,7 @@
       if(!audioCtx) audioCtx = new AudioContext();
       const o = audioCtx.createOscillator();
       o.connect(audioCtx.destination);
-      o.type = "sine"; o.frequency.value = 440; // A4
+      o.type = "sine"; o.frequency.value = 440;
       o.start();
       o.stop(audioCtx.currentTime + 0.5);
       log("Played 0.5s beep");
@@ -182,6 +196,5 @@
     window.getCamera = getCamera;
 
   </script>
-
 </body>
 </html>
