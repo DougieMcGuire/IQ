@@ -45,105 +45,17 @@ onAuthStateChanged(auth, async user => {
 async function requireAuth() {
   await authReady;
   if (!currentUser && !IQData.isGuest()) {
-    window.location.href = '/auth.html';
+    if (window.parent !== window) { parent.goTo('auth'); } else { window.location.href = '/auth.html'; }
   }
 }
 
 // auth.html: already logged in? skip straight to the app
 async function redirectIfLoggedIn() {
   await authReady;
-  if (currentUser) window.location.href = '/improve.html';
+  if (currentUser) {
+    if (window.parent !== window) { parent.goTo('improve'); } else { window.location.href = '/improve.html'; }
+  }
 }
-
-// ═══════════════════════════════════════════════════
-// SYNC STRATEGY  (stay well inside free tier)
-// Free tier: 20K writes / day
-// We write every 10 correct answers + on page unload + on session end
-// A single user would need 200K answers/day to hit the cap — impossible
-// ═══════════════════════════════════════════════════
-const SYNC_EVERY = 10;
-let _pendingAnswers = 0;
-
-// ═══════════════════════════════════════════════════
-// IQData — the single source of truth
-// ═══════════════════════════════════════════════════
-const IQData = {
-  KEY:       'iq_profile_v6',
-  GUEST_KEY: 'iq_guest',
-
-  // ─── Schema ──────────────────────────────────────
-  defaults() {
-    return {
-      uid:      null,
-      username: null,
-      age:      null,
-      ratings: {
-        patternRecognition: { r:1000, n:0, wins:0, history:[] },
-        problemSolving:     { r:1000, n:0, wins:0, history:[] },
-        mentalAgility:      { r:1000, n:0, wins:0, history:[] },
-        workingMemory:      { r:1000, n:0, wins:0, history:[] },
-        verbalReasoning:    { r:1000, n:0, wins:0, history:[] },
-        logicalReasoning:   { r:1000, n:0, wins:0, history:[] },
-        spatialAwareness:   { r:1000, n:0, wins:0, history:[] },
-        numericalReasoning: { r:1000, n:0, wins:0, history:[] }
-      },
-      answered:      0,
-      correct:       0,
-      streak:        0,
-      bestStreak:    0,
-      iq:            null,
-      pic:           null,
-      xp:            0,
-      level:         1,
-      avgMs:         0,
-      fastAnswers:   0,
-      totalSessions: 0,
-      createdAt:     null,
-      lastSeen:      null,
-    };
-  },
-
-  // ─── Local storage ───────────────────────────────
-  load() {
-    try {
-      const s = localStorage.getItem(this.KEY);
-      if (!s) return this.defaults();
-      const d    = JSON.parse(s);
-      const def  = this.defaults();
-      // Migrate: fill any missing rating keys
-      for (const k of Object.keys(def.ratings)) {
-        if (!d.ratings[k])                    d.ratings[k]         = def.ratings[k];
-        if (d.ratings[k].history === undefined) d.ratings[k].history = [];
-        if (d.ratings[k].wins   === undefined) d.ratings[k].wins   = 0;
-      }
-      // Migrate: fill any missing top-level keys
-      for (const k of Object.keys(def)) {
-        if (d[k] === undefined) d[k] = def[k];
-      }
-      return d;
-    } catch { return this.defaults(); }
-  },
-
-  save(d) {
-    try { localStorage.setItem(this.KEY, JSON.stringify(d)); } catch {}
-  },
-
-  // ─── Guest mode ──────────────────────────────────
-  // Guest: plays without an account; data is local-only
-  isGuest()     { return localStorage.getItem(this.GUEST_KEY) === '1'; },
-  setGuest(v)   { localStorage.setItem(this.GUEST_KEY, v ? '1' : '0'); },
-
-  // ─── Auth helpers ────────────────────────────────
-  isLoggedIn()     { return !!currentUser; },
-  getCurrentUser() { return currentUser; },
-
-  async signOut() {
-    await this._pushToCloud();          // save before leaving
-    await signOut(auth);
-    localStorage.removeItem(this.KEY);
-    localStorage.removeItem(this.GUEST_KEY);
-    window.location.href = '/auth.html';
-  },
 
   // ─── Profile setters ─────────────────────────────
   needsOnboarding() { return !this.load().age; },
