@@ -3,8 +3,9 @@
   "short_name": "Braindeer",
   "start_url": "app.html",
   "display": "standalone",
-  "background_color": "#111111",
-  "theme_color": "#111111",
+  "background_color": "#3a2918",
+  "theme_color": "#3a2918",
+  "gcm_sender_id": "331205139765",
   "icons": [
     {
       "src": "3918CB8F-DA0D-4131-B6A7-E60B0102C850.jpeg",
@@ -13,4 +14,3 @@
     }
   ]
 }
-
