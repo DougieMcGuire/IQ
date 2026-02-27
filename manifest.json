@@ -1,13 +1,13 @@
 {
-  "name": "Braindeer",
-  "short_name": "Braindeer - Improve your IQ.",
-  "start_url": "IQ/app.html",
+  "name": "Braindeer - Improve your IQ",
+  "short_name": "Braindeer",
+  "start_url": "app.html",
   "display": "standalone",
   "background_color": "#111111",
   "theme_color": "#111111",
   "icons": [
     {
-      "src": "IQ/3918CB8F-DA0D-4131-B6A7-E60B0102C850.jpeg",
+      "src": "3918CB8F-DA0D-4131-B6A7-E60B0102C850.jpeg",
       "sizes": "192x192",
       "type": "image/jpeg"
     }
