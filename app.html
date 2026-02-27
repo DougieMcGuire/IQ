@@ -8,138 +8,92 @@
   <meta name="theme-color" content="#3a2918">
   <link rel="manifest" href="manifest.json">
   <title>BrainDeer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #f0e2cc;
-      --card: #f7eed8;
-      --brown-dark: #3a2918;
-      --brown-mid: #6b4f32;
-      --brown-light: #8f6b4a;
-      --tan: #c2a476;
-      --cream: #f0e2cc;
-      --green: #58cc02;
-      --green-dark: #46a302;
-      --red: #ea2b2b;
-      --red-dark: #c42020;
-      --gold: #ffc800;
-      --blue: #1cb0f6;
-      --purple: #ce82ff;
-      --orange: #ff9600;
-    }
+    :root { --bg: #3a2918; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; overflow: hidden; background: var(--brown-dark); }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
+
+    #splash {
+      position: fixed; inset: 0; z-index: 9999; background: var(--bg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 0.3s ease;
+    }
+    #splash.hide { opacity: 0; pointer-events: none; }
+    #splash .mascot { font-size: 56px; animation: bob 1.2s ease-in-out infinite; }
+    #splash .name {
+      font-family: 'Nunito', sans-serif; font-size: 26px; font-weight: 900;
+      color: #f0e2cc; margin-top: 8px;
+    }
+    #splash .dots { margin-top: 16px; display: flex; gap: 6px; }
+    #splash .dots span {
+      width: 8px; height: 8px; border-radius: 50%; background: #6b4f32;
+      animation: dotPulse 1s ease infinite;
+    }
+    #splash .dots span:nth-child(2) { animation-delay: 0.15s; }
+    #splash .dots span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    @keyframes dotPulse { 0%,100%{opacity:.3;transform:scale(.8)} 50%{opacity:1;transform:scale(1.2)} }
 
     .screen {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      display: none;
-      overflow: hidden;
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      display: none; overflow: hidden;
     }
-    .screen.active {
-      display: block;
-    }
-
-    /* Hide everything until we know auth state */
-    body.loading .screen { display: none !important; }
-    body.loading::after {
-      content: '🦌';
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 48px;
-      background: var(--brown-dark);
-      animation: pulse 1s ease infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.7; transform: scale(1.1); }
-    }
+    .screen.active { display: block; }
+    .screen iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
   </style>
 </head>
-<body class="loading">
+<body>
+
+<div id="splash">
+  <div class="mascot">🦌</div>
+  <div class="name">BrainDeer</div>
+  <div class="dots"><span></span><span></span><span></span></div>
+</div>
 
 <div class="screen" id="screen-auth"></div>
 <div class="screen" id="screen-improve"></div>
 <div class="screen" id="screen-profile"></div>
 
 <script>
-  // Navigation system
-  let currentScreen = null;
+  var currentScreen = null;
+  var screensLoaded = {};
 
   function goTo(page) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const el = document.getElementById('screen-' + page);
-    if (el) {
-      el.classList.add('active');
-      currentScreen = page;
-      // Notify the loaded page
-      if (el._onShow) el._onShow();
-    }
-  }
-
-  // Dynamic page loader - loads HTML into divs instead of iframes
-  async function loadPage(name, url) {
-    const container = document.getElementById('screen-' + name);
-    try {
-      const resp = await fetch(url);
-      const html = await resp.text();
-      // Extract body content and styles
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      
-      // Create a shadow-like container
-      const wrapper = document.createElement('div');
-      wrapper.style.cssText = 'width:100%;height:100%;overflow:hidden;position:relative;';
-      
-      // We'll use iframes but manage them better
-      const iframe = document.createElement('iframe');
-      iframe.src = url;
-      iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;background:var(--brown-dark);';
-      iframe.setAttribute('scrolling', 'yes');
-      container.appendChild(iframe);
-    } catch(e) {
-      console.warn('Failed to load', name, e);
-    }
-  }
-
-  // Boot sequence
-  async function boot() {
-    // Load all pages as iframes
-    ['auth', 'improve', 'profile'].forEach(name => {
-      const container = document.getElementById('screen-' + name);
-      const iframe = document.createElement('iframe');
-      iframe.src = name + '.html';
-      iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;';
-      iframe.setAttribute('scrolling', 'yes');
+    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+    if (!screensLoaded[page]) {
+      var container = document.getElementById('screen-' + page);
+      var iframe = document.createElement('iframe');
+      iframe.src = page + '.html';
       iframe.allow = 'web-share';
       container.appendChild(iframe);
-    });
+      screensLoaded[page] = true;
+    }
+    var el = document.getElementById('screen-' + page);
+    if (el) { el.classList.add('active'); currentScreen = page; }
+    var splash = document.getElementById('splash');
+    if (splash && !splash.classList.contains('hide')) {
+      splash.classList.add('hide');
+      setTimeout(function() { if (splash.parentNode) splash.remove(); }, 400);
+    }
+  }
 
-    // Check auth state
-    const isGuest = localStorage.getItem('iq_guest') === '1';
-    const hasFirebaseUser = Object.keys(localStorage).some(k => k.startsWith('firebase:authUser:'));
-    
-    // Remove loading state and show correct screen
-    document.body.classList.remove('loading');
-    
+  function authCheck() { /* no-op */ }
+
+  // Boot: check auth synchronously before loading any iframe
+  (function() {
+    var isGuest = localStorage.getItem('iq_guest') === '1';
+    var hasFirebaseUser = false;
+    for (var i = 0; i < localStorage.length; i++) {
+      if (localStorage.key(i).indexOf('firebase:authUser:') === 0) { hasFirebaseUser = true; break; }
+    }
     if (isGuest || hasFirebaseUser) {
       goTo('improve');
     } else {
       goTo('auth');
     }
-  }
-
-  // Called from child iframes
-  function authCheck() {
-    // Already handled by boot - this is a no-op now
-  }
-
-  boot();
+  })();
 </script>
-
 </body>
 </html>
