@@ -8,327 +8,102 @@
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #F2EBD9;
-      --card: #EDE5CF;
-      --tan: #C4AD8A;
-      --tan-dark: #A89872;
-      --ink: #2A2018;
-      --ink-light: #6B5740;
-      --green: #5EB85E;
-      --red: #D64545;
+      --bg: #F2EBD9; --card: #EDE5CF; --tan: #C4AD8A; --tan-dark: #A89872;
+      --ink: #2A2018; --ink-light: #6B5740; --green: #5EB85E; --red: #D64545;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { 
-      width: 100%; height: 100%; 
-      overflow: hidden;
-      font-family: 'Nunito', sans-serif;
-      background: var(--bg);
-      color: var(--ink);
-    }
+    html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--ink); }
     body { display: flex; flex-direction: column; }
-
-    /* ── Top Bar ── */
-    .top-bar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      padding: calc(env(safe-area-inset-top, 0px) + 10px) 16px 8px;
-      z-index: 50;
-      background: var(--bg);
-    }
-    .stats-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-    .stat-pill {
-      background: var(--card);
-      border: 2px solid var(--tan);
-      border-radius: 20px;
-      padding: 5px 12px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
+    .top-bar { position: fixed; top: 0; left: 0; right: 0; padding: calc(env(safe-area-inset-top, 0px) + 10px) 16px 8px; z-index: 50; background: var(--bg); }
+    .stats-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .stat-pill { background: var(--card); border: 2px solid var(--tan); border-radius: 20px; padding: 5px 12px; display: flex; align-items: center; gap: 5px; }
     .pill-icon { width: 18px; height: 18px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     .pill-icon svg { width: 100%; height: 100%; }
-    .stat-pill .val {
-      font-family: 'Verdana', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-    }
-    .stat-pill .lbl {
-      font-family: 'Patrick Hand', cursive;
-      font-size: 11px;
-      color: var(--ink-light);
-    }
-    
+    .stat-pill .val { font-family: 'Verdana', sans-serif; font-size: 15px; font-weight: 700; }
+    .stat-pill .lbl { font-family: 'Patrick Hand', cursive; font-size: 11px; color: var(--ink-light); }
     .xp-wrap { display: flex; align-items: center; gap: 8px; }
-    .xp-bar-outer {
-      flex: 1; height: 7px;
-      background: var(--tan-dark);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .xp-bar-inner {
-      height: 100%;
-      background: var(--green);
-      border-radius: 4px;
-      transition: width 0.4s ease;
-    }
-    .xp-label {
-      font-family: 'Patrick Hand', cursive;
-      font-size: 11px;
-      color: var(--ink-light);
-      white-space: nowrap;
-    }
-
-    /* ── Nav ── */
-    nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      height: calc(60px + env(safe-area-inset-bottom, 0px));
-      background: var(--card);
-      border-top: 2px solid var(--tan);
-      display: flex; justify-content: center; align-items: flex-start;
-      padding-top: 8px;
-      gap: 8px;
-      z-index: 100;
-    }
-    .nav-btn {
-      padding: 6px 30px;
-      background: none; border: none;
-      display: flex; flex-direction: column; align-items: center; gap: 3px;
-      color: var(--ink-light);
-      font-family: 'Patrick Hand', cursive;
-      font-size: 12px;
-      text-decoration: none;
-      border-radius: 12px;
-      transition: all 0.2s;
-    }
+    .xp-bar-outer { flex: 1; height: 7px; background: var(--tan-dark); border-radius: 4px; overflow: hidden; }
+    .xp-bar-inner { height: 100%; background: var(--green); border-radius: 4px; transition: width 0.4s ease; }
+    .xp-label { font-family: 'Patrick Hand', cursive; font-size: 11px; color: var(--ink-light); white-space: nowrap; }
+    nav { position: fixed; bottom: 0; left: 0; right: 0; height: calc(60px + env(safe-area-inset-bottom, 0px)); background: var(--card); border-top: 2px solid var(--tan); display: flex; justify-content: center; align-items: flex-start; padding-top: 8px; gap: 8px; z-index: 100; }
+    .nav-btn { padding: 6px 30px; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--ink-light); font-family: 'Patrick Hand', cursive; font-size: 12px; text-decoration: none; border-radius: 12px; transition: all 0.2s; }
     .nav-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; }
     .nav-btn.active { color: var(--ink); background: rgba(196,173,138,0.3); }
     .nav-divider { width: 2px; height: 28px; background: var(--tan); margin-top: 2px; }
-
-    /* ── Feed ── */
-    main {
-      flex: 1;
-      padding-top: 78px;
-      padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
-      overflow-y: auto;
-      scroll-snap-type: y mandatory;
-      -webkit-overflow-scrolling: touch;
-    }
+    main { flex: 1; padding-top: 78px; padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)); overflow-y: auto; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
     main::-webkit-scrollbar { display: none; }
-
-    .slide {
-      min-height: 100%;
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-
-    /* ── Card ── */
-    .card {
-      background: var(--card);
-      border: 2.5px solid var(--tan);
-      border-radius: 22px;
-      width: 100%;
-      max-width: 360px;
-      padding: clamp(16px, 4vw, 24px) clamp(14px, 3.5vw, 20px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: clamp(10px, 2.5vw, 16px);
-    }
-    .category {
-      font-family: 'Patrick Hand', cursive;
-      font-size: 12px;
-      letter-spacing: 1px;
-      color: var(--ink-light);
-      background: rgba(196,173,138,0.2);
-      padding: 3px 12px;
-      border-radius: 10px;
-      border: 1.5px solid var(--tan);
-    }
-    .question {
-      font-size: clamp(14px, 3.8vw, 17px);
-      font-weight: 700;
-      text-align: center;
-      line-height: 1.45;
-      padding: 0 2px;
-    }
-
-    /* Sequence */
-    .sequence {
-      display: flex; align-items: center; justify-content: center;
-      gap: clamp(4px, 1.5vw, 8px); flex-wrap: wrap;
-      font-family: 'Verdana', sans-serif;
-      font-size: clamp(18px, 5vw, 24px); font-weight: 700;
-      margin: 2px 0;
-    }
+    .slide { min-height: 100%; scroll-snap-align: start; scroll-snap-stop: always; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; }
+    .card { background: var(--card); border: 2.5px solid var(--tan); border-radius: 22px; width: 100%; max-width: 360px; padding: clamp(16px,4vw,24px) clamp(14px,3.5vw,20px); display: flex; flex-direction: column; align-items: center; gap: clamp(10px,2.5vw,16px); }
+    .category { font-family: 'Patrick Hand', cursive; font-size: 12px; letter-spacing: 1px; color: var(--ink-light); background: rgba(196,173,138,0.2); padding: 3px 12px; border-radius: 10px; border: 1.5px solid var(--tan); }
+    .question { font-size: clamp(14px,3.8vw,17px); font-weight: 700; text-align: center; line-height: 1.45; padding: 0 2px; }
+    .sequence { display: flex; align-items: center; justify-content: center; gap: clamp(4px,1.5vw,8px); flex-wrap: wrap; font-family: 'Verdana', sans-serif; font-size: clamp(18px,5vw,24px); font-weight: 700; margin: 2px 0; }
     .sequence span { padding: 2px; }
-    .sequence .arrow { color: var(--tan-dark); font-size: clamp(12px, 3vw, 16px); }
-    .sequence .blank {
-      background: var(--bg);
-      border: 2px dashed var(--tan);
-      border-radius: 8px;
-      padding: 4px 12px;
-      color: var(--tan-dark);
-    }
-
-    /* Matrix */
-    .matrix {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 5px;
-      width: clamp(120px, 32vw, 150px);
-    }
-    .matrix-cell {
-      aspect-ratio: 1;
-      background: var(--bg);
-      border-radius: 8px;
-      border: 2px solid var(--tan);
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Verdana', sans-serif;
-      font-size: clamp(14px, 3.8vw, 18px); font-weight: 700;
-    }
+    .sequence .arrow { color: var(--tan-dark); font-size: clamp(12px,3vw,16px); }
+    .sequence .blank { background: var(--bg); border: 2px dashed var(--tan); border-radius: 8px; padding: 4px 12px; color: var(--tan-dark); }
+    .matrix { display: grid; grid-template-columns: repeat(3,1fr); gap: 5px; width: clamp(120px,32vw,150px); }
+    .matrix-cell { aspect-ratio: 1; background: var(--bg); border-radius: 8px; border: 2px solid var(--tan); display: flex; align-items: center; justify-content: center; font-family: 'Verdana', sans-serif; font-size: clamp(14px,3.8vw,18px); font-weight: 700; }
     .matrix-cell.blank { border-style: dashed; color: var(--tan-dark); }
-
-    /* Options */
-    .options {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px; width: 100%;
-    }
+    .options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
     .options.wide { grid-template-columns: 1fr; }
-    .opt {
-      background: var(--bg);
-      border: 2.5px solid var(--tan);
-      border-radius: 14px;
-      padding: clamp(10px, 2.5vw, 14px) 10px;
-      font-family: 'Nunito', sans-serif;
-      font-size: clamp(13px, 3.4vw, 15px); font-weight: 700;
-      color: var(--ink);
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.15s;
-      word-break: break-word;
-    }
+    .opt { background: var(--bg); border: 2.5px solid var(--tan); border-radius: 14px; padding: clamp(10px,2.5vw,14px) 10px; font-family: 'Nunito', sans-serif; font-size: clamp(13px,3.4vw,15px); font-weight: 700; color: var(--ink); cursor: pointer; text-align: center; transition: all 0.15s; word-break: break-word; }
     .opt:active { transform: scale(0.97); }
     .opt.correct { background: var(--green); border-color: #4a9a4a; color: #fff; animation: pop 0.4s ease; }
     .opt.wrong { background: var(--red); border-color: #b33; color: #fff; animation: shake 0.4s ease; }
     .opt.dim { opacity: 0.3; }
     .opt.show-correct { background: var(--green); border-color: #4a9a4a; color: #fff; opacity: 1; }
-    
     @keyframes pop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
     @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
-
-    .feedback {
-      font-family: 'Patrick Hand', cursive;
-      font-size: 16px; min-height: 22px;
-      opacity: 0; transition: opacity 0.3s;
-    }
+    .feedback { font-family: 'Patrick Hand', cursive; font-size: 16px; min-height: 22px; opacity: 0; transition: opacity 0.3s; }
     .feedback.show { opacity: 1; }
     .feedback.correct { color: var(--green); }
     .feedback.wrong { color: var(--red); }
-
-    .explain {
-      background: rgba(0,0,0,0.04);
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 12px; color: var(--ink-light);
-      line-height: 1.5; text-align: center;
-      display: none; width: 100%;
-    }
+    .explain { background: rgba(0,0,0,0.04); border-radius: 10px; padding: 10px 14px; font-size: 12px; color: var(--ink-light); line-height: 1.5; text-align: center; display: none; width: 100%; }
     .explain.show { display: block; animation: slideUp 0.3s ease; }
     @keyframes slideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-
-    .scroll-hint {
-      margin-top: 14px;
-      font-family: 'Patrick Hand', cursive;
-      font-size: 13px; color: var(--ink-light);
-      opacity: 0;
-      display: flex; flex-direction: column; align-items: center; gap: 3px;
-      transition: opacity 0.3s;
-    }
+    .scroll-hint { margin-top: 14px; font-family: 'Patrick Hand', cursive; font-size: 13px; color: var(--ink-light); opacity: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; transition: opacity 0.3s; }
     .scroll-hint.show { opacity: 0.5; }
     .scroll-hint svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; animation: bounce 1.5s infinite; }
     @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
-
-    /* ── Streak Popup ── */
-    .streak-popup {
-      position: fixed; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.6);
-      z-index: 200;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.3s;
-    }
+    .streak-popup { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
     .streak-popup.show { opacity: 1; }
     .streak-popup .streak-icon { width: 44px; height: 44px; margin-bottom: 6px; }
     .streak-popup .streak-icon svg { width:100%;height:100%; }
-    .streak-popup .num {
-      font-family: 'Verdana', sans-serif;
-      font-size: 64px; font-weight: 700;
-      color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    }
+    .streak-popup .num { font-family: 'Verdana', sans-serif; font-size: 64px; font-weight: 700; color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,0.4); }
     .streak-popup .txt { font-family: 'Patrick Hand', cursive; font-size: 26px; color: #fff; }
-
-    /* ── Effects ── */
     .flash { position: fixed; inset: 0; pointer-events: none; opacity: 0; z-index: 150; }
     .flash.green { background: radial-gradient(circle, rgba(94,184,94,0.3) 0%, transparent 70%); }
     .flash.red { background: radial-gradient(circle, rgba(214,69,69,0.25) 0%, transparent 70%); }
     .flash.show { animation: flash 0.3s ease; }
     @keyframes flash { 0%{opacity:1} 100%{opacity:0} }
-
     .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 160; overflow: hidden; }
     .confetti i { position: absolute; width: 10px; height: 10px; opacity: 0; }
     .confetti i.fall { animation: confettiFall 1.2s ease-out forwards; }
     @keyframes confettiFall { 0%{opacity:1;transform:translateY(0) rotate(0)} 100%{opacity:0;transform:translateY(100vh) rotate(720deg)} }
-
-    /* ── Modal ── */
-    .modal {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.6);
-      display: none; align-items: center; justify-content: center;
-      z-index: 300; padding: 20px;
-    }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 300; padding: 20px; }
     .modal.show { display: flex; }
-    .modal-box {
-      background: var(--bg); border-radius: 22px;
-      padding: 28px 22px; width: 100%; max-width: 320px;
-      text-align: center; border: 3px solid var(--tan);
-    }
+    .modal-box { background: var(--bg); border-radius: 22px; padding: 28px 22px; width: 100%; max-width: 320px; text-align: center; border: 3px solid var(--tan); }
     .modal-title { font-family: 'Patrick Hand', cursive; font-size: 24px; margin-bottom: 6px; }
     .modal-text { font-size: 13px; color: var(--ink-light); line-height: 1.5; margin-bottom: 18px; }
     .age-num { font-family: 'Verdana', sans-serif; font-size: 44px; font-weight: 700; margin: 14px 0; }
-    .age-slider {
-      width: 100%; height: 10px; -webkit-appearance: none;
-      background: var(--tan-dark); border-radius: 5px; margin-bottom: 22px;
-    }
-    .age-slider::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 28px; height: 28px;
-      background: var(--ink); border-radius: 50%; cursor: pointer;
-    }
-    .btn {
-      background: var(--ink); color: #fff; border: none;
-      border-radius: 22px; padding: 12px 36px;
-      font-family: 'Patrick Hand', cursive; font-size: 19px; cursor: pointer;
-    }
+    .age-slider { width: 100%; height: 10px; -webkit-appearance: none; background: var(--tan-dark); border-radius: 5px; margin-bottom: 22px; }
+    .age-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; background: var(--ink); border-radius: 50%; cursor: pointer; }
+    .btn { background: var(--ink); color: #fff; border: none; border-radius: 22px; padding: 12px 36px; font-family: 'Patrick Hand', cursive; font-size: 19px; cursor: pointer; }
+    /* Loading veil — shown while Firebase auth resolves */
+    #auth-veil { position: fixed; inset: 0; background: var(--bg); z-index: 999; display: flex; align-items: center; justify-content: center; }
+    #auth-veil.gone { display: none; }
+    .spin { width: 32px; height: 32px; border: 3px solid var(--tan); border-top-color: var(--ink); border-radius: 50%; animation: spinA 0.8s linear infinite; }
+    @keyframes spinA { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
+
+<!-- Hides the page until auth state is known, prevents flicker -->
+<div id="auth-veil"><div class="spin"></div></div>
 
 <div class="top-bar">
   <div class="stats-row">
     <div class="stat-pill">
       <span class="pill-icon">
-        <!-- Brain icon -->
         <svg viewBox="0 0 24 24" fill="none" stroke="#E07850" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9.5 2a3.5 3.5 0 0 0-3.2 4.8A3.5 3.5 0 0 0 4 10.5a3.5 3.5 0 0 0 1.1 2.5A3.5 3.5 0 0 0 4 16a3.5 3.5 0 0 0 3.5 3.5c.6 0 1.1-.1 1.6-.4.4 1.1 1.5 1.9 2.9 1.9"/>
           <path d="M14.5 2a3.5 3.5 0 0 1 3.2 4.8A3.5 3.5 0 0 1 20 10.5a3.5 3.5 0 0 1-1.1 2.5A3.5 3.5 0 0 1 20 16a3.5 3.5 0 0 1-3.5 3.5c-.6 0-1.1-.1-1.6-.4a3 3 0 0 1-2.9 1.9"/>
@@ -340,7 +115,6 @@
     </div>
     <div class="stat-pill" id="streak-pill" style="display:none;">
       <span class="pill-icon">
-        <!-- Flame icon -->
         <svg viewBox="0 0 24 24" fill="#F59E0B" fill-opacity="0.2" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22c-4.97 0-8-3.58-8-7.5 0-3.07 1.74-5.25 3.53-7.28C9.18 5.38 10.34 3.7 10.34 2c0 0 1.77 2.18 2.34 4.18.27.94.5 1.82 1.32 1.82 0-2 1-3 1-3s1 1.5 1 3.5c.5-.5 1.5-1.5 1.5-1.5s1 2.5 1 5c0 3.92-3.03 7.5-8 7.5z"/>
           <path d="M12 22c-1.66 0-3-1.5-3-3.5 0-1.5.83-2.5 1.5-3.5.5-.72 1-1.5 1-2.5 0 0 .5.72.72 1.5.18.6.28 1.3.78 1.3 0-1 .5-1.5.5-1.5s.5.75.5 1.75C14 17.5 14.66 22 12 22z" fill="#F59E0B" fill-opacity="0.35" stroke="none"/>
@@ -352,9 +126,7 @@
   </div>
   <div class="xp-wrap">
     <span class="xp-label" id="level-label">Lvl 1</span>
-    <div class="xp-bar-outer">
-      <div class="xp-bar-inner" id="xp-bar" style="width:0%"></div>
-    </div>
+    <div class="xp-bar-outer"><div class="xp-bar-inner" id="xp-bar" style="width:0%"></div></div>
     <span class="xp-label" id="xp-label">0/150</span>
   </div>
 </div>
@@ -392,177 +164,228 @@
     <div class="modal-text">Train your brain with personalized challenges.<br>First, how old are you?</div>
     <div class="age-num" id="age-display">25</div>
     <input type="range" class="age-slider" id="age-slider" min="8" max="80" value="25">
-    <button class="btn" onclick="startApp()">Let's Go</button>
+    <button class="btn" id="start-btn">Let's Go</button>
   </div>
 </div>
 
-<script src="data.js"></script>
+<!-- questions.js has no import/export — plain script is correct -->
 <script src="questions.js"></script>
-<script>
-import { requireAuth } from './data.js';
-await requireAuth();
-const feed = document.getElementById('feed');
-const iqVal = document.getElementById('iq-val');
-const streakVal = document.getElementById('streak-val');
-const streakPill = document.getElementById('streak-pill');
-const streakPopup = document.getElementById('streak-popup');
-const streakNum = document.getElementById('streak-num');
-const onboard = document.getElementById('onboard');
-const ageSlider = document.getElementById('age-slider');
-const ageDisplay = document.getElementById('age-display');
-const flash = document.getElementById('flash');
-const confetti = document.getElementById('confetti');
-const xpBar = document.getElementById('xp-bar');
-const levelLabel = document.getElementById('level-label');
-const xpLabel = document.getElementById('xp-label');
 
-let slides = 0, answerStart = 0;
-const questionQueue = [];
-const QUEUE_TARGET = 25;
+<!--
+  ONE type="module" script for everything Firebase-related.
+  Rules:
+    - NO <script src="data.js"> — data.js is a module, you import it
+    - NO import statements outside type="module"
+    - questions.js (plain script) sets window.Q, accessible here normally
+-->
+<script type="module">
+  import { IQData, requireAuth, getEncouragement } from './data.js';
 
-function fillQueue() {
-  while (questionQueue.length < QUEUE_TARGET) questionQueue.push(Q.generate());
-}
-function nextQuestion() {
-  if (!questionQueue.length) fillQueue();
-  const q = questionQueue.shift();
-  if (questionQueue.length < QUEUE_TARGET / 2) requestAnimationFrame(fillQueue);
-  return q;
-}
+  // Block the page until auth is settled, redirect if needed
+  await requireAuth();
+  document.getElementById('auth-veil').classList.add('gone');
 
-function init() {
-  if (IQData.needsOnboarding()) { onboard.classList.add('show'); } else { load(); }
+  // ── DOM ──────────────────────────────────────────────
+  const feed        = document.getElementById('feed');
+  const iqVal       = document.getElementById('iq-val');
+  const streakVal   = document.getElementById('streak-val');
+  const streakPill  = document.getElementById('streak-pill');
+  const streakPopup = document.getElementById('streak-popup');
+  const streakNum   = document.getElementById('streak-num');
+  const onboard     = document.getElementById('onboard');
+  const ageSlider   = document.getElementById('age-slider');
+  const ageDisplay  = document.getElementById('age-display');
+  const flashEl     = document.getElementById('flash');
+  const confettiEl  = document.getElementById('confetti');
+  const xpBar       = document.getElementById('xp-bar');
+  const levelLabel  = document.getElementById('level-label');
+  const xpLabel     = document.getElementById('xp-label');
+
+  let slides = 0, answerStart = 0;
+  const questionQueue = [];
+  const QUEUE_TARGET  = 25;
+
+  // ── Question queue ────────────────────────────────────
+  function fillQueue() {
+    while (questionQueue.length < QUEUE_TARGET) {
+      const weakCat = IQData.getWeakestCategory();
+      const diff    = weakCat ? IQData.getDifficulty(weakCat) : 1.0;
+      // Q is set by questions.js on window — accessible from module scripts too
+      questionQueue.push(Q.generate(diff));
+    }
+  }
+
+  function nextQuestion() {
+    if (!questionQueue.length) fillQueue();
+    const q = questionQueue.shift();
+    if (questionQueue.length < QUEUE_TARGET / 2) requestAnimationFrame(fillQueue);
+    return q;
+  }
+
+  // ── Onboarding ────────────────────────────────────────
   ageSlider.oninput = () => ageDisplay.textContent = ageSlider.value;
-}
-function startApp() {
-  IQData.setAge(parseInt(ageSlider.value));
-  onboard.classList.remove('show');
-  Q.setAge(parseInt(ageSlider.value));
-  load();
-}
-function load() {
-  const d = IQData.load();
-  Q.setAge(d.age);
-  updateUI(d);
-  fillQueue();
-  for (let i = 0; i < 10; i++) addSlide();
-  feed.addEventListener('scroll', checkMore, { passive: true });
-  feed.addEventListener('touchmove', checkMore, { passive: true });
-  setInterval(checkMore, 150);
-}
-function checkMore() {
-  const h = feed.clientHeight;
-  if (!h) return;
-  const idx = Math.round(feed.scrollTop / h);
-  while (slides < idx + 10) addSlide();
-}
-function addSlide() {
-  const q = nextQuestion();
-  const idx = slides++;
-  const div = document.createElement('div');
-  div.className = 'slide';
-  div.innerHTML = render(q, idx);
-  feed.appendChild(div);
-  answerStart = Date.now();
-}
 
-function render(q, idx) {
-  let visual = '';
-  if (q.visual === 'sequence' || q.visual === 'letterSequence') {
-    const parts = q.sequence.map((n, i) => {
-      if (n === '?') return `<span class="blank">?</span>`;
-      const arrow = i < q.sequence.length - 1 ? `<span class="arrow">-</span>` : '';
-      return `<span>${n}</span>${arrow}`;
-    });
-    if (q.sequence[0] !== '?') parts.push(`<span class="arrow">-</span><span class="blank">?</span>`);
-    visual = `<div class="sequence">${parts.join('')}</div>`;
-  } else if (q.visual === 'matrix') {
-    visual = `<div class="matrix">${q.grid.map(c => 
-      `<div class="matrix-cell${c === '?' ? ' blank' : ''}">${c}</div>`
-    ).join('')}</div>`;
-  }
-  const wide = q.options.some(o => String(o).length > 18);
-  const esc = s => String(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  return `
-    <div class="card">
-      <div class="category">${q.categoryLabel}</div>
-      <div class="question">${q.question}</div>
-      ${visual}
-      <div class="options${wide ? ' wide' : ''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">
-        ${q.options.map(o => `<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}
-      </div>
-      <div class="feedback" id="fb-${idx}"></div>
-      <div class="explain" id="exp-${idx}">${q.explanation}</div>
-    </div>
-    <div class="scroll-hint" id="hint-${idx}">
-      <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-      Swipe for next
-    </div>`;
-}
-
-document.addEventListener('click', e => {
-  if (!e.target.classList.contains('opt')) return;
-  const btn = e.target, opts = btn.parentElement;
-  if (opts.dataset.done) return;
-  opts.dataset.done = '1';
-  const idx = parseInt(opts.dataset.idx);
-  const correct = opts.dataset.ans, val = btn.dataset.v;
-  const isCorrect = val === correct;
-  const ms = Date.now() - answerStart;
-  
-  opts.querySelectorAll('.opt').forEach(o => {
-    if (o.dataset.v === correct) o.classList.add(isCorrect ? 'correct' : 'show-correct');
-    else if (o === btn) o.classList.add('wrong');
-    else o.classList.add('dim');
+  document.getElementById('start-btn').addEventListener('click', () => {
+    const age = parseInt(ageSlider.value);
+    IQData.setAge(age);
+    Q.setAge(age);
+    onboard.classList.remove('show');
+    startFeed();
   });
-  
-  const result = IQData.recordAnswer(opts.dataset.cat, isCorrect, parseFloat(opts.dataset.diff), ms);
-  const fb = document.getElementById(`fb-${idx}`);
-  fb.textContent = getEncouragement(result.streak, isCorrect);
-  fb.className = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
-  
-  if (isCorrect) { flash.className = 'flash green show'; spawnConfetti(8); }
-  else { flash.className = 'flash red show'; }
-  setTimeout(() => flash.className = 'flash', 300);
-  
-  if (isCorrect && result.streak > 0 && result.streak % 5 === 0) {
-    setTimeout(() => {
-      streakNum.textContent = result.streak;
-      streakPopup.classList.add('show');
-      spawnConfetti(25);
-      setTimeout(() => streakPopup.classList.remove('show'), 1800);
-    }, 300);
-  }
-  updateUI(result);
-  checkMore();
-  setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'), 250);
-  setTimeout(() => document.getElementById(`hint-${idx}`)?.classList.add('show'), 400);
-  answerStart = Date.now();
-});
 
-function spawnConfetti(n) {
-  const colors = ['#5EB85E','#FFD700','#FF6B6B','#4ECDC4','#A855F7','#F59E0B'];
-  for (let i = 0; i < n; i++) {
-    const p = document.createElement('i');
-    p.style.left = Math.random()*100+'%'; p.style.top = '-10px';
-    p.style.background = colors[Math.floor(Math.random()*colors.length)];
-    p.style.borderRadius = Math.random()>0.5?'50%':'2px';
-    p.style.animationDelay = Math.random()*0.2+'s';
-    confetti.appendChild(p);
-    setTimeout(() => p.classList.add('fall'), 10);
-    setTimeout(() => p.remove(), 1400);
+  // ── Boot ─────────────────────────────────────────────
+  function init() {
+    if (IQData.needsOnboarding()) {
+      onboard.classList.add('show');
+    } else {
+      startFeed();
+    }
   }
-}
-function updateUI(d) {
-  iqVal.textContent = d.iq || '--';
-  if (d.streak > 0) { streakPill.style.display = 'flex'; streakVal.textContent = d.streak; }
-  else { streakPill.style.display = 'none'; }
-  const xpInLevel = d.xp % 150;
-  xpBar.style.width = (xpInLevel/150*100)+'%';
-  levelLabel.textContent = 'Lvl ' + d.level;
-  xpLabel.textContent = xpInLevel + '/150';
-}
-init();
+
+  function startFeed() {
+    const d = IQData.load();
+    Q.setAge(d.age);
+    IQData.startSession();
+    updateUI(d);
+    fillQueue();
+    for (let i = 0; i < 10; i++) addSlide();
+    feed.addEventListener('scroll',    checkMore, { passive: true });
+    feed.addEventListener('touchmove', checkMore, { passive: true });
+    setInterval(checkMore, 150);
+  }
+
+  function checkMore() {
+    const h = feed.clientHeight;
+    if (!h) return;
+    const idx = Math.round(feed.scrollTop / h);
+    while (slides < idx + 10) addSlide();
+  }
+
+  function addSlide() {
+    const q   = nextQuestion();
+    const idx = slides++;
+    const div = document.createElement('div');
+    div.className = 'slide';
+    div.innerHTML = render(q, idx);
+    feed.appendChild(div);
+    answerStart = Date.now();
+  }
+
+  // ── Render ────────────────────────────────────────────
+  function render(q, idx) {
+    let visual = '';
+    if (q.visual === 'sequence' || q.visual === 'letterSequence') {
+      const parts = q.sequence.map((n, i) => {
+        if (n === '?') return `<span class="blank">?</span>`;
+        const arrow = i < q.sequence.length - 1 ? `<span class="arrow">-</span>` : '';
+        return `<span>${n}</span>${arrow}`;
+      });
+      if (q.sequence[0] !== '?') parts.push(`<span class="arrow">-</span><span class="blank">?</span>`);
+      visual = `<div class="sequence">${parts.join('')}</div>`;
+    } else if (q.visual === 'matrix') {
+      visual = `<div class="matrix">${q.grid.map(c =>
+        `<div class="matrix-cell${c === '?' ? ' blank' : ''}">${c}</div>`
+      ).join('')}</div>`;
+    }
+    const wide = q.options.some(o => String(o).length > 18);
+    const esc  = s => String(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    return `
+      <div class="card">
+        <div class="category">${q.categoryLabel}</div>
+        <div class="question">${q.question}</div>
+        ${visual}
+        <div class="options${wide ? ' wide' : ''}"
+             data-idx="${idx}"
+             data-ans="${esc(q.answer)}"
+             data-cat="${q.category}"
+             data-diff="${q.difficulty}">
+          ${q.options.map(o => `<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}
+        </div>
+        <div class="feedback" id="fb-${idx}"></div>
+        <div class="explain"  id="exp-${idx}">${q.explanation}</div>
+      </div>
+      <div class="scroll-hint" id="hint-${idx}">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        Swipe for next
+      </div>`;
+  }
+
+  // ── Answer handling ───────────────────────────────────
+  document.addEventListener('click', e => {
+    if (!e.target.classList.contains('opt')) return;
+    const btn  = e.target;
+    const opts = btn.parentElement;
+    if (opts.dataset.done) return;
+    opts.dataset.done = '1';
+
+    const idx       = parseInt(opts.dataset.idx);
+    const correct   = opts.dataset.ans;
+    const val       = btn.dataset.v;
+    const isCorrect = val === correct;
+    const ms        = Date.now() - answerStart;
+
+    opts.querySelectorAll('.opt').forEach(o => {
+      if (o.dataset.v === correct) o.classList.add(isCorrect ? 'correct' : 'show-correct');
+      else if (o === btn)          o.classList.add('wrong');
+      else                         o.classList.add('dim');
+    });
+
+    const result = IQData.recordAnswer(opts.dataset.cat, isCorrect, parseFloat(opts.dataset.diff), ms);
+
+    const fb = document.getElementById(`fb-${idx}`);
+    fb.textContent = getEncouragement(result.streak, isCorrect);
+    fb.className   = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
+
+    if (isCorrect) { flashEl.className = 'flash green show'; spawnConfetti(8); }
+    else           { flashEl.className = 'flash red show'; }
+    setTimeout(() => flashEl.className = 'flash', 300);
+
+    if (isCorrect && result.streak > 0 && result.streak % 5 === 0) {
+      setTimeout(() => {
+        streakNum.textContent = result.streak;
+        streakPopup.classList.add('show');
+        spawnConfetti(25);
+        setTimeout(() => streakPopup.classList.remove('show'), 1800);
+      }, 300);
+    }
+
+    updateUI(result);
+    checkMore();
+    setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'),  250);
+    setTimeout(() => document.getElementById(`hint-${idx}`)?.classList.add('show'), 400);
+    answerStart = Date.now();
+  });
+
+  // ── Effects ───────────────────────────────────────────
+  function spawnConfetti(n) {
+    const colors = ['#5EB85E','#FFD700','#FF6B6B','#4ECDC4','#A855F7','#F59E0B'];
+    for (let i = 0; i < n; i++) {
+      const p = document.createElement('i');
+      p.style.left           = Math.random() * 100 + '%';
+      p.style.top            = '-10px';
+      p.style.background     = colors[Math.floor(Math.random() * colors.length)];
+      p.style.borderRadius   = Math.random() > 0.5 ? '50%' : '2px';
+      p.style.animationDelay = Math.random() * 0.2 + 's';
+      confettiEl.appendChild(p);
+      setTimeout(() => p.classList.add('fall'), 10);
+      setTimeout(() => p.remove(), 1400);
+    }
+  }
+
+  // ── UI ────────────────────────────────────────────────
+  function updateUI(d) {
+    iqVal.textContent = d.iq || '--';
+    if (d.streak > 0) { streakPill.style.display = 'flex'; streakVal.textContent = d.streak; }
+    else              { streakPill.style.display = 'none'; }
+    const xpInLevel        = d.xp % 150;
+    xpBar.style.width      = (xpInLevel / 150 * 100) + '%';
+    levelLabel.textContent = 'Lvl ' + d.level;
+    xpLabel.textContent    = xpInLevel + '/150';
+  }
+
+  window.addEventListener('beforeunload', () => IQData.endSession());
+
+  init();
 </script>
 </body>
 </html>
