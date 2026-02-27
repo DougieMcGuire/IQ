@@ -75,8 +75,7 @@
     .toast.show { opacity: 1; }
     
     
-    .spin { width: 32px; height: 32px; border: 3px solid var(--tan); border-top-color: var(--ink); border-radius: 50%; animation: spinA 0.8s linear infinite; }
-    @keyframes spinA { to { transform: rotate(360deg); } }
+
   </style>
 </head>
 <body>
@@ -167,6 +166,9 @@
 <!-- NO <script src="data.js"> — it's a module, imported below -->
 <script type="module">
   import { IQData, iqToPercentile, formatPercentile } from './data.js';
+
+  // Instant auth check — no async wait needed
+  if (window.parent !== window) parent.authCheck();
 
   // ── Abilities config ──────────────────────────────────
   const ABILITIES = [
