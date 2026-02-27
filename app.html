@@ -27,9 +27,9 @@
 </head>
 <body>
 
-<iframe src="improve.html" class="screen active" id="screen-improve"></iframe>
+<iframe src="auth.html"    class="screen active" id="screen-auth"></iframe>
+<iframe src="improve.html" class="screen"        id="screen-improve"></iframe>
 <iframe src="profile.html" class="screen"        id="screen-profile"></iframe>
-<iframe src="auth.html"    class="screen"        id="screen-auth"></iframe>
 
 <script>
   // Called from inside any iframe: parent.goTo('profile')
@@ -39,17 +39,17 @@
     if (el) el.classList.add('active');
   }
 
-  // Called by improve.html / profile.html once they confirm auth is ready
-  // If not logged in and not a guest, swap to auth screen
+  // On load: check if user is already logged in.
+  // If yes, skip auth and go straight to improve.
+  // If no, stay on auth (it's already the active screen).
   function authCheck() {
     var isGuest = localStorage.getItem('iq_guest') === '1';
-    // Check if Firebase user exists by peeking at localStorage
-    // Firebase stores its auth state here — no async needed
     var hasFirebaseUser = Object.keys(localStorage)
       .some(k => k.startsWith('firebase:authUser:'));
-    if (!isGuest && !hasFirebaseUser) {
-      goTo('auth');
+    if (isGuest || hasFirebaseUser) {
+      goTo('improve');
     }
+    // else: do nothing, auth screen stays visible
   }
 </script>
 
