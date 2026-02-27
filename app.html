@@ -69,14 +69,52 @@
   <span class="close-banner" id="closeBanner">✕</span>
 </div>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script>
+  // ── Firebase init ──
+  // Replace this config with yours from Firebase Console → Project Settings → Your Apps
+  var firebaseConfig = {
+    apiKey: "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
+    authDomain: "braindeer-backend.firebaseapp.com",
+    projectId: "braindeer-backend",
+    storageBucket: "braindeer-backend.firebasestorage.app",
+    messagingSenderId: "331205139765",
+    appId: "1:331205139765:web:20cfef8194af63fc55c07c",
+    measurementId: "G-9B6885G0X0"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  // ── Push subscription listener ──
+  // improve.html runs in an iframe and can't access Firebase directly,
+  // so it postMessages the subscription up here to save it.
+  window.addEventListener('message', function(e) {
+    if (!e.data || e.data.type !== 'savePushSub') return;
+    var user = firebase.auth().currentUser;
+    if (!user) {
+      console.warn('BrainDeer: no user logged in, cannot save push sub');
+      return;
+    }
+    firebase.firestore().collection('pushSubscriptions').doc(user.uid).set({
+      subscription: e.data.sub,
+      uid: user.uid,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(function() {
+      console.log('BrainDeer: push subscription saved to Firestore ✓');
+    }).catch(function(err) {
+      console.error('BrainDeer: failed to save push sub', err);
+    });
+  });
+
   var currentScreen = null;
   var screensLoaded = {};
 
   function goTo(page) {
     document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
 
-    // Profile always reloads its iframe so stats are fresh after a training session
     if (page === 'profile' && screensLoaded[page]) {
       var old = document.querySelector('#screen-profile iframe');
       if (old) old.remove();
@@ -102,12 +140,11 @@
     }
   }
 
-  // Called by child iframes — no-op at shell level
   function authCheck() {}
 
-  // ── Initial route: no guests ──
+  // ── Initial route ──
   (function() {
-    localStorage.removeItem('iq_guest'); // kill any stale guest flag
+    localStorage.removeItem('iq_guest');
 
     var hasFirebaseUser = false;
     for (var i = 0; i < localStorage.length; i++) {
@@ -120,18 +157,14 @@
     goTo(hasFirebaseUser ? 'improve' : 'auth');
   })();
 
-  // ── PWA install (desktop Chrome URL-bar icon) ──
-  // Calling preventDefault() on beforeinstallprompt is what signals Chrome
-  // to show the install icon in the address bar automatically on desktop.
-  // No additional code is needed for that icon to appear — the browser handles it.
+  // ── PWA install ──
   var deferredPrompt = null;
 
   window.addEventListener('beforeinstallprompt', function(e) {
-    e.preventDefault(); // <-- this is the key line for the URL-bar icon
+    e.preventDefault();
     deferredPrompt = e;
   });
 
-  // Expose for any future "Install App" button to call
   window.triggerInstall = function() {
     if (deferredPrompt) {
       deferredPrompt.prompt();
