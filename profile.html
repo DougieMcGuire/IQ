@@ -3,88 +3,243 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Profile | IQ Profile</title>
+  <title>Profile — BrainDeer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #F2EBD9; --card: #EDE5CF; --tan: #C4AD8A; --tan-dark: #A89872;
-      --ink: #2A2018; --ink-light: #6B5740; --green: #5EB85E;
+      --bg: #3a2918;
+      --card: #4a3625;
+      --card-glow: #5a4232;
+      --brown-mid: #6b4f32;
+      --brown-light: #8f6b4a;
+      --tan: #c2a476;
+      --cream: #f0e2cc;
+      --green: #58cc02;
+      --green-dark: #46a302;
+      --red: #ea2b2b;
+      --gold: #ffc800;
+      --gold-dark: #d9aa00;
+      --blue: #1cb0f6;
+      --blue-dark: #1899d6;
+      --purple: #ce82ff;
+      --orange: #ff9600;
+      --pink: #ff4b8a;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { width: 100%; height: 100%; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--ink); }
+    html, body { width: 100%; height: 100%; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--cream); }
     body { display: flex; flex-direction: column; }
-    nav { position: fixed; bottom: 0; left: 0; right: 0; height: calc(60px + env(safe-area-inset-bottom, 0px)); background: var(--card); border-top: 2px solid var(--tan); display: flex; justify-content: center; align-items: flex-start; padding-top: 8px; gap: 8px; z-index: 100; }
-    .nav-btn { padding: 6px 30px; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--ink-light); font-family: 'Patrick Hand', cursive; font-size: 12px; text-decoration: none; border-radius: 12px; transition: all 0.2s; }
-    .nav-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; }
-    .nav-btn.active { color: var(--ink); background: rgba(196,173,138,0.3); }
-    .nav-divider { width: 2px; height: 28px; background: var(--tan); margin-top: 2px; }
-    main { flex: 1; overflow-y: auto; padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(68px + env(safe-area-inset-bottom, 0px)); }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .header-right { display: flex; gap: 8px; align-items: center; }
-    .share-btn { background: var(--card); border: 2px solid var(--tan); border-radius: 18px; padding: 6px 14px; font-family: 'Patrick Hand', cursive; font-size: 13px; color: var(--ink); cursor: pointer; display: flex; align-items: center; gap: 5px; }
-    .share-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
-    .signout-btn { background: none; border: none; font-family: 'Patrick Hand', cursive; font-size: 13px; color: var(--ink-light); cursor: pointer; padding: 6px 10px; opacity: 0.6; }
-    .profile-hero { position: relative; display: flex; flex-direction: column; align-items: center; min-height: 220px; margin-bottom: 12px; }
-    .avatar-wrap { position: relative; margin-bottom: 8px; z-index: 2; }
-    .avatar { width: clamp(80px,22vw,100px); height: clamp(80px,22vw,100px); border-radius: 50%; background: var(--card); border: 3px solid var(--tan); overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-    .avatar img { width: 100%; height: 100%; object-fit: cover; display: none; }
-    .avatar svg { width: 40px; height: 40px; stroke: var(--tan-dark); fill: none; stroke-width: 1.5; }
-    .avatar-edit { position: absolute; bottom: 0; right: 0; width: 26px; height: 26px; background: var(--ink); border-radius: 50%; border: 2px solid var(--card); display: flex; align-items: center; justify-content: center; cursor: pointer; }
-    .avatar-edit svg { width: 11px; height: 11px; stroke: #fff; fill: none; stroke-width: 2; }
-    #avatar-input { display: none; }
-    .username-display { font-family: 'Patrick Hand', cursive; font-size: 16px; color: var(--ink-light); margin-bottom: 2px; }
-    .iq-num { font-family: 'Verdana', sans-serif; font-size: clamp(56px,16vw,72px); font-weight: 700; line-height: 1; }
-    .iq-label { font-family: 'Verdana', sans-serif; font-size: clamp(14px,4vw,18px); color: var(--ink-light); letter-spacing: 4px; margin-bottom: 6px; }
-    .pct-badge { background: var(--tan-dark); color: var(--bg); font-family: 'Patrick Hand', cursive; font-size: 13px; padding: 4px 14px; border-radius: 12px; }
-    .side-stats { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: clamp(4px,1.2vw,6px); z-index: 1; }
-    .side-stat { background: var(--card); border: 2px solid var(--tan); border-radius: 12px; padding: clamp(5px,1.2vw,8px) clamp(8px,2vw,12px); display: flex; flex-direction: column; align-items: center; min-width: clamp(58px,16vw,76px); }
-    .side-stat .s-icon { width: 13px; height: 13px; margin-bottom: 1px; }
-    .side-stat .s-icon svg { width: 100%; height: 100%; stroke: var(--tan-dark); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .side-stat .s-val { font-family: 'Verdana', sans-serif; font-size: clamp(15px,4.2vw,19px); font-weight: 700; line-height: 1.2; }
-    .side-stat .s-lbl { font-family: 'Patrick Hand', cursive; font-size: clamp(9px,2.3vw,11px); color: var(--ink-light); margin-top: 1px; }
-    .section-title { font-family: 'Patrick Hand', cursive; font-size: 13px; color: var(--ink-light); letter-spacing: 2px; text-transform: uppercase; margin: 16px 0 10px; }
-    .abilities-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .ability-card { background: var(--card); border: 2px solid var(--tan); border-radius: 12px; padding: 10px 12px; }
-    .ability-name { font-family: 'Patrick Hand', cursive; font-size: clamp(10px,2.6vw,11px); font-weight: 600; color: var(--ink); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .ability-bar-outer { height: clamp(22px,5.5vw,28px); background: var(--tan); border-radius: 6px; overflow: hidden; }
-    .ability-bar-inner { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 8px; min-width: 28px; transition: width 0.5s ease; }
-    .ability-bar-inner span { font-family: 'Verdana', sans-serif; font-size: 11px; font-weight: 700; color: #fff; }
-    .bar-pattern  { background: #E07850; }
-    .bar-problem  { background: #D96A28; }
-    .bar-mental   { background: #5EB85E; }
-    .bar-memory   { background: #8A5BAF; }
-    .bar-verbal   { background: #5B8DEF; }
-    .bar-logic    { background: #2A96B8; }
-    .bar-emotional{ background: #E85880; }
-    .bar-spatial  { background: #059669; }
-    .reset-btn { margin-top: 24px; background: none; border: none; font-family: 'Patrick Hand', cursive; font-size: 12px; color: var(--ink-light); cursor: pointer; opacity: 0.35; display: block; width: 100%; text-align: center; }
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 200; padding: 16px; }
-    .modal.show { display: flex; }
-    .modal-box { background: var(--bg); border-radius: 18px; border: 3px solid var(--tan); padding: 18px; width: 100%; max-width: 340px; position: relative; }
-    .modal-close { position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer; opacity: 0.5; }
-    .modal-close svg { width: 16px; height: 16px; stroke: var(--ink); stroke-width: 2; }
-    .modal-title { font-family: 'Patrick Hand', cursive; font-size: 17px; text-align: center; margin-bottom: 12px; }
-    .share-preview { background: var(--card); border: 2px solid var(--tan); border-radius: 10px; overflow: hidden; }
-    .share-preview canvas { width: 100%; display: block; }
-    .share-btns { display: flex; gap: 8px; margin-top: 12px; }
-    .share-btns button { flex: 1; background: var(--card); border: 2px solid var(--tan); border-radius: 10px; padding: 10px; font-family: 'Patrick Hand', cursive; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
-    .share-btns button svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
-    .share-btns button.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
-    .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 8px 18px; border-radius: 18px; font-family: 'Patrick Hand', cursive; font-size: 13px; opacity: 0; transition: opacity 0.3s; z-index: 300; white-space: nowrap; }
-    .toast.show { opacity: 1; }
-    
-    
 
+    /* ── Nav ── */
+    nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: calc(64px + env(safe-area-inset-bottom, 0px));
+      background: var(--card); box-shadow: 0 -3px 0 rgba(0,0,0,0.15);
+      display: flex; justify-content: center; align-items: flex-start;
+      padding-top: 6px; gap: 6px; z-index: 100;
+    }
+    .nav-btn {
+      padding: 8px 28px; background: none; border: none;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      color: var(--brown-light); font-family: 'Nunito', sans-serif;
+      font-size: 12px; font-weight: 800; border-radius: 14px;
+      transition: all 0.15s; cursor: pointer;
+    }
+    .nav-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .nav-btn.active { color: var(--cream); background: var(--brown-mid); box-shadow: 0 3px 0 rgba(0,0,0,0.15); }
+
+    /* ── Main ── */
+    main {
+      flex: 1; overflow-y: auto;
+      padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(72px + env(safe-area-inset-bottom, 0px));
+    }
+    main::-webkit-scrollbar { display: none; }
+
+    /* ── Header ── */
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .header-left { font-size: 14px; font-weight: 800; color: var(--tan); }
+    .header-right { display: flex; gap: 8px; align-items: center; }
+    .share-btn, .signout-btn {
+      background: var(--card); border: none; border-radius: 12px;
+      padding: 8px 14px; font-family: 'Nunito', sans-serif;
+      font-size: 13px; font-weight: 800; cursor: pointer;
+      display: flex; align-items: center; gap: 5px;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.12);
+      transition: transform 0.1s;
+    }
+    .share-btn { color: var(--cream); }
+    .share-btn:active, .signout-btn:active { transform: translateY(2px); }
+    .share-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+    .signout-btn { color: var(--brown-light); box-shadow: none; background: transparent; }
+
+    /* ── Profile Hero ── */
+    .profile-hero {
+      position: relative; display: flex; flex-direction: column;
+      align-items: center; margin-bottom: 20px; padding: 20px 0;
+    }
+    .avatar-wrap { position: relative; margin-bottom: 12px; z-index: 2; }
+    .avatar {
+      width: clamp(80px,22vw,100px); height: clamp(80px,22vw,100px);
+      border-radius: 50%; background: var(--card);
+      overflow: hidden; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+      position: relative;
+    }
+    .avatar::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+      border-radius: 50% 50% 0 0; pointer-events: none; z-index: 1;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .avatar svg { width: 40px; height: 40px; stroke: var(--brown-light); fill: none; stroke-width: 1.5; }
+    .avatar-edit {
+      position: absolute; bottom: 2px; right: 2px; width: 28px; height: 28px;
+      background: var(--blue); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 3px 0 var(--blue-dark);
+    }
+    .avatar-edit svg { width: 12px; height: 12px; stroke: #fff; fill: none; stroke-width: 2.5; }
+    #avatar-input { display: none; }
+
+    .username-display { font-size: 15px; font-weight: 800; color: var(--tan); margin-bottom: 8px; }
+    .iq-num { font-size: clamp(60px,18vw,80px); font-weight: 900; line-height: 1; color: var(--cream); text-shadow: 0 4px 0 rgba(0,0,0,0.2); }
+    .iq-label { font-size: clamp(14px,4vw,18px); font-weight: 900; color: var(--brown-light); letter-spacing: 6px; text-transform: uppercase; margin-bottom: 8px; }
+    .pct-badge {
+      background: var(--gold); color: var(--bg);
+      font-size: 14px; font-weight: 900; padding: 5px 16px;
+      border-radius: 12px; box-shadow: 0 3px 0 var(--gold-dark);
+      text-transform: uppercase;
+    }
+
+    /* ── Side stats ── */
+    .side-stats {
+      position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+      display: flex; flex-direction: column; gap: clamp(6px,1.5vw,8px); z-index: 1;
+    }
+    .side-stat {
+      background: var(--card); border-radius: 14px;
+      padding: clamp(6px,1.5vw,10px) clamp(10px,2.5vw,14px);
+      display: flex; flex-direction: column; align-items: center;
+      min-width: clamp(60px,17vw,80px);
+      box-shadow: 0 3px 0 rgba(0,0,0,0.12);
+      position: relative; overflow: hidden;
+    }
+    .side-stat::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    .side-stat .s-icon { width: 14px; height: 14px; margin-bottom: 2px; }
+    .side-stat .s-icon svg { width: 100%; height: 100%; stroke: var(--tan); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .side-stat .s-val { font-size: clamp(16px,4.5vw,20px); font-weight: 900; line-height: 1.2; color: var(--cream); }
+    .side-stat .s-lbl { font-size: clamp(10px,2.5vw,11px); font-weight: 800; color: var(--tan); }
+
+    /* ── Section ── */
+    .section-title {
+      font-size: 13px; font-weight: 900; color: var(--tan);
+      letter-spacing: 2px; text-transform: uppercase; margin: 16px 0 10px;
+    }
+
+    /* ── Abilities ── */
+    .abilities-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .ability-card {
+      background: var(--card); border-radius: 14px;
+      padding: 12px 14px; box-shadow: 0 3px 0 rgba(0,0,0,0.12);
+      position: relative; overflow: hidden;
+    }
+    .ability-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    .ability-name {
+      font-size: clamp(10px,2.6vw,12px); font-weight: 900; color: var(--cream);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;
+    }
+    .ability-bar-outer {
+      height: clamp(24px,6vw,30px); background: var(--brown-mid);
+      border-radius: 8px; overflow: hidden;
+    }
+    .ability-bar-inner {
+      height: 100%; border-radius: 8px;
+      display: flex; align-items: center; padding-left: 10px;
+      min-width: 32px; transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+    .ability-bar-inner::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 40%;
+      background: rgba(255,255,255,0.2); border-radius: 8px 8px 0 0;
+    }
+    .ability-bar-inner span { font-size: 12px; font-weight: 900; color: #fff; position: relative; z-index: 1; }
+
+    .bar-pattern  { background: var(--orange); }
+    .bar-problem  { background: var(--red); }
+    .bar-mental   { background: var(--green); }
+    .bar-memory   { background: var(--purple); }
+    .bar-verbal   { background: var(--blue); }
+    .bar-logic    { background: var(--blue-dark); }
+    .bar-emotional{ background: var(--pink); }
+    .bar-spatial  { background: var(--gold); }
+
+    /* ── Reset ── */
+    .reset-btn {
+      margin-top: 24px; background: none; border: none;
+      font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700;
+      color: var(--brown-light); cursor: pointer; opacity: 0.3;
+      display: block; width: 100%; text-align: center;
+      padding: 12px;
+    }
+
+    /* ── Modal ── */
+    .modal {
+      position: fixed; inset: 0; background: rgba(58,41,24,0.9);
+      display: none; align-items: center; justify-content: center;
+      z-index: 200; padding: 16px;
+    }
+    .modal.show { display: flex; }
+    .modal-box {
+      background: var(--card); border-radius: 20px;
+      padding: 20px; width: 100%; max-width: 340px;
+      position: relative; box-shadow: 0 6px 0 rgba(0,0,0,0.15);
+    }
+    .modal-close {
+      position: absolute; top: 12px; right: 12px;
+      background: var(--brown-mid); border: none; border-radius: 50%;
+      width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    .modal-close svg { width: 14px; height: 14px; stroke: var(--cream); stroke-width: 2.5; }
+    .modal-title { font-size: 18px; font-weight: 900; text-align: center; margin-bottom: 14px; color: var(--cream); }
+    .share-preview { background: var(--bg); border-radius: 12px; overflow: hidden; }
+    .share-preview canvas { width: 100%; display: block; }
+    .share-btns { display: flex; gap: 8px; margin-top: 14px; }
+    .share-btns button {
+      flex: 1; background: var(--card-glow); border: none; border-radius: 12px;
+      padding: 12px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+      color: var(--cream); box-shadow: 0 3px 0 rgba(0,0,0,0.12);
+      transition: transform 0.1s;
+    }
+    .share-btns button:active { transform: translateY(2px); }
+    .share-btns button svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+    .share-btns button.primary { background: var(--green); color: #fff; box-shadow: 0 3px 0 var(--green-dark); }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%);
+      background: var(--green); color: #fff; padding: 10px 20px;
+      border-radius: 14px; font-size: 14px; font-weight: 800;
+      opacity: 0; transition: opacity 0.3s; z-index: 300; white-space: nowrap;
+      box-shadow: 0 3px 0 var(--green-dark);
+    }
+    .toast.show { opacity: 1; }
   </style>
 </head>
 <body>
 
-
-
 <main>
   <div class="header">
-    <div class="username-display" id="username-display"></div>
+    <div class="header-left" id="username-display"></div>
     <div class="header-right">
       <button class="share-btn" id="share-btn">
         <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
@@ -114,15 +269,15 @@
       <div class="side-stat">
         <div class="s-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
         <div class="s-val" id="answered">0</div>
-        <div class="s-lbl">Answered</div>
+        <div class="s-lbl">Done</div>
       </div>
       <div class="side-stat">
         <div class="s-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none"/><path d="M12 6v6l4 2"/></svg></div>
         <div class="s-val" id="accuracy">0%</div>
-        <div class="s-lbl">Accuracy</div>
+        <div class="s-lbl">Acc</div>
       </div>
       <div class="side-stat">
-        <div class="s-icon"><svg viewBox="0 0 24 24" fill="#F59E0B" fill-opacity="0.15" stroke="#F59E0B" stroke-width="2"><path d="M12 22c-4.97 0-8-3.58-8-7.5 0-3.07 1.74-5.25 3.53-7.28C9.18 5.38 10.34 3.7 10.34 2c0 0 1.77 2.18 2.34 4.18.27.94.5 1.82 1.32 1.82 0-2 1-3 1-3s1 1.5 1 3.5c.5-.5 1.5-1.5 1.5-1.5s1 2.5 1 5c0 3.92-3.03 7.5-8 7.5z"/></svg></div>
+        <div class="s-icon"><svg viewBox="0 0 24 24" fill="#ff9600" fill-opacity="0.2" stroke="#ff9600" stroke-width="2.5"><path d="M12 22c-4.97 0-8-3.58-8-7.5 0-3.07 1.74-5.25 3.53-7.28C9.18 5.38 10.34 3.7 10.34 2c0 0 1.77 2.18 2.34 4.18.27.94.5 1.82 1.32 1.82 0-2 1-3 1-3s1 1.5 1 3.5c.5-.5 1.5-1.5 1.5-1.5s1 2.5 1 5c0 3.92-3.03 7.5-8 7.5z"/></svg></div>
         <div class="s-val" id="best-streak">0</div>
         <div class="s-lbl">Best</div>
       </div>
@@ -138,9 +293,8 @@
 <nav>
   <button class="nav-btn" onclick="parent.goTo('improve')">
     <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-    Improve
+    Train
   </button>
-  <div class="nav-divider"></div>
   <button class="nav-btn active" onclick="parent.goTo('profile')">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     Profile
@@ -163,67 +317,55 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- NO <script src="data.js"> — it's a module, imported below -->
 <script type="module">
   import { IQData, iqToPercentile, formatPercentile } from './data.js';
 
-  // Instant auth check — no async wait needed
   if (window.parent !== window) parent.authCheck();
 
-  // ── Abilities config ──────────────────────────────────
   const ABILITIES = [
-    { key: 'patternRecognition', name: 'Pattern',       bar: 'pattern'  },
-    { key: 'problemSolving',     name: 'Problem Solving',bar: 'problem'  },
-    { key: 'mentalAgility',      name: 'Mental Agility', bar: 'mental'   },
-    { key: 'workingMemory',      name: 'Memory',         bar: 'memory'   },
-    { key: 'verbalReasoning',    name: 'Verbal',         bar: 'verbal'   },
-    { key: 'logicalReasoning',   name: 'Common Sense',   bar: 'logic'    },
-    { key: 'spatialAwareness',   name: 'Emotional',      bar: 'emotional'},
-    { key: 'numericalReasoning', name: 'Spatial',        bar: 'spatial'  },
+    { key: 'patternRecognition', name: 'Pattern',        bar: 'pattern' },
+    { key: 'problemSolving',     name: 'Problem Solving', bar: 'problem' },
+    { key: 'mentalAgility',      name: 'Mental Agility',  bar: 'mental' },
+    { key: 'workingMemory',      name: 'Memory',          bar: 'memory' },
+    { key: 'verbalReasoning',    name: 'Verbal',          bar: 'verbal' },
+    { key: 'logicalReasoning',   name: 'Logic',           bar: 'logic' },
+    { key: 'spatialAwareness',   name: 'Emotional',       bar: 'emotional' },
+    { key: 'numericalReasoning', name: 'Spatial',         bar: 'spatial' },
   ];
 
-  // ── Toast helper ─────────────────────────────────────
   function toast(msg) {
     const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
+    t.textContent = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2000);
   }
 
-  // ── Load & render ─────────────────────────────────────
   function load() {
     const d = IQData.load();
-
-    // Username
     const uname = d.username || IQData.getCurrentUser()?.displayName || '';
     document.getElementById('username-display').textContent = uname;
 
-    // IQ
     if (d.iq) {
       document.getElementById('iq-num').textContent = d.iq;
       const pct = iqToPercentile(d.iq);
       const badge = document.getElementById('pct-badge');
-      badge.textContent    = 'Top ' + formatPercentile(pct);
-      badge.style.display  = 'inline-block';
+      badge.textContent = 'Top ' + formatPercentile(pct);
+      badge.style.display = 'inline-block';
     }
 
-    // Stats
-    document.getElementById('answered').textContent    = d.answered;
-    document.getElementById('accuracy').textContent    = IQData.getAccuracy() + '%';
+    document.getElementById('answered').textContent = d.answered;
+    document.getElementById('accuracy').textContent = IQData.getAccuracy() + '%';
     document.getElementById('best-streak').textContent = d.bestStreak;
 
-    // Avatar
     if (d.pic) {
-      document.getElementById('avatar-img').src          = d.pic;
+      document.getElementById('avatar-img').src = d.pic;
       document.getElementById('avatar-img').style.display = 'block';
       document.getElementById('avatar-icon').style.display = 'none';
     }
 
-    // Abilities
     const grid = document.getElementById('abilities');
     grid.innerHTML = '';
     ABILITIES.forEach(a => {
-      const pct  = IQData.getStatPercent(a.key);
+      const pct = IQData.getStatPercent(a.key);
       const card = document.createElement('div');
       card.className = 'ability-card';
       card.innerHTML = `
@@ -235,7 +377,6 @@
         </div>`;
       grid.appendChild(card);
     });
-    // Animate bars after paint
     requestAnimationFrame(() => setTimeout(() => {
       document.querySelectorAll('.ability-bar-inner').forEach(bar => {
         const val = parseInt(bar.querySelector('span').textContent);
@@ -244,21 +385,20 @@
     }, 80));
   }
 
-  // ── Avatar upload ─────────────────────────────────────
   function handleAvatarFile(file) {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = e => {
       const img = new Image();
       img.onload = () => {
-        const c   = document.createElement('canvas');
+        const c = document.createElement('canvas');
         c.width = c.height = 200;
         const ctx = c.getContext('2d');
         const min = Math.min(img.width, img.height);
         ctx.drawImage(img, (img.width - min) / 2, (img.height - min) / 2, min, min, 0, 0, 200, 200);
         const url = c.toDataURL('image/jpeg', 0.8);
         IQData.setProfilePic(url);
-        document.getElementById('avatar-img').src           = url;
+        document.getElementById('avatar-img').src = url;
         document.getElementById('avatar-img').style.display = 'block';
         document.getElementById('avatar-icon').style.display = 'none';
         toast('Photo updated!');
@@ -268,34 +408,25 @@
     reader.readAsDataURL(file);
   }
 
-  document.getElementById('avatar-tap').onclick      = () => document.getElementById('avatar-input').click();
+  document.getElementById('avatar-tap').onclick = () => document.getElementById('avatar-input').click();
   document.getElementById('avatar-edit-btn').onclick = () => document.getElementById('avatar-input').click();
-  document.getElementById('avatar-input').onchange   = e => handleAvatarFile(e.target.files[0]);
-
-  // ── Sign out ──────────────────────────────────────────
+  document.getElementById('avatar-input').onchange = e => handleAvatarFile(e.target.files[0]);
   document.getElementById('signout-btn').onclick = () => IQData.signOut();
-
-  // ── Reset ─────────────────────────────────────────────
   document.getElementById('reset-btn').onclick = () => {
     if (confirm('Reset all progress?')) { IQData.reset(); location.reload(); }
   };
 
-  // ── Share modal ───────────────────────────────────────
   let shareCanvas = null;
 
   function openShare() {
     document.getElementById('share-modal').classList.add('show');
     genShareImg();
   }
-  function closeShare() {
-    document.getElementById('share-modal').classList.remove('show');
-  }
+  function closeShare() { document.getElementById('share-modal').classList.remove('show'); }
 
-  document.getElementById('share-btn').onclick   = openShare;
+  document.getElementById('share-btn').onclick = openShare;
   document.getElementById('share-close').onclick = closeShare;
-  document.getElementById('share-modal').onclick = e => {
-    if (e.target.id === 'share-modal') closeShare();
-  };
+  document.getElementById('share-modal').onclick = e => { if (e.target.id === 'share-modal') closeShare(); };
 
   function genShareImg() {
     const d = IQData.load();
@@ -303,45 +434,76 @@
     const W = 480, H = 640;
     cv.width = W; cv.height = H;
     const ctx = cv.getContext('2d');
-    ctx.fillStyle = '#F2EBD9';
+
+    // Background
+    ctx.fillStyle = '#3a2918';
     ctx.fillRect(0, 0, W, H);
-    rr(ctx, 20, 20, W - 40, H - 40, 24, '#EDE5CF', '#C4AD8A', 3);
+
+    // Card
+    rr(ctx, 20, 20, W - 40, H - 40, 24, '#4a3625', null);
+
+    // Glare
+    ctx.save();
+    ctx.beginPath();
+    rr_path(ctx, 20, 20, W - 40, (H - 40) * 0.45, 24);
+    ctx.fillStyle = 'rgba(255,255,255,0.03)';
+    ctx.fill();
+    ctx.restore();
 
     const draw = () => {
-      ctx.font = '700 80px Verdana'; ctx.fillStyle = '#2A2018'; ctx.textAlign = 'center';
-      ctx.fillText(d.iq || '--', W / 2, 180);
-      ctx.font = '600 16px Verdana'; ctx.fillStyle = '#A89872';
-      ctx.fillText('I Q', W / 2, 205);
+      // IQ
+      ctx.font = '900 80px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc'; ctx.textAlign = 'center';
+      ctx.fillText(d.iq || '--', W / 2, 190);
+      ctx.font = '900 16px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a';
+      ctx.fillText('I Q', W / 2, 215);
+
+      // Badge
       if (d.iq) {
-        rr(ctx, W / 2 - 55, 220, 110, 28, 14, '#A89872', null);
-        ctx.font = '600 13px Patrick Hand'; ctx.fillStyle = '#F2EBD9';
-        ctx.fillText('Top ' + formatPercentile(iqToPercentile(d.iq)), W / 2, 239);
+        rr(ctx, W / 2 - 55, 225, 110, 30, 10, '#ffc800', null);
+        ctx.font = '900 13px Nunito, sans-serif'; ctx.fillStyle = '#3a2918';
+        ctx.fillText('TOP ' + formatPercentile(iqToPercentile(d.iq)).toUpperCase(), W / 2, 245);
       }
-      [{ v: d.answered, l: 'Answered' }, { v: IQData.getAccuracy() + '%', l: 'Accuracy' }, { v: d.bestStreak, l: 'Best' }]
+
+      // Stats
+      [{ v: d.answered, l: 'Done' }, { v: IQData.getAccuracy() + '%', l: 'Accuracy' }, { v: d.bestStreak, l: 'Best' }]
         .forEach((s, i) => {
-          const x = 40 + ((W - 80) / 3) * i + (W - 80) / 6;
-          ctx.font = '700 24px Verdana'; ctx.fillStyle = '#2A2018'; ctx.fillText(s.v, x, 300);
-          ctx.font = '400 12px Patrick Hand'; ctx.fillStyle = '#6B5740'; ctx.fillText(s.l, x, 320);
+          const x = 50 + ((W - 100) / 3) * i + (W - 100) / 6;
+          rr(ctx, x - 36, 270, 72, 56, 10, '#5a4232', null);
+          ctx.font = '900 20px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc'; ctx.fillText(s.v, x, 296);
+          ctx.font = '800 10px Nunito, sans-serif'; ctx.fillStyle = '#c2a476'; ctx.fillText(s.l, x, 314);
         });
-      ctx.font = '600 12px Patrick Hand'; ctx.fillStyle = '#A89872'; ctx.textAlign = 'left';
+
+      // Abilities
+      ctx.font = '900 11px Nunito, sans-serif'; ctx.fillStyle = '#c2a476'; ctx.textAlign = 'left';
       ctx.fillText('ABILITIES', 50, 365);
-      [
-        { n: 'Pattern', c: '#E07850', k: 'patternRecognition' },
-        { n: 'Problem Solving', c: '#D96A28', k: 'problemSolving' },
-        { n: 'Mental Agility', c: '#5EB85E', k: 'mentalAgility' },
-        { n: 'Memory', c: '#8A5BAF', k: 'workingMemory' },
-        { n: 'Verbal', c: '#5B8DEF', k: 'verbalReasoning' },
-        { n: 'Common Sense', c: '#2A96B8', k: 'logicalReasoning' },
-      ].forEach((b, i) => {
-        const y = 385 + i * 34;
+
+      const bars = [
+        { n: 'Pattern', c: '#ff9600', k: 'patternRecognition' },
+        { n: 'Problem Solving', c: '#ea2b2b', k: 'problemSolving' },
+        { n: 'Mental Agility', c: '#58cc02', k: 'mentalAgility' },
+        { n: 'Memory', c: '#ce82ff', k: 'workingMemory' },
+        { n: 'Verbal', c: '#1cb0f6', k: 'verbalReasoning' },
+        { n: 'Logic', c: '#1899d6', k: 'logicalReasoning' },
+      ];
+      bars.forEach((b, i) => {
+        const y = 385 + i * 36;
         const v = IQData.getStatPercent(b.k);
-        ctx.font = '600 10px Patrick Hand'; ctx.fillStyle = '#6B5740'; ctx.fillText(b.n, 50, y);
-        rr(ctx, 50, y + 5, W - 100, 20, 4, '#C4AD8A', null);
-        rr(ctx, 50, y + 5, Math.max(30, (v / 100) * (W - 100)), 20, 4, b.c, null);
-        ctx.font = '700 10px Verdana'; ctx.fillStyle = '#fff'; ctx.fillText(v, 58, y + 19);
+        ctx.font = '800 10px Nunito, sans-serif'; ctx.fillStyle = '#c2a476'; ctx.fillText(b.n, 50, y);
+        rr(ctx, 50, y + 5, W - 100, 22, 6, '#6b4f32', null);
+        rr(ctx, 50, y + 5, Math.max(30, (v / 100) * (W - 100)), 22, 6, b.c, null);
+        // Glare on bar
+        ctx.save();
+        ctx.globalAlpha = 0.2;
+        rr(ctx, 50, y + 5, Math.max(30, (v / 100) * (W - 100)), 10, 6, '#fff', null);
+        ctx.globalAlpha = 1;
+        ctx.restore();
+        ctx.font = '900 10px Nunito, sans-serif'; ctx.fillStyle = '#fff'; ctx.fillText(v, 58, y + 20);
       });
-      ctx.font = '600 16px Patrick Hand'; ctx.fillStyle = '#A89872'; ctx.textAlign = 'center';
-      ctx.fillText('IQ Profile', W / 2, H - 45);
+
+      // Branding
+      ctx.font = '900 18px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a'; ctx.textAlign = 'center';
+      ctx.fillText('🦌 BrainDeer', W / 2, H - 45);
+
       shareCanvas = cv;
       const preview = document.getElementById('share-preview');
       preview.innerHTML = '';
@@ -351,25 +513,41 @@
     if (d.pic) {
       const img = new Image();
       img.onload = () => {
-        ctx.save(); ctx.beginPath(); ctx.arc(W / 2, 75, 40, 0, Math.PI * 2); ctx.clip();
-        ctx.drawImage(img, W / 2 - 40, 35, 80, 80); ctx.restore();
-        ctx.strokeStyle = '#C4AD8A'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(W / 2, 75, 40, 0, Math.PI * 2); ctx.stroke();
+        ctx.save(); ctx.beginPath(); ctx.arc(W / 2, 80, 40, 0, Math.PI * 2); ctx.clip();
+        ctx.drawImage(img, W / 2 - 40, 40, 80, 80); ctx.restore();
         draw();
       };
       img.src = d.pic;
     } else {
-      ctx.fillStyle = '#D5C8AD'; ctx.beginPath(); ctx.arc(W / 2, 75, 40, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#C4AD8A'; ctx.lineWidth = 3; ctx.stroke();
+      ctx.fillStyle = '#6b4f32'; ctx.beginPath(); ctx.arc(W / 2, 80, 40, 0, Math.PI * 2); ctx.fill();
+      ctx.font = '32px serif'; ctx.textAlign = 'center'; ctx.fillText('🦌', W / 2, 92);
       draw();
     }
   }
 
   function rr(ctx, x, y, w, h, r, fill, stroke, lw) {
-    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h); ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
-    if (fill)   { ctx.fillStyle = fill; ctx.fill(); }
+    ctx.beginPath();
+    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+    if (fill) { ctx.fillStyle = fill; ctx.fill(); }
     if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw || 2; ctx.stroke(); }
+  }
+
+  function rr_path(ctx, x, y, w, h, r) {
+    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h);
+    ctx.lineTo(x, y + h);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
   }
 
   document.getElementById('copy-btn').onclick = async () => {
@@ -384,13 +562,12 @@
   document.getElementById('download-btn').onclick = () => {
     if (!shareCanvas) return;
     const a = document.createElement('a');
-    a.download = 'iq-profile.png';
+    a.download = 'braindeer-profile.png';
     a.href = shareCanvas.toDataURL('image/png');
     a.click();
     toast('Saved!');
   };
 
-  // ── Boot ──────────────────────────────────────────────
   load();
 </script>
 </body>
