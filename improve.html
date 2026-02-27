@@ -209,6 +209,32 @@
     #cal-result .result-iq { font-size:64px; font-weight:900; color:var(--gold); text-shadow:0 4px 0 var(--gold-dark); margin:8px 0; }
     #cal-result .result-label { font-size:14px; font-weight:900; color:var(--brown-light); letter-spacing:4px; margin-bottom:12px; }
     #cal-result .result-text { font-size:14px; color:var(--tan); font-weight:600; margin-bottom:18px; line-height:1.5; }
+
+    /* ── Push Prompt ── */
+    #push-prompt {
+      position: fixed; bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+      left: 50%; transform: translateX(-50%);
+      background: var(--card); border-radius: 18px; padding: 16px 18px;
+      width: calc(100% - 32px); max-width: 360px;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+      z-index: 250; display: none;
+      animation: slideUp 0.3s ease;
+    }
+    #push-prompt.show { display: block; }
+    #push-prompt .pp-title { font-size: 15px; font-weight: 900; color: var(--cream); margin-bottom: 4px; }
+    #push-prompt .pp-text { font-size: 12px; font-weight: 600; color: var(--tan); margin-bottom: 12px; line-height: 1.4; }
+    #push-prompt .pp-btns { display: flex; gap: 8px; }
+    #push-prompt .pp-yes {
+      flex: 1; background: var(--green); color: #fff; border: none;
+      border-radius: 12px; padding: 10px; font-family: 'Nunito', sans-serif;
+      font-size: 14px; font-weight: 900; cursor: pointer;
+      box-shadow: 0 3px 0 var(--green-dark);
+    }
+    #push-prompt .pp-no {
+      background: var(--brown-mid); color: var(--tan); border: none;
+      border-radius: 12px; padding: 10px 16px; font-family: 'Nunito', sans-serif;
+      font-size: 14px; font-weight: 900; cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -254,6 +280,16 @@
 
 <div class="flash" id="flash"></div>
 <div class="confetti" id="confetti"></div>
+
+<!-- Push Notification Prompt (custom, shown before browser dialog) -->
+<div id="push-prompt">
+  <div class="pp-title">🦌 Daily brain reminders?</div>
+  <div class="pp-text">Get a nudge each day to keep your streak alive. We'll only ping you once a day.</div>
+  <div class="pp-btns">
+    <button class="pp-yes" id="pp-yes">Sure!</button>
+    <button class="pp-no" id="pp-no">Not now</button>
+  </div>
+</div>
 
 <!-- Age Onboarding -->
 <div class="modal" id="onboard">
@@ -336,7 +372,6 @@
     IQData.setAge(parseInt(ageSlider.value));
     Q.setAge(parseInt(ageSlider.value));
     onboard.classList.remove('show');
-    // After age, show calibration if needed
     if (IQData.needsCalibration()) {
       startCalibration();
     } else {
@@ -346,7 +381,6 @@
 
   // ── IQ Calibration Test ──
   const CAL_QUESTIONS = [
-    // Mixed difficulty covering multiple categories
     { q:'What comes next? 2, 6, 18, 54, ?', a:'162', w:['108','126','148'], cat:'patternRecognition', d:1.2 },
     { q:'If all Bloops are Razzies, and all Razzies are Lazzies, are all Bloops Lazzies?', a:'Yes', w:['No','Maybe','Not enough info'], cat:'logicalReasoning', d:1.1 },
     { q:'Hot is to Cold as Up is to _____', a:'Down', w:['High','Sky','Top'], cat:'verbalReasoning', d:0.6 },
@@ -395,19 +429,16 @@
     const isCorrect = btn.dataset.v === btn.dataset.ans;
     if (isCorrect) calCorrect++;
 
-    // Highlight
     parent.querySelectorAll('.cal-opt').forEach(o => {
       if (o.dataset.v === btn.dataset.ans) o.classList.add('correct');
       else if (o === btn) o.classList.add('wrong');
       else o.classList.add('dim');
     });
 
-    // Update dot
     const dot = document.getElementById('cal-dot-' + calIdx);
     dot.classList.remove('active');
     dot.classList.add(isCorrect ? 'done' : 'wrong-dot');
 
-    // Record in IQData for rating
     const cq = CAL_QUESTIONS[calIdx];
     IQData.recordAnswer(cq.cat, isCorrect, cq.d, 5000);
 
@@ -424,7 +455,6 @@
   });
 
   function showCalResult() {
-    // Calculate initial IQ from calibration
     const baseIQ = 85 + Math.round((calCorrect / CAL_QUESTIONS.length) * 30);
     const iq = Math.max(75, Math.min(130, baseIQ));
     IQData.markCalibrated(iq);
@@ -463,6 +493,8 @@
     feed.addEventListener('scroll', checkMore, { passive: true });
     feed.addEventListener('touchmove', checkMore, { passive: true });
     setInterval(checkMore, 200);
+    // Show push prompt after user has settled in (3s delay, won't spam)
+    setTimeout(maybeShowPushPrompt, 3000);
   }
 
   function checkMore() {
@@ -582,6 +614,93 @@
     xpBar.style.width = (xpInLevel / 150 * 100) + '%';
     levelLabel.textContent = 'Lvl ' + d.level;
     xpLabel.textContent = xpInLevel + '/150';
+  }
+
+  // ── Push Notifications ──
+  const VAPID_PUBLIC_KEY = 'BCeif8Bk8ozGVFukIl2zE7UWB1YXN5eBPF0nHgNc0ELsEyNmZ0VE3xo15UCuqjgNg9dARdIKThXKakZL9ci8ZXI';
+
+  function maybeShowPushPrompt() {
+    // Don't show if: already subscribed, already denied, or browser doesn't support
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    if (Notification.permission === 'granted') {
+      // Already granted — just silently subscribe/save in background
+      subscribePush();
+      return;
+    }
+    if (Notification.permission === 'denied') return;
+    if (localStorage.getItem('push_dismissed')) return;
+
+    // Show our friendly in-app prompt first (better UX than raw browser dialog)
+    document.getElementById('push-prompt').classList.add('show');
+  }
+
+  document.getElementById('pp-yes').addEventListener('click', async () => {
+    document.getElementById('push-prompt').classList.remove('show');
+    await subscribePush();
+  });
+
+  document.getElementById('pp-no').addEventListener('click', () => {
+    document.getElementById('push-prompt').classList.remove('show');
+    localStorage.setItem('push_dismissed', '1');
+  });
+
+  async function subscribePush() {
+    try {
+      const reg = await navigator.serviceWorker.register('/sw.js');
+      await navigator.serviceWorker.ready;
+
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') return;
+
+      // Check if already subscribed
+      const existing = await reg.pushManager.getSubscription();
+      const sub = existing || await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+
+      // Save to Firestore — requires firebase to be available in parent scope
+      // We reach up to parent window's firebase instance since we're in an iframe
+      const db = window.parent.firebase
+        ? window.parent.firebase.firestore()
+        : (typeof firebase !== 'undefined' ? firebase.firestore() : null);
+
+      if (!db) {
+        console.warn('BrainDeer: firebase not available, push subscription saved locally only');
+        localStorage.setItem('push_sub', JSON.stringify(sub));
+        return;
+      }
+
+      // Get current user UID
+      const user = window.parent.firebase
+        ? window.parent.firebase.auth().currentUser
+        : (typeof firebase !== 'undefined' ? firebase.auth().currentUser : null);
+
+      const uid = user ? user.uid : 'anon_' + (localStorage.getItem('bd_anon_id') || (() => {
+        const id = Math.random().toString(36).slice(2);
+        localStorage.setItem('bd_anon_id', id);
+        return id;
+      })());
+
+      await db.collection('pushSubscriptions').doc(uid).set({
+        subscription: JSON.parse(JSON.stringify(sub)),
+        uid: uid,
+        updatedAt: window.parent.firebase
+          ? window.parent.firebase.firestore.FieldValue.serverTimestamp()
+          : new Date().toISOString()
+      });
+
+      console.log('BrainDeer: push subscription saved ✓');
+    } catch (err) {
+      console.error('BrainDeer: push setup failed', err);
+    }
+  }
+
+  function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = atob(base64);
+    return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
   }
 
   // ── Helpers ──
