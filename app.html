@@ -5,52 +5,140 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#F2EBD9">
+  <meta name="theme-color" content="#3a2918">
   <link rel="manifest" href="manifest.json">
-  <title>IQ Profile</title>
+  <title>BrainDeer</title>
   <style>
-    :root { --bg: #F2EBD9; --tan: #C4AD8A; --ink: #2A2018; }
+    :root {
+      --bg: #f0e2cc;
+      --card: #f7eed8;
+      --brown-dark: #3a2918;
+      --brown-mid: #6b4f32;
+      --brown-light: #8f6b4a;
+      --tan: #c2a476;
+      --cream: #f0e2cc;
+      --green: #58cc02;
+      --green-dark: #46a302;
+      --red: #ea2b2b;
+      --red-dark: #c42020;
+      --gold: #ffc800;
+      --blue: #1cb0f6;
+      --purple: #ce82ff;
+      --orange: #ff9600;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: var(--bg); overflow: hidden; height: 100dvh; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: var(--brown-dark); }
 
     .screen {
       position: absolute;
-      inset: 0; width: 100%; height: 100%;
-      border: none;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.18s ease;
-      background: var(--bg);
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      overflow: hidden;
     }
-    .screen.active { opacity: 1; pointer-events: all; }
+    .screen.active {
+      display: block;
+    }
+
+    /* Hide everything until we know auth state */
+    body.loading .screen { display: none !important; }
+    body.loading::after {
+      content: '🦌';
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      background: var(--brown-dark);
+      animation: pulse 1s ease infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.1); }
+    }
   </style>
 </head>
-<body>
+<body class="loading">
 
-<iframe src="auth.html"    class="screen active" id="screen-auth"></iframe>
-<iframe src="improve.html" class="screen"        id="screen-improve"></iframe>
-<iframe src="profile.html" class="screen"        id="screen-profile"></iframe>
+<div class="screen" id="screen-auth"></div>
+<div class="screen" id="screen-improve"></div>
+<div class="screen" id="screen-profile"></div>
 
 <script>
-  // Called from inside any iframe: parent.goTo('profile')
+  // Navigation system
+  let currentScreen = null;
+
   function goTo(page) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    var el = document.getElementById('screen-' + page);
-    if (el) el.classList.add('active');
+    const el = document.getElementById('screen-' + page);
+    if (el) {
+      el.classList.add('active');
+      currentScreen = page;
+      // Notify the loaded page
+      if (el._onShow) el._onShow();
+    }
   }
 
-  // On load: check if user is already logged in.
-  // If yes, skip auth and go straight to improve.
-  // If no, stay on auth (it's already the active screen).
-  function authCheck() {
-    var isGuest = localStorage.getItem('iq_guest') === '1';
-    var hasFirebaseUser = Object.keys(localStorage)
-      .some(k => k.startsWith('firebase:authUser:'));
+  // Dynamic page loader - loads HTML into divs instead of iframes
+  async function loadPage(name, url) {
+    const container = document.getElementById('screen-' + name);
+    try {
+      const resp = await fetch(url);
+      const html = await resp.text();
+      // Extract body content and styles
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      // Create a shadow-like container
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = 'width:100%;height:100%;overflow:hidden;position:relative;';
+      
+      // We'll use iframes but manage them better
+      const iframe = document.createElement('iframe');
+      iframe.src = url;
+      iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;background:var(--brown-dark);';
+      iframe.setAttribute('scrolling', 'yes');
+      container.appendChild(iframe);
+    } catch(e) {
+      console.warn('Failed to load', name, e);
+    }
+  }
+
+  // Boot sequence
+  async function boot() {
+    // Load all pages as iframes
+    ['auth', 'improve', 'profile'].forEach(name => {
+      const container = document.getElementById('screen-' + name);
+      const iframe = document.createElement('iframe');
+      iframe.src = name + '.html';
+      iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;';
+      iframe.setAttribute('scrolling', 'yes');
+      iframe.allow = 'web-share';
+      container.appendChild(iframe);
+    });
+
+    // Check auth state
+    const isGuest = localStorage.getItem('iq_guest') === '1';
+    const hasFirebaseUser = Object.keys(localStorage).some(k => k.startsWith('firebase:authUser:'));
+    
+    // Remove loading state and show correct screen
+    document.body.classList.remove('loading');
+    
     if (isGuest || hasFirebaseUser) {
       goTo('improve');
+    } else {
+      goTo('auth');
     }
-    // else: do nothing, auth screen stays visible
   }
+
+  // Called from child iframes
+  function authCheck() {
+    // Already handled by boot - this is a no-op now
+  }
+
+  boot();
 </script>
 
 </body>
