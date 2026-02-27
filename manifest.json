@@ -1,7 +1,7 @@
 {
-  "name": "Push Test",
-  "short_name": "PushTest",
-  "start_url": "/IQ/testingnoti.html",
+  "name": "Braindeer - Improve IQ",
+  "short_name": "Braindeer",
+  "start_url": "/IQ/app.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000"
