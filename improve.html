@@ -3,104 +3,316 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>IQ Profile</title>
+  <title>BrainDeer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #F2EBD9; --card: #EDE5CF; --tan: #C4AD8A; --tan-dark: #A89872;
-      --ink: #2A2018; --ink-light: #6B5740; --green: #5EB85E; --red: #D64545;
+      --bg: #3a2918;
+      --card: #4a3625;
+      --card-glow: #5a4232;
+      --brown-mid: #6b4f32;
+      --brown-light: #8f6b4a;
+      --tan: #c2a476;
+      --cream: #f0e2cc;
+      --ink: #f0e2cc;
+      --ink-dim: #c2a476;
+      --green: #58cc02;
+      --green-dark: #46a302;
+      --red: #ea2b2b;
+      --red-dark: #c42020;
+      --gold: #ffc800;
+      --gold-dark: #d9aa00;
+      --blue: #1cb0f6;
+      --blue-dark: #1899d6;
+      --purple: #ce82ff;
+      --orange: #ff9600;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--ink); }
     body { display: flex; flex-direction: column; }
-    .top-bar { position: fixed; top: 0; left: 0; right: 0; padding: calc(env(safe-area-inset-top, 0px) + 10px) 16px 8px; z-index: 50; background: var(--bg); }
-    .stats-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-    .stat-pill { background: var(--card); border: 2px solid var(--tan); border-radius: 20px; padding: 5px 12px; display: flex; align-items: center; gap: 5px; }
+
+    /* ── Top Bar ── */
+    .top-bar {
+      position: fixed; top: 0; left: 0; right: 0;
+      padding: calc(env(safe-area-inset-top, 0px) + 8px) 14px 8px;
+      z-index: 50;
+      background: var(--bg);
+    }
+    .stats-row {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+    }
+    .stat-pill {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 5px 12px;
+      display: flex; align-items: center; gap: 6px;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+      position: relative; overflow: hidden;
+    }
+    .stat-pill::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%);
+      pointer-events: none;
+    }
     .pill-icon { width: 18px; height: 18px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     .pill-icon svg { width: 100%; height: 100%; }
-    .stat-pill .val { font-family: 'Verdana', sans-serif; font-size: 15px; font-weight: 700; }
-    .stat-pill .lbl { font-family: 'Patrick Hand', cursive; font-size: 11px; color: var(--ink-light); }
+    .stat-pill .val { font-size: 16px; font-weight: 800; color: var(--cream); }
+    .stat-pill .lbl { font-size: 11px; font-weight: 700; color: var(--tan); }
+
     .xp-wrap { display: flex; align-items: center; gap: 8px; }
-    .xp-bar-outer { flex: 1; height: 7px; background: var(--tan-dark); border-radius: 4px; overflow: hidden; }
-    .xp-bar-inner { height: 100%; background: var(--green); border-radius: 4px; transition: width 0.4s ease; }
-    .xp-label { font-family: 'Patrick Hand', cursive; font-size: 11px; color: var(--ink-light); white-space: nowrap; }
-    nav { position: fixed; bottom: 0; left: 0; right: 0; height: calc(60px + env(safe-area-inset-bottom, 0px)); background: var(--card); border-top: 2px solid var(--tan); display: flex; justify-content: center; align-items: flex-start; padding-top: 8px; gap: 8px; z-index: 100; }
-    .nav-btn { padding: 6px 30px; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--ink-light); font-family: 'Patrick Hand', cursive; font-size: 12px; text-decoration: none; border-radius: 12px; transition: all 0.2s; }
-    .nav-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; }
-    .nav-btn.active { color: var(--ink); background: rgba(196,173,138,0.3); }
-    .nav-divider { width: 2px; height: 28px; background: var(--tan); margin-top: 2px; }
-    main { flex: 1; padding-top: 78px; padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)); overflow-y: auto; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
+    .xp-bar-outer { flex: 1; height: 10px; background: var(--brown-mid); border-radius: 5px; overflow: hidden; }
+    .xp-bar-inner { height: 100%; background: var(--gold); border-radius: 5px; transition: width 0.4s ease; position: relative; }
+    .xp-bar-inner::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 40%;
+      background: rgba(255,255,255,0.25); border-radius: 5px 5px 0 0;
+    }
+    .xp-label { font-size: 12px; font-weight: 800; color: var(--tan); white-space: nowrap; }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: calc(64px + env(safe-area-inset-bottom, 0px));
+      background: var(--card);
+      box-shadow: 0 -3px 0 rgba(0,0,0,0.15);
+      display: flex; justify-content: center; align-items: flex-start; padding-top: 6px; gap: 6px;
+      z-index: 100;
+    }
+    .nav-btn {
+      padding: 8px 28px; background: none; border: none;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      color: var(--brown-light); font-family: 'Nunito', sans-serif;
+      font-size: 12px; font-weight: 800; text-decoration: none;
+      border-radius: 14px; transition: all 0.15s; cursor: pointer;
+    }
+    .nav-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .nav-btn.active {
+      color: var(--cream); background: var(--brown-mid);
+      box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+    }
+
+    /* ── Feed ── */
+    main {
+      flex: 1;
+      padding-top: 78px;
+      padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
     main::-webkit-scrollbar { display: none; }
-    .slide { min-height: 100%; scroll-snap-align: start; scroll-snap-stop: always; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; }
-    .card { background: var(--card); border: 2.5px solid var(--tan); border-radius: 22px; width: 100%; max-width: 360px; padding: clamp(16px,4vw,24px) clamp(14px,3.5vw,20px); display: flex; flex-direction: column; align-items: center; gap: clamp(10px,2.5vw,16px); }
-    .category { font-family: 'Patrick Hand', cursive; font-size: 12px; letter-spacing: 1px; color: var(--ink-light); background: rgba(196,173,138,0.2); padding: 3px 12px; border-radius: 10px; border: 1.5px solid var(--tan); }
-    .question { font-size: clamp(14px,3.8vw,17px); font-weight: 700; text-align: center; line-height: 1.45; padding: 0 2px; }
-    .sequence { display: flex; align-items: center; justify-content: center; gap: clamp(4px,1.5vw,8px); flex-wrap: wrap; font-family: 'Verdana', sans-serif; font-size: clamp(18px,5vw,24px); font-weight: 700; margin: 2px 0; }
+
+    .slide {
+      min-height: 100%;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 16px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border-radius: 20px;
+      width: 100%; max-width: 380px;
+      padding: clamp(16px,4vw,24px) clamp(14px,3.5vw,20px);
+      display: flex; flex-direction: column; align-items: center;
+      gap: clamp(10px,2.5vw,14px);
+      box-shadow: 0 6px 0 rgba(0,0,0,0.15);
+      position: relative; overflow: hidden;
+    }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+      border-radius: 20px 20px 0 0; pointer-events: none;
+    }
+
+    .category {
+      font-size: 11px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase;
+      color: var(--cream); background: var(--brown-mid);
+      padding: 4px 14px; border-radius: 10px;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.12);
+    }
+    .question {
+      font-size: clamp(15px,4vw,18px); font-weight: 800;
+      text-align: center; line-height: 1.4; padding: 0 4px;
+      color: var(--cream);
+    }
+
+    /* ── Sequences ── */
+    .sequence {
+      display: flex; align-items: center; justify-content: center;
+      gap: clamp(4px,1.5vw,8px); flex-wrap: wrap;
+      font-size: clamp(20px,5.5vw,26px); font-weight: 900; margin: 4px 0;
+      color: var(--cream);
+    }
     .sequence span { padding: 2px; }
-    .sequence .arrow { color: var(--tan-dark); font-size: clamp(12px,3vw,16px); }
-    .sequence .blank { background: var(--bg); border: 2px dashed var(--tan); border-radius: 8px; padding: 4px 12px; color: var(--tan-dark); }
+    .sequence .arrow { color: var(--brown-light); font-size: clamp(12px,3vw,16px); }
+    .sequence .blank {
+      background: var(--brown-mid); border-radius: 10px;
+      padding: 4px 14px; color: var(--gold);
+    }
+
+    /* ── Matrix ── */
     .matrix { display: grid; grid-template-columns: repeat(3,1fr); gap: 5px; width: clamp(120px,32vw,150px); }
-    .matrix-cell { aspect-ratio: 1; background: var(--bg); border-radius: 8px; border: 2px solid var(--tan); display: flex; align-items: center; justify-content: center; font-family: 'Verdana', sans-serif; font-size: clamp(14px,3.8vw,18px); font-weight: 700; }
-    .matrix-cell.blank { border-style: dashed; color: var(--tan-dark); }
+    .matrix-cell {
+      aspect-ratio: 1; background: var(--brown-mid); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: clamp(15px,4vw,19px); font-weight: 800; color: var(--cream);
+      box-shadow: 0 2px 0 rgba(0,0,0,0.12);
+    }
+    .matrix-cell.blank { background: var(--bg); color: var(--gold); }
+
+    /* ── Options ── */
     .options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
     .options.wide { grid-template-columns: 1fr; }
-    .opt { background: var(--bg); border: 2.5px solid var(--tan); border-radius: 14px; padding: clamp(10px,2.5vw,14px) 10px; font-family: 'Nunito', sans-serif; font-size: clamp(13px,3.4vw,15px); font-weight: 700; color: var(--ink); cursor: pointer; text-align: center; transition: all 0.15s; word-break: break-word; }
-    .opt:active { transform: scale(0.97); }
-    .opt.correct { background: var(--green); border-color: #4a9a4a; color: #fff; animation: pop 0.4s ease; }
-    .opt.wrong { background: var(--red); border-color: #b33; color: #fff; animation: shake 0.4s ease; }
-    .opt.dim { opacity: 0.3; }
-    .opt.show-correct { background: var(--green); border-color: #4a9a4a; color: #fff; opacity: 1; }
-    @keyframes pop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
-    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
-    .feedback { font-family: 'Patrick Hand', cursive; font-size: 16px; min-height: 22px; opacity: 0; transition: opacity 0.3s; }
+    .opt {
+      background: var(--card-glow); border: none; border-radius: 14px;
+      padding: clamp(11px,2.8vw,15px) 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: clamp(14px,3.5vw,16px); font-weight: 800;
+      color: var(--cream); cursor: pointer; text-align: center;
+      transition: transform 0.1s; word-break: break-word;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+      position: relative; overflow: hidden;
+    }
+    .opt::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%);
+      border-radius: 14px 14px 0 0; pointer-events: none;
+    }
+    .opt:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
+
+    .opt.correct {
+      background: var(--green); color: #fff;
+      box-shadow: 0 4px 0 var(--green-dark);
+      animation: pop 0.4s ease;
+    }
+    .opt.wrong {
+      background: var(--red); color: #fff;
+      box-shadow: 0 4px 0 var(--red-dark);
+      animation: shake 0.4s ease;
+    }
+    .opt.dim { opacity: 0.25; }
+    .opt.show-correct {
+      background: var(--green); color: #fff;
+      box-shadow: 0 4px 0 var(--green-dark);
+      opacity: 1;
+    }
+
+    @keyframes pop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+
+    /* ── Feedback ── */
+    .feedback {
+      font-size: 17px; font-weight: 900; min-height: 24px;
+      opacity: 0; transition: opacity 0.3s; text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
     .feedback.show { opacity: 1; }
     .feedback.correct { color: var(--green); }
     .feedback.wrong { color: var(--red); }
-    .explain { background: rgba(0,0,0,0.04); border-radius: 10px; padding: 10px 14px; font-size: 12px; color: var(--ink-light); line-height: 1.5; text-align: center; display: none; width: 100%; }
+
+    .explain {
+      background: var(--bg); border-radius: 12px;
+      padding: 10px 14px; font-size: 13px; font-weight: 600;
+      color: var(--tan); line-height: 1.5; text-align: center;
+      display: none; width: 100%;
+    }
     .explain.show { display: block; animation: slideUp 0.3s ease; }
     @keyframes slideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-    .scroll-hint { margin-top: 14px; font-family: 'Patrick Hand', cursive; font-size: 13px; color: var(--ink-light); opacity: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; transition: opacity 0.3s; }
+
+    .scroll-hint {
+      margin-top: 14px; font-size: 14px; font-weight: 800;
+      color: var(--brown-light); opacity: 0;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      transition: opacity 0.3s;
+    }
     .scroll-hint.show { opacity: 0.5; }
-    .scroll-hint svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; animation: bounce 1.5s infinite; }
-    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
-    .streak-popup { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    .scroll-hint svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; animation: bounce 1.5s infinite; }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(5px)} }
+
+    /* ── Streak Popup ── */
+    .streak-popup {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(58,41,24,0.85); z-index: 200;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
     .streak-popup.show { opacity: 1; }
-    .streak-popup .streak-icon { width: 44px; height: 44px; margin-bottom: 6px; }
+    .streak-popup .streak-icon { width: 48px; height: 48px; margin-bottom: 6px; }
     .streak-popup .streak-icon svg { width:100%;height:100%; }
-    .streak-popup .num { font-family: 'Verdana', sans-serif; font-size: 64px; font-weight: 700; color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,0.4); }
-    .streak-popup .txt { font-family: 'Patrick Hand', cursive; font-size: 26px; color: #fff; }
+    .streak-popup .num {
+      font-size: 72px; font-weight: 900; color: var(--gold);
+      text-shadow: 0 4px 0 var(--gold-dark);
+    }
+    .streak-popup .txt { font-size: 28px; font-weight: 900; color: var(--cream); text-transform: uppercase; }
+
+    /* ── Flash ── */
     .flash { position: fixed; inset: 0; pointer-events: none; opacity: 0; z-index: 150; }
-    .flash.green { background: radial-gradient(circle, rgba(94,184,94,0.3) 0%, transparent 70%); }
-    .flash.red { background: radial-gradient(circle, rgba(214,69,69,0.25) 0%, transparent 70%); }
-    .flash.show { animation: flash 0.3s ease; }
+    .flash.green { background: radial-gradient(circle, rgba(88,204,2,0.25) 0%, transparent 70%); }
+    .flash.red { background: radial-gradient(circle, rgba(234,43,43,0.2) 0%, transparent 70%); }
+    .flash.show { animation: flash 0.35s ease; }
     @keyframes flash { 0%{opacity:1} 100%{opacity:0} }
+
+    /* ── Confetti ── */
     .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 160; overflow: hidden; }
-    .confetti i { position: absolute; width: 10px; height: 10px; opacity: 0; }
+    .confetti i { position: absolute; width: 10px; height: 10px; opacity: 0; border-radius: 3px; }
     .confetti i.fall { animation: confettiFall 1.2s ease-out forwards; }
     @keyframes confettiFall { 0%{opacity:1;transform:translateY(0) rotate(0)} 100%{opacity:0;transform:translateY(100vh) rotate(720deg)} }
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 300; padding: 20px; }
-    .modal.show { display: flex; }
-    .modal-box { background: var(--bg); border-radius: 22px; padding: 28px 22px; width: 100%; max-width: 320px; text-align: center; border: 3px solid var(--tan); }
-    .modal-title { font-family: 'Patrick Hand', cursive; font-size: 24px; margin-bottom: 6px; }
-    .modal-text { font-size: 13px; color: var(--ink-light); line-height: 1.5; margin-bottom: 18px; }
-    .age-num { font-family: 'Verdana', sans-serif; font-size: 44px; font-weight: 700; margin: 14px 0; }
-    .age-slider { width: 100%; height: 10px; -webkit-appearance: none; background: var(--tan-dark); border-radius: 5px; margin-bottom: 22px; }
-    .age-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; background: var(--ink); border-radius: 50%; cursor: pointer; }
-    .btn { background: var(--ink); color: #fff; border: none; border-radius: 22px; padding: 12px 36px; font-family: 'Patrick Hand', cursive; font-size: 19px; cursor: pointer; }
-    /* Loading veil — shown while Firebase auth resolves */
 
+    /* ── Onboard Modal ── */
+    .modal {
+      position: fixed; inset: 0;
+      background: rgba(58,41,24,0.9);
+      display: none; align-items: center; justify-content: center;
+      z-index: 300; padding: 20px;
+    }
+    .modal.show { display: flex; }
+    .modal-box {
+      background: var(--card); border-radius: 22px;
+      padding: 28px 22px; width: 100%; max-width: 340px;
+      text-align: center;
+      box-shadow: 0 8px 0 rgba(0,0,0,0.15);
+      position: relative; overflow: hidden;
+    }
+    .modal-box::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    .modal-title { font-size: 24px; font-weight: 900; margin-bottom: 6px; color: var(--cream); }
+    .modal-text { font-size: 14px; color: var(--tan); line-height: 1.5; margin-bottom: 18px; font-weight: 600; }
+    .modal-mascot { font-size: 48px; margin-bottom: 8px; }
+    .age-num { font-size: 48px; font-weight: 900; margin: 10px 0; color: var(--gold); text-shadow: 0 3px 0 var(--gold-dark); }
+    .age-slider {
+      width: 100%; height: 12px; -webkit-appearance: none;
+      background: var(--brown-mid); border-radius: 6px; margin-bottom: 22px;
+    }
+    .age-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 32px; height: 32px;
+      background: var(--gold); border-radius: 50%; cursor: pointer;
+      box-shadow: 0 3px 0 var(--gold-dark);
+    }
+    .btn-go {
+      background: var(--green); color: #fff; border: none;
+      border-radius: 16px; padding: 14px 40px;
+      font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 900;
+      cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;
+      box-shadow: 0 5px 0 var(--green-dark);
+      transition: transform 0.1s;
+    }
+    .btn-go:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--green-dark); }
   </style>
 </head>
 <body>
-
-
 
 <div class="top-bar">
   <div class="stats-row">
     <div class="stat-pill">
       <span class="pill-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#E07850" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#ff9600" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9.5 2a3.5 3.5 0 0 0-3.2 4.8A3.5 3.5 0 0 0 4 10.5a3.5 3.5 0 0 0 1.1 2.5A3.5 3.5 0 0 0 4 16a3.5 3.5 0 0 0 3.5 3.5c.6 0 1.1-.1 1.6-.4.4 1.1 1.5 1.9 2.9 1.9"/>
           <path d="M14.5 2a3.5 3.5 0 0 1 3.2 4.8A3.5 3.5 0 0 1 20 10.5a3.5 3.5 0 0 1-1.1 2.5A3.5 3.5 0 0 1 20 16a3.5 3.5 0 0 1-3.5 3.5c-.6 0-1.1-.1-1.6-.4a3 3 0 0 1-2.9 1.9"/>
           <path d="M12 2v19"/>
@@ -111,9 +323,8 @@
     </div>
     <div class="stat-pill" id="streak-pill" style="display:none;">
       <span class="pill-icon">
-        <svg viewBox="0 0 24 24" fill="#F59E0B" fill-opacity="0.2" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" fill="#ff9600" fill-opacity="0.3" stroke="#ff9600" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22c-4.97 0-8-3.58-8-7.5 0-3.07 1.74-5.25 3.53-7.28C9.18 5.38 10.34 3.7 10.34 2c0 0 1.77 2.18 2.34 4.18.27.94.5 1.82 1.32 1.82 0-2 1-3 1-3s1 1.5 1 3.5c.5-.5 1.5-1.5 1.5-1.5s1 2.5 1 5c0 3.92-3.03 7.5-8 7.5z"/>
-          <path d="M12 22c-1.66 0-3-1.5-3-3.5 0-1.5.83-2.5 1.5-3.5.5-.72 1-1.5 1-2.5 0 0 .5.72.72 1.5.18.6.28 1.3.78 1.3 0-1 .5-1.5.5-1.5s.5.75.5 1.75C14 17.5 14.66 22 12 22z" fill="#F59E0B" fill-opacity="0.35" stroke="none"/>
         </svg>
       </span>
       <span class="val" id="streak-val">0</span>
@@ -132,9 +343,8 @@
 <nav>
   <button class="nav-btn active" onclick="parent.goTo('improve')">
     <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-    Improve
+    Train
   </button>
-  <div class="nav-divider"></div>
   <button class="nav-btn" onclick="parent.goTo('profile')">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     Profile
@@ -143,7 +353,7 @@
 
 <div class="streak-popup" id="streak-popup">
   <div class="streak-icon">
-    <svg viewBox="0 0 24 24" fill="#F59E0B" fill-opacity="0.4" stroke="#F59E0B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 2px 8px rgba(245,158,11,0.5))">
+    <svg viewBox="0 0 24 24" fill="#ff9600" fill-opacity="0.5" stroke="#ff9600" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 2px 8px rgba(255,150,0,0.5))">
       <path d="M12 22c-4.97 0-8-3.58-8-7.5 0-3.07 1.74-5.25 3.53-7.28C9.18 5.38 10.34 3.7 10.34 2c0 0 1.77 2.18 2.34 4.18.27.94.5 1.82 1.32 1.82 0-2 1-3 1-3s1 1.5 1 3.5c.5-.5 1.5-1.5 1.5-1.5s1 2.5 1 5c0 3.92-3.03 7.5-8 7.5z"/>
     </svg>
   </div>
@@ -156,56 +366,45 @@
 
 <div class="modal" id="onboard">
   <div class="modal-box">
-    <div class="modal-title">Welcome to IQ Profile</div>
+    <div class="modal-mascot">🦌</div>
+    <div class="modal-title">Welcome to BrainDeer!</div>
     <div class="modal-text">Train your brain with personalized challenges.<br>First, how old are you?</div>
     <div class="age-num" id="age-display">25</div>
     <input type="range" class="age-slider" id="age-slider" min="8" max="80" value="25">
-    <button class="btn" id="start-btn">Let's Go</button>
+    <button class="btn-go" id="start-btn">Let's Go</button>
   </div>
 </div>
 
-<!-- questions.js has no import/export — plain script is correct -->
 <script src="questions.js"></script>
 
-<!--
-  ONE type="module" script for everything Firebase-related.
-  Rules:
-    - NO <script src="data.js"> — data.js is a module, you import it
-    - NO import statements outside type="module"
-    - questions.js (plain script) sets window.Q, accessible here normally
--->
 <script type="module">
   import { IQData, getEncouragement } from './data.js';
 
-  // Instant auth check — no async wait needed
   if (window.parent !== window) parent.authCheck();
 
-  // ── DOM ──────────────────────────────────────────────
-  const feed        = document.getElementById('feed');
-  const iqVal       = document.getElementById('iq-val');
-  const streakVal   = document.getElementById('streak-val');
-  const streakPill  = document.getElementById('streak-pill');
+  const feed = document.getElementById('feed');
+  const iqVal = document.getElementById('iq-val');
+  const streakVal = document.getElementById('streak-val');
+  const streakPill = document.getElementById('streak-pill');
   const streakPopup = document.getElementById('streak-popup');
-  const streakNum   = document.getElementById('streak-num');
-  const onboard     = document.getElementById('onboard');
-  const ageSlider   = document.getElementById('age-slider');
-  const ageDisplay  = document.getElementById('age-display');
-  const flashEl     = document.getElementById('flash');
-  const confettiEl  = document.getElementById('confetti');
-  const xpBar       = document.getElementById('xp-bar');
-  const levelLabel  = document.getElementById('level-label');
-  const xpLabel     = document.getElementById('xp-label');
+  const streakNum = document.getElementById('streak-num');
+  const onboard = document.getElementById('onboard');
+  const ageSlider = document.getElementById('age-slider');
+  const ageDisplay = document.getElementById('age-display');
+  const flashEl = document.getElementById('flash');
+  const confettiEl = document.getElementById('confetti');
+  const xpBar = document.getElementById('xp-bar');
+  const levelLabel = document.getElementById('level-label');
+  const xpLabel = document.getElementById('xp-label');
 
   let slides = 0, answerStart = 0;
   const questionQueue = [];
-  const QUEUE_TARGET  = 25;
+  const QUEUE_TARGET = 25;
 
-  // ── Question queue ────────────────────────────────────
   function fillQueue() {
     while (questionQueue.length < QUEUE_TARGET) {
       const weakCat = IQData.getWeakestCategory();
-      const diff    = weakCat ? IQData.getDifficulty(weakCat) : 1.0;
-      // Q is set by questions.js on window — accessible from module scripts too
+      const diff = weakCat ? IQData.getDifficulty(weakCat) : 1.0;
       questionQueue.push(Q.generate(diff));
     }
   }
@@ -217,7 +416,6 @@
     return q;
   }
 
-  // ── Onboarding ────────────────────────────────────────
   ageSlider.oninput = () => ageDisplay.textContent = ageSlider.value;
 
   document.getElementById('start-btn').addEventListener('click', () => {
@@ -228,7 +426,6 @@
     startFeed();
   });
 
-  // ── Boot ─────────────────────────────────────────────
   function init() {
     if (IQData.needsOnboarding()) {
       onboard.classList.add('show');
@@ -244,7 +441,7 @@
     updateUI(d);
     fillQueue();
     for (let i = 0; i < 10; i++) addSlide();
-    feed.addEventListener('scroll',    checkMore, { passive: true });
+    feed.addEventListener('scroll', checkMore, { passive: true });
     feed.addEventListener('touchmove', checkMore, { passive: true });
     setInterval(checkMore, 150);
   }
@@ -257,7 +454,7 @@
   }
 
   function addSlide() {
-    const q   = nextQuestion();
+    const q = nextQuestion();
     const idx = slides++;
     const div = document.createElement('div');
     div.className = 'slide';
@@ -266,16 +463,15 @@
     answerStart = Date.now();
   }
 
-  // ── Render ────────────────────────────────────────────
   function render(q, idx) {
     let visual = '';
     if (q.visual === 'sequence' || q.visual === 'letterSequence') {
       const parts = q.sequence.map((n, i) => {
         if (n === '?') return `<span class="blank">?</span>`;
-        const arrow = i < q.sequence.length - 1 ? `<span class="arrow">-</span>` : '';
+        const arrow = i < q.sequence.length - 1 ? `<span class="arrow">→</span>` : '';
         return `<span>${n}</span>${arrow}`;
       });
-      if (q.sequence[0] !== '?') parts.push(`<span class="arrow">-</span><span class="blank">?</span>`);
+      if (q.sequence[0] !== '?') parts.push(`<span class="arrow">→</span><span class="blank">?</span>`);
       visual = `<div class="sequence">${parts.join('')}</div>`;
     } else if (q.visual === 'matrix') {
       visual = `<div class="matrix">${q.grid.map(c =>
@@ -283,21 +479,19 @@
       ).join('')}</div>`;
     }
     const wide = q.options.some(o => String(o).length > 18);
-    const esc  = s => String(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const esc = s => String(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     return `
       <div class="card">
         <div class="category">${q.categoryLabel}</div>
         <div class="question">${q.question}</div>
         ${visual}
         <div class="options${wide ? ' wide' : ''}"
-             data-idx="${idx}"
-             data-ans="${esc(q.answer)}"
-             data-cat="${q.category}"
-             data-diff="${q.difficulty}">
+             data-idx="${idx}" data-ans="${esc(q.answer)}"
+             data-cat="${q.category}" data-diff="${q.difficulty}">
           ${q.options.map(o => `<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}
         </div>
         <div class="feedback" id="fb-${idx}"></div>
-        <div class="explain"  id="exp-${idx}">${q.explanation}</div>
+        <div class="explain" id="exp-${idx}">${q.explanation}</div>
       </div>
       <div class="scroll-hint" id="hint-${idx}">
         <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
@@ -305,35 +499,34 @@
       </div>`;
   }
 
-  // ── Answer handling ───────────────────────────────────
   document.addEventListener('click', e => {
     if (!e.target.classList.contains('opt')) return;
-    const btn  = e.target;
+    const btn = e.target;
     const opts = btn.parentElement;
     if (opts.dataset.done) return;
     opts.dataset.done = '1';
 
-    const idx       = parseInt(opts.dataset.idx);
-    const correct   = opts.dataset.ans;
-    const val       = btn.dataset.v;
+    const idx = parseInt(opts.dataset.idx);
+    const correct = opts.dataset.ans;
+    const val = btn.dataset.v;
     const isCorrect = val === correct;
-    const ms        = Date.now() - answerStart;
+    const ms = Date.now() - answerStart;
 
     opts.querySelectorAll('.opt').forEach(o => {
       if (o.dataset.v === correct) o.classList.add(isCorrect ? 'correct' : 'show-correct');
-      else if (o === btn)          o.classList.add('wrong');
-      else                         o.classList.add('dim');
+      else if (o === btn) o.classList.add('wrong');
+      else o.classList.add('dim');
     });
 
     const result = IQData.recordAnswer(opts.dataset.cat, isCorrect, parseFloat(opts.dataset.diff), ms);
 
     const fb = document.getElementById(`fb-${idx}`);
     fb.textContent = getEncouragement(result.streak, isCorrect);
-    fb.className   = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
+    fb.className = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
 
     if (isCorrect) { flashEl.className = 'flash green show'; spawnConfetti(8); }
-    else           { flashEl.className = 'flash red show'; }
-    setTimeout(() => flashEl.className = 'flash', 300);
+    else { flashEl.className = 'flash red show'; }
+    setTimeout(() => flashEl.className = 'flash', 350);
 
     if (isCorrect && result.streak > 0 && result.streak % 5 === 0) {
       setTimeout(() => {
@@ -346,20 +539,18 @@
 
     updateUI(result);
     checkMore();
-    setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'),  250);
+    setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'), 250);
     setTimeout(() => document.getElementById(`hint-${idx}`)?.classList.add('show'), 400);
     answerStart = Date.now();
   });
 
-  // ── Effects ───────────────────────────────────────────
   function spawnConfetti(n) {
-    const colors = ['#5EB85E','#FFD700','#FF6B6B','#4ECDC4','#A855F7','#F59E0B'];
+    const colors = ['#58cc02','#ffc800','#ea2b2b','#1cb0f6','#ce82ff','#ff9600'];
     for (let i = 0; i < n; i++) {
       const p = document.createElement('i');
-      p.style.left           = Math.random() * 100 + '%';
-      p.style.top            = '-10px';
-      p.style.background     = colors[Math.floor(Math.random() * colors.length)];
-      p.style.borderRadius   = Math.random() > 0.5 ? '50%' : '2px';
+      p.style.left = Math.random() * 100 + '%';
+      p.style.top = '-10px';
+      p.style.background = colors[Math.floor(Math.random() * colors.length)];
       p.style.animationDelay = Math.random() * 0.2 + 's';
       confettiEl.appendChild(p);
       setTimeout(() => p.classList.add('fall'), 10);
@@ -367,19 +558,17 @@
     }
   }
 
-  // ── UI ────────────────────────────────────────────────
   function updateUI(d) {
     iqVal.textContent = d.iq || '--';
     if (d.streak > 0) { streakPill.style.display = 'flex'; streakVal.textContent = d.streak; }
-    else              { streakPill.style.display = 'none'; }
-    const xpInLevel        = d.xp % 150;
-    xpBar.style.width      = (xpInLevel / 150 * 100) + '%';
+    else { streakPill.style.display = 'none'; }
+    const xpInLevel = d.xp % 150;
+    xpBar.style.width = (xpInLevel / 150 * 100) + '%';
     levelLabel.textContent = 'Lvl ' + d.level;
-    xpLabel.textContent    = xpInLevel + '/150';
+    xpLabel.textContent = xpInLevel + '/150';
   }
 
   window.addEventListener('beforeunload', () => IQData.endSession());
-
   init();
 </script>
 </body>
