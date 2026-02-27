@@ -73,15 +73,15 @@
     .share-btns button.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
     .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 8px 18px; border-radius: 18px; font-family: 'Patrick Hand', cursive; font-size: 13px; opacity: 0; transition: opacity 0.3s; z-index: 300; white-space: nowrap; }
     .toast.show { opacity: 1; }
-    #auth-veil { position: fixed; inset: 0; background: var(--bg); z-index: 999; display: flex; align-items: center; justify-content: center; }
-    #auth-veil.gone { display: none; }
+    
+    
     .spin { width: 32px; height: 32px; border: 3px solid var(--tan); border-top-color: var(--ink); border-radius: 50%; animation: spinA 0.8s linear infinite; }
     @keyframes spinA { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
-<div id="auth-veil"><div class="spin"></div></div>
+
 
 <main>
   <div class="header">
@@ -137,15 +137,15 @@
 </main>
 
 <nav>
-  <a class="nav-btn" href="improve.html">
+  <button class="nav-btn" onclick="parent.goTo('improve')">
     <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
     Improve
-  </a>
+  </button>
   <div class="nav-divider"></div>
-  <a class="nav-btn active" href="profile.html">
+  <button class="nav-btn active" onclick="parent.goTo('profile')">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     Profile
-  </a>
+  </button>
 </nav>
 
 <div class="modal" id="share-modal">
@@ -166,11 +166,7 @@
 
 <!-- NO <script src="data.js"> — it's a module, imported below -->
 <script type="module">
-  import { IQData, requireAuth, iqToPercentile, formatPercentile } from './data.js';
-
-  // Auth guard — redirect to /auth.html if not logged in or guest
-  await requireAuth();
-  document.getElementById('auth-veil').classList.add('gone');
+  import { IQData, iqToPercentile, formatPercentile } from './data.js';
 
   // ── Abilities config ──────────────────────────────────
   const ABILITIES = [
