@@ -17,14 +17,12 @@ const firebaseConfig = {
   measurementId:     "G-9B6885G0X0"
 };
 
-const _app  = initializeApp(firebaseConfig);
-const auth  = getAuth(_app);
-const db    = getFirestore(_app);
+const _app = initializeApp(firebaseConfig);
+const auth = getAuth(_app);
+const db   = getFirestore(_app);
 
 // ═══════════════════════════════════════════════════
 // AUTH STATE
-// Resolves once Firebase tells us who the user is (or null)
-// Every other module can await authReady before doing anything
 // ═══════════════════════════════════════════════════
 let currentUser = null;
 let _authResolve;
@@ -37,29 +35,98 @@ onAuthStateChanged(auth, async user => {
 });
 
 // ═══════════════════════════════════════════════════
-// PAGE GUARDS  (call at top of each page)
+// PAGE GUARDS
 // ═══════════════════════════════════════════════════
-
-// Protected pages: improve.html, profile.html
-// If visitor is neither logged-in nor a guest → send to auth
 async function requireAuth() {
   await authReady;
   if (!currentUser && !IQData.isGuest()) {
-    if (window.parent !== window) { parent.goTo('auth'); } else { window.location.href = '/auth.html'; }
+    if (window.parent !== window) { parent.goTo('auth'); }
+    else { window.location.href = '/auth.html'; }
   }
 }
 
-// auth.html: already logged in? skip straight to the app
 async function redirectIfLoggedIn() {
   await authReady;
   if (currentUser) {
-    if (window.parent !== window) { parent.goTo('improve'); } else { window.location.href = '/improve.html'; }
+    if (window.parent !== window) { parent.goTo('improve'); }
+    else { window.location.href = '/improve.html'; }
   }
 }
 
-  // ─── Profile setters ─────────────────────────────
+// ═══════════════════════════════════════════════════
+// IQDATA — all local storage + cloud sync logic
+// ═══════════════════════════════════════════════════
+const SYNC_EVERY = 10;
+let _pendingAnswers = 0;
+
+const IQData = {
+  KEY: 'iq_profile_v6',
+
+  defaults() {
+    return {
+      version:      6,
+      uid:          null,
+      username:     null,
+      pic:          null,
+      age:          null,
+      iq:           null,
+      xp:           0,
+      level:        1,
+      answered:     0,
+      correct:      0,
+      streak:       0,
+      bestStreak:   0,
+      avgMs:        0,
+      fastAnswers:  0,
+      totalSessions:0,
+      sessionStart: null,
+      ratings: {
+        patternRecognition: { r: 1000, n: 0, wins: 0, history: [] },
+        problemSolving:     { r: 1000, n: 0, wins: 0, history: [] },
+        mentalAgility:      { r: 1000, n: 0, wins: 0, history: [] },
+        workingMemory:      { r: 1000, n: 0, wins: 0, history: [] },
+        verbalReasoning:    { r: 1000, n: 0, wins: 0, history: [] },
+        logicalReasoning:   { r: 1000, n: 0, wins: 0, history: [] },
+        spatialAwareness:   { r: 1000, n: 0, wins: 0, history: [] },
+        numericalReasoning: { r: 1000, n: 0, wins: 0, history: [] },
+      }
+    };
+  },
+
+  load() {
+    try {
+      const raw = localStorage.getItem(this.KEY);
+      if (!raw) return this.defaults();
+      const d = JSON.parse(raw);
+      // Ensure all rating keys exist (migration safety)
+      const def = this.defaults();
+      for (const k of Object.keys(def.ratings)) {
+        if (!d.ratings[k]) d.ratings[k] = def.ratings[k];
+      }
+      return d;
+    } catch { return this.defaults(); }
+  },
+
+  save(d) {
+    localStorage.setItem(this.KEY, JSON.stringify(d));
+  },
+
+  // ─── Auth helpers ─────────────────────────────────
+  isGuest() { return localStorage.getItem('iq_guest') === '1'; },
+
+  getCurrentUser() { return currentUser; },
+
+  signOut() {
+    signOut(auth).then(() => {
+      localStorage.removeItem('iq_guest');
+      if (window.parent !== window) { parent.goTo('auth'); }
+      else { window.location.href = '/auth.html'; }
+    });
+  },
+
   needsOnboarding() { return !this.load().age; },
 
+  // ─── Profile setters ──────────────────────────────
   setAge(age) {
     const d = this.load(); d.age = age; this.save(d);
     this._pushToCloud(d);
@@ -75,9 +142,7 @@ async function redirectIfLoggedIn() {
     this._pushToCloud(d);
   },
 
-  // ─── Cloud sync ──────────────────────────────────
-
-  // Pull Firestore → merge → save locally
+  // ─── Cloud sync ───────────────────────────────────
   async _syncFromCloud() {
     if (!currentUser) return;
     try {
@@ -91,7 +156,6 @@ async function redirectIfLoggedIn() {
         merged.pic      = cloud.pic || currentUser.photoURL || local.pic;
         this.save(merged);
       } else {
-        // First ever login — push local progress to cloud
         const d = this.load();
         d.uid       = currentUser.uid;
         d.username  = currentUser.displayName || null;
@@ -105,7 +169,6 @@ async function redirectIfLoggedIn() {
     }
   },
 
-  // Merge strategy: always keep the higher / more-progressed value
   _merge(local, cloud) {
     const m = { ...this.defaults(), ...local };
     for (const k of Object.keys(m.ratings)) {
@@ -126,31 +189,23 @@ async function redirectIfLoggedIn() {
     return m;
   },
 
-  // Push local state → Firestore (fire-and-forget, never blocks gameplay)
   async _pushToCloud(dataOverride) {
     if (!currentUser) return;
     try {
       const d = dataOverride ? { ...dataOverride } : { ...this.load() };
-
-      // Trim history to last 20 entries per category to save Firestore bytes
       for (const k of Object.keys(d.ratings)) {
         d.ratings[k] = { ...d.ratings[k] };
         d.ratings[k].history = (d.ratings[k].history || []).slice(-20);
       }
-
-      // Ephemeral fields — don't persist these
-      delete d.streak;        // resets each session anyway
+      delete d.streak;
       delete d.sessionStart;
-
       d.lastSeen = serverTimestamp();
       await setDoc(doc(db, 'users', currentUser.uid), d, { merge: true });
     } catch (e) {
       console.warn('[IQData] Push failed:', e.message);
-      // Silent fail — local data intact, will retry next answer batch
     }
   },
 
-  // Call after recording each answer
   async _maybeSync() {
     if (!currentUser) return;
     _pendingAnswers++;
@@ -160,7 +215,7 @@ async function redirectIfLoggedIn() {
     }
   },
 
-  // ─── Difficulty & categories ─────────────────────
+  // ─── Difficulty & categories ──────────────────────
   getDifficulty(cat) {
     const d = this.load(), c = d.ratings[cat];
     if (!c || c.n < 3) return 0.8;
@@ -183,20 +238,18 @@ async function redirectIfLoggedIn() {
     return r.filter(x => x).length / r.length;
   },
 
-  // ─── Core: record an answer ──────────────────────
+  // ─── Core: record an answer ───────────────────────
   recordAnswer(cat, correct, diff, ms) {
     const d = this.load();
     const c = d.ratings[cat];
     if (!c) return d;
 
-    // Elo — dynamic K (aggressive early, settles after ~64 games)
     const expected = 1 / (1 + Math.pow(10, (diff * 400 - (c.r - 1000)) / 400));
     const K = Math.max(16, 48 - c.n * 0.5);
     c.r = Math.round(c.r + K * ((correct ? 1 : 0) - expected));
     c.r = Math.max(400, Math.min(1600, c.r));
     c.n++;
     if (correct) c.wins++;
-
     c.history.push(correct ? 1 : 0);
     if (c.history.length > 50) c.history = c.history.slice(-50);
 
@@ -209,11 +262,9 @@ async function redirectIfLoggedIn() {
       d.streak = 0;
     }
 
-    // Speed (exponential moving average)
     d.avgMs = d.answered === 1 ? ms : Math.round(d.avgMs * 0.95 + ms * 0.05);
     if (correct && ms < 3500) d.fastAnswers++;
 
-    // XP
     let xp = correct ? 10 : 3;
     if (correct && ms < 3000)      xp += 7;
     else if (correct && ms < 5000) xp += 3;
@@ -223,15 +274,14 @@ async function redirectIfLoggedIn() {
 
     const oldLvl = d.level;
     d.level = Math.floor(d.xp / 150) + 1;
-
     d.iq = this.calcIQ(d);
     this.save(d);
-    this._maybeSync();                  // non-blocking
+    this._maybeSync();
 
     return { ...d, xpGain: xp, leveledUp: d.level > oldLvl };
   },
 
-  // ─── IQ calculation ──────────────────────────────
+  // ─── IQ calculation ───────────────────────────────
   calcIQ(d) {
     const w = {
       patternRecognition: 0.15,
@@ -260,7 +310,7 @@ async function redirectIfLoggedIn() {
     return Math.round(Math.max(55, Math.min(160, iq)));
   },
 
-  // ─── Stats helpers ───────────────────────────────
+  // ─── Stats helpers ────────────────────────────────
   getAccuracy() {
     const d = this.load();
     return d.answered === 0 ? 0 : Math.round((d.correct / d.answered) * 100);
@@ -277,7 +327,7 @@ async function redirectIfLoggedIn() {
     return c ? c.r : 1000;
   },
 
-  // ─── Session ─────────────────────────────────────
+  // ─── Session ──────────────────────────────────────
   startSession() {
     const d = this.load();
     d.sessionStart   = Date.now();
@@ -287,10 +337,10 @@ async function redirectIfLoggedIn() {
 
   endSession() {
     _pendingAnswers = 0;
-    this._pushToCloud();  // always sync on session end
+    this._pushToCloud();
   },
 
-  // ─── Reset ───────────────────────────────────────
+  // ─── Reset ────────────────────────────────────────
   reset() {
     localStorage.removeItem(this.KEY);
     if (currentUser) {
@@ -301,7 +351,6 @@ async function redirectIfLoggedIn() {
   }
 };
 
-// Always push before the tab closes — safety net
 window.addEventListener('beforeunload', () => {
   if (currentUser && _pendingAnswers > 0) IQData._pushToCloud();
 });
@@ -309,7 +358,6 @@ window.addEventListener('beforeunload', () => {
 // ═══════════════════════════════════════════════════
 // UTILITY FUNCTIONS
 // ═══════════════════════════════════════════════════
-
 function iqToPercentile(iq) {
   const z = (iq - 100) / 15;
   const t = 1 / (1 + 0.2316419 * Math.abs(z));
