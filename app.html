@@ -23,48 +23,33 @@
       background: var(--bg);
     }
     .screen.active { opacity: 1; pointer-events: all; }
-
-    #veil {
-      position: fixed; inset: 0;
-      background: var(--bg);
-      z-index: 999;
-      display: flex; align-items: center; justify-content: center;
-      transition: opacity 0.25s ease;
-    }
-    #veil.hidden { opacity: 0; pointer-events: none; }
-    .spin {
-      width: 32px; height: 32px;
-      border: 3px solid var(--tan); border-top-color: var(--ink);
-      border-radius: 50%; animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
-
-<div id="veil"><div class="spin"></div></div>
 
 <iframe src="improve.html" class="screen active" id="screen-improve"></iframe>
 <iframe src="profile.html" class="screen"        id="screen-profile"></iframe>
 <iframe src="auth.html"    class="screen"        id="screen-auth"></iframe>
 
-<script type="module">
-  import { authReady } from './data.js';
-
-  // Any iframe calls parent.goTo('profile') to switch pages — instant, no reload
-  window.goTo = function(page) {
+<script>
+  // Called from inside any iframe: parent.goTo('profile')
+  function goTo(page) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const el = document.getElementById('screen-' + page);
+    var el = document.getElementById('screen-' + page);
     if (el) el.classList.add('active');
-  };
+  }
 
-  // Wait for Firebase auth before revealing anything (prevents auth flicker)
-  const user = await authReady;
-  document.getElementById('veil').classList.add('hidden');
-
-  const isGuest = localStorage.getItem('iq_guest') === '1';
-  if (!user && !isGuest) {
-    window.goTo('auth');
+  // Called by improve.html / profile.html once they confirm auth is ready
+  // If not logged in and not a guest, swap to auth screen
+  function authCheck() {
+    var isGuest = localStorage.getItem('iq_guest') === '1';
+    // Check if Firebase user exists by peeking at localStorage
+    // Firebase stores its auth state here — no async needed
+    var hasFirebaseUser = Object.keys(localStorage)
+      .some(k => k.startsWith('firebase:authUser:'));
+    if (!isGuest && !hasFirebaseUser) {
+      goTo('auth');
+    }
   }
 </script>
 
