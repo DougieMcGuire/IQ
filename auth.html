@@ -358,8 +358,18 @@
     const gProvider = new GoogleAuthProvider();
 
     // ── Already logged in? Skip this page ─────────
+    // Only redirect when auth screen is actually the active/visible one.
+    // Without this guard, the background preloaded iframe fires goTo on every page load.
     onAuthStateChanged(auth, user => {
-      if (user) window.location.href = '/improve.html';
+      if (!user) return;
+      if (window.parent === window) { parent.goTo('improve'); return; }
+      try {
+        const active = window.parent.document.querySelector('.screen.active');
+        if (active && active.id === 'screen-auth') parent.goTo('improve');
+      } catch(e) {
+        // cross-origin fallback
+        parent.goTo('improve');
+      }
     });
 
     // ── State ─────────────────────────────────────
@@ -434,7 +444,7 @@
       try {
         const result = await signInWithPopup(auth, gProvider);
         await ensureUserDoc(result.user);
-        window.location.href = '/improve.html';
+        parent.goTo('improve');
       } catch (e) {
         setLoading('btn-google', false);
         if (e.code !== 'auth/popup-closed-by-user') {
@@ -470,7 +480,7 @@
           }
           await ensureUserDoc(cred.user, { username });
         }
-        window.location.href = '/improve.html';
+        parent.goTo('improve');
       } catch (e) {
         setLoading('btn-submit', false);
         showError(friendlyError(e.code));
@@ -492,7 +502,7 @@
     // ── Guest ─────────────────────────────────────
     window.continueAsGuest = function() {
       localStorage.setItem('iq_guest', '1');
-      window.location.href = '/improve.html';
+      parent.goTo('improve');
     };
 
     // ── Friendly Firebase error messages ──────────
