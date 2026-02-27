@@ -281,7 +281,7 @@
 <div class="flash" id="flash"></div>
 <div class="confetti" id="confetti"></div>
 
-<!-- Push Notification Prompt (custom, shown before browser dialog) -->
+<!-- Push Notification Prompt -->
 <div id="push-prompt">
   <div class="pp-title">🦌 Daily brain reminders?</div>
   <div class="pp-text">Get a nudge each day to keep your streak alive. We'll only ping you once a day.</div>
@@ -458,7 +458,6 @@
     const baseIQ = 85 + Math.round((calCorrect / CAL_QUESTIONS.length) * 30);
     const iq = Math.max(75, Math.min(130, baseIQ));
     IQData.markCalibrated(iq);
-
     document.getElementById('cal-quiz').style.display = 'none';
     document.getElementById('cal-result').style.display = 'block';
     document.getElementById('cal-iq').textContent = iq;
@@ -493,7 +492,6 @@
     feed.addEventListener('scroll', checkMore, { passive: true });
     feed.addEventListener('touchmove', checkMore, { passive: true });
     setInterval(checkMore, 200);
-    // Show push prompt after user has settled in (3s delay, won't spam)
     setTimeout(maybeShowPushPrompt, 3000);
   }
 
@@ -620,17 +618,10 @@
   const VAPID_PUBLIC_KEY = 'BCeif8Bk8ozGVFukIl2zE7UWB1YXN5eBPF0nHgNc0ELsEyNmZ0VE3xo15UCuqjgNg9dARdIKThXKakZL9ci8ZXI';
 
   function maybeShowPushPrompt() {
-    // Don't show if: already subscribed, already denied, or browser doesn't support
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-    if (Notification.permission === 'granted') {
-      // Already granted — just silently subscribe/save in background
-      subscribePush();
-      return;
-    }
+    if (Notification.permission === 'granted') { subscribePush(); return; }
     if (Notification.permission === 'denied') return;
     if (localStorage.getItem('push_dismissed')) return;
-
-    // Show our friendly in-app prompt first (better UX than raw browser dialog)
     document.getElementById('push-prompt').classList.add('show');
   }
 
@@ -652,45 +643,17 @@
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') return;
 
-      // Check if already subscribed
       const existing = await reg.pushManager.getSubscription();
       const sub = existing || await reg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
       });
 
-      // Save to Firestore — requires firebase to be available in parent scope
-      // We reach up to parent window's firebase instance since we're in an iframe
-      const db = window.parent.firebase
-        ? window.parent.firebase.firestore()
-        : (typeof firebase !== 'undefined' ? firebase.firestore() : null);
-
-      if (!db) {
-        console.warn('BrainDeer: firebase not available, push subscription saved locally only');
-        localStorage.setItem('push_sub', JSON.stringify(sub));
-        return;
-      }
-
-      // Get current user UID
-      const user = window.parent.firebase
-        ? window.parent.firebase.auth().currentUser
-        : (typeof firebase !== 'undefined' ? firebase.auth().currentUser : null);
-
-      const uid = user ? user.uid : 'anon_' + (localStorage.getItem('bd_anon_id') || (() => {
-        const id = Math.random().toString(36).slice(2);
-        localStorage.setItem('bd_anon_id', id);
-        return id;
-      })());
-
-      await db.collection('pushSubscriptions').doc(uid).set({
-        subscription: JSON.parse(JSON.stringify(sub)),
-        uid: uid,
-        updatedAt: window.parent.firebase
-          ? window.parent.firebase.firestore.FieldValue.serverTimestamp()
-          : new Date().toISOString()
-      });
-
-      console.log('BrainDeer: push subscription saved ✓');
+      // sub.toJSON() properly flattens the PushSubscription object
+      // postMessage it up to app.html which has Firebase access
+      const subPlain = sub.toJSON();
+      window.parent.postMessage({ type: 'savePushSub', sub: subPlain }, '*');
+      console.log('BrainDeer: push sub sent to parent ✓');
     } catch (err) {
       console.error('BrainDeer: push setup failed', err);
     }
