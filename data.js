@@ -80,6 +80,7 @@ const IQData = {
       fastAnswers:  0,
       totalSessions:0,
       sessionStart: null,
+      calibrated:   false, // Has the user done the initial IQ calibration?
       ratings: {
         patternRecognition: { r: 1000, n: 0, wins: 0, history: [] },
         problemSolving:     { r: 1000, n: 0, wins: 0, history: [] },
@@ -98,11 +99,12 @@ const IQData = {
       const raw = localStorage.getItem(this.KEY);
       if (!raw) return this.defaults();
       const d = JSON.parse(raw);
-      // Ensure all rating keys exist (migration safety)
       const def = this.defaults();
       for (const k of Object.keys(def.ratings)) {
         if (!d.ratings[k]) d.ratings[k] = def.ratings[k];
       }
+      // Migration: add calibrated field if missing
+      if (d.calibrated === undefined) d.calibrated = false;
       return d;
     } catch { return this.defaults(); }
   },
@@ -111,9 +113,7 @@ const IQData = {
     localStorage.setItem(this.KEY, JSON.stringify(d));
   },
 
-  // ─── Auth helpers ─────────────────────────────────
   isGuest() { return localStorage.getItem('iq_guest') === '1'; },
-
   getCurrentUser() { return currentUser; },
 
   signOut() {
@@ -124,7 +124,25 @@ const IQData = {
     });
   },
 
-  needsOnboarding() { return !this.load().age; },
+  // Only prompt age if NEITHER local nor cloud have it
+  needsOnboarding() {
+    const d = this.load();
+    return !d.age;
+  },
+
+  // Has user done the 5-question calibration?
+  needsCalibration() {
+    const d = this.load();
+    return !d.calibrated && d.answered < 5;
+  },
+
+  markCalibrated(iq) {
+    const d = this.load();
+    d.calibrated = true;
+    d.iq = iq;
+    this.save(d);
+    this._pushToCloud(d);
+  },
 
   // ─── Profile setters ──────────────────────────────
   setAge(age) {
@@ -152,8 +170,12 @@ const IQData = {
         const local  = this.load();
         const merged = this._merge(local, cloud);
         merged.uid      = currentUser.uid;
-        merged.username = cloud.username || currentUser.displayName || null;
+        merged.username = cloud.username || currentUser.displayName || local.username || null;
         merged.pic      = cloud.pic || currentUser.photoURL || local.pic;
+        // Persist age from cloud if local doesn't have it
+        if (!local.age && cloud.age) merged.age = cloud.age;
+        // Persist calibrated from cloud
+        if (cloud.calibrated) merged.calibrated = true;
         this.save(merged);
       } else {
         const d = this.load();
@@ -177,15 +199,16 @@ const IQData = {
       if (cc && cc.n > (lc?.n || 0)) m.ratings[k] = cc;
     }
     const hi = (a, b) => Math.max(a || 0, b || 0);
-    m.answered      = hi(local.answered,      cloud.answered);
-    m.correct       = hi(local.correct,       cloud.correct);
-    m.bestStreak    = hi(local.bestStreak,    cloud.bestStreak);
-    m.xp            = hi(local.xp,            cloud.xp);
+    m.answered      = hi(local.answered, cloud.answered);
+    m.correct       = hi(local.correct, cloud.correct);
+    m.bestStreak    = hi(local.bestStreak, cloud.bestStreak);
+    m.xp            = hi(local.xp, cloud.xp);
     m.level         = Math.max(local.level || 1, cloud.level || 1);
-    m.fastAnswers   = hi(local.fastAnswers,   cloud.fastAnswers);
+    m.fastAnswers   = hi(local.fastAnswers, cloud.fastAnswers);
     m.totalSessions = hi(local.totalSessions, cloud.totalSessions);
     if (cloud.iq && cloud.answered >= local.answered) m.iq = cloud.iq;
     m.age = cloud.age || local.age;
+    m.calibrated = local.calibrated || cloud.calibrated || false;
     return m;
   },
 
@@ -284,14 +307,10 @@ const IQData = {
   // ─── IQ calculation ───────────────────────────────
   calcIQ(d) {
     const w = {
-      patternRecognition: 0.15,
-      problemSolving:     0.14,
-      mentalAgility:      0.13,
-      workingMemory:      0.14,
-      verbalReasoning:    0.13,
-      logicalReasoning:   0.13,
-      spatialAwareness:   0.09,
-      numericalReasoning: 0.09,
+      patternRecognition: 0.15, problemSolving: 0.14,
+      mentalAgility: 0.13, workingMemory: 0.14,
+      verbalReasoning: 0.13, logicalReasoning: 0.13,
+      spatialAwareness: 0.09, numericalReasoning: 0.09,
     };
     let sum = 0, wt = 0, games = 0;
     for (const [k, v] of Object.entries(w)) {
@@ -303,7 +322,7 @@ const IQData = {
         games += r.n;
       }
     }
-    if (wt === 0 || games < 5) return null;
+    if (wt === 0 || games < 5) return d.iq || null; // Keep calibrated IQ until enough data
     const avg = sum / wt;
     let iq = 100 + ((avg - 1000) / 100) * 15;
     iq = 100 + (iq - 100) * Math.min(1, games / 50);
@@ -327,7 +346,6 @@ const IQData = {
     return c ? c.r : 1000;
   },
 
-  // ─── Session ──────────────────────────────────────
   startSession() {
     const d = this.load();
     d.sessionStart   = Date.now();
@@ -340,7 +358,6 @@ const IQData = {
     this._pushToCloud();
   },
 
-  // ─── Reset ────────────────────────────────────────
   reset() {
     localStorage.removeItem(this.KEY);
     if (currentUser) {
@@ -367,9 +384,9 @@ function iqToPercentile(iq) {
 }
 
 function formatPercentile(p) {
-  if (p <= 1)  return 'top 99%';
-  if (p >= 99) return 'top 1%';
-  return `top ${100 - p}%`;
+  if (p <= 1)  return '1%';
+  if (p >= 99) return '99%';
+  return `${100 - p}%`;
 }
 
 function getEncouragement(streak, correct) {
