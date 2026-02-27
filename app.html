@@ -11,9 +11,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root { --bg: #3a2918; }
+    :root { --bg: #3a2918; --btn-bg: #f0e2cc; --btn-color: #3a2918; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); font-family: 'Nunito', sans-serif; }
 
     #splash {
       position: fixed; inset: 0; z-index: 9999; background: var(--bg);
@@ -22,10 +22,7 @@
     }
     #splash.hide { opacity: 0; pointer-events: none; }
     #splash .mascot { font-size: 56px; animation: bob 1.2s ease-in-out infinite; }
-    #splash .name {
-      font-family: 'Nunito', sans-serif; font-size: 26px; font-weight: 900;
-      color: #f0e2cc; margin-top: 8px;
-    }
+    #splash .name { font-size: 26px; font-weight: 900; color: #f0e2cc; margin-top: 8px; }
     #splash .dots { margin-top: 16px; display: flex; gap: 6px; }
     #splash .dots span {
       width: 8px; height: 8px; border-radius: 50%; background: #6b4f32;
@@ -36,12 +33,29 @@
     @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
     @keyframes dotPulse { 0%,100%{opacity:.3;transform:scale(.8)} 50%{opacity:1;transform:scale(1.2)} }
 
-    .screen {
-      position: absolute; inset: 0; width: 100%; height: 100%;
-      display: none; overflow: hidden;
-    }
+    .screen { position: absolute; inset: 0; width: 100%; height: 100%; display: none; overflow: hidden; }
     .screen.active { display: block; }
     .screen iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+
+    /* Install button styles */
+    #installBtn {
+      position: fixed; bottom: 16px; right: 16px;
+      background: var(--btn-bg); color: var(--btn-color); border: none;
+      padding: 12px 18px; border-radius: 8px; font-size: 16px; font-weight: 700;
+      cursor: pointer; z-index: 10000;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      display: none;
+    }
+    #installBtn:focus { outline: 3px solid #fff; }
+    
+    /* iOS instruction banner */
+    #iosInstallBanner {
+      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+      background: #f0e2cc; color: #3a2918; padding: 12px 20px; border-radius: 8px; font-size: 16px;
+      display: none; z-index: 10000;
+      max-width: 90%;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -55,6 +69,12 @@
 <div class="screen" id="screen-auth"></div>
 <div class="screen" id="screen-improve"></div>
 <div class="screen" id="screen-profile"></div>
+
+<!-- Install Button -->
+<button id="installBtn" aria-label="Install BrainDeer as an app for faster access">⬇️ Install App</button>
+
+<!-- iOS Banner -->
+<div id="iosInstallBanner" role="alert">Tap the Share button → Add to Home Screen to install BrainDeer</div>
 
 <script>
   var currentScreen = null;
@@ -81,7 +101,6 @@
 
   function authCheck() { /* no-op */ }
 
-  // Boot: check auth synchronously before loading any iframe
   (function() {
     var isGuest = localStorage.getItem('iq_guest') === '1';
     var hasFirebaseUser = false;
@@ -94,6 +113,35 @@
       goTo('auth');
     }
   })();
+
+  // ================== PWA Install Handling ==================
+  let deferredPrompt;
+  const installBtn = document.getElementById('installBtn');
+  const iosBanner = document.getElementById('iosInstallBanner');
+  const isIos = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+  const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'block';
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      console.log('Install outcome:', choice.outcome);
+      deferredPrompt = null;
+      installBtn.style.display = 'none';
+    }
+  });
+
+  // Show instructions for iOS users
+  if (isIos && !isInStandaloneMode) {
+    iosBanner.style.display = 'block';
+  }
 </script>
+
 </body>
 </html>
