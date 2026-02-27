@@ -177,6 +177,9 @@
 <script type="module">
   import { IQData, getEncouragement } from './data.js';
 
+  // Instant auth check — no async wait needed
+  if (window.parent !== window) parent.authCheck();
+
   // ── DOM ──────────────────────────────────────────────
   const feed        = document.getElementById('feed');
   const iqVal       = document.getElementById('iq-val');
