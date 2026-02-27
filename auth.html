@@ -3,221 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>BrainDeer — Train Your Brain</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <title>BrainDeer</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    :root {
-      --bg: #3a2918; --card: #4a3625; --card-glow: #5a4232;
-      --text: #f0e2cc; --text-dim: #c2a476; --brown-mid: #6b4f32;
-      --brown-light: #8f6b4a; --tan: #c2a476; --cream: #f0e2cc;
-      --green: #58cc02; --green-shadow: #46a302;
-      --red: #ea2b2b; --red-shadow: #c42020;
-      --gold: #ffc800; --blue: #1cb0f6;
-    }
-    body {
-      background: var(--bg); min-height: 100dvh;
-      font-family: 'Nunito', sans-serif; color: var(--text);
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; padding: 24px 20px; overflow-y: auto;
-    }
-
-    .logo { text-align: center; margin-bottom: 28px; animation: bounceIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both; }
-    .mascot { font-size: 64px; line-height: 1; margin-bottom: 4px; display: block; filter: drop-shadow(0 4px 0 rgba(0,0,0,0.2)); }
-    .logo-name { font-size: 32px; font-weight: 900; color: var(--cream); text-shadow: 0 3px 0 rgba(0,0,0,0.2); }
-    .logo-tag { font-size: 14px; font-weight: 700; color: var(--tan); margin-top: 2px; }
-
-    .card {
-      background: var(--card); border-radius: 20px; padding: 24px 20px;
-      width: 100%; max-width: 380px; box-shadow: 0 6px 0 rgba(0,0,0,0.15);
-      animation: bounceIn 0.6s 0.1s cubic-bezier(0.34,1.56,0.64,1) both;
-      position: relative; overflow: hidden;
-    }
-    .card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
-      border-radius: 20px 20px 0 0; pointer-events: none;
-    }
-
-    .tabs { display: grid; grid-template-columns: 1fr 1fr; background: var(--bg); border-radius: 14px; padding: 4px; margin-bottom: 20px; }
-    .tab { padding: 10px; text-align: center; font-size: 15px; font-weight: 800; color: var(--text-dim); border-radius: 11px; cursor: pointer; transition: all 0.2s; user-select: none; }
-    .tab.active { background: var(--brown-mid); color: var(--cream); box-shadow: 0 3px 0 rgba(0,0,0,0.15); }
-
-    .form-group { margin-bottom: 14px; }
-    label { display: block; font-size: 13px; font-weight: 800; color: var(--tan); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
-    input {
-      width: 100%; padding: 14px 16px; border: none; border-radius: 14px;
-      background: var(--bg); font-size: 16px; font-weight: 700; color: var(--cream);
-      font-family: 'Nunito', sans-serif; outline: none; transition: box-shadow 0.2s; -webkit-appearance: none;
-    }
-    input:focus { box-shadow: 0 0 0 3px var(--brown-light); }
-    input::placeholder { color: var(--brown-light); }
-
-    .btn {
-      width: 100%; padding: 14px; border: none; border-radius: 14px;
-      font-size: 16px; font-weight: 800; font-family: 'Nunito', sans-serif;
-      cursor: pointer; transition: transform 0.1s; display: flex;
-      align-items: center; justify-content: center; gap: 8px;
-      position: relative; text-transform: uppercase; letter-spacing: 0.5px;
-    }
-    .btn:active { transform: translateY(3px); }
-    .btn:disabled { opacity: 0.5; pointer-events: none; }
-    .btn-primary { background: var(--green); color: #fff; box-shadow: 0 5px 0 var(--green-shadow); margin-bottom: 14px; }
-    .btn-primary:active { box-shadow: 0 2px 0 var(--green-shadow); }
-    .btn-google { background: var(--card-glow); color: var(--cream); box-shadow: 0 4px 0 rgba(0,0,0,0.15); margin-bottom: 14px; text-transform: none; font-weight: 700; }
-    .btn-google:active { box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
-    .btn-guest { background: transparent; color: var(--tan); font-size: 14px; font-weight: 700; padding: 10px; text-transform: none; }
-    .g-logo { width: 18px; height: 18px; }
-
-    .divider { display: flex; align-items: center; gap: 10px; margin: 4px 0 14px; color: var(--brown-light); font-size: 13px; font-weight: 700; }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 2px; background: var(--brown-mid); border-radius: 1px; }
-
-    .banner { padding: 12px 14px; border-radius: 12px; font-size: 14px; font-weight: 700; margin-bottom: 14px; display: none; }
-    .banner.error { background: var(--red); color: #fff; display: block; box-shadow: 0 3px 0 var(--red-shadow); }
-    .banner.success { background: var(--green); color: #fff; display: block; box-shadow: 0 3px 0 var(--green-shadow); }
-
-    .spinner { width: 20px; height: 20px; border: 3px solid transparent; border-top-color: currentColor; border-radius: 50%; animation: spin 0.6s linear infinite; display: none; }
-    .btn.loading .spinner { display: block; }
-    .btn.loading .btn-text { display: none; }
-
-    .forgot { text-align: right; font-size: 13px; font-weight: 700; color: var(--blue); margin-top: -8px; margin-bottom: 14px; cursor: pointer; }
-
-    #strength-bar { height: 4px; border-radius: 2px; margin-top: 6px; background: var(--brown-mid); overflow: hidden; display: none; }
-    #strength-fill { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; }
-
-    /* Footer matches nav bar color */
-    .footer {
-      margin-top: 20px; text-align: center; font-size: 12px; font-weight: 600;
-      color: var(--brown-light); line-height: 1.6;
-      background: var(--card); padding: 12px 20px; border-radius: 14px;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.1);
-      animation: bounceIn 0.6s 0.2s cubic-bezier(0.34,1.56,0.64,1) both;
-    }
-
-    @keyframes bounceIn { from{opacity:0;transform:translateY(16px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
-    @keyframes spin { to{transform:rotate(360deg)} }
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    :root{--bg:#3a2918;--card:#4a3625;--card2:#5a4232;--cream:#f0e2cc;--tan:#c2a476;--mid:#6b4f32;--light:#8f6b4a;--green:#58cc02;--greend:#46a302;--red:#ea2b2b;--redd:#c42020;--gold:#ffc800;--blue:#1cb0f6}
+    body{background:var(--bg);min-height:100dvh;font-family:'Nunito',sans-serif;color:var(--cream);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;overflow-y:auto}
+    .logo{text-align:center;margin-bottom:28px;animation:bi .6s cubic-bezier(.34,1.56,.64,1) both}
+    .mascot{font-size:64px;line-height:1;margin-bottom:4px;display:block;filter:drop-shadow(0 4px 0 rgba(0,0,0,.2))}
+    .logo-name{font-size:32px;font-weight:900;text-shadow:0 3px 0 rgba(0,0,0,.2)}
+    .logo-tag{font-size:14px;font-weight:700;color:var(--tan);margin-top:2px}
+    .card{background:var(--card);border-radius:20px;padding:24px 20px;width:100%;max-width:380px;box-shadow:0 6px 0 rgba(0,0,0,.15);animation:bi .6s .1s cubic-bezier(.34,1.56,.64,1) both;position:relative;overflow:hidden}
+    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,.04)0%,transparent 100%);border-radius:20px 20px 0 0;pointer-events:none}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--bg);border-radius:14px;padding:4px;margin-bottom:20px}
+    .tab{padding:10px;text-align:center;font-size:15px;font-weight:800;color:var(--tan);border-radius:11px;cursor:pointer;transition:all .2s;user-select:none}
+    .tab.active{background:var(--mid);color:var(--cream);box-shadow:0 3px 0 rgba(0,0,0,.15)}
+    .form-group{margin-bottom:14px}
+    label{display:block;font-size:13px;font-weight:800;color:var(--tan);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+    input{width:100%;padding:14px 16px;border:none;border-radius:14px;background:var(--bg);font-size:16px;font-weight:700;color:var(--cream);font-family:'Nunito',sans-serif;outline:none;transition:box-shadow .2s;-webkit-appearance:none}
+    input:focus{box-shadow:0 0 0 3px var(--light)}
+    input::placeholder{color:var(--light)}
+    .btn{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;transition:transform .1s;display:flex;align-items:center;justify-content:center;gap:8px;position:relative;text-transform:uppercase;letter-spacing:.5px}
+    .btn:active{transform:translateY(3px)}
+    .btn:disabled{opacity:.5;pointer-events:none}
+    .btn-primary{background:var(--green);color:#fff;box-shadow:0 5px 0 var(--greend);margin-bottom:14px}
+    .btn-primary:active{box-shadow:0 2px 0 var(--greend)}
+    .btn-google{background:var(--card2);color:var(--cream);box-shadow:0 4px 0 rgba(0,0,0,.15);margin-bottom:14px;text-transform:none;font-weight:700}
+    .btn-google:active{box-shadow:0 1px 0 rgba(0,0,0,.15)}
+    .btn-guest{background:transparent;color:var(--tan);font-size:14px;font-weight:700;padding:10px;text-transform:none}
+    .g-logo{width:18px;height:18px}
+    .divider{display:flex;align-items:center;gap:10px;margin:4px 0 14px;color:var(--light);font-size:13px;font-weight:700}
+    .divider::before,.divider::after{content:'';flex:1;height:2px;background:var(--mid);border-radius:1px}
+    .banner{padding:12px 14px;border-radius:12px;font-size:14px;font-weight:700;margin-bottom:14px;display:none}
+    .banner.error{background:var(--red);color:#fff;display:block;box-shadow:0 3px 0 var(--redd)}
+    .banner.success{background:var(--green);color:#fff;display:block;box-shadow:0 3px 0 var(--greend)}
+    .spinner{width:20px;height:20px;border:3px solid transparent;border-top-color:currentColor;border-radius:50%;animation:spin .6s linear infinite;display:none}
+    .btn.loading .spinner{display:block}
+    .btn.loading .btn-text{display:none}
+    .forgot{text-align:right;font-size:13px;font-weight:700;color:var(--blue);margin-top:-8px;margin-bottom:14px;cursor:pointer}
+    #str-bar{height:4px;border-radius:2px;margin-top:6px;background:var(--mid);overflow:hidden;display:none}
+    #str-fill{height:100%;border-radius:2px;transition:width .3s,background .3s}
+    .footer{margin-top:20px;text-align:center;font-size:12px;font-weight:600;color:var(--light);line-height:1.6;background:var(--card);padding:12px 20px;border-radius:14px;box-shadow:0 3px 0 rgba(0,0,0,.1);animation:bi .6s .2s cubic-bezier(.34,1.56,.64,1) both}
+    @keyframes bi{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
-  <div class="logo">
-    <span class="mascot">🦌</span>
-    <div class="logo-name">BrainDeer</div>
-    <div class="logo-tag">Train your brain daily</div>
-  </div>
-
+  <div class="logo"><span class="mascot">🦌</span><div class="logo-name">BrainDeer</div><div class="logo-tag">Train your brain daily</div></div>
   <div class="card">
-    <div class="tabs">
-      <div class="tab active" id="tab-login" onclick="switchTab('login')">Sign In</div>
-      <div class="tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</div>
-    </div>
+    <div class="tabs"><div class="tab active" id="tab-login" onclick="switchTab('login')">Sign In</div><div class="tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</div></div>
     <div class="banner" id="banner"></div>
     <button class="btn btn-google" id="btn-google" onclick="signInWithGoogle()">
       <svg class="g-logo" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-      <span class="btn-text">Continue with Google</span>
-      <div class="spinner"></div>
+      <span class="btn-text">Continue with Google</span><div class="spinner"></div>
     </button>
     <div class="divider">or</div>
     <form id="auth-form" onsubmit="handleSubmit(event)">
-      <div class="form-group" id="field-username" style="display:none">
-        <label>Username</label>
-        <input type="text" id="input-username" placeholder="Your display name" autocomplete="username" maxlength="24">
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="input-email" placeholder="you@example.com" autocomplete="email" required>
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="input-password" placeholder="••••••••" autocomplete="current-password" required oninput="checkStrength(this.value)">
-        <div id="strength-bar"><div id="strength-fill"></div></div>
-      </div>
+      <div class="form-group" id="field-username" style="display:none"><label>Username</label><input type="text" id="input-username" placeholder="Your display name" autocomplete="username" maxlength="24"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="input-email" placeholder="you@example.com" autocomplete="email" required></div>
+      <div class="form-group"><label>Password</label><input type="password" id="input-password" placeholder="••••••••" autocomplete="current-password" required oninput="checkStrength(this.value)"><div id="str-bar"><div id="str-fill"></div></div></div>
       <div class="forgot" id="forgot-link" onclick="forgotPassword()">Forgot password?</div>
-      <button type="submit" class="btn btn-primary" id="btn-submit">
-        <span class="btn-text" id="submit-label">Sign In</span>
-        <div class="spinner"></div>
-      </button>
+      <button type="submit" class="btn btn-primary" id="btn-submit"><span class="btn-text" id="submit-label">Sign In</span><div class="spinner"></div></button>
     </form>
     <div class="divider">or</div>
     <button class="btn btn-guest" onclick="continueAsGuest()">Continue without an account →</button>
   </div>
-
   <div class="footer">By continuing you agree to our terms.<br>Your progress syncs across devices.</div>
-
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    const firebaseConfig = { apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No", authDomain:"braindeer-backend.firebaseapp.com", projectId:"braindeer-backend", storageBucket:"braindeer-backend.firebasestorage.app", messagingSenderId:"331205139765", appId:"1:331205139765:web:20cfef8194af63fc55c07c" };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const gProvider = new GoogleAuthProvider();
-
-    onAuthStateChanged(auth, user => { if (user) parent.goTo('improve'); });
-
-    let mode = 'login';
-    window.switchTab = function(m) {
-      mode = m;
-      document.getElementById('tab-login').classList.toggle('active', m==='login');
-      document.getElementById('tab-signup').classList.toggle('active', m==='signup');
-      document.getElementById('field-username').style.display = m==='signup' ? 'block' : 'none';
-      document.getElementById('forgot-link').style.display = m==='login' ? 'block' : 'none';
-      document.getElementById('submit-label').textContent = m==='login' ? 'Sign In' : 'Create Account';
-      document.getElementById('input-password').autocomplete = m==='signup' ? 'new-password' : 'current-password';
-      document.getElementById('strength-bar').style.display = m==='signup' ? 'block' : 'none';
-      clearBanner();
-    };
-
-    function showError(msg) { const b=document.getElementById('banner'); b.textContent=msg; b.className='banner error'; }
-    function showSuccess(msg) { const b=document.getElementById('banner'); b.textContent=msg; b.className='banner success'; }
-    window.clearBanner = () => { document.getElementById('banner').className='banner'; };
-    function setLoading(id, on) { const b=document.getElementById(id); b.classList.toggle('loading',on); b.disabled=on; }
-
-    window.checkStrength = function(val) {
-      if (mode!=='signup') return;
-      const bar=document.getElementById('strength-fill');
-      let s=0; if(val.length>=8)s++; if(/[A-Z]/.test(val))s++; if(/[0-9]/.test(val))s++; if(/[^A-Za-z0-9]/.test(val))s++;
-      bar.style.width=['0%','30%','55%','80%','100%'][s];
-      bar.style.background=['#6b4f32','#ea2b2b','#ff9600','#ffc800','#58cc02'][s];
-    };
-
-    async function ensureUserDoc(user, extra={}) {
-      const ref=doc(db,'users',user.uid); const snap=await getDoc(ref);
-      if (!snap.exists()) {
-        await setDoc(ref, { uid:user.uid, email:user.email, username:extra.username||user.displayName||null, pic:user.photoURL||null, createdAt:serverTimestamp(), lastSeen:serverTimestamp(), answered:0, correct:0, xp:0, level:1, iq:null });
-      } else { setDoc(ref, { lastSeen:serverTimestamp() }, { merge:true }); }
-    }
-
-    window.signInWithGoogle = async function() {
-      setLoading('btn-google',true); clearBanner();
-      try { const r=await signInWithPopup(auth,gProvider); await ensureUserDoc(r.user); parent.goTo('improve'); }
-      catch(e) { setLoading('btn-google',false); if(e.code!=='auth/popup-closed-by-user') showError(friendlyError(e.code)); }
-    };
-    window.handleSubmit = async function(e) {
-      e.preventDefault(); clearBanner();
-      const email=document.getElementById('input-email').value.trim();
-      const password=document.getElementById('input-password').value;
-      const username=document.getElementById('input-username').value.trim();
-      if (mode==='signup' && password.length<6) { showError('Password must be at least 6 characters.'); return; }
-      setLoading('btn-submit',true);
-      try {
-        if (mode==='login') { const c=await signInWithEmailAndPassword(auth,email,password); await ensureUserDoc(c.user); }
-        else { const c=await createUserWithEmailAndPassword(auth,email,password); if(username) await updateProfile(c.user,{displayName:username}); await ensureUserDoc(c.user,{username}); }
-        parent.goTo('improve');
-      } catch(e) { setLoading('btn-submit',false); showError(friendlyError(e.code)); }
-    };
-    window.forgotPassword = async function() {
-      const email=document.getElementById('input-email').value.trim();
-      if (!email) { showError('Enter your email first.'); return; }
-      try { await sendPasswordResetEmail(auth,email); showSuccess('Reset email sent!'); } catch(e) { showError(friendlyError(e.code)); }
-    };
-    window.continueAsGuest = function() { localStorage.setItem('iq_guest','1'); parent.goTo('improve'); };
-
-    function friendlyError(code) {
-      return { 'auth/user-not-found':"No account with that email.", 'auth/wrong-password':"Incorrect password.", 'auth/email-already-in-use':"Email already registered.", 'auth/invalid-email':"Invalid email.", 'auth/weak-password':"Password too weak.", 'auth/too-many-requests':"Too many attempts.", 'auth/network-request-failed':"No internet.", 'auth/invalid-credential':"Email or password is incorrect." }[code] || "Something went wrong.";
-    }
+    import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,updateProfile}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import{getFirestore,doc,setDoc,getDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    const cfg={apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend",storageBucket:"braindeer-backend.firebasestorage.app",messagingSenderId:"331205139765",appId:"1:331205139765:web:20cfef8194af63fc55c07c"};
+    const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app),gp=new GoogleAuthProvider();
+    onAuthStateChanged(auth,u=>{if(u)parent.goTo('improve')});
+    let mode='login';
+    window.switchTab=function(m){mode=m;document.getElementById('tab-login').classList.toggle('active',m==='login');document.getElementById('tab-signup').classList.toggle('active',m==='signup');document.getElementById('field-username').style.display=m==='signup'?'block':'none';document.getElementById('forgot-link').style.display=m==='login'?'block':'none';document.getElementById('submit-label').textContent=m==='login'?'Sign In':'Create Account';document.getElementById('input-password').autocomplete=m==='signup'?'new-password':'current-password';document.getElementById('str-bar').style.display=m==='signup'?'block':'none';clr()};
+    function err(msg){const b=document.getElementById('banner');b.textContent=msg;b.className='banner error'}
+    function ok(msg){const b=document.getElementById('banner');b.textContent=msg;b.className='banner success'}
+    window.clr=()=>{document.getElementById('banner').className='banner'};
+    function ld(id,on){const b=document.getElementById(id);b.classList.toggle('loading',on);b.disabled=on}
+    window.checkStrength=function(v){if(mode!=='signup')return;const f=document.getElementById('str-fill');let s=0;if(v.length>=8)s++;if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;f.style.width=['0%','30%','55%','80%','100%'][s];f.style.background=['#6b4f32','#ea2b2b','#ff9600','#ffc800','#58cc02'][s]};
+    async function ensure(u,extra={}){const r=doc(db,'users',u.uid);const s=await getDoc(r);if(!s.exists()){await setDoc(r,{uid:u.uid,email:u.email,username:extra.username||u.displayName||null,pic:u.photoURL||null,createdAt:serverTimestamp(),lastSeen:serverTimestamp()})}else{setDoc(r,{lastSeen:serverTimestamp()},{merge:true})}}
+    window.signInWithGoogle=async function(){ld('btn-google',true);clr();try{const r=await signInWithPopup(auth,gp);await ensure(r.user);parent.goTo('improve')}catch(e){ld('btn-google',false);if(e.code!=='auth/popup-closed-by-user')err(fe(e.code))}};
+    window.handleSubmit=async function(e){e.preventDefault();clr();const email=document.getElementById('input-email').value.trim();const pw=document.getElementById('input-password').value;const un=document.getElementById('input-username').value.trim();if(mode==='signup'&&pw.length<6){err('Password must be at least 6 characters.');return}ld('btn-submit',true);try{if(mode==='login'){const c=await signInWithEmailAndPassword(auth,email,pw);await ensure(c.user)}else{const c=await createUserWithEmailAndPassword(auth,email,pw);if(un)await updateProfile(c.user,{displayName:un});await ensure(c.user,{username:un})}parent.goTo('improve')}catch(e){ld('btn-submit',false);err(fe(e.code))}};
+    window.forgotPassword=async function(){const email=document.getElementById('input-email').value.trim();if(!email){err('Enter your email first.');return}try{await sendPasswordResetEmail(auth,email);ok('Reset email sent!')}catch(e){err(fe(e.code))}};
+    window.continueAsGuest=function(){localStorage.setItem('iq_guest','1');parent.goTo('improve')};
+    function fe(c){return{'auth/user-not-found':"No account with that email.",'auth/wrong-password':"Incorrect password.",'auth/email-already-in-use':"Email already registered.",'auth/invalid-email':"Invalid email.",'auth/weak-password':"Password too weak.",'auth/too-many-requests':"Too many attempts.",'auth/network-request-failed':"No internet.",'auth/invalid-credential':"Email or password is incorrect."}[c]||"Something went wrong."}
   </script>
 </body>
 </html>
