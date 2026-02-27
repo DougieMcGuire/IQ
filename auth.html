@@ -357,19 +357,11 @@
     const db       = getFirestore(app);
     const gProvider = new GoogleAuthProvider();
 
-    // ── Already logged in? Skip this page ─────────
-    // Only redirect when auth screen is actually the active/visible one.
-    // Without this guard, the background preloaded iframe fires goTo on every page load.
+    // ── Already logged in? Go straight to improve ──
+    // Fires once on load. If user is already authenticated (returning user),
+    // skip the auth screen entirely. If not logged in, do nothing — stay here.
     onAuthStateChanged(auth, user => {
-      if (!user) return;
-      if (window.parent === window) { parent.goTo('improve'); return; }
-      try {
-        const active = window.parent.document.querySelector('.screen.active');
-        if (active && active.id === 'screen-auth') parent.goTo('improve');
-      } catch(e) {
-        // cross-origin fallback
-        parent.goTo('improve');
-      }
+      if (user) parent.goTo('improve');
     });
 
     // ── State ─────────────────────────────────────
