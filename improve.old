@@ -142,55 +142,103 @@
     .scroll-hint svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2.5; animation:bounce 1.5s infinite; }
     @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
 
-    /* ── Wordle ── */
-    .wordle-grid { display:flex; flex-direction:column; gap:5px; margin:2px 0; }
-    .wordle-row { display:flex; gap:5px; }
-    .wordle-tile {
-      width:clamp(42px,11.5vw,52px); height:clamp(42px,11.5vw,52px);
-      border-radius:10px; background:var(--bg); border:2.5px solid var(--brown-mid);
-      display:flex; align-items:center; justify-content:center;
-      font-size:clamp(18px,5vw,22px); font-weight:900; color:var(--cream);
-      transition:border-color 0.08s; perspective:250px;
+    /* ══════════════════════════════════════
+       WORDLE STYLES
+    ══════════════════════════════════════ */
+
+    /* Grid */
+    .wordle-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin: 2px 0;
     }
-    .wordle-tile.has-letter  { border-color:var(--tan); animation:wtPop 0.08s ease; }
-    .wordle-tile.reveal-correct { background:var(--green); border-color:var(--green); color:#fff; box-shadow:0 3px 0 var(--green-dark); }
-    .wordle-tile.reveal-present { background:var(--gold);  border-color:var(--gold);  color:#2a1800; box-shadow:0 3px 0 var(--gold-dark); }
-    .wordle-tile.reveal-absent  { background:var(--brown-mid); border-color:var(--brown-mid); color:var(--tan); }
-    .wordle-tile.shake { animation:wtShake 0.4s ease; }
+    .wordle-row { display: flex; gap: 5px; }
+
+    .wordle-tile {
+      width: clamp(42px, 11.5vw, 52px);
+      height: clamp(42px, 11.5vw, 52px);
+      border-radius: 10px;
+      background: var(--bg);
+      border: 2.5px solid var(--brown-mid);
+      display: flex; align-items: center; justify-content: center;
+      font-size: clamp(18px, 5vw, 22px);
+      font-weight: 900;
+      color: var(--cream);
+      transition: border-color 0.08s;
+      /* needed for flip animation */
+      perspective: 250px;
+    }
+    .wordle-tile.has-letter  { border-color: var(--tan); animation: wtPop 0.08s ease; }
+    .wordle-tile.reveal-correct { background: var(--green);      border-color: var(--green);      color: #fff;        box-shadow: 0 3px 0 var(--green-dark); }
+    .wordle-tile.reveal-present { background: var(--gold);       border-color: var(--gold);       color: #2a1800;     box-shadow: 0 3px 0 var(--gold-dark); }
+    .wordle-tile.reveal-absent  { background: var(--brown-mid);  border-color: var(--brown-mid);  color: var(--tan); }
+    .wordle-tile.shake { animation: wtShake 0.4s ease; }
+
     @keyframes wtPop   { 0%{transform:scale(1)} 40%{transform:scale(1.14)} 100%{transform:scale(1)} }
     @keyframes wtShake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-7px)} 40%,80%{transform:translateX(7px)} }
+    @keyframes wtFlipIn  { 0%{transform:rotateX(0)}   100%{transform:rotateX(-90deg)} }
+    @keyframes wtFlipOut { 0%{transform:rotateX(90deg)} 100%{transform:rotateX(0)} }
 
-    .wordle-msg { font-size:13px; font-weight:800; color:var(--tan); min-height:18px; text-align:center; transition:color 0.2s; }
-    .wordle-msg.error   { color:var(--red);   animation:wtShake 0.3s ease; }
-    .wordle-msg.success { color:var(--green); }
-
-    .wordle-kb { display:flex; flex-direction:column; gap:6px; width:100%; max-width:340px; }
-    .wordle-kb-row { display:flex; gap:5px; justify-content:center; }
-    .wk {
-      height:44px; flex:1; min-width:0; max-width:36px;
-      border:none; border-radius:8px; background:var(--brown-mid); color:var(--cream);
-      font-family:'Nunito',sans-serif; font-size:13px; font-weight:900;
-      cursor:pointer; display:flex; align-items:center; justify-content:center;
-      box-shadow:0 3px 0 rgba(0,0,0,0.22); transition:background 0.25s,color 0.25s,box-shadow 0.25s;
-      position:relative; overflow:hidden; user-select:none; -webkit-tap-highlight-color:transparent;
+    /* Message line */
+    .wordle-msg {
+      font-size: 13px; font-weight: 800;
+      color: var(--tan); min-height: 18px; text-align: center;
+      transition: color 0.2s;
     }
-    .wk::before { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:linear-gradient(180deg,rgba(255,255,255,0.09)0%,transparent 100%); pointer-events:none; }
-    .wk:active    { transform:translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,0.22); }
-    .wk.wide      { max-width:52px; font-size:11px; }
-    .wk.st-correct { background:var(--green); color:#fff;    box-shadow:0 3px 0 var(--green-dark); }
-    .wk.st-present { background:var(--gold);  color:#2a1800; box-shadow:0 3px 0 var(--gold-dark); }
-    .wk.st-absent  { background:#2c1d0e;      color:#6b4f32; box-shadow:0 2px 0 rgba(0,0,0,0.15); }
+    .wordle-msg.error   { color: var(--red);   animation: wtShake 0.3s ease; }
+    .wordle-msg.success { color: var(--green); }
+
+    /* Custom keyboard */
+    .wordle-kb {
+      display: flex; flex-direction: column;
+      gap: 6px; width: 100%; max-width: 340px;
+    }
+    .wordle-kb-row { display: flex; gap: 5px; justify-content: center; }
+
+    .wk {
+      height: 44px;
+      flex: 1;
+      min-width: 0;
+      max-width: 36px;
+      border: none; border-radius: 8px;
+      background: var(--brown-mid);
+      color: var(--cream);
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px; font-weight: 900;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.22);
+      transition: background 0.25s, color 0.25s, box-shadow 0.25s;
+      position: relative; overflow: hidden;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .wk::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 45%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.09) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    .wk:active    { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.22); }
+    .wk.wide      { max-width: 52px; font-size: 11px; }
+    /* colour states — applied after guesses */
+    .wk.st-correct { background: var(--green);     color: #fff;    box-shadow: 0 3px 0 var(--green-dark); }
+    .wk.st-present { background: var(--gold);      color: #2a1800; box-shadow: 0 3px 0 var(--gold-dark); }
+    .wk.st-absent  { background: #2c1d0e;          color: #6b4f32; box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
 
     /* ── Overlays ── */
     .streak-popup { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(58,41,24,0.85); z-index:200; opacity:0; pointer-events:none; transition:opacity 0.3s; }
     .streak-popup.show { opacity:1; }
+    .streak-popup .streak-icon { width:48px; height:48px; margin-bottom:6px; }
+    .streak-popup .streak-icon svg { width:100%;height:100%; }
     .streak-popup .num { font-size:72px; font-weight:900; color:var(--gold); text-shadow:0 4px 0 var(--gold-dark); }
     .streak-popup .txt { font-size:28px; font-weight:900; color:var(--cream); text-transform:uppercase; }
 
     .flash { position:fixed; inset:0; pointer-events:none; opacity:0; z-index:150; }
     .flash.green { background:radial-gradient(circle,rgba(88,204,2,0.25)0%,transparent 70%); }
-    .flash.red   { background:radial-gradient(circle,rgba(234,43,43,0.2)0%,transparent 70%); }
-    .flash.show  { animation:flash 0.35s ease; }
+    .flash.red { background:radial-gradient(circle,rgba(234,43,43,0.2)0%,transparent 70%); }
+    .flash.show { animation:flash 0.35s ease; }
     @keyframes flash { 0%{opacity:1} 100%{opacity:0} }
 
     .confetti { position:fixed; inset:0; pointer-events:none; z-index:160; overflow:hidden; }
@@ -201,18 +249,27 @@
     /* ── Modals ── */
     .modal { position:fixed; inset:0; background:rgba(58,41,24,0.92); display:none; align-items:center; justify-content:center; z-index:300; padding:20px; }
     .modal.show { display:flex; }
-    .modal-box { background:var(--card); border-radius:22px; padding:28px 22px; width:100%; max-width:360px; text-align:center; box-shadow:0 8px 0 rgba(0,0,0,0.15); position:relative; overflow:hidden; }
+    .modal-box {
+      background:var(--card); border-radius:22px; padding:28px 22px;
+      width:100%; max-width:360px; text-align:center;
+      box-shadow:0 8px 0 rgba(0,0,0,0.15); position:relative; overflow:hidden;
+    }
     .modal-box::before { content:''; position:absolute; top:0;left:0;right:0;height:50%; background:linear-gradient(180deg,rgba(255,255,255,0.04)0%,transparent 100%); pointer-events:none; }
     .modal-mascot { font-size:48px; margin-bottom:8px; }
-    .modal-title  { font-size:22px; font-weight:900; margin-bottom:6px; color:var(--cream); }
-    .modal-text   { font-size:14px; color:var(--tan); line-height:1.5; margin-bottom:18px; font-weight:600; }
-    .age-num    { font-size:48px; font-weight:900; margin:10px 0; color:var(--gold); text-shadow:0 3px 0 var(--gold-dark); }
+    .modal-title { font-size:22px; font-weight:900; margin-bottom:6px; color:var(--cream); }
+    .modal-text { font-size:14px; color:var(--tan); line-height:1.5; margin-bottom:18px; font-weight:600; }
+    .age-num { font-size:48px; font-weight:900; margin:10px 0; color:var(--gold); text-shadow:0 3px 0 var(--gold-dark); }
     .age-slider { width:100%; height:12px; -webkit-appearance:none; background:var(--brown-mid); border-radius:6px; margin-bottom:22px; }
     .age-slider::-webkit-slider-thumb { -webkit-appearance:none; width:32px; height:32px; background:var(--gold); border-radius:50%; cursor:pointer; box-shadow:0 3px 0 var(--gold-dark); }
-    .btn-go { background:var(--green); color:#fff; border:none; border-radius:16px; padding:14px 40px; font-family:'Nunito',sans-serif; font-size:18px; font-weight:900; cursor:pointer; text-transform:uppercase; box-shadow:0 5px 0 var(--green-dark); transition:transform 0.1s; }
+    .btn-go {
+      background:var(--green); color:#fff; border:none; border-radius:16px;
+      padding:14px 40px; font-family:'Nunito',sans-serif; font-size:18px;
+      font-weight:900; cursor:pointer; text-transform:uppercase;
+      box-shadow:0 5px 0 var(--green-dark); transition:transform 0.1s;
+    }
     .btn-go:active { transform:translateY(4px); box-shadow:0 1px 0 var(--green-dark); }
 
-    /* ── Calibration ── */
+    /* ── Calibration Modal ── */
     #calibration .cal-progress { display:flex; gap:6px; margin-bottom:16px; justify-content:center; }
     #calibration .cal-dot { width:12px; height:12px; border-radius:50%; background:var(--brown-mid); transition:background 0.3s; }
     #calibration .cal-dot.done { background:var(--green); }
@@ -220,25 +277,49 @@
     #calibration .cal-dot.wrong-dot { background:var(--red); }
     #calibration .cal-question { font-size:16px; font-weight:800; color:var(--cream); margin-bottom:14px; line-height:1.4; min-height:48px; }
     #calibration .cal-opts { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    #calibration .cal-opt { background:var(--card-glow); border:none; border-radius:14px; padding:12px 10px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; color:var(--cream); cursor:pointer; text-align:center; box-shadow:0 4px 0 rgba(0,0,0,0.15); transition:transform 0.1s; position:relative; overflow:hidden; }
+    #calibration .cal-opt {
+      background:var(--card-glow); border:none; border-radius:14px;
+      padding:12px 10px; font-family:'Nunito',sans-serif; font-size:14px;
+      font-weight:800; color:var(--cream); cursor:pointer; text-align:center;
+      box-shadow:0 4px 0 rgba(0,0,0,0.15); transition:transform 0.1s;
+      position:relative; overflow:hidden;
+    }
     #calibration .cal-opt::before { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:linear-gradient(180deg,rgba(255,255,255,0.06)0%,transparent 100%); pointer-events:none; }
     #calibration .cal-opt:active { transform:translateY(3px); }
     #calibration .cal-opt.correct { background:var(--green); color:#fff; box-shadow:0 4px 0 var(--green-dark); }
-    #calibration .cal-opt.wrong   { background:var(--red);   color:#fff; box-shadow:0 4px 0 var(--red-dark); }
-    #calibration .cal-opt.dim     { opacity:0.25; pointer-events:none; }
+    #calibration .cal-opt.wrong { background:var(--red); color:#fff; box-shadow:0 4px 0 var(--red-dark); }
+    #calibration .cal-opt.dim { opacity:0.25; pointer-events:none; }
+
     #cal-result { display:none; }
-    #cal-result .result-iq    { font-size:64px; font-weight:900; color:var(--gold); text-shadow:0 4px 0 var(--gold-dark); margin:8px 0; }
+    #cal-result .result-iq { font-size:64px; font-weight:900; color:var(--gold); text-shadow:0 4px 0 var(--gold-dark); margin:8px 0; }
     #cal-result .result-label { font-size:14px; font-weight:900; color:var(--brown-light); letter-spacing:4px; margin-bottom:12px; }
-    #cal-result .result-text  { font-size:14px; color:var(--tan); font-weight:600; margin-bottom:18px; line-height:1.5; }
+    #cal-result .result-text { font-size:14px; color:var(--tan); font-weight:600; margin-bottom:18px; line-height:1.5; }
 
     /* ── Push Prompt ── */
-    #push-prompt { position:fixed; bottom:calc(80px + env(safe-area-inset-bottom,0px)); left:50%; transform:translateX(-50%); background:var(--card); border-radius:18px; padding:16px 18px; width:calc(100% - 32px); max-width:360px; box-shadow:0 6px 0 rgba(0,0,0,0.2); z-index:250; display:none; animation:slideUp 0.3s ease; }
-    #push-prompt.show { display:block; }
-    #push-prompt .pp-title { font-size:15px; font-weight:900; color:var(--cream); margin-bottom:4px; }
-    #push-prompt .pp-text  { font-size:12px; font-weight:600; color:var(--tan); margin-bottom:12px; line-height:1.4; }
-    #push-prompt .pp-btns  { display:flex; gap:8px; }
-    #push-prompt .pp-yes { flex:1; background:var(--green); color:#fff; border:none; border-radius:12px; padding:10px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:900; cursor:pointer; box-shadow:0 3px 0 var(--green-dark); }
-    #push-prompt .pp-no  { background:var(--brown-mid); color:var(--tan); border:none; border-radius:12px; padding:10px 16px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:900; cursor:pointer; }
+    #push-prompt {
+      position: fixed; bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+      left: 50%; transform: translateX(-50%);
+      background: var(--card); border-radius: 18px; padding: 16px 18px;
+      width: calc(100% - 32px); max-width: 360px;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+      z-index: 250; display: none;
+      animation: slideUp 0.3s ease;
+    }
+    #push-prompt.show { display: block; }
+    #push-prompt .pp-title { font-size: 15px; font-weight: 900; color: var(--cream); margin-bottom: 4px; }
+    #push-prompt .pp-text { font-size: 12px; font-weight: 600; color: var(--tan); margin-bottom: 12px; line-height: 1.4; }
+    #push-prompt .pp-btns { display: flex; gap: 8px; }
+    #push-prompt .pp-yes {
+      flex: 1; background: var(--green); color: #fff; border: none;
+      border-radius: 12px; padding: 10px; font-family: 'Nunito', sans-serif;
+      font-size: 14px; font-weight: 900; cursor: pointer;
+      box-shadow: 0 3px 0 var(--green-dark);
+    }
+    #push-prompt .pp-no {
+      background: var(--brown-mid); color: var(--tan); border: none;
+      border-radius: 12px; padding: 10px 16px; font-family: 'Nunito', sans-serif;
+      font-size: 14px; font-weight: 900; cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -277,7 +358,7 @@
 </nav>
 
 <div class="streak-popup" id="streak-popup">
-  <div style="font-size:48px;margin-bottom:6px;">🔥</div>
+  <div class="streak-icon"><svg viewBox="0 0 24 24" fill="#ff9600" fill-opacity="0.5" stroke="#ff9600" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 2px 8px rgba(255,150,0,0.5))"><path d="M12 22c-4.97 0-8-3.58-8-7.5 0-3.07 1.74-5.25 3.53-7.28C9.18 5.38 10.34 3.7 10.34 2c0 0 1.77 2.18 2.34 4.18.27.94.5 1.82 1.32 1.82 0-2 1-3 1-3s1 1.5 1 3.5c.5-.5 1.5-1.5 1.5-1.5s1 2.5 1 5c0 3.92-3.03 7.5-8 7.5z"/></svg></div>
   <div class="num" id="streak-num">5</div>
   <div class="txt">Streak!</div>
 </div>
@@ -285,12 +366,13 @@
 <div class="flash" id="flash"></div>
 <div class="confetti" id="confetti"></div>
 
+<!-- Push Notification Prompt -->
 <div id="push-prompt">
   <div class="pp-title">🦌 Daily brain reminders?</div>
   <div class="pp-text">Get a nudge each day to keep your streak alive. We'll only ping you once a day.</div>
   <div class="pp-btns">
     <button class="pp-yes" id="pp-yes">Sure!</button>
-    <button class="pp-no"  id="pp-no">Not now</button>
+    <button class="pp-no" id="pp-no">Not now</button>
   </div>
 </div>
 
@@ -306,7 +388,7 @@
   </div>
 </div>
 
-<!-- IQ Calibration -->
+<!-- IQ Calibration Test -->
 <div class="modal" id="calibration">
   <div class="modal-box">
     <div id="cal-quiz">
@@ -328,13 +410,6 @@
   </div>
 </div>
 
-<!-- ════════════════════════════════════════
-     GAME FILES  — add new games here
-     ════════════════════════════════════════ -->
-<script src="games/wordle.js"></script>
-<script src="games/mcq.js"></script>
-<!-- <script src="games/tictactoe.js"></script>  ← future games go here -->
-
 <script src="questions.js"></script>
 
 <script type="module">
@@ -342,30 +417,24 @@
 
   if (window.parent !== window) parent.authCheck();
 
-  // init Q after all game scripts loaded
-  Q._init();
+  const feed      = document.getElementById('feed');
+  const iqVal     = document.getElementById('iq-val');
+  const streakVal = document.getElementById('streak-val');
+  const streakPill   = document.getElementById('streak-pill');
+  const streakPopup  = document.getElementById('streak-popup');
+  const streakNum    = document.getElementById('streak-num');
+  const onboard      = document.getElementById('onboard');
+  const ageSlider    = document.getElementById('age-slider');
+  const ageDisplay   = document.getElementById('age-display');
+  const flashEl      = document.getElementById('flash');
+  const confettiEl   = document.getElementById('confetti');
+  const xpBar        = document.getElementById('xp-bar');
+  const levelLabel   = document.getElementById('level-label');
+  const xpLabel      = document.getElementById('xp-label');
 
-  const feed        = document.getElementById('feed');
-  const iqVal       = document.getElementById('iq-val');
-  const streakVal   = document.getElementById('streak-val');
-  const streakPill  = document.getElementById('streak-pill');
-  const streakPopup = document.getElementById('streak-popup');
-  const streakNum   = document.getElementById('streak-num');
-  const onboard     = document.getElementById('onboard');
-  const ageSlider   = document.getElementById('age-slider');
-  const ageDisplay  = document.getElementById('age-display');
-  const flashEl     = document.getElementById('flash');
-  const confettiEl  = document.getElementById('confetti');
-  const xpBar       = document.getElementById('xp-bar');
-  const levelLabel  = document.getElementById('level-label');
-  const xpLabel     = document.getElementById('xp-label');
-
-  // answerStart is a ref object so game files can read/write it
-  const answerStartRef = { value: Date.now() };
-
-  let slides = 0;
-  const QUEUE_TARGET = 25;
+  let slides = 0, answerStart = 0;
   const questionQueue = [];
+  const QUEUE_TARGET  = 25;
 
   // ── Queue ──
   function fillQueue() {
@@ -391,7 +460,7 @@
     IQData.needsCalibration() ? startCalibration() : startFeed();
   });
 
-  // ── IQ Calibration ──
+  // ── IQ Calibration Test ──
   const CAL_QUESTIONS = [
     { q:'What comes next? 2, 6, 18, 54, ?', a:'162', w:['108','126','148'], cat:'patternRecognition', d:1.2 },
     { q:'If all Bloops are Razzies, and all Razzies are Lazzies, are all Bloops Lazzies?', a:'Yes', w:['No','Maybe','Not enough info'], cat:'logicalReasoning', d:1.1 },
@@ -406,7 +475,8 @@
     document.getElementById('calibration').classList.add('show');
     document.getElementById('cal-quiz').style.display = 'block';
     document.getElementById('cal-result').style.display = 'none';
-    renderCalDots(); renderCalQuestion();
+    renderCalDots();
+    renderCalQuestion();
   }
   function renderCalDots() {
     const dots = document.getElementById('cal-dots');
@@ -428,18 +498,20 @@
   }
   document.getElementById('cal-opts').addEventListener('click', e => {
     if (!e.target.classList.contains('cal-opt')) return;
-    const btn = e.target, par = btn.parentElement;
+    const btn = e.target;
+    const par = btn.parentElement;
     if (par.dataset.done) return;
     par.dataset.done = '1';
     const ok = btn.dataset.v === btn.dataset.ans;
     if (ok) calCorrect++;
     par.querySelectorAll('.cal-opt').forEach(o => {
-      if      (o.dataset.v === btn.dataset.ans) o.classList.add('correct');
-      else if (o === btn)                       o.classList.add('wrong');
-      else                                      o.classList.add('dim');
+      if (o.dataset.v === btn.dataset.ans) o.classList.add('correct');
+      else if (o === btn) o.classList.add('wrong');
+      else o.classList.add('dim');
     });
     const dot = document.getElementById('cal-dot-' + calIdx);
-    dot.classList.remove('active'); dot.classList.add(ok ? 'done' : 'wrong-dot');
+    dot.classList.remove('active');
+    dot.classList.add(ok ? 'done' : 'wrong-dot');
     IQData.recordAnswer(CAL_QUESTIONS[calIdx].cat, ok, CAL_QUESTIONS[calIdx].d, 5000);
     setTimeout(() => {
       calIdx++;
@@ -463,9 +535,9 @@
   function init() {
     const d = IQData.load();
     updateUI(d);
-    if      (IQData.needsOnboarding())  { onboard.classList.add('show'); }
-    else if (IQData.needsCalibration()) { Q.setAge(d.age); startCalibration(); }
-    else                                { startFeed(); }
+    if      (IQData.needsOnboarding())   { onboard.classList.add('show'); }
+    else if (IQData.needsCalibration())  { Q.setAge(d.age); startCalibration(); }
+    else                                 { startFeed(); }
   }
 
   function startFeed() {
@@ -493,31 +565,337 @@
     const idx = slides++;
     const div = document.createElement('div');
     div.className = 'slide';
-
-    // Each game file owns its own render()
-    // Wordle uses WordleGame.render; everything else uses MCQGame.render
-    if (q.type === 'wordle') {
-      div.innerHTML = WordleGame.render(q, idx);
-      feed.appendChild(div);
-      WordleGame.attach(div, q, idx, feed, answerStartRef, handleAnswer);
-    } else {
-      div.innerHTML = MCQGame.render(q, idx);
-      feed.appendChild(div);
-      // MCQ answers handled by global click delegation below
-    }
-
-    answerStartRef.value = Date.now();
+    div.innerHTML = render(q, idx);
+    feed.appendChild(div);
+    // Wordle cards need JS state attached after the DOM exists
+    if (q.type === 'wordle') attachWordle(div, q, idx);
+    answerStart = Date.now();
   }
 
-  // ── Shared answer callback (called by any game) ──
-  // signature: (category, isCorrect, difficulty, ms, idx, explainText)
-  function handleAnswer(category, isCorrect, difficulty, ms, idx, explainText) {
-    const result = IQData.recordAnswer(category, isCorrect, difficulty, ms);
+  // ══════════════════════════════════════════════════
+  //  WORDLE — render + logic
+  // ══════════════════════════════════════════════════
 
-    if (explainText) {
-      const expEl = document.getElementById(`exp-${idx}`);
-      if (expEl) { expEl.textContent = explainText; setTimeout(() => expEl.classList.add('show'), 200); }
+  const KB_ROWS = [
+    ['Q','W','E','R','T','Y','U','I','O','P'],
+    ['A','S','D','F','G','H','J','K','L'],
+    ['ENTER','Z','X','C','V','B','N','M','⌫'],
+  ];
+
+  function renderWordle(q, idx) {
+    // 6×5 grid
+    let gridHTML = '';
+    for (let r = 0; r < 6; r++) {
+      let rowHTML = '';
+      for (let c = 0; c < 5; c++) {
+        rowHTML += `<div class="wordle-tile" id="wt-${idx}-${r}-${c}"></div>`;
+      }
+      gridHTML += `<div class="wordle-row">${rowHTML}</div>`;
     }
+
+    // custom keyboard
+    const kbHTML = KB_ROWS.map(row => {
+      const keys = row.map(k => {
+        const wide = (k === 'ENTER' || k === '⌫') ? ' wide' : '';
+        return `<button class="wk${wide}" data-wk="${k}" data-wi="${idx}">${k}</button>`;
+      }).join('');
+      return `<div class="wordle-kb-row">${keys}</div>`;
+    }).join('');
+
+    return `
+      <div class="qcard">
+        <div class="category">🟩 Wordle</div>
+        <div class="question">Guess the 5-letter word</div>
+        <div class="wordle-grid">${gridHTML}</div>
+        <div class="wordle-msg" id="wm-${idx}"></div>
+        <div class="wordle-kb">${kbHTML}</div>
+        <div class="explain" id="exp-${idx}"></div>
+      </div>
+      <div class="scroll-hint" id="hint-${idx}">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        Swipe for next
+      </div>`;
+  }
+
+  function attachWordle(slideEl, q, idx) {
+    // Per-card mutable state
+    const st = {
+      answer:    q.answer,   // e.g. 'BRAIN'
+      category:  q.category,
+      difficulty:q.difficulty,
+      guesses:   [],         // array of { word, result }
+      current:   '',         // letters typed so far
+      done:      false,
+      keyColors: {},         // letter → 'correct'|'present'|'absent'
+    };
+
+    // ── tap on our custom keyboard ──
+    slideEl.addEventListener('click', e => {
+      const btn = e.target.closest('[data-wk]');
+      if (!btn || +btn.dataset.wi !== idx) return;
+      handleWKey(btn.dataset.wk, st, idx);
+    });
+
+    // ── physical / desktop keyboard (only when this slide is visible) ──
+    document.addEventListener('keydown', e => {
+      if (st.done) return;
+      const visIdx = Math.round(feed.scrollTop / (feed.clientHeight || 1));
+      if (feed.children[visIdx] !== slideEl) return;
+      if      (e.key === 'Enter')     handleWKey('ENTER', st, idx);
+      else if (e.key === 'Backspace') handleWKey('⌫',    st, idx);
+      else if (/^[a-zA-Z]$/.test(e.key)) handleWKey(e.key.toUpperCase(), st, idx);
+    });
+  }
+
+  // ---------- key handler ----------
+  function handleWKey(key, st, idx) {
+    if (st.done) return;
+    const msgEl = document.getElementById(`wm-${idx}`);
+
+    if (key === '⌫') {
+      st.current = st.current.slice(0, -1);
+      updateCurrentRow(st, idx);
+      msgEl.className = 'wordle-msg';
+      msgEl.textContent = '';
+      return;
+    }
+
+    if (key === 'ENTER') {
+      if (st.current.length < 5) {
+        msgEl.className = 'wordle-msg error';
+        msgEl.textContent = 'Not enough letters';
+        shakeRow(st.guesses.length, idx);
+        return;
+      }
+      submitGuess(st, idx);
+      return;
+    }
+
+    // letter
+    if (st.current.length < 5) {
+      st.current += key;
+      updateCurrentRow(st, idx);
+      msgEl.className = 'wordle-msg';
+      msgEl.textContent = '';
+    }
+  }
+
+  // ---------- live tile update as user types ----------
+  function updateCurrentRow(st, idx) {
+    const row = st.guesses.length;
+    for (let c = 0; c < 5; c++) {
+      const tile = document.getElementById(`wt-${idx}-${row}-${c}`);
+      if (!tile) continue;
+      const letter = st.current[c] || '';
+      tile.textContent = letter;
+      tile.className = 'wordle-tile' + (letter ? ' has-letter' : '');
+    }
+  }
+
+  function shakeRow(row, idx) {
+    for (let c = 0; c < 5; c++) {
+      const t = document.getElementById(`wt-${idx}-${row}-${c}`);
+      if (!t) continue;
+      t.classList.remove('shake');
+      // force reflow so animation restarts
+      void t.offsetWidth;
+      t.classList.add('shake');
+      setTimeout(() => t.classList.remove('shake'), 400);
+    }
+  }
+
+  // ---------- score a guess (returns array of 5 strings) ----------
+  function scoreGuess(guess, answer) {
+    const res  = Array(5).fill('absent');
+    const pool = answer.split('');
+    // pass 1: mark correct
+    for (let i = 0; i < 5; i++) {
+      if (guess[i] === pool[i]) { res[i] = 'correct'; pool[i] = null; }
+    }
+    // pass 2: mark present
+    for (let i = 0; i < 5; i++) {
+      if (res[i] === 'correct') continue;
+      const j = pool.indexOf(guess[i]);
+      if (j !== -1) { res[i] = 'present'; pool[j] = null; }
+    }
+    return res;
+  }
+
+  // ---------- submit + animate ----------
+  function submitGuess(st, idx) {
+    const guess  = st.current;
+    const result = scoreGuess(guess, st.answer);
+    const row    = st.guesses.length;
+    st.guesses.push({ word: guess, result });
+    st.current = '';
+
+    // Flip each tile: half-way through swap class + letter
+    const FLIP_HALF = 200; // ms to halfway point
+    const FLIP_DUR  = 400; // total flip duration per tile
+    const STAGGER   = 100; // delay between tiles
+
+    for (let c = 0; c < 5; c++) {
+      const tile  = document.getElementById(`wt-${idx}-${row}-${c}`);
+      if (!tile) continue;
+      const delay = c * STAGGER;
+
+      setTimeout(() => {
+        // animate out (tile face disappears)
+        tile.style.transition = `transform ${FLIP_HALF}ms ease-in`;
+        tile.style.transform  = 'rotateX(-90deg)';
+
+        setTimeout(() => {
+          // swap content + colour at halfway
+          tile.textContent = guess[c];
+          tile.className   = `wordle-tile reveal-${result[c]}`;
+          // animate back in
+          tile.style.transition = `transform ${FLIP_HALF}ms ease-out`;
+          tile.style.transform  = 'rotateX(0deg)';
+        }, FLIP_HALF);
+
+      }, delay);
+    }
+
+    // after all tiles have flipped, update keyboard + check game state
+    const allDone = 4 * STAGGER + FLIP_DUR + 50;
+    setTimeout(() => {
+      updateKeyboard(st, guess, result, idx);
+
+      const won  = result.every(r => r === 'correct');
+      const lost = !won && st.guesses.length >= 6;
+      if (won || lost) finishWordle(st, idx, won);
+    }, allDone);
+  }
+
+  // ---------- keyboard colour update ----------
+  function updateKeyboard(st, guess, result, idx) {
+    const priority = { correct: 3, present: 2, absent: 1 };
+    for (let i = 0; i < 5; i++) {
+      const l = guess[i];
+      if (!st.keyColors[l] || priority[result[i]] > priority[st.keyColors[l]]) {
+        st.keyColors[l] = result[i];
+      }
+    }
+    document.querySelectorAll(`[data-wi="${idx}"]`).forEach(btn => {
+      const state = st.keyColors[btn.dataset.wk];
+      if (!state) return;
+      // remove all state classes then add the right one
+      btn.classList.remove('st-correct', 'st-present', 'st-absent');
+      btn.classList.add(`st-${state}`);
+    });
+  }
+
+  // ---------- win / lose ----------
+  function finishWordle(st, idx, won) {
+    st.done = true;
+    const msgEl  = document.getElementById(`wm-${idx}`);
+    const expEl  = document.getElementById(`exp-${idx}`);
+    const hintEl = document.getElementById(`hint-${idx}`);
+
+    const ms     = Date.now() - answerStart;
+    const result = IQData.recordAnswer(st.category, won, st.difficulty, ms);
+
+    if (won) {
+      const byGuess = ['Ace! 🎯','Brilliant! 🧠','Nailed it! ⚡','Great! 🔥','Nice! 💡','Phew! 😅'];
+      msgEl.className  = 'wordle-msg success';
+      msgEl.textContent = byGuess[st.guesses.length - 1] || 'Yes!';
+      flashEl.className = 'flash green show';
+      spawnConfetti(st.guesses.length === 1 ? 30 : 14);
+      setTimeout(() => flashEl.className = 'flash', 350);
+    } else {
+      msgEl.className  = 'wordle-msg error';
+      msgEl.textContent = `The word was ${st.answer}`;
+      flashEl.className = 'flash red show';
+      setTimeout(() => flashEl.className = 'flash', 350);
+    }
+
+    if (expEl) {
+      expEl.textContent = won
+        ? `Solved in ${st.guesses.length} guess${st.guesses.length === 1 ? '' : 'es'}!`
+        : `The answer was "${st.answer}". Keep going!`;
+      setTimeout(() => expEl.classList.add('show'), 200);
+    }
+    setTimeout(() => hintEl?.classList.add('show'), 500);
+    updateUI(result);
+
+    // streak milestone popup
+    if (won && result.streak > 0 && result.streak % 5 === 0) {
+      setTimeout(() => {
+        streakNum.textContent = result.streak;
+        streakPopup.classList.add('show');
+        spawnConfetti(25);
+        setTimeout(() => streakPopup.classList.remove('show'), 1800);
+      }, 600);
+    }
+
+    checkMore();
+    answerStart = Date.now();
+  }
+
+  // ══════════════════════════════════════════════════
+  //  REGULAR CARD — render
+  // ══════════════════════════════════════════════════
+
+  function render(q, idx) {
+    if (q.type === 'wordle') return renderWordle(q, idx);
+
+    let visual = '';
+    if (q.visual === 'sequence' || q.visual === 'letterSequence') {
+      const parts = q.sequence.map((n, i) => {
+        if (n === '?') return `<span class="blank">?</span>`;
+        const arrow = i < q.sequence.length - 1 ? `<span class="arrow">→</span>` : '';
+        return `<span>${n}</span>${arrow}`;
+      });
+      if (q.sequence[q.sequence.length - 1] !== '?')
+        parts.push(`<span class="arrow">→</span><span class="blank">?</span>`);
+      visual = `<div class="sequence">${parts.join('')}</div>`;
+    } else if (q.visual === 'matrix') {
+      visual = `<div class="matrix">${q.grid.map(c =>
+        `<div class="matrix-cell${c === '?' ? ' blank' : ''}">${c}</div>`
+      ).join('')}</div>`;
+    }
+    const wide = q.options.some(o => String(o).length > 20);
+    return `
+      <div class="qcard">
+        <div class="category">${q.categoryLabel}</div>
+        <div class="question">${q.question}</div>
+        ${visual}
+        <div class="options${wide ? ' wide' : ''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">
+          ${q.options.map(o => `<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}
+        </div>
+        <div class="feedback" id="fb-${idx}"></div>
+        <div class="explain"  id="exp-${idx}">${q.explanation}</div>
+      </div>
+      <div class="scroll-hint" id="hint-${idx}">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        Swipe for next
+      </div>`;
+  }
+
+  // ── Answer handling (regular cards) ──
+  document.addEventListener('click', e => {
+    if (!e.target.classList.contains('opt')) return;
+    const btn  = e.target;
+    const opts = btn.parentElement;
+    if (opts.dataset.done) return;
+    opts.dataset.done = '1';
+
+    const idx       = parseInt(opts.dataset.idx);
+    const correct   = opts.dataset.ans;
+    const isCorrect = btn.dataset.v === correct;
+    const ms        = Date.now() - answerStart;
+
+    opts.querySelectorAll('.opt').forEach(o => {
+      if      (o.dataset.v === correct) o.classList.add(isCorrect ? 'correct' : 'show-correct');
+      else if (o === btn)               o.classList.add('wrong');
+      else                              o.classList.add('dim');
+    });
+
+    const result = IQData.recordAnswer(opts.dataset.cat, isCorrect, parseFloat(opts.dataset.diff), ms);
+
+    const fb = document.getElementById(`fb-${idx}`);
+    fb.textContent = getEncouragement(result.streak, isCorrect);
+    fb.className   = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
 
     if (isCorrect) { flashEl.className = 'flash green show'; spawnConfetti(8); }
     else           { flashEl.className = 'flash red show'; }
@@ -534,33 +912,9 @@
 
     updateUI(result);
     checkMore();
-    answerStartRef.value = Date.now();
-  }
-
-  // ── MCQ click delegation ──
-  document.addEventListener('click', e => {
-    if (!e.target.classList.contains('opt')) return;
-    const btn  = e.target;
-    const opts = btn.parentElement;
-    if (opts.dataset.done) return;
-    opts.dataset.done = '1';
-
-    const idx       = parseInt(opts.dataset.idx);
-    const correct   = opts.dataset.ans;
-    const isCorrect = btn.dataset.v === correct;
-    const ms        = Date.now() - answerStartRef.value;
-
-    opts.querySelectorAll('.opt').forEach(o => {
-      if      (o.dataset.v === correct) o.classList.add(isCorrect ? 'correct' : 'show-correct');
-      else if (o === btn)               o.classList.add('wrong');
-      else                              o.classList.add('dim');
-    });
-
-    const fb = document.getElementById(`fb-${idx}`);
-    if (fb) { fb.textContent = getEncouragement(0, isCorrect); fb.className = `feedback show ${isCorrect ? 'correct' : 'wrong'}`; }
-
-    handleAnswer(opts.dataset.cat, isCorrect, parseFloat(opts.dataset.diff), ms, idx, null);
+    setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'),  250);
     setTimeout(() => document.getElementById(`hint-${idx}`)?.classList.add('show'), 500);
+    answerStart = Date.now();
   });
 
   // ── Utils ──
@@ -568,10 +922,10 @@
     const colors = ['#58cc02','#ffc800','#ea2b2b','#1cb0f6','#ce82ff','#ff9600'];
     for (let i = 0; i < n; i++) {
       const p = document.createElement('i');
-      p.style.left           = Math.random() * 100 + '%';
-      p.style.top            = '-10px';
-      p.style.background     = colors[Math.floor(Math.random() * colors.length)];
-      p.style.animationDelay = Math.random() * 0.2 + 's';
+      p.style.left            = Math.random() * 100 + '%';
+      p.style.top             = '-10px';
+      p.style.background      = colors[Math.floor(Math.random() * colors.length)];
+      p.style.animationDelay  = Math.random() * 0.2 + 's';
       confettiEl.appendChild(p);
       setTimeout(() => p.classList.add('fall'), 10);
       setTimeout(() => p.remove(), 1400);
@@ -582,8 +936,8 @@
     iqVal.textContent = d.iq || '--';
     if (d.streak > 0) { streakPill.style.display = 'flex'; streakVal.textContent = d.streak; }
     else              { streakPill.style.display = 'none'; }
-    const xpInLevel = d.xp % 150;
-    xpBar.style.width      = (xpInLevel / 150 * 100) + '%';
+    const xpInLevel  = d.xp % 150;
+    xpBar.style.width    = (xpInLevel / 150 * 100) + '%';
     levelLabel.textContent = 'Lvl ' + d.level;
     xpLabel.textContent    = xpInLevel + '/150';
   }
@@ -617,17 +971,21 @@
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
       });
-      window.parent.postMessage({ type: 'savePushSub', sub: sub.toJSON() }, '*');
-    } catch (err) { console.error('BrainDeer: push setup failed', err); }
+      const subPlain = sub.toJSON();
+      window.parent.postMessage({ type: 'savePushSub', sub: subPlain }, '*');
+      console.log('BrainDeer: push sub sent to parent ✓');
+    } catch (err) {
+      console.error('BrainDeer: push setup failed', err);
+    }
   }
   function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64  = (base64String + padding).replace(/-/g,'+').replace(/_/g,'/');
+    const base64  = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
     const rawData = atob(base64);
     return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
   }
 
-  function esc(s) { return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  function esc(s) { return String(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
   function shuffle(arr) {
     const a = [...arr];
     for (let i = a.length - 1; i > 0; i--) {
