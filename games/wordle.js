@@ -1,11 +1,14 @@
 // ═══════════════════════════════════════════════════
-//  WORDLE GAME
-//  Provides: WordleGame.generate(difficulty)
-//            WordleGame.render(q, idx)
-//            WordleGame.attach(slideEl, q, idx, onAnswer)
+// WORDLE GAME
 // ═══════════════════════════════════════════════════
 
 const WordleGame = (() => {
+
+  const KB_ROWS = [
+    ['Q','W','E','R','T','Y','U','I','O','P'],
+    ['A','S','D','F','G','H','J','K','L'],
+    ['ENTER','Z','X','C','V','B','N','M','⌫'],
+  ];
 
   const WORDS = {
     easy: [
@@ -32,23 +35,18 @@ const WordleGame = (() => {
       'AXIOM','BUSHY','CHIMP','DUCHY','ELFIN','FETID','GAUZE','HUSKY','IGLOO','JUICY',
       'KITTY','LUSTY','MURKY','NUTTY','OUGHT','PERKY','QUALM','RUSTY','SAVVY','TAWNY',
       'VERVE','WITTY','FIZZY','GAUDY','HIPPO','IMPLY','JUMBO','KNOLL','LYRIC','NADIR',
-      'OVULE','PIXEL','RABID','SCOFF','UNZIP','VEXED','WIZEN','EXPEL',
+      'OVULE','PIXEL','RABID','SCOFF','VEXED','WIZEN',
     ],
   };
 
-  const KB_ROWS = [
-    ['Q','W','E','R','T','Y','U','I','O','P'],
-    ['A','S','D','F','G','H','J','K','L'],
-    ['ENTER','Z','X','C','V','B','N','M','⌫'],
-  ];
+  // ── Public: generate a question object ────────────
+  function generate(targetDifficulty) {
+    const tier  = targetDifficulty < 1.0 ? 0 : targetDifficulty < 1.4 ? 1 : 2;
+    const tiers = ['easy', 'medium', 'hard'];
+    const diffs = [0.8, 1.2, 1.7];
+    const list  = WORDS[tiers[tier]];
+    const word  = list[Math.floor(Math.random() * list.length)];
 
-  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-
-  // ── Generate ──────────────────────────────────────
-  function generate(difficulty) {
-    const tier  = difficulty < 1.0 ? 'easy' : difficulty < 1.5 ? 'medium' : 'hard';
-    const diffs = { easy: 0.8, medium: 1.2, hard: 1.7 };
-    const word  = pick(WORDS[tier]);
     return {
       type:          'wordle',
       category:      'verbalReasoning',
@@ -59,28 +57,23 @@ const WordleGame = (() => {
       options:       [],
       explanation:   `The word was ${word}.`,
       visual:        'wordle',
-      maxGuesses:    6,
     };
   }
 
-  // ── Render ────────────────────────────────────────
+  // ── Public: render HTML string ────────────────────
   function render(q, idx) {
     let gridHTML = '';
     for (let r = 0; r < 6; r++) {
       let row = '';
-      for (let c = 0; c < 5; c++) {
-        row += `<div class="wordle-tile" id="wt-${idx}-${r}-${c}"></div>`;
-      }
+      for (let c = 0; c < 5; c++) row += `<div class="wordle-tile" id="wt-${idx}-${r}-${c}"></div>`;
       gridHTML += `<div class="wordle-row">${row}</div>`;
     }
 
-    const kbHTML = KB_ROWS.map(row => {
-      const keys = row.map(k => {
-        const wide = (k === 'ENTER' || k === '⌫') ? ' wide' : '';
-        return `<button class="wk${wide}" data-wk="${k}" data-wi="${idx}">${k}</button>`;
-      }).join('');
-      return `<div class="wordle-kb-row">${keys}</div>`;
-    }).join('');
+    const kbHTML = KB_ROWS.map(row =>
+      `<div class="wordle-kb-row">${row.map(k =>
+        `<button class="wk${k==='ENTER'||k==='⌫'?' wide':''}" data-wk="${k}" data-wi="${idx}">${k}</button>`
+      ).join('')}</div>`
+    ).join('');
 
     return `
       <div class="qcard">
@@ -97,9 +90,9 @@ const WordleGame = (() => {
       </div>`;
   }
 
-  // ── Attach (interactive logic) ────────────────────
-  // onAnswer(isCorrect, ms) is called when the game ends
-  function attach(slideEl, q, idx, feed, onAnswer) {
+  // ── Public: attach interactivity to a rendered slide ──
+  // onAnswer(category, isCorrect, difficulty, ms, idx, explainText)
+  function attach(slideEl, q, idx, feed, answerStartRef, onAnswer) {
     const st = {
       answer:     q.answer,
       category:   q.category,
@@ -113,51 +106,49 @@ const WordleGame = (() => {
     slideEl.addEventListener('click', e => {
       const btn = e.target.closest('[data-wk]');
       if (!btn || +btn.dataset.wi !== idx) return;
-      handleKey(btn.dataset.wk, st, idx, feed, onAnswer);
+      _handleKey(btn.dataset.wk, st, idx, feed, answerStartRef, onAnswer);
     });
 
     document.addEventListener('keydown', e => {
       if (st.done) return;
       const visIdx = Math.round(feed.scrollTop / (feed.clientHeight || 1));
       if (feed.children[visIdx] !== slideEl) return;
-      if      (e.key === 'Enter')               handleKey('ENTER', st, idx, feed, onAnswer);
-      else if (e.key === 'Backspace')           handleKey('⌫',    st, idx, feed, onAnswer);
-      else if (/^[a-zA-Z]$/.test(e.key))       handleKey(e.key.toUpperCase(), st, idx, feed, onAnswer);
+      if      (e.key === 'Enter')            _handleKey('ENTER', st, idx, feed, answerStartRef, onAnswer);
+      else if (e.key === 'Backspace')        _handleKey('⌫',    st, idx, feed, answerStartRef, onAnswer);
+      else if (/^[a-zA-Z]$/.test(e.key))    _handleKey(e.key.toUpperCase(), st, idx, feed, answerStartRef, onAnswer);
     });
   }
 
-  // ── Internal helpers ──────────────────────────────
+  // ── Private helpers ───────────────────────────────
 
-  function handleKey(key, st, idx, feed, onAnswer) {
+  function _handleKey(key, st, idx, feed, answerStartRef, onAnswer) {
     if (st.done) return;
     const msgEl = document.getElementById(`wm-${idx}`);
 
     if (key === '⌫') {
       st.current = st.current.slice(0, -1);
-      updateCurrentRow(st, idx);
-      msgEl.className = 'wordle-msg';
-      msgEl.textContent = '';
+      _updateRow(st, idx);
+      msgEl.className = 'wordle-msg'; msgEl.textContent = '';
       return;
     }
     if (key === 'ENTER') {
       if (st.current.length < 5) {
         msgEl.className = 'wordle-msg error';
         msgEl.textContent = 'Not enough letters';
-        shakeRow(st.guesses.length, idx);
+        _shakeRow(st.guesses.length, idx);
         return;
       }
-      submitGuess(st, idx, onAnswer);
+      _submitGuess(st, idx, feed, answerStartRef, onAnswer);
       return;
     }
     if (st.current.length < 5) {
       st.current += key;
-      updateCurrentRow(st, idx);
-      msgEl.className = 'wordle-msg';
-      msgEl.textContent = '';
+      _updateRow(st, idx);
+      msgEl.className = 'wordle-msg'; msgEl.textContent = '';
     }
   }
 
-  function updateCurrentRow(st, idx) {
+  function _updateRow(st, idx) {
     const row = st.guesses.length;
     for (let c = 0; c < 5; c++) {
       const tile = document.getElementById(`wt-${idx}-${row}-${c}`);
@@ -168,23 +159,19 @@ const WordleGame = (() => {
     }
   }
 
-  function shakeRow(row, idx) {
+  function _shakeRow(row, idx) {
     for (let c = 0; c < 5; c++) {
       const t = document.getElementById(`wt-${idx}-${row}-${c}`);
       if (!t) continue;
-      t.classList.remove('shake');
-      void t.offsetWidth;
-      t.classList.add('shake');
+      t.classList.remove('shake'); void t.offsetWidth; t.classList.add('shake');
       setTimeout(() => t.classList.remove('shake'), 400);
     }
   }
 
-  function scoreGuess(guess, answer) {
+  function _scoreGuess(guess, answer) {
     const res  = Array(5).fill('absent');
     const pool = answer.split('');
-    for (let i = 0; i < 5; i++) {
-      if (guess[i] === pool[i]) { res[i] = 'correct'; pool[i] = null; }
-    }
+    for (let i = 0; i < 5; i++) if (guess[i] === pool[i]) { res[i] = 'correct'; pool[i] = null; }
     for (let i = 0; i < 5; i++) {
       if (res[i] === 'correct') continue;
       const j = pool.indexOf(guess[i]);
@@ -193,19 +180,17 @@ const WordleGame = (() => {
     return res;
   }
 
-  function submitGuess(st, idx, onAnswer) {
+  function _submitGuess(st, idx, feed, answerStartRef, onAnswer) {
     const guess  = st.current;
-    const result = scoreGuess(guess, st.answer);
+    const result = _scoreGuess(guess, st.answer);
     const row    = st.guesses.length;
     st.guesses.push({ word: guess, result });
     st.current = '';
 
-    const FLIP_HALF = 200, FLIP_DUR = 400, STAGGER = 100;
-
+    const FLIP_HALF = 200, STAGGER = 100;
     for (let c = 0; c < 5; c++) {
-      const tile  = document.getElementById(`wt-${idx}-${row}-${c}`);
+      const tile = document.getElementById(`wt-${idx}-${row}-${c}`);
       if (!tile) continue;
-      const delay = c * STAGGER;
       setTimeout(() => {
         tile.style.transition = `transform ${FLIP_HALF}ms ease-in`;
         tile.style.transform  = 'rotateX(-90deg)';
@@ -215,41 +200,43 @@ const WordleGame = (() => {
           tile.style.transition = `transform ${FLIP_HALF}ms ease-out`;
           tile.style.transform  = 'rotateX(0deg)';
         }, FLIP_HALF);
-      }, delay);
+      }, c * STAGGER);
     }
 
-    const allDone = 4 * STAGGER + FLIP_DUR + 50;
     setTimeout(() => {
-      updateKeyboard(st, guess, result, idx);
+      _updateKeyboard(st, guess, result, idx);
       const won  = result.every(r => r === 'correct');
       const lost = !won && st.guesses.length >= 6;
-      if (won || lost) finishGame(st, idx, won, onAnswer);
-    }, allDone);
+      if (won || lost) _finish(st, idx, won, answerStartRef, onAnswer);
+    }, 4 * STAGGER + 400 + 50);
   }
 
-  function updateKeyboard(st, guess, result, idx) {
+  function _updateKeyboard(st, guess, result, idx) {
     const priority = { correct: 3, present: 2, absent: 1 };
     for (let i = 0; i < 5; i++) {
       const l = guess[i];
-      if (!st.keyColors[l] || priority[result[i]] > priority[st.keyColors[l]]) {
+      if (!st.keyColors[l] || priority[result[i]] > priority[st.keyColors[l]])
         st.keyColors[l] = result[i];
-      }
     }
     document.querySelectorAll(`[data-wi="${idx}"]`).forEach(btn => {
       const state = st.keyColors[btn.dataset.wk];
       if (!state) return;
-      btn.classList.remove('st-correct', 'st-present', 'st-absent');
+      btn.classList.remove('st-correct','st-present','st-absent');
       btn.classList.add(`st-${state}`);
     });
   }
 
-  function finishGame(st, idx, won, onAnswer) {
+  function _finish(st, idx, won, answerStartRef, onAnswer) {
     st.done = true;
     const msgEl  = document.getElementById(`wm-${idx}`);
     const expEl  = document.getElementById(`exp-${idx}`);
     const hintEl = document.getElementById(`hint-${idx}`);
+    const ms     = Date.now() - answerStartRef.value;
+    const explainText = won
+      ? `Solved in ${st.guesses.length} guess${st.guesses.length === 1 ? '' : 'es'}!`
+      : `The answer was "${st.answer}". Keep going!`;
 
-    const ms = Date.now() - (st._startTime || Date.now());
+    onAnswer(st.category, won, st.difficulty, ms, idx, explainText);
 
     if (won) {
       const byGuess = ['Ace! 🎯','Brilliant! 🧠','Nailed it! ⚡','Great! 🔥','Nice! 💡','Phew! 😅'];
@@ -260,19 +247,9 @@ const WordleGame = (() => {
       msgEl.textContent = `The word was ${st.answer}`;
     }
 
-    if (expEl) {
-      expEl.textContent = won
-        ? `Solved in ${st.guesses.length} guess${st.guesses.length === 1 ? '' : 'es'}!`
-        : `The answer was "${st.answer}". Keep going!`;
-      setTimeout(() => expEl.classList.add('show'), 200);
-    }
+    if (expEl) { expEl.textContent = explainText; setTimeout(() => expEl.classList.add('show'), 200); }
     setTimeout(() => hintEl?.classList.add('show'), 500);
-
-    // Call back to improve.html with the result
-    onAnswer(won, ms, st);
   }
 
   return { generate, render, attach };
 })();
-
-window.WordleGame = WordleGame;
