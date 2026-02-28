@@ -1,86 +1,59 @@
-// ═══════════════════════════════════════════════════
-//  questions.js  —  question router
-//
-//  Depends on (load before this):
-//    games/wordle.js   → WordleGame
-//    games/mcq.js      → MCQGame
-//    (future)          → TicTacToeGame, etc.
-//
-//  Public API (used by improve.html):
-//    Q.setAge(n)
-//    Q.generate(difficulty)   → question object
-//    Q.render(q, idx)         → HTML string
-//    Q.attach(slideEl, q, idx, feed, onAnswer)
-// ═══════════════════════════════════════════════════
+// questions.js
+// Thin router — delegates to the individual game files.
+// To add a new game: create games/yourgame.js and add it to the
+// `games` array below.  That's it.
 
-const Q = (() => {
+const Q = {
+  age: 25,
+  used: new Set(),
 
-  let _age = 25;
-  const _used = new Set();
+  setAge(a) {
+    this.age = a || 25;
+    MCQGame.setAge(this.age);
+  },
 
-  function setAge(a) { _age = a || 25; }
+  // All registered games.
+  // Each entry must expose: generate(difficulty) → question object
+  // Wordle also needs: render(q, idx) and attach(slideEl, q, idx, feed, answerStartRef, onAnswer)
+  // MCQ questions use the shared render/attach in improve.html
+  games: [
+    // { game: WordleGame, weight: 10 },   ← uncomment once loaded
+    // { game: MCQGame,    weight: 90 },
+  ],
 
-  // ── Hash for deduplication ──────────────────────
-  function hash(q) {
-    return q.type + ':' + q.question.slice(0, 50) + (q.sequence || q.grid || []).join('');
-  }
+  _init() {
+    // Called after all game scripts have loaded (see improve.html)
+    this.games = [
+      { game: WordleGame, weight: 10 },
+      { game: MCQGame,    weight: 90 },
+    ];
+  },
 
-  // ── Pick the right game for a question type ─────
-  function gameFor(q) {
-    if (q.type === 'wordle') return WordleGame;
-    return MCQGame;
-    // Future: if (q.type === 'tictactoe') return TicTacToeGame;
-  }
+  hash(q) {
+    return q.type + ':' + q.question.slice(0, 50) + (q.sequence || []).join('');
+  },
 
-  // ── Difficulty helper (based on IQ) ─────────────
-  function difficultyFromIQ(iq) {
-    if (iq < 85)  return 0.6;
-    if (iq < 95)  return 0.8;
-    if (iq < 105) return 1.0;
-    if (iq < 115) return 1.2;
-    if (iq < 125) return 1.5;
-    if (iq < 135) return 1.8;
-    return 2.1;
-  }
+  generate(targetDifficulty = 1.0) {
+    if (!this.games.length) this._init();
 
-  // ── Generate ─────────────────────────────────────
-  // Picks a game type, generates a question, deduplicates
-  function generate(difficulty = 1.0) {
-    // Decide which game to use (weighted)
-    // Right now: ~20% Wordle, ~80% MCQ
-    const useWordle = Math.random() < 0.20;
-    const game = useWordle ? WordleGame : MCQGame;
+    // weighted pick
+    const totalWeight = this.games.reduce((s, g) => s + g.weight, 0);
+    let rng = Math.random() * totalWeight;
+    let chosen = this.games[this.games.length - 1].game;
+    for (const g of this.games) {
+      rng -= g.weight;
+      if (rng <= 0) { chosen = g.game; break; }
+    }
 
     let q, tries = 0;
     do {
-      q = game.generate(difficulty);
+      q = chosen.generate(targetDifficulty);
       tries++;
       if (tries > 30) break;
-    } while (_used.has(hash(q)));
+    } while (this.used.has(this.hash(q)));
 
-    _used.add(hash(q));
-    if (_used.size > 1500) {
-      // Keep only the last 750
-      const arr = [..._used];
-      _used.clear();
-      arr.slice(-750).forEach(h => _used.add(h));
-    }
+    this.used.add(this.hash(q));
+    if (this.used.size > 1500) this.used = new Set([...this.used].slice(-750));
     return q;
-  }
-
-  // ── Render ────────────────────────────────────────
-  function render(q, idx) {
-    return gameFor(q).render(q, idx);
-  }
-
-  // ── Attach ────────────────────────────────────────
-  function attach(slideEl, q, idx, feed, onAnswer) {
-    slideEl._startTime = Date.now();
-    gameFor(q).attach(slideEl, q, idx, feed, onAnswer);
-  }
-
-  return { setAge, generate, render, attach, difficultyFromIQ };
-
-})();
-
-window.Q = Q;
+  },
+};
