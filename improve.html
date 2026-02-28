@@ -142,6 +142,91 @@
     .scroll-hint svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2.5; animation:bounce 1.5s infinite; }
     @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
 
+    /* ══════════════════════════════════════
+       WORDLE STYLES
+    ══════════════════════════════════════ */
+
+    /* Grid */
+    .wordle-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin: 2px 0;
+    }
+    .wordle-row { display: flex; gap: 5px; }
+
+    .wordle-tile {
+      width: clamp(42px, 11.5vw, 52px);
+      height: clamp(42px, 11.5vw, 52px);
+      border-radius: 10px;
+      background: var(--bg);
+      border: 2.5px solid var(--brown-mid);
+      display: flex; align-items: center; justify-content: center;
+      font-size: clamp(18px, 5vw, 22px);
+      font-weight: 900;
+      color: var(--cream);
+      transition: border-color 0.08s;
+      /* needed for flip animation */
+      perspective: 250px;
+    }
+    .wordle-tile.has-letter  { border-color: var(--tan); animation: wtPop 0.08s ease; }
+    .wordle-tile.reveal-correct { background: var(--green);      border-color: var(--green);      color: #fff;        box-shadow: 0 3px 0 var(--green-dark); }
+    .wordle-tile.reveal-present { background: var(--gold);       border-color: var(--gold);       color: #2a1800;     box-shadow: 0 3px 0 var(--gold-dark); }
+    .wordle-tile.reveal-absent  { background: var(--brown-mid);  border-color: var(--brown-mid);  color: var(--tan); }
+    .wordle-tile.shake { animation: wtShake 0.4s ease; }
+
+    @keyframes wtPop   { 0%{transform:scale(1)} 40%{transform:scale(1.14)} 100%{transform:scale(1)} }
+    @keyframes wtShake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-7px)} 40%,80%{transform:translateX(7px)} }
+    @keyframes wtFlipIn  { 0%{transform:rotateX(0)}   100%{transform:rotateX(-90deg)} }
+    @keyframes wtFlipOut { 0%{transform:rotateX(90deg)} 100%{transform:rotateX(0)} }
+
+    /* Message line */
+    .wordle-msg {
+      font-size: 13px; font-weight: 800;
+      color: var(--tan); min-height: 18px; text-align: center;
+      transition: color 0.2s;
+    }
+    .wordle-msg.error   { color: var(--red);   animation: wtShake 0.3s ease; }
+    .wordle-msg.success { color: var(--green); }
+
+    /* Custom keyboard */
+    .wordle-kb {
+      display: flex; flex-direction: column;
+      gap: 6px; width: 100%; max-width: 340px;
+    }
+    .wordle-kb-row { display: flex; gap: 5px; justify-content: center; }
+
+    .wk {
+      height: 44px;
+      flex: 1;
+      min-width: 0;
+      max-width: 36px;
+      border: none; border-radius: 8px;
+      background: var(--brown-mid);
+      color: var(--cream);
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px; font-weight: 900;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.22);
+      transition: background 0.25s, color 0.25s, box-shadow 0.25s;
+      position: relative; overflow: hidden;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .wk::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 45%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.09) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    .wk:active    { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.22); }
+    .wk.wide      { max-width: 52px; font-size: 11px; }
+    /* colour states — applied after guesses */
+    .wk.st-correct { background: var(--green);     color: #fff;    box-shadow: 0 3px 0 var(--green-dark); }
+    .wk.st-present { background: var(--gold);      color: #2a1800; box-shadow: 0 3px 0 var(--gold-dark); }
+    .wk.st-absent  { background: #2c1d0e;          color: #6b4f32; box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
+
     /* ── Overlays ── */
     .streak-popup { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(58,41,24,0.85); z-index:200; opacity:0; pointer-events:none; transition:opacity 0.3s; }
     .streak-popup.show { opacity:1; }
@@ -332,24 +417,24 @@
 
   if (window.parent !== window) parent.authCheck();
 
-  const feed = document.getElementById('feed');
-  const iqVal = document.getElementById('iq-val');
+  const feed      = document.getElementById('feed');
+  const iqVal     = document.getElementById('iq-val');
   const streakVal = document.getElementById('streak-val');
-  const streakPill = document.getElementById('streak-pill');
-  const streakPopup = document.getElementById('streak-popup');
-  const streakNum = document.getElementById('streak-num');
-  const onboard = document.getElementById('onboard');
-  const ageSlider = document.getElementById('age-slider');
-  const ageDisplay = document.getElementById('age-display');
-  const flashEl = document.getElementById('flash');
-  const confettiEl = document.getElementById('confetti');
-  const xpBar = document.getElementById('xp-bar');
-  const levelLabel = document.getElementById('level-label');
-  const xpLabel = document.getElementById('xp-label');
+  const streakPill   = document.getElementById('streak-pill');
+  const streakPopup  = document.getElementById('streak-popup');
+  const streakNum    = document.getElementById('streak-num');
+  const onboard      = document.getElementById('onboard');
+  const ageSlider    = document.getElementById('age-slider');
+  const ageDisplay   = document.getElementById('age-display');
+  const flashEl      = document.getElementById('flash');
+  const confettiEl   = document.getElementById('confetti');
+  const xpBar        = document.getElementById('xp-bar');
+  const levelLabel   = document.getElementById('level-label');
+  const xpLabel      = document.getElementById('xp-label');
 
   let slides = 0, answerStart = 0;
   const questionQueue = [];
-  const QUEUE_TARGET = 25;
+  const QUEUE_TARGET  = 25;
 
   // ── Queue ──
   function fillQueue() {
@@ -372,11 +457,7 @@
     IQData.setAge(parseInt(ageSlider.value));
     Q.setAge(parseInt(ageSlider.value));
     onboard.classList.remove('show');
-    if (IQData.needsCalibration()) {
-      startCalibration();
-    } else {
-      startFeed();
-    }
+    IQData.needsCalibration() ? startCalibration() : startFeed();
   });
 
   // ── IQ Calibration Test ──
@@ -385,7 +466,7 @@
     { q:'If all Bloops are Razzies, and all Razzies are Lazzies, are all Bloops Lazzies?', a:'Yes', w:['No','Maybe','Not enough info'], cat:'logicalReasoning', d:1.1 },
     { q:'Hot is to Cold as Up is to _____', a:'Down', w:['High','Sky','Top'], cat:'verbalReasoning', d:0.6 },
     { q:'(7 × 8) − 13 = ?', a:'43', w:['42','45','49'], cat:'mentalAgility', d:1.0 },
-    { q:'Which doesn\'t belong? Cello, Flute, Violin, Harp', a:'Flute', w:['Cello','Violin','Harp'], cat:'logicalReasoning', d:1.0 },
+    { q:"Which doesn't belong? Cello, Flute, Violin, Harp", a:'Flute', w:['Cello','Violin','Harp'], cat:'logicalReasoning', d:1.0 },
   ];
   let calIdx = 0, calCorrect = 0;
 
@@ -397,7 +478,6 @@
     renderCalDots();
     renderCalQuestion();
   }
-
   function renderCalDots() {
     const dots = document.getElementById('cal-dots');
     dots.innerHTML = '';
@@ -408,61 +488,44 @@
       dots.appendChild(d);
     }
   }
-
   function renderCalQuestion() {
     const cq = CAL_QUESTIONS[calIdx];
     document.getElementById('cal-q').textContent = cq.q;
     const optsEl = document.getElementById('cal-opts');
-    const opts = shuffle([cq.a, ...cq.w]);
-    optsEl.innerHTML = opts.map(o =>
+    optsEl.innerHTML = shuffle([cq.a, ...cq.w]).map(o =>
       `<button class="cal-opt" data-v="${esc(o)}" data-ans="${esc(cq.a)}">${o}</button>`
     ).join('');
   }
-
   document.getElementById('cal-opts').addEventListener('click', e => {
     if (!e.target.classList.contains('cal-opt')) return;
     const btn = e.target;
-    const parent = btn.parentElement;
-    if (parent.dataset.done) return;
-    parent.dataset.done = '1';
-
-    const isCorrect = btn.dataset.v === btn.dataset.ans;
-    if (isCorrect) calCorrect++;
-
-    parent.querySelectorAll('.cal-opt').forEach(o => {
+    const par = btn.parentElement;
+    if (par.dataset.done) return;
+    par.dataset.done = '1';
+    const ok = btn.dataset.v === btn.dataset.ans;
+    if (ok) calCorrect++;
+    par.querySelectorAll('.cal-opt').forEach(o => {
       if (o.dataset.v === btn.dataset.ans) o.classList.add('correct');
       else if (o === btn) o.classList.add('wrong');
       else o.classList.add('dim');
     });
-
     const dot = document.getElementById('cal-dot-' + calIdx);
     dot.classList.remove('active');
-    dot.classList.add(isCorrect ? 'done' : 'wrong-dot');
-
-    const cq = CAL_QUESTIONS[calIdx];
-    IQData.recordAnswer(cq.cat, isCorrect, cq.d, 5000);
-
+    dot.classList.add(ok ? 'done' : 'wrong-dot');
+    IQData.recordAnswer(CAL_QUESTIONS[calIdx].cat, ok, CAL_QUESTIONS[calIdx].d, 5000);
     setTimeout(() => {
       calIdx++;
-      if (calIdx >= CAL_QUESTIONS.length) {
-        showCalResult();
-      } else {
-        parent.dataset.done = '';
-        renderCalDots();
-        renderCalQuestion();
-      }
+      if (calIdx >= CAL_QUESTIONS.length) { showCalResult(); }
+      else { par.dataset.done = ''; renderCalDots(); renderCalQuestion(); }
     }, 800);
   });
-
   function showCalResult() {
-    const baseIQ = 85 + Math.round((calCorrect / CAL_QUESTIONS.length) * 30);
-    const iq = Math.max(75, Math.min(130, baseIQ));
+    const iq = Math.max(75, Math.min(130, 85 + Math.round(calCorrect / CAL_QUESTIONS.length * 30)));
     IQData.markCalibrated(iq);
     document.getElementById('cal-quiz').style.display = 'none';
     document.getElementById('cal-result').style.display = 'block';
     document.getElementById('cal-iq').textContent = iq;
   }
-
   document.getElementById('cal-done-btn').addEventListener('click', () => {
     document.getElementById('calibration').classList.remove('show');
     startFeed();
@@ -472,14 +535,9 @@
   function init() {
     const d = IQData.load();
     updateUI(d);
-    if (IQData.needsOnboarding()) {
-      onboard.classList.add('show');
-    } else if (IQData.needsCalibration()) {
-      Q.setAge(d.age);
-      startCalibration();
-    } else {
-      startFeed();
-    }
+    if      (IQData.needsOnboarding())   { onboard.classList.add('show'); }
+    else if (IQData.needsCalibration())  { Q.setAge(d.age); startCalibration(); }
+    else                                 { startFeed(); }
   }
 
   function startFeed() {
@@ -489,7 +547,7 @@
     updateUI(d);
     fillQueue();
     for (let i = 0; i < 8; i++) addSlide();
-    feed.addEventListener('scroll', checkMore, { passive: true });
+    feed.addEventListener('scroll',    checkMore, { passive: true });
     feed.addEventListener('touchmove', checkMore, { passive: true });
     setInterval(checkMore, 200);
     setTimeout(maybeShowPushPrompt, 3000);
@@ -503,16 +561,284 @@
   }
 
   function addSlide() {
-    const q = nextQuestion();
+    const q   = nextQuestion();
     const idx = slides++;
     const div = document.createElement('div');
     div.className = 'slide';
     div.innerHTML = render(q, idx);
     feed.appendChild(div);
+    // Wordle cards need JS state attached after the DOM exists
+    if (q.type === 'wordle') attachWordle(div, q, idx);
     answerStart = Date.now();
   }
 
+  // ══════════════════════════════════════════════════
+  //  WORDLE — render + logic
+  // ══════════════════════════════════════════════════
+
+  const KB_ROWS = [
+    ['Q','W','E','R','T','Y','U','I','O','P'],
+    ['A','S','D','F','G','H','J','K','L'],
+    ['ENTER','Z','X','C','V','B','N','M','⌫'],
+  ];
+
+  function renderWordle(q, idx) {
+    // 6×5 grid
+    let gridHTML = '';
+    for (let r = 0; r < 6; r++) {
+      let rowHTML = '';
+      for (let c = 0; c < 5; c++) {
+        rowHTML += `<div class="wordle-tile" id="wt-${idx}-${r}-${c}"></div>`;
+      }
+      gridHTML += `<div class="wordle-row">${rowHTML}</div>`;
+    }
+
+    // custom keyboard
+    const kbHTML = KB_ROWS.map(row => {
+      const keys = row.map(k => {
+        const wide = (k === 'ENTER' || k === '⌫') ? ' wide' : '';
+        return `<button class="wk${wide}" data-wk="${k}" data-wi="${idx}">${k}</button>`;
+      }).join('');
+      return `<div class="wordle-kb-row">${keys}</div>`;
+    }).join('');
+
+    return `
+      <div class="qcard">
+        <div class="category">🟩 Wordle</div>
+        <div class="question">Guess the 5-letter word</div>
+        <div class="wordle-grid">${gridHTML}</div>
+        <div class="wordle-msg" id="wm-${idx}"></div>
+        <div class="wordle-kb">${kbHTML}</div>
+        <div class="explain" id="exp-${idx}"></div>
+      </div>
+      <div class="scroll-hint" id="hint-${idx}">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        Swipe for next
+      </div>`;
+  }
+
+  function attachWordle(slideEl, q, idx) {
+    // Per-card mutable state
+    const st = {
+      answer:    q.answer,   // e.g. 'BRAIN'
+      category:  q.category,
+      difficulty:q.difficulty,
+      guesses:   [],         // array of { word, result }
+      current:   '',         // letters typed so far
+      done:      false,
+      keyColors: {},         // letter → 'correct'|'present'|'absent'
+    };
+
+    // ── tap on our custom keyboard ──
+    slideEl.addEventListener('click', e => {
+      const btn = e.target.closest('[data-wk]');
+      if (!btn || +btn.dataset.wi !== idx) return;
+      handleWKey(btn.dataset.wk, st, idx);
+    });
+
+    // ── physical / desktop keyboard (only when this slide is visible) ──
+    document.addEventListener('keydown', e => {
+      if (st.done) return;
+      const visIdx = Math.round(feed.scrollTop / (feed.clientHeight || 1));
+      if (feed.children[visIdx] !== slideEl) return;
+      if      (e.key === 'Enter')     handleWKey('ENTER', st, idx);
+      else if (e.key === 'Backspace') handleWKey('⌫',    st, idx);
+      else if (/^[a-zA-Z]$/.test(e.key)) handleWKey(e.key.toUpperCase(), st, idx);
+    });
+  }
+
+  // ---------- key handler ----------
+  function handleWKey(key, st, idx) {
+    if (st.done) return;
+    const msgEl = document.getElementById(`wm-${idx}`);
+
+    if (key === '⌫') {
+      st.current = st.current.slice(0, -1);
+      updateCurrentRow(st, idx);
+      msgEl.className = 'wordle-msg';
+      msgEl.textContent = '';
+      return;
+    }
+
+    if (key === 'ENTER') {
+      if (st.current.length < 5) {
+        msgEl.className = 'wordle-msg error';
+        msgEl.textContent = 'Not enough letters';
+        shakeRow(st.guesses.length, idx);
+        return;
+      }
+      submitGuess(st, idx);
+      return;
+    }
+
+    // letter
+    if (st.current.length < 5) {
+      st.current += key;
+      updateCurrentRow(st, idx);
+      msgEl.className = 'wordle-msg';
+      msgEl.textContent = '';
+    }
+  }
+
+  // ---------- live tile update as user types ----------
+  function updateCurrentRow(st, idx) {
+    const row = st.guesses.length;
+    for (let c = 0; c < 5; c++) {
+      const tile = document.getElementById(`wt-${idx}-${row}-${c}`);
+      if (!tile) continue;
+      const letter = st.current[c] || '';
+      tile.textContent = letter;
+      tile.className = 'wordle-tile' + (letter ? ' has-letter' : '');
+    }
+  }
+
+  function shakeRow(row, idx) {
+    for (let c = 0; c < 5; c++) {
+      const t = document.getElementById(`wt-${idx}-${row}-${c}`);
+      if (!t) continue;
+      t.classList.remove('shake');
+      // force reflow so animation restarts
+      void t.offsetWidth;
+      t.classList.add('shake');
+      setTimeout(() => t.classList.remove('shake'), 400);
+    }
+  }
+
+  // ---------- score a guess (returns array of 5 strings) ----------
+  function scoreGuess(guess, answer) {
+    const res  = Array(5).fill('absent');
+    const pool = answer.split('');
+    // pass 1: mark correct
+    for (let i = 0; i < 5; i++) {
+      if (guess[i] === pool[i]) { res[i] = 'correct'; pool[i] = null; }
+    }
+    // pass 2: mark present
+    for (let i = 0; i < 5; i++) {
+      if (res[i] === 'correct') continue;
+      const j = pool.indexOf(guess[i]);
+      if (j !== -1) { res[i] = 'present'; pool[j] = null; }
+    }
+    return res;
+  }
+
+  // ---------- submit + animate ----------
+  function submitGuess(st, idx) {
+    const guess  = st.current;
+    const result = scoreGuess(guess, st.answer);
+    const row    = st.guesses.length;
+    st.guesses.push({ word: guess, result });
+    st.current = '';
+
+    // Flip each tile: half-way through swap class + letter
+    const FLIP_HALF = 200; // ms to halfway point
+    const FLIP_DUR  = 400; // total flip duration per tile
+    const STAGGER   = 100; // delay between tiles
+
+    for (let c = 0; c < 5; c++) {
+      const tile  = document.getElementById(`wt-${idx}-${row}-${c}`);
+      if (!tile) continue;
+      const delay = c * STAGGER;
+
+      setTimeout(() => {
+        // animate out (tile face disappears)
+        tile.style.transition = `transform ${FLIP_HALF}ms ease-in`;
+        tile.style.transform  = 'rotateX(-90deg)';
+
+        setTimeout(() => {
+          // swap content + colour at halfway
+          tile.textContent = guess[c];
+          tile.className   = `wordle-tile reveal-${result[c]}`;
+          // animate back in
+          tile.style.transition = `transform ${FLIP_HALF}ms ease-out`;
+          tile.style.transform  = 'rotateX(0deg)';
+        }, FLIP_HALF);
+
+      }, delay);
+    }
+
+    // after all tiles have flipped, update keyboard + check game state
+    const allDone = 4 * STAGGER + FLIP_DUR + 50;
+    setTimeout(() => {
+      updateKeyboard(st, guess, result, idx);
+
+      const won  = result.every(r => r === 'correct');
+      const lost = !won && st.guesses.length >= 6;
+      if (won || lost) finishWordle(st, idx, won);
+    }, allDone);
+  }
+
+  // ---------- keyboard colour update ----------
+  function updateKeyboard(st, guess, result, idx) {
+    const priority = { correct: 3, present: 2, absent: 1 };
+    for (let i = 0; i < 5; i++) {
+      const l = guess[i];
+      if (!st.keyColors[l] || priority[result[i]] > priority[st.keyColors[l]]) {
+        st.keyColors[l] = result[i];
+      }
+    }
+    document.querySelectorAll(`[data-wi="${idx}"]`).forEach(btn => {
+      const state = st.keyColors[btn.dataset.wk];
+      if (!state) return;
+      // remove all state classes then add the right one
+      btn.classList.remove('st-correct', 'st-present', 'st-absent');
+      btn.classList.add(`st-${state}`);
+    });
+  }
+
+  // ---------- win / lose ----------
+  function finishWordle(st, idx, won) {
+    st.done = true;
+    const msgEl  = document.getElementById(`wm-${idx}`);
+    const expEl  = document.getElementById(`exp-${idx}`);
+    const hintEl = document.getElementById(`hint-${idx}`);
+
+    const ms     = Date.now() - answerStart;
+    const result = IQData.recordAnswer(st.category, won, st.difficulty, ms);
+
+    if (won) {
+      const byGuess = ['Ace! 🎯','Brilliant! 🧠','Nailed it! ⚡','Great! 🔥','Nice! 💡','Phew! 😅'];
+      msgEl.className  = 'wordle-msg success';
+      msgEl.textContent = byGuess[st.guesses.length - 1] || 'Yes!';
+      flashEl.className = 'flash green show';
+      spawnConfetti(st.guesses.length === 1 ? 30 : 14);
+      setTimeout(() => flashEl.className = 'flash', 350);
+    } else {
+      msgEl.className  = 'wordle-msg error';
+      msgEl.textContent = `The word was ${st.answer}`;
+      flashEl.className = 'flash red show';
+      setTimeout(() => flashEl.className = 'flash', 350);
+    }
+
+    if (expEl) {
+      expEl.textContent = won
+        ? `Solved in ${st.guesses.length} guess${st.guesses.length === 1 ? '' : 'es'}!`
+        : `The answer was "${st.answer}". Keep going!`;
+      setTimeout(() => expEl.classList.add('show'), 200);
+    }
+    setTimeout(() => hintEl?.classList.add('show'), 500);
+    updateUI(result);
+
+    // streak milestone popup
+    if (won && result.streak > 0 && result.streak % 5 === 0) {
+      setTimeout(() => {
+        streakNum.textContent = result.streak;
+        streakPopup.classList.add('show');
+        spawnConfetti(25);
+        setTimeout(() => streakPopup.classList.remove('show'), 1800);
+      }, 600);
+    }
+
+    checkMore();
+    answerStart = Date.now();
+  }
+
+  // ══════════════════════════════════════════════════
+  //  REGULAR CARD — render
+  // ══════════════════════════════════════════════════
+
   function render(q, idx) {
+    if (q.type === 'wordle') return renderWordle(q, idx);
+
     let visual = '';
     if (q.visual === 'sequence' || q.visual === 'letterSequence') {
       const parts = q.sequence.map((n, i) => {
@@ -520,7 +846,8 @@
         const arrow = i < q.sequence.length - 1 ? `<span class="arrow">→</span>` : '';
         return `<span>${n}</span>${arrow}`;
       });
-      if (q.sequence[q.sequence.length - 1] !== '?') parts.push(`<span class="arrow">→</span><span class="blank">?</span>`);
+      if (q.sequence[q.sequence.length - 1] !== '?')
+        parts.push(`<span class="arrow">→</span><span class="blank">?</span>`);
       visual = `<div class="sequence">${parts.join('')}</div>`;
     } else if (q.visual === 'matrix') {
       visual = `<div class="matrix">${q.grid.map(c =>
@@ -537,7 +864,7 @@
           ${q.options.map(o => `<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}
         </div>
         <div class="feedback" id="fb-${idx}"></div>
-        <div class="explain" id="exp-${idx}">${q.explanation}</div>
+        <div class="explain"  id="exp-${idx}">${q.explanation}</div>
       </div>
       <div class="scroll-hint" id="hint-${idx}">
         <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
@@ -545,34 +872,33 @@
       </div>`;
   }
 
-  // ── Answer handling ──
+  // ── Answer handling (regular cards) ──
   document.addEventListener('click', e => {
     if (!e.target.classList.contains('opt')) return;
-    const btn = e.target;
+    const btn  = e.target;
     const opts = btn.parentElement;
     if (opts.dataset.done) return;
     opts.dataset.done = '1';
 
-    const idx = parseInt(opts.dataset.idx);
-    const correct = opts.dataset.ans;
-    const val = btn.dataset.v;
-    const isCorrect = val === correct;
-    const ms = Date.now() - answerStart;
+    const idx       = parseInt(opts.dataset.idx);
+    const correct   = opts.dataset.ans;
+    const isCorrect = btn.dataset.v === correct;
+    const ms        = Date.now() - answerStart;
 
     opts.querySelectorAll('.opt').forEach(o => {
-      if (o.dataset.v === correct) o.classList.add(isCorrect ? 'correct' : 'show-correct');
-      else if (o === btn) o.classList.add('wrong');
-      else o.classList.add('dim');
+      if      (o.dataset.v === correct) o.classList.add(isCorrect ? 'correct' : 'show-correct');
+      else if (o === btn)               o.classList.add('wrong');
+      else                              o.classList.add('dim');
     });
 
     const result = IQData.recordAnswer(opts.dataset.cat, isCorrect, parseFloat(opts.dataset.diff), ms);
 
     const fb = document.getElementById(`fb-${idx}`);
     fb.textContent = getEncouragement(result.streak, isCorrect);
-    fb.className = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
+    fb.className   = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
 
     if (isCorrect) { flashEl.className = 'flash green show'; spawnConfetti(8); }
-    else { flashEl.className = 'flash red show'; }
+    else           { flashEl.className = 'flash red show'; }
     setTimeout(() => flashEl.className = 'flash', 350);
 
     if (isCorrect && result.streak > 0 && result.streak % 5 === 0) {
@@ -586,18 +912,20 @@
 
     updateUI(result);
     checkMore();
-    setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'), 250);
+    setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'),  250);
     setTimeout(() => document.getElementById(`hint-${idx}`)?.classList.add('show'), 500);
     answerStart = Date.now();
   });
 
+  // ── Utils ──
   function spawnConfetti(n) {
     const colors = ['#58cc02','#ffc800','#ea2b2b','#1cb0f6','#ce82ff','#ff9600'];
     for (let i = 0; i < n; i++) {
       const p = document.createElement('i');
-      p.style.left = Math.random()*100+'%'; p.style.top = '-10px';
-      p.style.background = colors[Math.floor(Math.random()*colors.length)];
-      p.style.animationDelay = Math.random()*0.2+'s';
+      p.style.left            = Math.random() * 100 + '%';
+      p.style.top             = '-10px';
+      p.style.background      = colors[Math.floor(Math.random() * colors.length)];
+      p.style.animationDelay  = Math.random() * 0.2 + 's';
       confettiEl.appendChild(p);
       setTimeout(() => p.classList.add('fall'), 10);
       setTimeout(() => p.remove(), 1400);
@@ -607,11 +935,11 @@
   function updateUI(d) {
     iqVal.textContent = d.iq || '--';
     if (d.streak > 0) { streakPill.style.display = 'flex'; streakVal.textContent = d.streak; }
-    else { streakPill.style.display = 'none'; }
-    const xpInLevel = d.xp % 150;
-    xpBar.style.width = (xpInLevel / 150 * 100) + '%';
+    else              { streakPill.style.display = 'none'; }
+    const xpInLevel  = d.xp % 150;
+    xpBar.style.width    = (xpInLevel / 150 * 100) + '%';
     levelLabel.textContent = 'Lvl ' + d.level;
-    xpLabel.textContent = xpInLevel + '/150';
+    xpLabel.textContent    = xpInLevel + '/150';
   }
 
   // ── Push Notifications ──
@@ -624,33 +952,25 @@
     if (localStorage.getItem('push_dismissed')) return;
     document.getElementById('push-prompt').classList.add('show');
   }
-
   document.getElementById('pp-yes').addEventListener('click', async () => {
     document.getElementById('push-prompt').classList.remove('show');
     await subscribePush();
   });
-
   document.getElementById('pp-no').addEventListener('click', () => {
     document.getElementById('push-prompt').classList.remove('show');
     localStorage.setItem('push_dismissed', '1');
   });
-
   async function subscribePush() {
     try {
       const reg = await navigator.serviceWorker.register('/sw.js');
       await navigator.serviceWorker.ready;
-
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') return;
-
       const existing = await reg.pushManager.getSubscription();
       const sub = existing || await reg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
       });
-
-      // sub.toJSON() properly flattens the PushSubscription object
-      // postMessage it up to app.html which has Firebase access
       const subPlain = sub.toJSON();
       window.parent.postMessage({ type: 'savePushSub', sub: subPlain }, '*');
       console.log('BrainDeer: push sub sent to parent ✓');
@@ -658,17 +978,22 @@
       console.error('BrainDeer: push setup failed', err);
     }
   }
-
   function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const base64  = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
     const rawData = atob(base64);
     return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
   }
 
-  // ── Helpers ──
-  function esc(s) { return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-  function shuffle(arr) { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+  function esc(s) { return String(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
 
   window.addEventListener('beforeunload', () => IQData.endSession());
   init();
