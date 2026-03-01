@@ -5,18 +5,6 @@
 
 (function () {
 
-  // ─── Inject styles ──────────────────────────────
-  Q.injectCSS('ticTacToe',
-    '.ttt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:clamp(180px,50vw,240px);margin:4px 0}' +
-    '.ttt-cell{aspect-ratio:1;border:none;border-radius:12px;background:var(--bg);cursor:pointer;font-family:"Nunito",sans-serif;font-size:clamp(28px,8vw,38px);font-weight:900;color:var(--cream);display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 rgba(0,0,0,.15);transition:background .15s,transform .1s;position:relative;overflow:hidden}' +
-    '.ttt-cell::before{content:"";position:absolute;top:0;left:0;right:0;height:45%;background:linear-gradient(180deg,rgba(255,255,255,.05)0%,transparent 100%);pointer-events:none;border-radius:12px 12px 0 0}' +
-    '.ttt-cell:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.15)}' +
-    '.ttt-cell.ttt-x{color:var(--blue)}' +
-    '.ttt-cell.ttt-o{color:var(--red)}' +
-    '.ttt-cell.ttt-win{background:var(--green);color:#fff;box-shadow:0 3px 0 var(--green-dark);animation:pop .4s ease}' +
-    '.ttt-status{font-size:14px;font-weight:800;color:var(--tan);min-height:20px;text-align:center;transition:color .2s}'
-  );
-
   var DIFFS = [0.6, 1.0, 1.5];
   var LABELS = ['Easy', 'Medium', 'Hard'];
 
