@@ -5,7 +5,31 @@
 
 (function () {
 
-  // ─── Word lists by difficulty tier ───────────────
+  // ─── Inject styles ──────────────────────────────
+  Q.injectCSS('wordle',
+    '.wordle-grid{display:flex;flex-direction:column;gap:5px;margin:2px 0}' +
+    '.wordle-row{display:flex;gap:5px}' +
+    '.wordle-tile{width:clamp(42px,11.5vw,52px);height:clamp(42px,11.5vw,52px);border-radius:10px;background:var(--bg);border:2.5px solid var(--brown-mid);display:flex;align-items:center;justify-content:center;font-size:clamp(18px,5vw,22px);font-weight:900;color:var(--cream);transition:border-color .08s;perspective:250px}' +
+    '.wordle-tile.has-letter{border-color:var(--tan);animation:wtPop .08s ease}' +
+    '.wordle-tile.reveal-correct{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 3px 0 var(--green-dark)}' +
+    '.wordle-tile.reveal-present{background:var(--gold);border-color:var(--gold);color:#2a1800;box-shadow:0 3px 0 var(--gold-dark)}' +
+    '.wordle-tile.reveal-absent{background:var(--brown-mid);border-color:var(--brown-mid);color:var(--tan)}' +
+    '.wordle-tile.shake{animation:wtShake .4s ease}' +
+    '@keyframes wtPop{0%{transform:scale(1)}40%{transform:scale(1.14)}100%{transform:scale(1)}}' +
+    '@keyframes wtShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}' +
+    '.wordle-msg{font-size:13px;font-weight:800;color:var(--tan);min-height:18px;text-align:center;transition:color .2s}' +
+    '.wordle-msg.error{color:var(--red);animation:wtShake .3s ease}' +
+    '.wordle-msg.success{color:var(--green)}' +
+    '.wordle-kb{display:flex;flex-direction:column;gap:6px;width:100%;max-width:340px}' +
+    '.wordle-kb-row{display:flex;gap:5px;justify-content:center}' +
+    '.wk{height:44px;flex:1;min-width:0;max-width:36px;border:none;border-radius:8px;background:var(--brown-mid);color:var(--cream);font-family:"Nunito",sans-serif;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 rgba(0,0,0,.22);transition:background .25s,color .25s,box-shadow .25s;position:relative;overflow:hidden;user-select:none;-webkit-tap-highlight-color:transparent}' +
+    '.wk::before{content:"";position:absolute;top:0;left:0;right:0;height:45%;background:linear-gradient(180deg,rgba(255,255,255,.09)0%,transparent 100%);pointer-events:none}' +
+    '.wk:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.22)}' +
+    '.wk.wide{max-width:52px;font-size:11px}' +
+    '.wk.st-correct{background:var(--green);color:#fff;box-shadow:0 3px 0 var(--green-dark)}' +
+    '.wk.st-present{background:var(--gold);color:#2a1800;box-shadow:0 3px 0 var(--gold-dark)}' +
+    '.wk.st-absent{background:#2c1d0e;color:#6b4f32;box-shadow:0 2px 0 rgba(0,0,0,.15)}'
+  );
   const WORDS = {
     easy: [
       'BRAIN','LIGHT','SMART','THINK','QUICK','LEARN','POWER','DREAM','HEART','WORLD',
