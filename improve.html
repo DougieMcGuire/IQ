@@ -215,6 +215,174 @@
       transition: color 0.2s;
     }
 
+    /* ══════════════════════════════════════
+       BRANDING
+    ══════════════════════════════════════ */
+    .branding {
+      text-align: center; font-size: 11px; font-weight: 800;
+      color: var(--brown-mid); letter-spacing: 0.5px;
+      margin-top: 12px; opacity: 0.6;
+    }
+
+    /* ══════════════════════════════════════
+       MEMORY MATCH STYLES
+    ══════════════════════════════════════ */
+    .mem-grid { display: grid; gap: 6px; margin: 4px 0; justify-content: center; }
+    .mem-cols-3 { grid-template-columns: repeat(3, 1fr); width: clamp(160px, 45vw, 210px); }
+    .mem-cols-4 { grid-template-columns: repeat(4, 1fr); width: clamp(210px, 55vw, 280px); }
+    .mem-card {
+      aspect-ratio: 1; border: none; border-radius: 10px;
+      background: var(--brown-mid); cursor: pointer;
+      font-size: clamp(20px, 5.5vw, 28px);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+      transition: transform 0.3s, background 0.3s;
+      position: relative; user-select: none;
+    }
+    .mem-front, .mem-back { position: absolute; backface-visibility: hidden; }
+    .mem-front { color: var(--tan); font-weight: 900; font-size: 18px; }
+    .mem-back { opacity: 0; transition: opacity 0.2s; }
+    .mem-card.mem-flip .mem-front { opacity: 0; }
+    .mem-card.mem-flip .mem-back { opacity: 1; }
+    .mem-card.mem-flip { background: var(--bg); transform: scale(1.05); }
+    .mem-card.mem-matched { background: var(--green); box-shadow: 0 3px 0 var(--green-dark); animation: pop 0.4s ease; }
+    .mem-card.mem-matched .mem-back { opacity: 1; }
+    .mem-card.mem-matched .mem-front { opacity: 0; }
+    .mem-status { font-size: 13px; font-weight: 800; color: var(--tan); min-height: 18px; text-align: center; }
+
+    /* ══════════════════════════════════════
+       SIMON SAYS STYLES
+    ══════════════════════════════════════ */
+    .simon-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 8px; width: clamp(160px, 42vw, 200px); margin: 6px 0;
+    }
+    .simon-pad {
+      aspect-ratio: 1; border: none; border-radius: 16px;
+      cursor: pointer; opacity: 0.45;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+      transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+      user-select: none; -webkit-tap-highlight-color: transparent;
+    }
+    .simon-pad:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
+    .simon-pad.simon-lit { opacity: 1; box-shadow: 0 0 20px rgba(255,255,255,0.3); transform: scale(1.06); }
+    .simon-status { font-size: 14px; font-weight: 800; color: var(--tan); min-height: 20px; text-align: center; }
+    .simon-level { font-size: 12px; font-weight: 700; color: var(--brown-mid); text-align: center; }
+
+    /* ══════════════════════════════════════
+       REACTION TIME STYLES
+    ══════════════════════════════════════ */
+    .react-zone { display: flex; justify-content: center; margin: 8px 0; }
+    .react-circle {
+      width: clamp(120px, 32vw, 160px); height: clamp(120px, 32vw, 160px);
+      border-radius: 50%; background: var(--red);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 900; color: #fff;
+      cursor: pointer; user-select: none;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+      transition: background 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .react-circle:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0,0,0,0.2); }
+    .react-circle.react-go { background: var(--green); animation: pop 0.3s ease; }
+    .react-circle.react-fail { background: var(--red); }
+    .react-circle.react-success { background: var(--green); font-size: 28px; }
+    .react-circle.react-slow { background: var(--gold); color: #2a1800; font-size: 28px; }
+    .react-result { font-size: 14px; font-weight: 800; text-align: center; min-height: 20px; margin-top: 4px; }
+
+    /* ══════════════════════════════════════
+       WORD SCRAMBLE STYLES
+    ══════════════════════════════════════ */
+    .ws-hint { font-size: 12px; font-weight: 700; color: var(--gold); text-align: center; margin-bottom: 4px; }
+    .ws-answer, .ws-source { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; margin: 6px 0; }
+    .ws-tile {
+      width: clamp(36px, 9vw, 44px); height: clamp(36px, 9vw, 44px);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: clamp(16px, 4.5vw, 20px); font-weight: 900; font-family: 'Nunito', sans-serif;
+      user-select: none;
+    }
+    .ws-src {
+      background: var(--brown-mid); color: var(--cream); border: none; cursor: pointer;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.2); transition: transform 0.1s, opacity 0.2s;
+    }
+    .ws-src:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.2); }
+    .ws-src.ws-used { opacity: 0.25; pointer-events: none; }
+    .ws-slot { background: var(--bg); color: var(--cream); border: 2.5px dashed var(--brown-mid); }
+    .ws-slot.ws-filled { border-style: solid; border-color: var(--tan); cursor: pointer; }
+    .ws-slot.ws-correct { border-color: var(--green); background: var(--green); color: #fff; animation: pop 0.3s ease; }
+    .ws-status { font-size: 13px; font-weight: 800; text-align: center; min-height: 18px; }
+    .ws-shake { animation: wtShake 0.4s ease; }
+
+    /* ══════════════════════════════════════
+       SLIDE PUZZLE STYLES
+    ══════════════════════════════════════ */
+    .slide-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 4px; width: clamp(150px, 40vw, 195px); margin: 4px 0;
+    }
+    .slide-cell {
+      aspect-ratio: 1; border: none; border-radius: 10px;
+      background: var(--brown-mid); color: var(--cream);
+      font-family: 'Nunito', sans-serif; font-size: clamp(22px, 6vw, 30px); font-weight: 900;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+      transition: transform 0.12s, background 0.15s;
+    }
+    .slide-cell:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
+    .slide-empty { background: transparent; box-shadow: none; cursor: default; }
+    .slide-cell.slide-win { background: var(--green); color: #fff; box-shadow: 0 3px 0 var(--green-dark); animation: pop 0.4s ease; }
+    .slide-moves { font-size: 13px; font-weight: 800; color: var(--tan); text-align: center; min-height: 18px; }
+
+    /* ══════════════════════════════════════
+       COLOR SORT STYLES
+    ══════════════════════════════════════ */
+    .csort-pool { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin: 6px 0; }
+    .csort-tile {
+      width: clamp(42px, 11vw, 52px); height: clamp(42px, 11vw, 52px);
+      border-radius: 10px; border: none; cursor: pointer;
+      font-size: 10px; font-weight: 800; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+      transition: transform 0.1s, opacity 0.2s;
+      font-family: 'Nunito', sans-serif;
+    }
+    .csort-tile:active { transform: translateY(2px); }
+    .csort-tile.csort-used { opacity: 0.2; pointer-events: none; }
+    .csort-placed { display: flex; gap: 4px; justify-content: center; margin: 4px 0; min-height: 36px; }
+    .csort-placed-tile {
+      width: clamp(30px, 8vw, 38px); height: clamp(30px, 8vw, 38px);
+      border-radius: 8px; animation: pop 0.25s ease;
+    }
+    .csort-status { font-size: 13px; font-weight: 800; text-align: center; min-height: 18px; color: var(--tan); }
+
+    /* ══════════════════════════════════════
+       MATH RUSH STYLES
+    ══════════════════════════════════════ */
+    .mr-eq {
+      font-size: clamp(22px, 6vw, 30px); font-weight: 900;
+      color: var(--cream); text-align: center; min-height: 40px;
+      padding: 8px; border-radius: 12px; transition: background 0.2s, color 0.2s;
+    }
+    .mr-eq.mr-correct { background: var(--green); color: #fff; }
+    .mr-eq.mr-wrong { background: var(--red); color: #fff; }
+    .mr-timer { font-size: 16px; font-weight: 800; text-align: center; color: var(--cream); min-height: 22px; }
+    .mr-btns { display: flex; gap: 10px; justify-content: center; margin: 8px 0; }
+    .mr-btn {
+      flex: 1; max-width: 140px; height: 48px;
+      border: none; border-radius: 12px; cursor: pointer;
+      font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 900;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.2); transition: transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .mr-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
+    .mr-true { background: var(--green); color: #fff; }
+    .mr-false { background: var(--red); color: #fff; }
+    .mr-score { font-size: 14px; font-weight: 800; color: var(--tan); text-align: center; }
+    .mr-progress { display: flex; gap: 6px; justify-content: center; margin: 4px 0; }
+    .mr-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--brown-mid); }
+    .mr-dot-active { background: var(--gold); }
+    .mr-dot-done { background: var(--green); }
+
     /* ── Overlays ── */
     .streak-popup { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(58,41,24,0.85); z-index:200; opacity:0; pointer-events:none; transition:opacity 0.3s; }
     .streak-popup.show { opacity:1; }
@@ -422,6 +590,13 @@
 <script src="games/riddle.js"></script>
 <script src="games/codeBreak.js"></script>
 <script src="games/logic.js"></script>
+<script src="games/memory.js"></script>
+<script src="games/simon.js"></script>
+<script src="games/reaction.js"></script>
+<script src="games/wordScramble.js"></script>
+<script src="games/slidePuzzle.js"></script>
+<script src="games/colorSort.js"></script>
+<script src="games/mathRush.js"></script>
 
 <script type="module">
   import { IQData, getEncouragement } from './data.js';
@@ -626,6 +801,7 @@
         </div>
         <div class="feedback" id="fb-${idx}"></div>
         <div class="explain"  id="exp-${idx}">${q.explanation}</div>
+        <div class="branding">braindeer.org</div>
       </div>
       <div class="scroll-hint" id="hint-${idx}">
         <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
