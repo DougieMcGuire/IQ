@@ -1,0 +1,33 @@
+// games/codeBreak.js — Code Breaker puzzles
+(function () {
+
+  Q.register('codeBreak', function () {
+    var items = [
+      { q:'If A=1, B=2, C=3, what is A+B+C?', a:'6', w:['3','9','5'], why:'1+2+3=6', d:0.7 },
+      { q:'If N+N=10, what is N?', a:'5', w:['10','4','6'], why:'2N=10, N=5', d:0.7 },
+      { q:'If X × X = 25, what is X?', a:'5', w:['4','6','25'], why:'5×5=25', d:0.7 },
+      { q:'If P × 3 = 18, what is P?', a:'6', w:['3','9','18'], why:'18/3=6', d:0.7 },
+      { q:'If X/2 = 7, what is X?', a:'14', w:['7','9','12'], why:'X=7×2=14', d:0.7 },
+      { q:'If A=1, B=2... what is Z?', a:'26', w:['24','25','28'], why:'Z is the 26th letter.', d:0.8 },
+      { q:'If X=5 and Y=3, what is X+Y+X?', a:'13', w:['11','8','15'], why:'5+3+5=13', d:0.9 },
+      { q:'If A=1, B=2... what is D+E?', a:'9', w:['7','8','10'], why:'D=4, E=5. 4+5=9', d:0.9 },
+      { q:'If M=4, what is M×M−M?', a:'12', w:['8','16','0'], why:'16-4=12', d:1.0 },
+      { q:'If 2X − 3 = 7, what is X?', a:'5', w:['4','6','7'], why:'2X=10, X=5', d:1.0 },
+      { q:'If A=2, B=4, C=6... what is E?', a:'10', w:['8','12','5'], why:'Each letter=position×2. E=5th=10.', d:1.1 },
+      { q:'If N×N×N = 27, what is N?', a:'3', w:['9','6','4'], why:'3×3×3=27', d:1.0 },
+      { q:'If X+X+X+X = 48, what is X?', a:'12', w:['8','16','24'], why:'4X=48, X=12', d:1.0 },
+      { q:'If X²=Y and Y=81, what is X?', a:'9', w:['8','10','27'], why:'X²=81, X=9', d:1.2 },
+      { q:'If 3X + 2Y = 20 and X=4, what is Y?', a:'4', w:['2','6','8'], why:'12+2Y=20, 2Y=8, Y=4', d:1.4 },
+      { q:'STAR=58 (each letter = alphabet position). What does DOG equal?', a:'26', w:['30','22','29'], why:'D=4, O=15, G=7. 4+15+7=26', d:1.5 },
+      { q:'If RED=27, GREEN=49, what is BLUE?', a:'40', w:['35','45','38'], why:'B+L+U+E = 2+12+21+5 = 40', d:1.7 },
+      { q:'If A=1, B=2... what is the product of the first 4 letters?', a:'24', w:['10','12','48'], why:'1×2×3×4=24', d:1.3 },
+    ];
+    var i = Q.pick(items);
+    return {
+      type:'codeBreak', category:'problemSolving', categoryLabel:'Code Breaker',
+      difficulty:i.d||1.2, question:i.q, answer:i.a,
+      options:Q.shuffle([i.a].concat(i.w)), explanation:i.why, visual:'text'
+    };
+  }, 3);
+
+})();
