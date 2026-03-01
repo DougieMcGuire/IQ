@@ -92,17 +92,6 @@ var Q = {
 
   hash(q) { return q.type + ':' + q.question.slice(0, 50) + (q.sequence || []).join(''); },
 
-  // ─── CSS injection (game plugins call this to add their styles) ──
-  _injectedCSS: {},
-  injectCSS(name, css) {
-    if (this._injectedCSS[name]) return; // only inject once
-    var style = document.createElement('style');
-    style.setAttribute('data-game', name);
-    style.textContent = css;
-    document.head.appendChild(style);
-    this._injectedCSS[name] = true;
-  },
-
   // ─── Difficulty helpers ──────────────────────────
   getTargetDifficulty(iq) {
     if (iq < 85)  return 0.6;
