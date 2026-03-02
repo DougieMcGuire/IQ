@@ -14,8 +14,11 @@
     render: function (q, idx) {
       return '<div class="qcard">' +
         '<div class="category">⚡ Reaction Time</div>' +
-        '<div class="question">' + q.question + '</div>' +
-        '<div class="react-zone" id="react-zone-' + idx + '">' +
+        '<div class="question">Tap GREEN as fast as you can!</div>' +
+        '<div id="react-ready-wrap-' + idx + '" style="display:flex;justify-content:center;margin:16px 0;">' +
+          '<button id="react-ready-' + idx + '" style="background:var(--gold);color:#2a1800;border:none;border-radius:14px;padding:14px 36px;font-family:Nunito,sans-serif;font-size:18px;font-weight:900;cursor:pointer;box-shadow:0 4px 0 var(--gold-dark);">Tap to Start!</button>' +
+        '</div>' +
+        '<div class="react-zone" id="react-zone-' + idx + '" style="display:none;">' +
           '<div class="react-circle" id="react-circle-' + idx + '">Wait...</div>' +
         '</div>' +
         '<div class="react-result" id="react-result-' + idx + '"></div>' +
@@ -24,30 +27,38 @@
         '</div>';
     },
     attach: function (slideEl, q, idx, ctx) {
-      var circle = slideEl.querySelector('#react-circle-' + idx);
-      var result = slideEl.querySelector('#react-result-' + idx);
+      var readyWrap = slideEl.querySelector('#react-ready-wrap-' + idx);
+      var readyBtn  = slideEl.querySelector('#react-ready-' + idx);
+      var zone      = slideEl.querySelector('#react-zone-' + idx);
+      var circle    = slideEl.querySelector('#react-circle-' + idx);
+      var result    = slideEl.querySelector('#react-result-' + idx);
       if (!circle) return;
 
-      var state = 'waiting'; // waiting → ready → go → done
+      var state = 'idle';
       var goTime = 0;
       var timer = null;
       var done = false;
 
-      // Random delay 1.5-4s before turning green
-      var delay = 1500 + Math.random() * 2500;
-      timer = setTimeout(function () {
-        if (done) return;
-        state = 'go';
-        goTime = Date.now();
-        circle.classList.add('react-go');
-        circle.textContent = 'TAP!';
-      }, delay);
+      readyBtn.addEventListener('click', function () {
+        readyWrap.style.display = 'none';
+        zone.style.display = 'flex';
+        state = 'waiting';
+        ctx.answerStartRef.set(Date.now());
+
+        var delay = 1500 + Math.random() * 2500;
+        timer = setTimeout(function () {
+          if (done) return;
+          state = 'go';
+          goTime = Date.now();
+          circle.classList.add('react-go');
+          circle.textContent = 'TAP!';
+        }, delay);
+      });
 
       circle.addEventListener('click', function () {
-        if (done) return;
+        if (done || state === 'idle') return;
 
-        if (state === 'waiting' || state === 'ready') {
-          // Too early!
+        if (state === 'waiting') {
           done = true;
           clearTimeout(timer);
           circle.classList.add('react-fail');
