@@ -1,11 +1,6 @@
-// ═══════════════════════════════════════════════════
 // games/wordle.js — Wordle question type plugin
-// Self-registers with Q (questions.js must be loaded first)
-// ═══════════════════════════════════════════════════
-
 (function () {
 
-  // ─── Word lists by difficulty tier ───────────────
   const WORDS = {
     easy: [
       'BRAIN','LIGHT','SMART','THINK','QUICK','LEARN','POWER','DREAM','HEART','WORLD',
@@ -23,7 +18,7 @@
       'CHANT','DEPOT','EVOKE','GUSTO','HEIST','INEPT','JUMPY','KNAVE','LODGE','MERIT',
       'NEXUS','ONSET','PARCH','QUELL','RISKY','SCALP','TAUNT','UNFIT','VENOM','WRATH',
       'YEARN','ZESTY','BLAZE','CHORD','DECOY','ENVOY','FROTH','GRAFT','HASTY','INFER',
-      'LIBEL','MAXIM','NIFTY','PLAIT','QUASH','REALM','SCORN','THWAT','VIVID','WHIFF',
+      'LIBEL','MAXIM','NIFTY','PLAIT','QUASH','REALM','SCORN','VIVID','WHIFF',
     ],
     hard: [
       'GLYPH','TRYST','CRYPT','PYGMY','GYPSY','BORAX','CYNIC','EPOXY','FJORD','GHOUL',
@@ -31,12 +26,12 @@
       'AXIOM','BUSHY','CHIMP','DUCHY','ELFIN','FETID','GAUZE','HUSKY','IGLOO','JUICY',
       'KITTY','LUSTY','MURKY','NUTTY','OUGHT','PERKY','QUALM','RUSTY','SAVVY','TAWNY',
       'VERVE','WITTY','FIZZY','GAUDY','HIPPO','IMPLY','JUMBO','KNOLL','LYRIC','NADIR',
-      'OVULE','PIXEL','QUASAR','RABID','SCOFF','TWIXT','UNZIP','VEXED','WIZEN','EXPEL',
+      'OVULE','PIXEL','RABID','SCOFF','UNZIP','VEXED','WIZEN','EXPEL',
     ],
   };
 
-  const TIERS  = ['easy', 'medium', 'hard'];
-  const DIFFS  = [0.8, 1.2, 1.7];
+  const TIERS = ['easy', 'medium', 'hard'];
+  const DIFFS = [0.8, 1.2, 1.7];
 
   const KB_ROWS = [
     ['Q','W','E','R','T','Y','U','I','O','P'],
@@ -44,7 +39,102 @@
     ['ENTER','Z','X','C','V','B','N','M','⌫'],
   ];
 
-  // ─── 1. Register the generator ──────────────────
+  // All valid guess words — answer words plus a broad common-word list
+  const VALID_WORDS = new Set([
+    // Answer words
+    'BRAIN','LIGHT','SMART','THINK','QUICK','LEARN','POWER','DREAM','HEART','WORLD',
+    'SHARP','FOCUS','ALERT','GRASP','CLEAR','DEPTH','RAISE','SCORE','STAGE','TRACE',
+    'VALUE','WATCH','PLACE','SPACE','VOICE','BLEND','BRAVE','CATCH','DANCE','EARLY',
+    'GIANT','HAPPY','JUDGE','LARGE','NIGHT','OCEAN','PAINT','REACH','SOLAR','TIRED',
+    'WATER','YOUNG','AFTER','CLOSE','DAILY','EARTH','FIRST','HOUSE','MAGIC','ORDER',
+    'STORM','TOWER','FORCE','GRADE','LUNCH','MAYOR','NURSE','PILOT','RIVER','SIGHT',
+    'TRAIN','ULTRA','VALID','WHEAT','EXTRA','FLAIR','GLOBE','HUMOR','INPUT','JOINT',
+    'FLINT','CRISP','KNACK','GRACE','PROXY','PLUMB','SWEPT','CLUMP','BRISK','CIVIC',
+    'DWARF','EXPEL','FROZE','GRUMP','HATCH','JOUST','KNEEL','LATCH','MOURN','NOTCH',
+    'PERCH','QUIRK','REVEL','SNOWY','THEFT','VOUCH','WALTZ','YACHT','ABHOR','BLUNT',
+    'CHANT','DEPOT','EVOKE','GUSTO','HEIST','INEPT','JUMPY','KNAVE','LODGE','MERIT',
+    'NEXUS','ONSET','PARCH','QUELL','RISKY','SCALP','TAUNT','UNFIT','VENOM','WRATH',
+    'YEARN','ZESTY','BLAZE','CHORD','DECOY','ENVOY','FROTH','GRAFT','HASTY','INFER',
+    'LIBEL','MAXIM','NIFTY','PLAIT','QUASH','REALM','SCORN','VIVID','WHIFF',
+    'GLYPH','TRYST','CRYPT','PYGMY','GYPSY','BORAX','CYNIC','EPOXY','FJORD','GHOUL',
+    'ICHOR','KUDZU','MYRRH','NYMPH','OKAPI','PSYCH','QUAFF','SYNTH','TABBY','ULCER',
+    'AXIOM','BUSHY','CHIMP','DUCHY','ELFIN','FETID','GAUZE','HUSKY','IGLOO','JUICY',
+    'KITTY','LUSTY','MURKY','NUTTY','OUGHT','PERKY','QUALM','RUSTY','SAVVY','TAWNY',
+    'VERVE','WITTY','FIZZY','GAUDY','HIPPO','IMPLY','JUMBO','KNOLL','LYRIC','NADIR',
+    'OVULE','PIXEL','RABID','SCOFF','UNZIP','VEXED','WIZEN',
+    // Common 5-letter words for guessing
+    'ABOUT','ABOVE','ABUSE','ACTOR','ACUTE','ADMIT','ADOPT','ADULT','AGAIN','AGENT',
+    'AGREE','AHEAD','ALARM','ALBUM','ALIBI','ALIEN','ALIGN','ALIKE','ALIVE','ALLEY',
+    'ALLOW','ALONE','ALONG','ALTER','ANGEL','ANGER','ANGLE','ANGRY','ANIME','ANKLE',
+    'ANNEX','ANNOY','ANVIL','AORTA','APPLE','APPLY','APRON','ARENA','ARGUE','ARISE',
+    'ARMOR','AROMA','AROSE','ARRAY','ARROW','ARSON','ASIDE','ATLAS','ATTIC','AUDIO',
+    'AUDIT','AVOID','AWARD','AWARE','AWFUL','BADLY','BAKER','BASIC','BASIS','BATCH',
+    'BATHE','BEACH','BEARD','BEAST','BEGAN','BEGIN','BEING','BELOW','BENCH','BERRY',
+    'BIBLE','BIRTH','BLACK','BLADE','BLAME','BLAND','BLANK','BLAST','BLEED','BLESS',
+    'BLIND','BLOCK','BLOOD','BLOOM','BLOWN','BOARD','BOAST','BONUS','BOOST','BOOTH',
+    'BOUND','BOXER','BRAND','BRASS','BREAK','BREED','BRICK','BRIDE','BRIEF','BRING',
+    'BROAD','BROKE','BROOD','BROOK','BROWN','BRUSH','BUDDY','BUILD','BUILT','BUNCH',
+    'BURST','BUYER','CABIN','CABLE','CAMEL','CANDY','CARGO','CARRY','CAUSE','CEASE',
+    'CHAIR','CHALK','CHAOS','CHARM','CHART','CHASE','CHEAP','CHECK','CHEEK','CHEER',
+    'CHESS','CHEST','CHIEF','CHILD','CHOIR','CLAIM','CLAMP','CLASH','CLASS','CLEAN',
+    'CLERK','CLICK','CLIFF','CLOCK','CLONE','CLOTH','CLOUD','CLOWN','COACH','COAST',
+    'COLOR','COMIC','COMMA','CONCH','CORAL','COUCH','COULD','COUNT','COURT','COVER',
+    'CRACK','CRAFT','CRANE','CRASH','CRAWL','CREAM','CREEK','CRIME','CROSS','CROWD',
+    'CROWN','CRUSH','CRUST','CURVE','CYCLE','DAIRY','DAISY','DEATH','DECAY','DECRY',
+    'DELAY','DELTA','DENSE','DERBY','DEVIL','DIRTY','DISCO','DITCH','DIVER','DIZZY',
+    'DOING','DONOR','DOUBT','DOUGH','DOWRY','DRAFT','DRAIN','DRAMA','DRAWL','DRINK',
+    'DRIVE','DROVE','DRUGS','DRYER','DUNCE','EAGER','EIGHT','ELECT','ELITE','EMAIL',
+    'EMBER','EMPTY','ENEMY','ENJOY','ENTER','ENTRY','EQUAL','ERROR','ESSAY','EVENT',
+    'EVERY','EXACT','EXIST','FABLE','FAINT','FAIRY','FAITH','FALSE','FANCY','FATAL',
+    'FAULT','FEAST','FENCE','FERRY','FEVER','FEWER','FIERY','FIGHT','FILED','FINAL',
+    'FIXED','FLARE','FLASH','FLASK','FLEET','FLESH','FLOCK','FLOOD','FLOOR','FLOUR',
+    'FLUID','FLUKE','FLUSH','FORGE','FORTH','FORUM','FOUND','FREED','FRESH','FRONT',
+    'FROST','FRUIT','FULLY','FUNNY','GAVEL','GHOST','GIVEN','GLAND','GLARE','GLEAM',
+    'GLOOM','GLORY','GLOSS','GLOVE','GOING','GRAIN','GRAND','GRANT','GRASS','GRAVE',
+    'GRAZE','GREAT','GREED','GREEN','GRIEF','GRILL','GRIND','GROAN','GROIN','GROUP',
+    'GROVE','GROWL','GROWN','GUARD','GUESS','GUEST','GUIDE','GUILD','GUILE','GUILT',
+    'GUISE','HABIT','HARSH','HASTE','HAVEN','HEARD','HEAVY','HERTZ','HINGE','HINTS',
+    'HOLLY','HONEY','HONOR','HOPED','HORSE','HOTEL','HOUND','HUMAN','HURRY','HYDRA',
+    'IDEAL','IDIOM','IDIOT','IMAGE','INDEX','INNER','INTER','INTRO','IRONY','ISSUE',
+    'IVORY','JAPAN','JEWEL','KARMA','KNIFE','KNOCK','KNOWN','LABEL','LANCE','LASER',
+    'LATER','LAUGH','LAYER','LEASE','LEAVE','LEGAL','LEVEL','LINEN','LIVER','LOCAL',
+    'LOGIC','LOOSE','LOUSE','LOWER','LUCKY','LUNAR','LYING','MAJOR','MAKER','MANOR',
+    'MAPLE','MARCH','MARSH','MATCH','MAYBE','MEDIA','MERCY','MERGE','METAL','MIGHT',
+    'MINCE','MINOR','MINUS','MIXED','MODEL','MONEY','MONTH','MORAL','MOUSE','MOUTH',
+    'MOVED','MOVIE','MUDDY','MUSIC','NAIVE','NERVE','NEVER','NOBLE','NOISE','NORTH',
+    'NOVEL','OCCUR','OFFER','OFTEN','OLIVE','OPERA','ORBIT','OTHER','OUTER','OWNER',
+    'OXIDE','OZONE','PANEL','PANIC','PAPER','PARTY','PATCH','PAUSE','PEACE','PEACH',
+    'PEARL','PEDAL','PHOTO','PIANO','PIECE','PITCH','PLAIN','PLANE','PLANK','PLANT',
+    'PLATE','PLAZA','PLEAD','PLUCK','PLUME','PLUNK','POINT','POKER','POLAR','POUND',
+    'PRESS','PRICE','PRIDE','PRIME','PRINT','PRIZE','PROBE','PROOF','PROSE','PROUD',
+    'PROVE','PUNCH','QUERY','QUEST','QUEUE','QUIET','QUOTA','QUOTE','RADAR','RADIO',
+    'RALLY','RANCH','RANGE','RAPID','RATIO','READY','REBUS','RECAP','REFER','REIGN',
+    'RELAX','RELAY','REMIX','RENAL','RENEW','REPAY','REPEL','REPLY','RESET','RESIN',
+    'RHINO','RIDGE','RIGHT','RIVAL','ROBOT','ROCKY','ROMAN','ROUGE','ROUGH','ROUND',
+    'ROYAL','RUGBY','RULER','RUNNY','SADLY','SALAD','SAUCE','SCALE','SCARE','SCENE',
+    'SCONE','SCOPE','SEDAN','SEIZE','SENSE','SERVE','SETUP','SEVEN','SHADE','SHAKE',
+    'SHALL','SHAME','SHAPE','SHARE','SHARK','SHEER','SHELF','SHELL','SHIFT','SHINE',
+    'SHIRT','SHOCK','SHORE','SHORT','SHOUT','SHOVE','SHRUG','SILLY','SINCE','SIXTH',
+    'SIXTY','SKILL','SKULL','SLACK','SLANT','SLAVE','SLEEK','SLEEP','SLEET','SLIDE',
+    'SLOPE','SLOTH','SMELL','SMILE','SMIRK','SMOKE','SNACK','SNAIL','SNAKE','SOLVE',
+    'SORRY','SOUTH','SPARK','SPEAK','SPEED','SPELL','SPILL','SPINE','SPOKE','SPOON',
+    'SPORT','STAFF','STAIN','STAKE','STALE','STALL','STAMP','STAND','STARE','START',
+    'STATE','STEAL','STEAM','STEEL','STEEP','STEER','STERN','STICK','STIFF','STILL',
+    'STOCK','STOMP','STONE','STOOD','STORE','STRAP','STRAW','STRAY','STRIP','STUCK',
+    'STUDY','STYLE','SUGAR','SUITE','SUNNY','SUPER','SURGE','SWAMP','SWEAR','SWEAT',
+    'SWEEP','SWEET','SWIFT','SWIPE','SWIRL','SWOOP','SWORD','TABLE','TAKEN','TASTE',
+    'TEACH','TENSE','THEIR','THEME','THERE','THESE','THICK','THING','THORN','THOSE',
+    'THREE','THREW','THROW','THUMB','TIGER','TIGHT','TITLE','TODAY','TONIC','TORCH',
+    'TOTAL','TOUCH','TOUGH','TOWEL','TRACK','TRADE','TRAIL','TRAIT','TRAMP','TRASH',
+    'TREAD','TREAT','TREND','TRIAL','TRIBE','TRICK','TRIED','TROOP','TROVE','TRUCK',
+    'TRULY','TRUNK','TRUST','TRUTH','TUMOR','TWIRL','TWIST','TYING','UNCLE','UNDER',
+    'UNIFY','UNION','UNITY','UPPER','UPSET','URBAN','USAGE','USHER','UTTER','VAGUE',
+    'VALVE','VAULT','VERSE','VIDEO','VIGOR','VIRAL','VIRUS','VISIT','VISTA','VOCAL',
+    'VOTER','VYING','WAIST','WEAVE','WEIGH','WEIRD','WHALE','WHERE','WHILE','WHITE',
+    'WHOLE','WHOSE','WIELD','WITCH','WOMAN','WOMEN','WOODS','WORRY','WORSE','WORST',
+    'WRIST','WROTE','YIELD','YOURS','YOUTH','ZEBRA','ZONED',
+  ]);
+
   Q.register('wordle', function () {
     const tier = this.rand(0, 2);
     const word = this.pick(WORDS[TIERS[tier]]);
@@ -62,12 +152,9 @@
     };
   }, 4);
 
-  // ─── 2. Register the custom renderer ────────────
   Q.registerRenderer('wordle', {
 
-    // Build the card HTML (grid + keyboard)
     render: function (q, idx) {
-      // 6×5 grid
       var gridHTML = '';
       for (var r = 0; r < 6; r++) {
         var rowHTML = '';
@@ -77,7 +164,6 @@
         gridHTML += '<div class="wordle-row">' + rowHTML + '</div>';
       }
 
-      // custom keyboard
       var kbHTML = KB_ROWS.map(function (row) {
         var keys = row.map(function (k) {
           var wide = (k === 'ENTER' || k === '⌫') ? ' wide' : '';
@@ -100,7 +186,6 @@
       '</div>';
     },
 
-    // Attach interactive logic after DOM insert
     attach: function (slideEl, q, idx, ctx) {
       var feed      = ctx.feed;
       var flashEl   = ctx.flashEl;
@@ -110,7 +195,6 @@
       var spawnConfetti  = ctx.spawnConfetti;
       var answerStartRef = ctx.answerStartRef;
 
-      // Per-card mutable state
       var st = {
         answer:    q.answer,
         category:  q.category,
@@ -121,14 +205,12 @@
         keyColors: {},
       };
 
-      // ── tap on custom keyboard ──
       slideEl.addEventListener('click', function (e) {
         var btn = e.target.closest('[data-wk]');
         if (!btn || +btn.dataset.wi !== idx) return;
         handleKey(btn.dataset.wk);
       });
 
-      // ── physical keyboard (only when this slide is visible) ──
       document.addEventListener('keydown', function (e) {
         if (st.done) return;
         var visIdx = Math.round(feed.scrollTop / (feed.clientHeight || 1));
@@ -138,7 +220,6 @@
         else if (/^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toUpperCase());
       });
 
-      // ── key handler ──
       function handleKey(key) {
         if (st.done) return;
         var msgEl = document.getElementById('wm-' + idx);
@@ -158,11 +239,16 @@
             shakeRow(st.guesses.length);
             return;
           }
+          if (!VALID_WORDS.has(st.current)) {
+            msgEl.className = 'wordle-msg error';
+            msgEl.textContent = 'Not a valid word!';
+            shakeRow(st.guesses.length);
+            return;
+          }
           submitGuess();
           return;
         }
 
-        // letter
         if (st.current.length < 5) {
           st.current += key;
           updateCurrentRow();
@@ -171,7 +257,6 @@
         }
       }
 
-      // ── live tile update ──
       function updateCurrentRow() {
         var row = st.guesses.length;
         for (var c = 0; c < 5; c++) {
@@ -194,7 +279,6 @@
         }
       }
 
-      // ── score a guess ──
       function scoreGuess(guess, answer) {
         var res  = [null,null,null,null,null];
         var pool = answer.split('');
@@ -211,7 +295,6 @@
         return res;
       }
 
-      // ── submit + animate ──
       function submitGuess() {
         var guess  = st.current;
         var result = scoreGuess(guess, st.answer);
@@ -228,11 +311,9 @@
             var tile = document.getElementById('wt-' + idx + '-' + row + '-' + col);
             if (!tile) return;
             var delay = col * STAGGER;
-
             setTimeout(function () {
               tile.style.transition = 'transform ' + FLIP_HALF + 'ms ease-in';
               tile.style.transform  = 'rotateX(-90deg)';
-
               setTimeout(function () {
                 tile.textContent = guess[col];
                 tile.className   = 'wordle-tile reveal-' + result[col];
@@ -252,7 +333,6 @@
         }, allDone);
       }
 
-      // ── keyboard colour update ──
       function updateKeyboard(guess, result) {
         var priority = { correct: 3, present: 2, absent: 1 };
         for (var i = 0; i < 5; i++) {
@@ -270,15 +350,14 @@
         });
       }
 
-      // ── win / lose ──
       function finishWordle(won) {
         st.done = true;
         var msgEl  = document.getElementById('wm-' + idx);
         var expEl  = document.getElementById('exp-' + idx);
         var hintEl = document.getElementById('hint-' + idx);
 
-        var ms     = Date.now() - answerStartRef.get();
-        var data   = IQData.recordAnswer(st.category, won, st.difficulty, ms);
+        var ms   = Date.now() - answerStartRef.get();
+        var data = IQData.recordAnswer(st.category, won, st.difficulty, ms);
 
         if (won) {
           var byGuess = ['Ace! 🎯','Brilliant! 🧠','Nailed it! ⚡','Great! 🔥','Nice! 💡','Phew! 😅'];
@@ -303,7 +382,6 @@
         setTimeout(function () { if (hintEl) hintEl.classList.add('show'); }, 500);
         updateUI(data);
 
-        // streak milestone popup
         if (won && data.streak > 0 && data.streak % 5 === 0) {
           setTimeout(function () {
             var streakNum   = document.getElementById('streak-num');
