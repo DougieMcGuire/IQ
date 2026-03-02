@@ -232,25 +232,43 @@
   const db   = getFirestore(app);
   const gp   = new GoogleAuthProvider();
 
-  // Detect PWA / iOS standalone environment — use redirect instead of popup
-  const isPWA = window.matchMedia('(display-mode: standalone)').matches
-             || (navigator.standalone === true)
-             || window.location.search.includes('pwa=1');
+  // Detect standalone iOS PWA — navigator.standalone is true when added to home screen
+  const isStandaloneIOS = (navigator.standalone === true);
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches || isStandaloneIOS;
 
-  // ── Handle redirect result on page load (PWA Google sign-in) ──
-  getRedirectResult(auth).then(async result => {
-    if (result && result.user) {
-      await ensure(result.user);
-      navigate();
-    }
-  }).catch(e => {
-    if (e.code !== 'auth/popup-closed-by-user') showErr(fe(e.code));
-  });
+  // ── Handle redirect result on page load (non-iOS PWA Google sign-in) ──
+  if (!isStandaloneIOS) {
+    getRedirectResult(auth).then(async result => {
+      if (result && result.user) {
+        await ensure(result.user);
+        navigate();
+      }
+    }).catch(e => {
+      if (e.code !== 'auth/popup-closed-by-user') showErr(fe(e.code));
+    });
+  }
 
   // ── Already signed in? ──
   onAuthStateChanged(auth, u => {
     if (u) navigate();
   });
+
+  // ── Poll for auth state (used after new-tab Google sign-in on iOS standalone) ──
+  let pollInterval = null;
+  function startPolling() {
+    if (pollInterval) return;
+    pollInterval = setInterval(() => {
+      const u = auth.currentUser;
+      if (u) {
+        clearInterval(pollInterval);
+        ensure(u).then(navigate);
+      }
+    }, 800);
+  }
+  function stopPolling() {
+    clearInterval(pollInterval);
+    pollInterval = null;
+  }
 
   function navigate() {
     if (window.parent && window.parent !== window && typeof window.parent.goTo === 'function') {
@@ -324,21 +342,39 @@
   }
 
   // ── Google sign-in ──
-  // Uses redirect on PWA/iOS (no popup blocker issues), popup elsewhere
   window.signInWithGoogle = async function() {
     clr();
     setLoading('btn-google', true);
     try {
-      if (isPWA) {
-        // redirect flow — page will reload, handled by getRedirectResult above
+      if (isStandaloneIOS) {
+        // iOS standalone can't do popups OR redirects (both break).
+        // Open a normal Safari tab — it CAN complete OAuth — then poll for the result.
+        const authUrl = `https://braindeer-backend.firebaseapp.com/__/auth/handler?providerId=google.com&signInMethod=signInWithRedirect&returnSecureToken=true`;
+        // Simpler: just open the Google sign-in page through Firebase's own hosted UI
+        // via a dedicated lightweight page. Best working pattern: open in new tab,
+        // user signs in there, comes back, onAuthStateChanged fires.
+        const newTab = window.open(
+          `https://braindeer.org/google-signin.html`,
+          '_blank'
+        );
+        // Start polling — when the tab completes sign-in, Firebase persists the
+        // session in IndexedDB which is shared across tabs on the same origin.
+        startPolling();
+        // Show a helpful message
+        showOk('Sign-in opened in Safari. Come back here after signing in!');
+        setLoading('btn-google', false);
+      } else if (isPWA) {
+        // Non-iOS PWA: use redirect
         await signInWithRedirect(auth, gp);
       } else {
+        // Regular browser: popup
         const result = await signInWithPopup(auth, gp);
         await ensure(result.user);
         navigate();
       }
     } catch (e) {
       setLoading('btn-google', false);
+      stopPolling();
       if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
         showErr(fe(e.code));
       }
