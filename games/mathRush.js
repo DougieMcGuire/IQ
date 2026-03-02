@@ -2,7 +2,6 @@
 (function () {
 
   Q.register('mathRush', function () {
-    // Generate 5 equations, some true, some false
     var eqs = [];
     for (var i = 0; i < 5; i++) {
       var a = Q.rand(2, 20), b = Q.rand(2, 20);
@@ -13,7 +12,7 @@
       else real = a * b;
       var isTrue = Math.random() > 0.4;
       var shown = isTrue ? real : real + (Q.rand(0,1) ? Q.rand(1,5) : -Q.rand(1,5));
-      if (shown === real) isTrue = true; // edge case
+      if (shown === real) isTrue = true;
       eqs.push({ text: a + ' ' + op + ' ' + b + ' = ' + shown, correct: isTrue });
     }
     return {
@@ -31,39 +30,49 @@
         '<div class="category">🏃 Math Rush</div>' +
         '<div class="question">True or False?</div>' +
         '<div class="mr-timer" id="mr-timer-' + idx + '"></div>' +
-        '<div class="mr-eq" id="mr-eq-' + idx + '"></div>' +
-        '<div class="mr-btns" id="mr-btns-' + idx + '">' +
-          '<button class="mr-btn mr-true" data-ri="' + idx + '" data-rv="true">✓ True</button>' +
-          '<button class="mr-btn mr-false" data-ri="' + idx + '" data-rv="false">✗ False</button>' +
+        '<div class="mr-eq" id="mr-eq-' + idx + '">Get ready...</div>' +
+        '<div class="mr-btns" id="mr-btns-' + idx + '" style="display:none">' +
+          '<button class="mr-btn mr-true" data-rv="true">✓ True</button>' +
+          '<button class="mr-btn mr-false" data-rv="false">✗ False</button>' +
         '</div>' +
-        '<div class="mr-score" id="mr-score-' + idx + '">0/5</div>' +
+        '<div id="mr-ready-wrap-' + idx + '" style="display:flex;justify-content:center;margin:10px 0;">' +
+          '<button id="mr-ready-' + idx + '" style="background:var(--gold);color:#2a1800;border:none;border-radius:14px;padding:14px 36px;font-family:Nunito,sans-serif;font-size:18px;font-weight:900;cursor:pointer;box-shadow:0 4px 0 var(--gold-dark);">Tap to Start!</button>' +
+        '</div>' +
+        '<div class="mr-score" id="mr-score-' + idx + '"></div>' +
         '<div class="mr-progress" id="mr-progress-' + idx + '"></div>' +
         '<div class="explanation" id="exp-' + idx + '"></div>' +
         '<div class="branding">braindeer.org</div>' +
         '</div>';
     },
     attach: function (slideEl, q, idx, ctx) {
-      var eqEl = slideEl.querySelector('#mr-eq-' + idx);
-      var scoreEl = slideEl.querySelector('#mr-score-' + idx);
-      var timerEl = slideEl.querySelector('#mr-timer-' + idx);
-      var btnsEl = slideEl.querySelector('#mr-btns-' + idx);
+      var eqEl       = slideEl.querySelector('#mr-eq-' + idx);
+      var scoreEl    = slideEl.querySelector('#mr-score-' + idx);
+      var timerEl    = slideEl.querySelector('#mr-timer-' + idx);
+      var btnsEl     = slideEl.querySelector('#mr-btns-' + idx);
       var progressEl = slideEl.querySelector('#mr-progress-' + idx);
+      var readyWrap  = slideEl.querySelector('#mr-ready-wrap-' + idx);
+      var readyBtn   = slideEl.querySelector('#mr-ready-' + idx);
       if (!eqEl) return;
 
       var round = 0, score = 0, done = false;
       var roundTimer = null;
 
+      readyBtn.addEventListener('click', function () {
+        readyWrap.style.display = 'none';
+        btnsEl.style.display = 'flex';
+        ctx.answerStartRef.set(Date.now());
+        showRound();
+      });
+
       function showRound() {
         if (round >= q.equations.length) { finish(); return; }
         eqEl.textContent = q.equations[round].text;
         eqEl.className = 'mr-eq';
-        // Progress dots
         var dots = '';
         for (var i = 0; i < q.equations.length; i++) {
           dots += '<span class="mr-dot' + (i < round ? ' mr-dot-done' : (i === round ? ' mr-dot-active' : '')) + '"></span>';
         }
         progressEl.innerHTML = dots;
-        // 5 second timer
         var timeLeft = 5.0;
         timerEl.textContent = '5.0s';
         timerEl.style.color = 'var(--cream)';
@@ -72,7 +81,6 @@
           timeLeft -= 0.1;
           if (timeLeft <= 0) {
             clearInterval(roundTimer);
-            // Time's up = wrong
             eqEl.classList.add('mr-wrong');
             round++;
             scoreEl.textContent = score + '/' + q.equations.length;
@@ -90,12 +98,8 @@
         clearInterval(roundTimer);
         var ans = btn.dataset.rv === 'true';
         var correct = q.equations[round].correct === ans;
-        if (correct) {
-          score++;
-          eqEl.classList.add('mr-correct');
-        } else {
-          eqEl.classList.add('mr-wrong');
-        }
+        if (correct) { score++; eqEl.classList.add('mr-correct'); }
+        else { eqEl.classList.add('mr-wrong'); }
         round++;
         scoreEl.textContent = score + '/' + q.equations.length;
         setTimeout(showRound, 500);
@@ -125,8 +129,6 @@
         ctx.checkMore();
         ctx.answerStartRef.set(Date.now());
       }
-
-      showRound();
     }
   });
 
