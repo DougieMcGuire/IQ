@@ -170,10 +170,13 @@
   }
 
   function showIOSBanner(user) {
-    var isIos        = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    // Only skip if actually running as installed PWA already
     var isStandalone = ('standalone' in navigator) && navigator.standalone;
-    var dismissed    = sessionStorage.getItem('iosBannerDismissed');
-    if (!isIos || isStandalone || dismissed) return;
+    if (isStandalone) return;
+
+    // Only show on iOS
+    var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    if (!isIos) return;
 
     function renderBanner(html) {
       var banner = document.getElementById('iosInstallBanner');
@@ -182,12 +185,10 @@
       var btn = document.getElementById('closeBanner');
       if (btn) btn.addEventListener('click', function() {
         banner.style.display = 'none';
-        sessionStorage.setItem('iosBannerDismissed', '1');
       });
     }
 
     if (user) {
-      // User is confirmed logged in — generate token then show banner
       generateInstallToken().then(function(token) {
         var url = token
           ? 'https://braindeer.org/app.html?t=' + token
@@ -223,9 +224,7 @@
     var token  = params.get('t');
 
     if (token) {
-      // PWA first launch — redeem the install token
       window.history.replaceState({}, '', window.location.pathname);
-
       fetch(WORKER_URL, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -240,7 +239,6 @@
         normalAuth();
       })
       .catch(function() { normalAuth(); });
-
     } else {
       normalAuth();
     }
@@ -249,8 +247,8 @@
       var unsubscribe = firebase.auth().onAuthStateChanged(function(user) {
         unsubscribe();
         goTo(user ? 'improve' : 'auth');
-        // Show iOS banner AFTER auth is confirmed — currentUser is guaranteed valid here
-        setTimeout(function() { showIOSBanner(user); }, 3000);
+        // Show banner every time — no dismissed check while testing
+        showIOSBanner(user);
       });
     }
   })();
