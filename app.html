@@ -74,8 +74,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-  // ── Firebase init ──
-  var firebaseConfig = {
+  firebase.initializeApp({
     apiKey: "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
     authDomain: "braindeer-backend.firebaseapp.com",
     projectId: "braindeer-backend",
@@ -83,19 +82,11 @@
     messagingSenderId: "331205139765",
     appId: "1:331205139765:web:20cfef8194af63fc55c07c",
     measurementId: "G-9B6885G0X0"
-  };
-  firebase.initializeApp(firebaseConfig);
+  });
 
-  // ── The Cloudflare Worker endpoint ──
-  // This lives on your own domain so no CORS issues.
   var WORKER_URL = 'https://braindeer.org/api/redeem-install-token';
 
-  // ── BG colors per screen ──
-  var BG_COLORS = {
-    auth:    '#3a2918',
-    improve: '#4a3625',
-    profile: '#4a3625'
-  };
+  var BG_COLORS = { auth: '#3a2918', improve: '#4a3625', profile: '#4a3625' };
 
   function setScreenBg(page) {
     var color = BG_COLORS[page] || '#4a3625';
@@ -105,21 +96,15 @@
     if (splash) splash.style.background = color;
   }
 
-  // ── Push subscription listener ──
   window.addEventListener('message', function(e) {
     if (!e.data || e.data.type !== 'savePushSub') return;
     var sub = e.data.sub;
     firebase.auth().onAuthStateChanged(function(user) {
       if (!user) return;
       firebase.firestore().collection('pushSubscriptions').doc(user.uid).set({
-        subscription: sub,
-        uid: user.uid,
+        subscription: sub, uid: user.uid,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(function() {
-        console.log('BrainDeer: push subscription saved to Firestore ✓');
-      }).catch(function(err) {
-        console.error('BrainDeer: failed to save push sub', err);
-      });
+      }).catch(function(err) { console.error('BrainDeer: failed to save push sub', err); });
     });
   });
 
@@ -156,21 +141,19 @@
     }
   }
 
-  // ════════════════════════════════════════════════
-  // INSTALL TOKEN SYSTEM
-  // iOS Safari and the installed PWA are completely separate
-  // storage sandboxes. We bridge this by:
-  // 1. Generating a one-time token in Firestore while user is in Safari
-  // 2. Baking it into the URL they navigate to before adding to homescreen
-  // 3. The PWA wakes up with ?t=TOKEN, sends it to the Cloudflare Worker,
-  //    gets back a Firebase custom token, and signs in silently.
-  // ════════════════════════════════════════════════
+  // ── Normal auth flow — always works, no dependencies ──
+  function normalAuthFlow() {
+    var unsubscribe = firebase.auth().onAuthStateChanged(function(user) {
+      unsubscribe();
+      goTo(user ? 'improve' : 'auth');
+    });
+  }
 
+  // ── Install token generation (for iOS banner) ──
   function generateInstallToken() {
     var user = firebase.auth().currentUser;
     if (!user) return Promise.resolve(null);
 
-    // ~20 unguessable chars: two random base36 chunks + timestamp
     var token = Math.random().toString(36).slice(2)
               + Math.random().toString(36).slice(2)
               + Date.now().toString(36);
@@ -178,95 +161,86 @@
     return firebase.firestore().collection('installTokens').doc(token).set({
       uid:       user.uid,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 min window
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000),
       used:      false
     }).then(function() {
       return token;
-    }).catch(function(e) {
-      console.warn('BrainDeer: could not generate install token', e);
-      return null;
+    }).catch(function() {
+      return null; // silently fail, banner still shows without token
     });
   }
 
+  // ── Install token redemption ──
+  // If ANYTHING goes wrong at any step, returns false and
+  // normalAuthFlow() takes over. The app cannot break from this.
   function redeemInstallToken() {
-    var params = new URLSearchParams(window.location.search);
-    var token  = params.get('t');
-    if (!token) return Promise.resolve(false);
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var token  = params.get('t');
+      if (!token) return Promise.resolve(false);
 
-    // Scrub the token from the URL bar immediately
-    window.history.replaceState({}, '', window.location.pathname);
+      // Scrub from URL immediately
+      window.history.replaceState({}, '', window.location.pathname);
 
-    // First mark it used client-side so a fast double-tap can't race
-    var ref = firebase.firestore().collection('installTokens').doc(token);
-    ref.get().then(function(snap) {
-      if (snap.exists && !snap.data().used) {
-        ref.update({ used: true }).catch(function(){});
-      }
-    }).catch(function(){});
+      return fetch(WORKER_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ token: token })
+      })
+      .then(function(r) {
+        if (!r.ok) return false;
+        return r.json();
+      })
+      .then(function(body) {
+        if (!body || !body.customToken) return false;
+        return firebase.auth().signInWithCustomToken(body.customToken)
+          .then(function() { return true; })
+          .catch(function() { return false; });
+      })
+      .catch(function() { return false; }); // network error, Worker down, anything — just fall back
 
-    // Send to Cloudflare Worker for validation + custom token exchange
-    return fetch(WORKER_URL, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ token: token })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(body) {
-      if (!body.customToken) return false;
-      return firebase.auth().signInWithCustomToken(body.customToken)
-        .then(function() {
-          console.log('BrainDeer: install token redeemed ✓');
-          return true;
-        });
-    })
-    .catch(function(e) {
-      console.warn('BrainDeer: token redemption failed', e);
-      return false;
-    });
+    } catch(e) {
+      return Promise.resolve(false); // synchronous errors caught too
+    }
   }
 
-  // ════════════════════════════════════════════════
-  // INITIAL ROUTE
-  // ════════════════════════════════════════════════
+  // ── App init ──
   (function() {
     localStorage.removeItem('iq_guest');
 
     var looksLoggedIn = false;
     for (var i = 0; i < localStorage.length; i++) {
       if (localStorage.key(i).indexOf('firebase:authUser:') === 0) {
-        looksLoggedIn = true;
-        break;
+        looksLoggedIn = true; break;
       }
     }
     setScreenBg(looksLoggedIn ? 'improve' : 'auth');
 
+    // Try token redemption, fall back to normal auth no matter what
     redeemInstallToken().then(function(redeemed) {
       if (redeemed) {
         goTo('improve');
       } else {
-        var unsubscribe = firebase.auth().onAuthStateChanged(function(user) {
-          unsubscribe();
-          goTo(user ? 'improve' : 'auth');
-        });
+        normalAuthFlow();
       }
+    }).catch(function() {
+      // Should never reach here but just in case
+      normalAuthFlow();
     });
   })();
 
-  // ── PWA install (Android / Chrome) ──
+  // ── Android / Chrome PWA install ──
   var deferredPrompt = null;
-
   window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
     deferredPrompt = e;
   });
-
   window.triggerInstall = function() {
     if (deferredPrompt) {
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then(function() { deferredPrompt = null; });
     }
   };
-
   window.addEventListener('appinstalled', function() {
     deferredPrompt = null;
     document.getElementById('iosInstallBanner').style.display = 'none';
@@ -280,37 +254,35 @@
 
     if (!isIos || isStandalone || dismissed) return;
 
-    setTimeout(function() {
+    function showBanner(html) {
       var banner = document.getElementById('iosInstallBanner');
-      var user   = firebase.auth().currentUser;
+      banner.innerHTML = html;
+      banner.style.display = 'block';
+      var btn = document.getElementById('closeBanner');
+      if (btn) btn.addEventListener('click', function() {
+        banner.style.display = 'none';
+        sessionStorage.setItem('iosBannerDismissed', '1');
+      });
+    }
 
-      function attachClose() {
-        var btn = document.getElementById('closeBanner');
-        if (btn) btn.addEventListener('click', function() {
-          banner.style.display = 'none';
-          sessionStorage.setItem('iosBannerDismissed', '1');
-        });
-      }
-
+    setTimeout(function() {
+      var user = firebase.auth().currentUser;
       if (user) {
         generateInstallToken().then(function(token) {
           var url = token
             ? 'https://braindeer.org/app.html?t=' + token
             : 'https://braindeer.org/app.html';
-
-          banner.innerHTML =
+          showBanner(
             '📲 <a href="' + url + '">Tap here</a> first, then ' +
             '<strong>Share ⬆️</strong> → <strong>Add to Home Screen</strong>' +
-            '<span class="close-banner" id="closeBanner"> ✕</span>';
-          banner.style.display = 'block';
-          attachClose();
+            '<span class="close-banner" id="closeBanner"> ✕</span>'
+          );
         });
       } else {
-        banner.innerHTML =
+        showBanner(
           '📲 Tap <strong>Share ⬆️</strong> → <strong>Add to Home Screen</strong>' +
-          '<span class="close-banner" id="closeBanner"> ✕</span>';
-        banner.style.display = 'block';
-        attachClose();
+          '<span class="close-banner" id="closeBanner"> ✕</span>'
+        );
       }
     }, 4000);
   })();
