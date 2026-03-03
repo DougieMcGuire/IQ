@@ -52,14 +52,6 @@
       display: inline-block; margin-left: 12px; font-size: 16px;
       cursor: pointer; opacity: 0.4; vertical-align: middle;
     }
-    /* DEBUG STATUS BOX */
-    #debugBox {
-      position: fixed; top: 60px; left: 10px; right: 10px;
-      background: rgba(0,0,0,0.85); color: #0f0; font-size: 12px;
-      font-family: monospace; padding: 10px; border-radius: 8px;
-      z-index: 99999; max-height: 200px; overflow-y: auto;
-      display: none;
-    }
   </style>
 </head>
 <body>
@@ -70,134 +62,132 @@
   <div class="dots"><span></span><span></span><span></span></div>
 </div>
 
-<div id="debugBox"></div>
-
 <div class="screen" id="screen-auth"></div>
 <div class="screen" id="screen-improve"></div>
 <div class="screen" id="screen-profile"></div>
 
 <div id="iosInstallBanner" role="alert"></div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script type="module">
+  import { initializeApp }     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signInWithCustomToken }
+                               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc, collection, serverTimestamp }
+                               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-<script>
-  var firebaseConfig = {
-    apiKey: "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
-    authDomain: "braindeer-backend.firebaseapp.com",
-    projectId: "braindeer-backend",
-    storageBucket: "braindeer-backend.firebasestorage.app",
+  const app = initializeApp({
+    apiKey:            "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
+    authDomain:        "braindeer-backend.firebaseapp.com",
+    projectId:         "braindeer-backend",
+    storageBucket:     "braindeer-backend.firebasestorage.app",
     messagingSenderId: "331205139765",
-    appId: "1:331205139765:web:20cfef8194af63fc55c07c",
-    measurementId: "G-9B6885G0X0"
-  };
-  firebase.initializeApp(firebaseConfig);
+    appId:             "1:331205139765:web:20cfef8194af63fc55c07c",
+    measurementId:     "G-9B6885G0X0"
+  });
 
-  var WORKER_URL = 'https://braindeer.org/api/redeem-install-token';
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
 
-  // ── Debug logger — only shows when ?t= token is present (i.e. PWA launch) ──
-  var isTokenLaunch = new URLSearchParams(window.location.search).has('t');
-  function dbg(msg) {
-    if (!isTokenLaunch) return;
-    var box = document.getElementById('debugBox');
-    box.style.display = 'block';
-    box.innerHTML += '<div>' + msg + '</div>';
-    box.scrollTop = box.scrollHeight;
-  }
+  const WORKER_URL = 'https://braindeer.org/api/redeem-install-token';
 
-  var BG_COLORS = { auth: '#3a2918', improve: '#4a3625', profile: '#4a3625' };
+  const BG_COLORS = { auth: '#3a2918', improve: '#4a3625', profile: '#4a3625' };
 
   function setScreenBg(page) {
-    var color = BG_COLORS[page] || '#4a3625';
+    const color = BG_COLORS[page] || '#4a3625';
     document.documentElement.style.setProperty('--bg', color);
     document.body.style.background = color;
-    var splash = document.getElementById('splash');
+    const splash = document.getElementById('splash');
     if (splash) splash.style.background = color;
   }
 
+  // ── Push subscription listener ──
   window.addEventListener('message', function(e) {
     if (!e.data || e.data.type !== 'savePushSub') return;
-    var sub = e.data.sub;
-    firebase.auth().onAuthStateChanged(function(user) {
+    const sub = e.data.sub;
+    onAuthStateChanged(auth, function(user) {
       if (!user) return;
-      firebase.firestore().collection('pushSubscriptions').doc(user.uid).set({
+      setDoc(doc(db, 'pushSubscriptions', user.uid), {
         subscription: sub,
         uid: user.uid,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).catch(function(err) { console.error('BrainDeer: failed to save push sub', err); });
+        updatedAt: serverTimestamp()
+      }).catch(err => console.error('BrainDeer: failed to save push sub', err));
     });
   });
 
-  var currentScreen = null;
-  var screensLoaded = {};
+  let currentScreen = null;
+  const screensLoaded = {};
 
   function goTo(page) {
-    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
 
     if (page === 'profile' && screensLoaded[page]) {
-      var old = document.querySelector('#screen-profile iframe');
+      const old = document.querySelector('#screen-profile iframe');
       if (old) old.remove();
       screensLoaded[page] = false;
     }
 
     if (!screensLoaded[page]) {
-      var container = document.getElementById('screen-' + page);
-      var iframe = document.createElement('iframe');
-      iframe.src = page + '.html';
-      iframe.allow = 'web-share';
+      const container = document.getElementById('screen-' + page);
+      const iframe    = document.createElement('iframe');
+      iframe.src      = page + '.html';
+      iframe.allow    = 'web-share';
       container.appendChild(iframe);
       screensLoaded[page] = true;
     }
 
-    var el = document.getElementById('screen-' + page);
+    const el = document.getElementById('screen-' + page);
     if (el) { el.classList.add('active'); currentScreen = page; }
 
     setScreenBg(page);
 
-    var splash = document.getElementById('splash');
+    const splash = document.getElementById('splash');
     if (splash && !splash.classList.contains('hide')) {
       splash.classList.add('hide');
-      setTimeout(function() { if (splash.parentNode) splash.remove(); }, 400);
+      setTimeout(() => { if (splash.parentNode) splash.remove(); }, 400);
     }
   }
 
-  function authCheck() {}
+  // expose for iframes
+  window.goTo = goTo;
 
-  function generateInstallToken() {
-    var user = firebase.auth().currentUser;
-    if (!user) return Promise.resolve(null);
-    var token = Math.random().toString(36).slice(2)
-              + Math.random().toString(36).slice(2)
-              + Date.now().toString(36);
-    return firebase.firestore().collection('installTokens').doc(token).set({
-      uid:       user.uid,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      expiresAt: new Date(Date.now() + 10 * 60 * 1000),
-      used:      false
-    }).then(function() { return token; }).catch(function() { return null; });
+  // ── Generate install token ──
+  async function generateInstallToken() {
+    const user = auth.currentUser;
+    if (!user) return null;
+    const token = Math.random().toString(36).slice(2)
+                + Math.random().toString(36).slice(2)
+                + Date.now().toString(36);
+    try {
+      await setDoc(doc(db, 'installTokens', token), {
+        uid:       user.uid,
+        createdAt: serverTimestamp(),
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+        used:      false
+      });
+      return token;
+    } catch {
+      return null;
+    }
   }
 
+  // ── iOS banner ──
   function showIOSBanner(user) {
-    var isStandalone = ('standalone' in navigator) && navigator.standalone;
+    const isStandalone = ('standalone' in navigator) && navigator.standalone;
     if (isStandalone) return;
-    var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
     if (!isIos) return;
 
     function renderBanner(html) {
-      var banner = document.getElementById('iosInstallBanner');
+      const banner = document.getElementById('iosInstallBanner');
       banner.innerHTML = html;
       banner.style.display = 'block';
-      var btn = document.getElementById('closeBanner');
-      if (btn) btn.addEventListener('click', function() {
-        banner.style.display = 'none';
-      });
+      const btn = document.getElementById('closeBanner');
+      if (btn) btn.addEventListener('click', () => { banner.style.display = 'none'; });
     }
 
     if (user) {
-      generateInstallToken().then(function(token) {
-        var url = token
+      generateInstallToken().then(token => {
+        const url = token
           ? 'https://braindeer.org/app.html?t=' + token
           : 'https://braindeer.org/app.html';
         renderBanner(
@@ -214,83 +204,71 @@
     }
   }
 
-  // ── Initial route ──
+  // ── Normal auth flow ──
+  function normalAuth() {
+    const unsub = onAuthStateChanged(auth, user => {
+      unsub();
+      goTo(user ? 'improve' : 'auth');
+      showIOSBanner(user);
+    });
+  }
+
+  // ── App init ──
   (function() {
     localStorage.removeItem('iq_guest');
 
-    var looksLoggedIn = false;
-    for (var i = 0; i < localStorage.length; i++) {
+    let looksLoggedIn = false;
+    for (let i = 0; i < localStorage.length; i++) {
       if (localStorage.key(i).indexOf('firebase:authUser:') === 0) {
-        looksLoggedIn = true;
-        break;
+        looksLoggedIn = true; break;
       }
     }
     setScreenBg(looksLoggedIn ? 'improve' : 'auth');
 
-    var params = new URLSearchParams(window.location.search);
-    var token  = params.get('t');
+    const params = new URLSearchParams(window.location.search);
+    const token  = params.get('t');
 
     if (token) {
       window.history.replaceState({}, '', window.location.pathname);
-      dbg('1. Token found: ' + token.slice(0, 8) + '...');
 
       fetch(WORKER_URL, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ token: token })
+        body:    JSON.stringify({ token })
       })
-      .then(function(r) {
-        dbg('2. Worker responded: ' + r.status);
-        return r.ok ? r.json() : null;
-      })
-      .then(function(body) {
-        dbg('3. Body: ' + JSON.stringify(body).slice(0, 80));
+      .then(r => r.ok ? r.json() : null)
+      .then(async body => {
         if (body && body.customToken) {
-          dbg('4. Signing in with custom token...');
-          return firebase.auth().signInWithCustomToken(body.customToken)
-            .then(function(cred) {
-              dbg('5. Signed in as: ' + cred.user.uid);
-              goTo('improve');
-            })
-            .catch(function(e) {
-              dbg('5. signInWithCustomToken FAILED: ' + e.code + ' ' + e.message);
-              normalAuth();
-            });
+          try {
+            await signInWithCustomToken(auth, body.customToken);
+            goTo('improve');
+            return;
+          } catch(e) {
+            console.warn('signInWithCustomToken failed:', e);
+          }
         }
-        dbg('4. No customToken in response — falling back');
         normalAuth();
       })
-      .catch(function(e) {
-        dbg('ERR: ' + e.message);
-        normalAuth();
-      });
+      .catch(() => normalAuth());
 
     } else {
       normalAuth();
     }
-
-    function normalAuth() {
-      var unsubscribe = firebase.auth().onAuthStateChanged(function(user) {
-        unsubscribe();
-        goTo(user ? 'improve' : 'auth');
-        showIOSBanner(user);
-      });
-    }
   })();
 
   // ── Android / Chrome PWA install ──
-  var deferredPrompt = null;
-  window.addEventListener('beforeinstallprompt', function(e) {
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     deferredPrompt = e;
   });
   window.triggerInstall = function() {
     if (deferredPrompt) {
       deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(function() { deferredPrompt = null; });
+      deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
     }
   };
-  window.addEventListener('appinstalled', function() {
+  window.addEventListener('appinstalled', () => {
     deferredPrompt = null;
     document.getElementById('iosInstallBanner').style.display = 'none';
   });
