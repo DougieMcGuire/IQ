@@ -52,6 +52,14 @@
       display: inline-block; margin-left: 12px; font-size: 16px;
       cursor: pointer; opacity: 0.4; vertical-align: middle;
     }
+    /* DEBUG STATUS BOX */
+    #debugBox {
+      position: fixed; top: 60px; left: 10px; right: 10px;
+      background: rgba(0,0,0,0.85); color: #0f0; font-size: 12px;
+      font-family: monospace; padding: 10px; border-radius: 8px;
+      z-index: 99999; max-height: 200px; overflow-y: auto;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -61,6 +69,8 @@
   <div class="name">BrainDeer</div>
   <div class="dots"><span></span><span></span><span></span></div>
 </div>
+
+<div id="debugBox"></div>
 
 <div class="screen" id="screen-auth"></div>
 <div class="screen" id="screen-improve"></div>
@@ -87,6 +97,16 @@
 
   var WORKER_URL = 'https://braindeer.org/api/redeem-install-token';
 
+  // ── Debug logger — only shows when ?t= token is present (i.e. PWA launch) ──
+  var isTokenLaunch = new URLSearchParams(window.location.search).has('t');
+  function dbg(msg) {
+    if (!isTokenLaunch) return;
+    var box = document.getElementById('debugBox');
+    box.style.display = 'block';
+    box.innerHTML += '<div>' + msg + '</div>';
+    box.scrollTop = box.scrollHeight;
+  }
+
   var BG_COLORS = { auth: '#3a2918', improve: '#4a3625', profile: '#4a3625' };
 
   function setScreenBg(page) {
@@ -106,11 +126,7 @@
         subscription: sub,
         uid: user.uid,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(function() {
-        console.log('BrainDeer: push subscription saved to Firestore ✓');
-      }).catch(function(err) {
-        console.error('BrainDeer: failed to save push sub', err);
-      });
+      }).catch(function(err) { console.error('BrainDeer: failed to save push sub', err); });
     });
   });
 
@@ -152,29 +168,20 @@
   function generateInstallToken() {
     var user = firebase.auth().currentUser;
     if (!user) return Promise.resolve(null);
-
     var token = Math.random().toString(36).slice(2)
               + Math.random().toString(36).slice(2)
               + Date.now().toString(36);
-
     return firebase.firestore().collection('installTokens').doc(token).set({
       uid:       user.uid,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       expiresAt: new Date(Date.now() + 10 * 60 * 1000),
       used:      false
-    }).then(function() {
-      return token;
-    }).catch(function() {
-      return null;
-    });
+    }).then(function() { return token; }).catch(function() { return null; });
   }
 
   function showIOSBanner(user) {
-    // Only skip if actually running as installed PWA already
     var isStandalone = ('standalone' in navigator) && navigator.standalone;
     if (isStandalone) return;
-
-    // Only show on iOS
     var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
     if (!isIos) return;
 
@@ -225,20 +232,39 @@
 
     if (token) {
       window.history.replaceState({}, '', window.location.pathname);
+      dbg('1. Token found: ' + token.slice(0, 8) + '...');
+
       fetch(WORKER_URL, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ token: token })
       })
-      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(r) {
+        dbg('2. Worker responded: ' + r.status);
+        return r.ok ? r.json() : null;
+      })
       .then(function(body) {
+        dbg('3. Body: ' + JSON.stringify(body).slice(0, 80));
         if (body && body.customToken) {
+          dbg('4. Signing in with custom token...');
           return firebase.auth().signInWithCustomToken(body.customToken)
-            .then(function() { goTo('improve'); });
+            .then(function(cred) {
+              dbg('5. Signed in as: ' + cred.user.uid);
+              goTo('improve');
+            })
+            .catch(function(e) {
+              dbg('5. signInWithCustomToken FAILED: ' + e.code + ' ' + e.message);
+              normalAuth();
+            });
         }
+        dbg('4. No customToken in response — falling back');
         normalAuth();
       })
-      .catch(function() { normalAuth(); });
+      .catch(function(e) {
+        dbg('ERR: ' + e.message);
+        normalAuth();
+      });
+
     } else {
       normalAuth();
     }
@@ -247,7 +273,6 @@
       var unsubscribe = firebase.auth().onAuthStateChanged(function(user) {
         unsubscribe();
         goTo(user ? 'improve' : 'auth');
-        // Show banner every time — no dismissed check while testing
         showIOSBanner(user);
       });
     }
