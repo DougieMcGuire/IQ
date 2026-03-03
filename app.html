@@ -74,7 +74,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-  // ── Firebase init ──
   var firebaseConfig = {
     apiKey: "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
     authDomain: "braindeer-backend.firebaseapp.com",
@@ -88,12 +87,7 @@
 
   var WORKER_URL = 'https://braindeer.org/api/redeem-install-token';
 
-  // ── BG colors per screen ──
-  var BG_COLORS = {
-    auth:    '#3a2918',
-    improve: '#4a3625',
-    profile: '#4a3625'
-  };
+  var BG_COLORS = { auth: '#3a2918', improve: '#4a3625', profile: '#4a3625' };
 
   function setScreenBg(page) {
     var color = BG_COLORS[page] || '#4a3625';
@@ -103,7 +97,6 @@
     if (splash) splash.style.background = color;
   }
 
-  // ── Push subscription listener ──
   window.addEventListener('message', function(e) {
     if (!e.data || e.data.type !== 'savePushSub') return;
     var sub = e.data.sub;
@@ -156,11 +149,6 @@
 
   function authCheck() {}
 
-  // ════════════════════════════════════════════════
-  // INSTALL TOKEN — generates a one-time token stored
-  // in Firestore so the PWA can redeem it on first launch
-  // ════════════════════════════════════════════════
-
   function generateInstallToken() {
     var user = firebase.auth().currentUser;
     if (!user) return Promise.resolve(null);
@@ -181,13 +169,44 @@
     });
   }
 
-  // ════════════════════════════════════════════════
-  // INITIAL ROUTE
-  // If there's a ?t= token in the URL (PWA first launch
-  // after install), redeem it. Otherwise do normal auth.
-  // Any failure at any point falls back to normal auth.
-  // ════════════════════════════════════════════════
+  function showIOSBanner(user) {
+    var isIos        = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    var isStandalone = ('standalone' in navigator) && navigator.standalone;
+    var dismissed    = sessionStorage.getItem('iosBannerDismissed');
+    if (!isIos || isStandalone || dismissed) return;
 
+    function renderBanner(html) {
+      var banner = document.getElementById('iosInstallBanner');
+      banner.innerHTML = html;
+      banner.style.display = 'block';
+      var btn = document.getElementById('closeBanner');
+      if (btn) btn.addEventListener('click', function() {
+        banner.style.display = 'none';
+        sessionStorage.setItem('iosBannerDismissed', '1');
+      });
+    }
+
+    if (user) {
+      // User is confirmed logged in — generate token then show banner
+      generateInstallToken().then(function(token) {
+        var url = token
+          ? 'https://braindeer.org/app.html?t=' + token
+          : 'https://braindeer.org/app.html';
+        renderBanner(
+          '📲 <a href="' + url + '">Tap here</a> first, then ' +
+          '<strong>Share ⬆️</strong> → <strong>Add to Home Screen</strong>' +
+          '<span class="close-banner" id="closeBanner"> ✕</span>'
+        );
+      });
+    } else {
+      renderBanner(
+        '📲 Tap <strong>Share ⬆️</strong> → <strong>Add to Home Screen</strong>' +
+        '<span class="close-banner" id="closeBanner"> ✕</span>'
+      );
+    }
+  }
+
+  // ── Initial route ──
   (function() {
     localStorage.removeItem('iq_guest');
 
@@ -200,15 +219,13 @@
     }
     setScreenBg(looksLoggedIn ? 'improve' : 'auth');
 
-    // Check for install token in URL
     var params = new URLSearchParams(window.location.search);
     var token  = params.get('t');
 
     if (token) {
-      // Scrub from URL bar immediately
+      // PWA first launch — redeem the install token
       window.history.replaceState({}, '', window.location.pathname);
 
-      // Send to Worker — if anything fails, fall through to normal auth
       fetch(WORKER_URL, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -220,7 +237,6 @@
           return firebase.auth().signInWithCustomToken(body.customToken)
             .then(function() { goTo('improve'); });
         }
-        // No custom token — fall back to normal auth
         normalAuth();
       })
       .catch(function() { normalAuth(); });
@@ -233,72 +249,28 @@
       var unsubscribe = firebase.auth().onAuthStateChanged(function(user) {
         unsubscribe();
         goTo(user ? 'improve' : 'auth');
+        // Show iOS banner AFTER auth is confirmed — currentUser is guaranteed valid here
+        setTimeout(function() { showIOSBanner(user); }, 3000);
       });
     }
   })();
 
-  // ── PWA install (Android / Chrome) ──
+  // ── Android / Chrome PWA install ──
   var deferredPrompt = null;
-
   window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
     deferredPrompt = e;
   });
-
   window.triggerInstall = function() {
     if (deferredPrompt) {
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then(function() { deferredPrompt = null; });
     }
   };
-
   window.addEventListener('appinstalled', function() {
     deferredPrompt = null;
     document.getElementById('iosInstallBanner').style.display = 'none';
   });
-
-  // ── iOS install banner ──
-  // For logged-in users: generates a token and puts it in the
-  // URL they tap before hitting Share → Add to Home Screen.
-  (function() {
-    var isIos        = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    var isStandalone = ('standalone' in navigator) && navigator.standalone;
-    var dismissed    = sessionStorage.getItem('iosBannerDismissed');
-
-    if (!isIos || isStandalone || dismissed) return;
-
-    function showBanner(html) {
-      var banner = document.getElementById('iosInstallBanner');
-      banner.innerHTML = html;
-      banner.style.display = 'block';
-      var btn = document.getElementById('closeBanner');
-      if (btn) btn.addEventListener('click', function() {
-        banner.style.display = 'none';
-        sessionStorage.setItem('iosBannerDismissed', '1');
-      });
-    }
-
-    setTimeout(function() {
-      var user = firebase.auth().currentUser;
-      if (user) {
-        generateInstallToken().then(function(token) {
-          var url = token
-            ? 'https://braindeer.org/app.html?t=' + token
-            : 'https://braindeer.org/app.html';
-          showBanner(
-            '📲 <a href="' + url + '">Tap here</a> first, then ' +
-            '<strong>Share ⬆️</strong> → <strong>Add to Home Screen</strong>' +
-            '<span class="close-banner" id="closeBanner"> ✕</span>'
-          );
-        });
-      } else {
-        showBanner(
-          '📲 Tap <strong>Share ⬆️</strong> → <strong>Add to Home Screen</strong>' +
-          '<span class="close-banner" id="closeBanner"> ✕</span>'
-        );
-      }
-    }, 4000);
-  })();
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7417896211953533"
      crossorigin="anonymous"></script>
