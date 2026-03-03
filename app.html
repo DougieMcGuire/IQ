@@ -76,7 +76,6 @@
 
 <script>
   // ── Firebase init ──
-  // Replace this config with yours from Firebase Console → Project Settings → Your Apps
   var firebaseConfig = {
     apiKey: "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
     authDomain: "braindeer-backend.firebaseapp.com",
@@ -88,14 +87,33 @@
   };
   firebase.initializeApp(firebaseConfig);
 
+  // ── Screen Background Map ──
+  var screenBackgrounds = {
+    auth: '#3a2918',
+    improve: '#4a3625',
+    profile: '#4a3625'
+  };
+
+  function setBackgroundFor(page) {
+    var color = screenBackgrounds[page] || '#4a3625';
+
+    // Update CSS variable
+    document.documentElement.style.setProperty('--bg', color);
+
+    // Update Android theme bar color
+    var metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) metaTheme.setAttribute('content', color);
+  }
+
   // ── Push subscription listener ──
-  // improve.html runs in an iframe and can't access Firebase directly,
-  // so it postMessages the subscription up here to save it.
   window.addEventListener('message', function(e) {
     if (!e.data || e.data.type !== 'savePushSub') return;
+
     var sub = e.data.sub;
+
     firebase.auth().onAuthStateChanged(function(user) {
       if (!user) return;
+
       firebase.firestore().collection('pushSubscriptions').doc(user.uid).set({
         subscription: sub,
         uid: user.uid,
@@ -112,14 +130,19 @@
   var screensLoaded = {};
 
   function goTo(page) {
-    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+    // Hide all screens
+    document.querySelectorAll('.screen').forEach(function(s) {
+      s.classList.remove('active');
+    });
 
+    // Force reload profile each visit
     if (page === 'profile' && screensLoaded[page]) {
       var old = document.querySelector('#screen-profile iframe');
       if (old) old.remove();
       screensLoaded[page] = false;
     }
 
+    // Load iframe if not loaded
     if (!screensLoaded[page]) {
       var container = document.getElementById('screen-' + page);
       var iframe = document.createElement('iframe');
@@ -129,13 +152,23 @@
       screensLoaded[page] = true;
     }
 
+    // Activate screen
     var el = document.getElementById('screen-' + page);
-    if (el) { el.classList.add('active'); currentScreen = page; }
+    if (el) {
+      el.classList.add('active');
+      currentScreen = page;
+    }
 
+    // ✅ Update background color
+    setBackgroundFor(page);
+
+    // Hide splash
     var splash = document.getElementById('splash');
     if (splash && !splash.classList.contains('hide')) {
       splash.classList.add('hide');
-      setTimeout(function() { if (splash.parentNode) splash.remove(); }, 400);
+      setTimeout(function() {
+        if (splash.parentNode) splash.remove();
+      }, 400);
     }
   }
 
@@ -167,7 +200,9 @@
   window.triggerInstall = function() {
     if (deferredPrompt) {
       deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(function() { deferredPrompt = null; });
+      deferredPrompt.userChoice.then(function() {
+        deferredPrompt = null;
+      });
     }
   };
 
