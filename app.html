@@ -97,10 +97,8 @@
   function setBackgroundFor(page) {
     var color = screenBackgrounds[page] || '#4a3625';
 
-    // Update CSS variable
     document.documentElement.style.setProperty('--bg', color);
 
-    // Update Android theme bar color
     var metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) metaTheme.setAttribute('content', color);
   }
@@ -119,7 +117,7 @@
         uid: user.uid,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(function() {
-        console.log('BrainDeer: push subscription saved to Firestore ✓');
+        console.log('BrainDeer: push subscription saved ✓');
       }).catch(function(err) {
         console.error('BrainDeer: failed to save push sub', err);
       });
@@ -130,7 +128,6 @@
   var screensLoaded = {};
 
   function goTo(page) {
-    // Hide all screens
     document.querySelectorAll('.screen').forEach(function(s) {
       s.classList.remove('active');
     });
@@ -142,7 +139,6 @@
       screensLoaded[page] = false;
     }
 
-    // Load iframe if not loaded
     if (!screensLoaded[page]) {
       var container = document.getElementById('screen-' + page);
       var iframe = document.createElement('iframe');
@@ -152,17 +148,15 @@
       screensLoaded[page] = true;
     }
 
-    // Activate screen
     var el = document.getElementById('screen-' + page);
     if (el) {
       el.classList.add('active');
       currentScreen = page;
     }
 
-    // ✅ Update background color
     setBackgroundFor(page);
 
-    // Hide splash
+    // Hide splash smoothly
     var splash = document.getElementById('splash');
     if (splash && !splash.classList.contains('hide')) {
       splash.classList.add('hide');
@@ -172,22 +166,19 @@
     }
   }
 
-  function authCheck() {}
+  // ── Proper Auth Routing (NO FLASH) ──
+  firebase.auth().onAuthStateChanged(function(user) {
 
-  // ── Initial route ──
-  (function() {
-    localStorage.removeItem('iq_guest');
+    // Prevent double routing
+    if (currentScreen !== null) return;
 
-    var hasFirebaseUser = false;
-    for (var i = 0; i < localStorage.length; i++) {
-      if (localStorage.key(i).indexOf('firebase:authUser:') === 0) {
-        hasFirebaseUser = true;
-        break;
-      }
+    if (user) {
+      goTo('improve');
+    } else {
+      goTo('auth');
     }
 
-    goTo(hasFirebaseUser ? 'improve' : 'auth');
-  })();
+  });
 
   // ── PWA install ──
   var deferredPrompt = null;
