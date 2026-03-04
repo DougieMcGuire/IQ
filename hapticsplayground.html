@@ -3,45 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Web-Haptics Playground</title>
+<title>Working Haptics Playground</title>
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; text-align:center; margin-top:50px; }
-  button { font-size:18px; margin:12px; padding:12px 24px; border-radius:8px; border:none; background:#0078ff; color:white; cursor:pointer; }
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; text-align:center; margin-top:50px; }
+button { font-size:18px; margin:12px; padding:12px 24px; border-radius:8px; border:none; background:#0078ff; color:white; cursor:pointer; }
 </style>
 </head>
 <body>
 
-<h1>Web-Haptics Playground</h1>
+<h1>Working Haptics Playground</h1>
+<button id="lightBtn">Light Tap</button>
+<button id="mediumBtn">Medium Tap</button>
+<button id="heavyBtn">Heavy Tap</button>
 
-<button id="successBtn">Success</button>
-<button id="errorBtn">Error</button>
-<button id="buzzBtn">Buzz</button>
-<button id="customBtn">Custom Pattern</button>
-
-<script src="haptics.js"></script>
 <script>
-  // Create a global WebHaptics instance
-  const haptics = new WebHaptics({ debug:true });
+(function(){
+    // Initialize hidden switch for iOS fallback
+    const SWITCH_ID = 'hapticSwitch';
+    let input = document.getElementById(SWITCH_ID);
+    let label = document.querySelector(`label[for="${SWITCH_ID}"]`);
+    
+    if(!input){
+        input = document.createElement('input');
+        input.type = 'checkbox';
+        input.id = SWITCH_ID;
+        input.setAttribute('switch','');
+        input.style.display = 'none';
+        document.body.appendChild(input);
 
-  // Success preset
-  document.getElementById("successBtn").addEventListener("pointerdown", () => {
-      haptics.trigger("success");
-  });
+        label = document.createElement('label');
+        label.htmlFor = SWITCH_ID;
+        label.style.display = 'none';
+        document.body.appendChild(label);
+    }
 
-  // Error preset
-  document.getElementById("errorBtn").addEventListener("pointerdown", () => {
-      haptics.trigger("error");
-  });
+    // Haptic trigger
+    function triggerHaptic(duration = 20){
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-  // Buzz preset
-  document.getElementById("buzzBtn").addEventListener("pointerdown", () => {
-      haptics.trigger("buzz");
-  });
+        if(isIOS){
+            label.click(); // toggles the hidden switch → fires native haptic
+        } else if(navigator.vibrate){
+            navigator.vibrate(duration);
+        }
+    }
 
-  // Custom pattern: vibrate 80ms, pause 50ms, vibrate 80ms
-  document.getElementById("customBtn").addEventListener("pointerdown", () => {
-      haptics.trigger([80, 50, 80]);
-  });
+    // Bind buttons
+    document.getElementById('lightBtn').addEventListener('pointerdown', () => triggerHaptic(20));
+    document.getElementById('mediumBtn').addEventListener('pointerdown', () => triggerHaptic(50));
+    document.getElementById('heavyBtn').addEventListener('pointerdown', () => triggerHaptic(100));
+})();
 </script>
 
 </body>
