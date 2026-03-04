@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web-Haptics Playground</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; text-align:center; margin-top:50px; }
+  button { font-size:18px; margin:12px; padding:12px 24px; border-radius:8px; border:none; background:#0078ff; color:white; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<h1>Web-Haptics Playground</h1>
+
+<button id="successBtn">Success</button>
+<button id="errorBtn">Error</button>
+<button id="buzzBtn">Buzz</button>
+<button id="customBtn">Custom Pattern</button>
+
+<script src="haptics.js"></script>
+<script>
+  // Create a global WebHaptics instance
+  const haptics = new WebHaptics({ debug:true });
+
+  // Success preset
+  document.getElementById("successBtn").addEventListener("pointerdown", () => {
+      haptics.trigger("success");
+  });
+
+  // Error preset
+  document.getElementById("errorBtn").addEventListener("pointerdown", () => {
+      haptics.trigger("error");
+  });
+
+  // Buzz preset
+  document.getElementById("buzzBtn").addEventListener("pointerdown", () => {
+      haptics.trigger("buzz");
+  });
+
+  // Custom pattern: vibrate 80ms, pause 50ms, vibrate 80ms
+  document.getElementById("customBtn").addEventListener("pointerdown", () => {
+      haptics.trigger([80, 50, 80]);
+  });
+</script>
+
+</body>
+</html>
