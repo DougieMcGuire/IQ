@@ -1,80 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Haptics Playground</title>
+<html>
+<body style="font-family:sans-serif;background:#111;color:white;text-align:center;padding:40px">
 
-<style>
-body{
-  font-family: Arial, sans-serif;
-  background:#111;
-  color:white;
-  text-align:center;
-  padding:40px;
-}
+<h2>iOS Haptic Playground</h2>
 
-button{
-  padding:15px 25px;
-  margin:10px;
-  font-size:16px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-button:hover{
-  transform:scale(1.05);
-}
-</style>
-</head>
-
-<body>
-
-<h1>Haptics Playground</h1>
-<p>Test vibration patterns</p>
-
-<button onclick="vibrationPattern(0)">2s Vibration</button>
-<button onclick="vibrationPattern(1)">Pulse Pattern</button>
-<button onclick="vibrationPattern(2)">Twinkle Star</button>
-<button onclick="vibrationPattern(3)">Mario</button>
-<button onclick="vibrationPattern(4)">Jingle Bells</button>
+<button onclick="iosHaptic([0])">Single Tap</button>
+<button onclick="iosHaptic([0,120])">Double Tap</button>
+<button onclick="iosHaptic([0,120,120])">Triple Tap</button>
+<button onclick="iosHaptic([0,80,80,80,80])">Rapid Pattern</button>
 
 <script>
 
-let patterns = [
-  2000,
-  [2000,1000,2000,1000,2000,1000,2000],
-  [400,200,400,200,400,200,800,200,800,200,400,200,400,200,200,200],
-  [150,50,150,50,300,100,150,50,150,50,300,100,150,50,150,50],
-  [300,200,300,200,300,400,300,200,300,200,300,400,300,200,600,200]
-];
+function createSwitch(){
+  const id = "haptic_"+Math.random().toString(36).slice(2)
 
-function vibrationPattern(index){
+  const el = document.createElement("div")
 
-  if (navigator.vibrate) {
+  el.innerHTML =
+    '<input type="checkbox" id="'+id+'" switch />' +
+    '<label for="'+id+'"></label>'
 
-    navigator.vibrate(patterns[index]);
+  el.style.display="none"
 
-  } else {
+  document.body.appendChild(el)
 
-    // iOS fallback trick
-    let el = document.createElement('div');
-    let id = Math.random().toString(36).slice(2);
+  return el.querySelector("label")
+}
 
-    el.innerHTML =
-      '<input type="checkbox" id="'+id+'" switch />' +
-      '<label for="'+id+'"></label>';
+function iosHaptic(pattern){
 
-    el.style.display = "none";
-    document.body.appendChild(el);
+  const label = createSwitch()
 
-    el.querySelector("label").click();
+  pattern.forEach((delay,i)=>{
 
     setTimeout(()=>{
-      el.remove();
-    },1500);
+      label.click()
+    },delay)
 
-  }
+  })
 
 }
 
