@@ -2,58 +2,82 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Working Haptics Playground</title>
+<title>Haptics Playground</title>
+
 <style>
-body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; text-align:center; margin-top:50px; }
-button { font-size:18px; margin:12px; padding:12px 24px; border-radius:8px; border:none; background:#0078ff; color:white; cursor:pointer; }
+body{
+  font-family: Arial, sans-serif;
+  background:#111;
+  color:white;
+  text-align:center;
+  padding:40px;
+}
+
+button{
+  padding:15px 25px;
+  margin:10px;
+  font-size:16px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+button:hover{
+  transform:scale(1.05);
+}
 </style>
 </head>
+
 <body>
 
-<h1>Working Haptics Playground</h1>
-<button id="lightBtn">Light Tap</button>
-<button id="mediumBtn">Medium Tap</button>
-<button id="heavyBtn">Heavy Tap</button>
+<h1>Haptics Playground</h1>
+<p>Test vibration patterns</p>
+
+<button onclick="vibrationPattern(0)">2s Vibration</button>
+<button onclick="vibrationPattern(1)">Pulse Pattern</button>
+<button onclick="vibrationPattern(2)">Twinkle Star</button>
+<button onclick="vibrationPattern(3)">Mario</button>
+<button onclick="vibrationPattern(4)">Jingle Bells</button>
 
 <script>
-(function(){
-    // Initialize hidden switch for iOS fallback
-    const SWITCH_ID = 'hapticSwitch';
-    let input = document.getElementById(SWITCH_ID);
-    let label = document.querySelector(`label[for="${SWITCH_ID}"]`);
-    
-    if(!input){
-        input = document.createElement('input');
-        input.type = 'checkbox';
-        input.id = SWITCH_ID;
-        input.setAttribute('switch','');
-        input.style.display = 'none';
-        document.body.appendChild(input);
 
-        label = document.createElement('label');
-        label.htmlFor = SWITCH_ID;
-        label.style.display = 'none';
-        document.body.appendChild(label);
-    }
+let patterns = [
+  2000,
+  [2000,1000,2000,1000,2000,1000,2000],
+  [400,200,400,200,400,200,800,200,800,200,400,200,400,200,200,200],
+  [150,50,150,50,300,100,150,50,150,50,300,100,150,50,150,50],
+  [300,200,300,200,300,400,300,200,300,200,300,400,300,200,600,200]
+];
 
-    // Haptic trigger
-    function triggerHaptic(duration = 20){
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+function vibrationPattern(index){
 
-        if(isIOS){
-            label.click(); // toggles the hidden switch → fires native haptic
-        } else if(navigator.vibrate){
-            navigator.vibrate(duration);
-        }
-    }
+  if (navigator.vibrate) {
 
-    // Bind buttons
-    document.getElementById('lightBtn').addEventListener('pointerdown', () => triggerHaptic(20));
-    document.getElementById('mediumBtn').addEventListener('pointerdown', () => triggerHaptic(50));
-    document.getElementById('heavyBtn').addEventListener('pointerdown', () => triggerHaptic(100));
-})();
+    navigator.vibrate(patterns[index]);
+
+  } else {
+
+    // iOS fallback trick
+    let el = document.createElement('div');
+    let id = Math.random().toString(36).slice(2);
+
+    el.innerHTML =
+      '<input type="checkbox" id="'+id+'" switch />' +
+      '<label for="'+id+'"></label>';
+
+    el.style.display = "none";
+    document.body.appendChild(el);
+
+    el.querySelector("label").click();
+
+    setTimeout(()=>{
+      el.remove();
+    },1500);
+
+  }
+
+}
+
 </script>
 
 </body>
