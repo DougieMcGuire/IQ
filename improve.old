@@ -145,87 +145,244 @@
     /* ══════════════════════════════════════
        WORDLE STYLES
     ══════════════════════════════════════ */
-
-    /* Grid */
-    .wordle-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      margin: 2px 0;
-    }
+    .wordle-grid { display: flex; flex-direction: column; gap: 5px; margin: 2px 0; }
     .wordle-row { display: flex; gap: 5px; }
-
     .wordle-tile {
-      width: clamp(42px, 11.5vw, 52px);
-      height: clamp(42px, 11.5vw, 52px);
-      border-radius: 10px;
-      background: var(--bg);
-      border: 2.5px solid var(--brown-mid);
+      width: clamp(42px, 11.5vw, 52px); height: clamp(42px, 11.5vw, 52px);
+      border-radius: 10px; background: var(--bg); border: 2.5px solid var(--brown-mid);
       display: flex; align-items: center; justify-content: center;
-      font-size: clamp(18px, 5vw, 22px);
-      font-weight: 900;
-      color: var(--cream);
-      transition: border-color 0.08s;
-      /* needed for flip animation */
-      perspective: 250px;
+      font-size: clamp(18px, 5vw, 22px); font-weight: 900; color: var(--cream);
+      transition: border-color 0.08s; perspective: 250px;
     }
     .wordle-tile.has-letter  { border-color: var(--tan); animation: wtPop 0.08s ease; }
-    .wordle-tile.reveal-correct { background: var(--green);      border-color: var(--green);      color: #fff;        box-shadow: 0 3px 0 var(--green-dark); }
-    .wordle-tile.reveal-present { background: var(--gold);       border-color: var(--gold);       color: #2a1800;     box-shadow: 0 3px 0 var(--gold-dark); }
-    .wordle-tile.reveal-absent  { background: var(--brown-mid);  border-color: var(--brown-mid);  color: var(--tan); }
+    .wordle-tile.reveal-correct { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 0 3px 0 var(--green-dark); }
+    .wordle-tile.reveal-present { background: var(--gold); border-color: var(--gold); color: #2a1800; box-shadow: 0 3px 0 var(--gold-dark); }
+    .wordle-tile.reveal-absent  { background: var(--brown-mid); border-color: var(--brown-mid); color: var(--tan); }
     .wordle-tile.shake { animation: wtShake 0.4s ease; }
-
     @keyframes wtPop   { 0%{transform:scale(1)} 40%{transform:scale(1.14)} 100%{transform:scale(1)} }
     @keyframes wtShake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-7px)} 40%,80%{transform:translateX(7px)} }
-    @keyframes wtFlipIn  { 0%{transform:rotateX(0)}   100%{transform:rotateX(-90deg)} }
+    @keyframes wtFlipIn  { 0%{transform:rotateX(0)} 100%{transform:rotateX(-90deg)} }
     @keyframes wtFlipOut { 0%{transform:rotateX(90deg)} 100%{transform:rotateX(0)} }
 
-    /* Message line */
-    .wordle-msg {
-      font-size: 13px; font-weight: 800;
-      color: var(--tan); min-height: 18px; text-align: center;
-      transition: color 0.2s;
-    }
-    .wordle-msg.error   { color: var(--red);   animation: wtShake 0.3s ease; }
+    .wordle-msg { font-size: 13px; font-weight: 800; color: var(--tan); min-height: 18px; text-align: center; transition: color 0.2s; }
+    .wordle-msg.error   { color: var(--red); animation: wtShake 0.3s ease; }
     .wordle-msg.success { color: var(--green); }
 
-    /* Custom keyboard */
-    .wordle-kb {
-      display: flex; flex-direction: column;
-      gap: 6px; width: 100%; max-width: 340px;
-    }
+    .wordle-kb { display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 340px; }
     .wordle-kb-row { display: flex; gap: 5px; justify-content: center; }
-
     .wk {
-      height: 44px;
-      flex: 1;
-      min-width: 0;
-      max-width: 36px;
-      border: none; border-radius: 8px;
-      background: var(--brown-mid);
-      color: var(--cream);
-      font-family: 'Nunito', sans-serif;
-      font-size: 13px; font-weight: 900;
-      cursor: pointer;
+      height: 44px; flex: 1; min-width: 0; max-width: 36px;
+      border: none; border-radius: 8px; background: var(--brown-mid); color: var(--cream);
+      font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 900; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       box-shadow: 0 3px 0 rgba(0,0,0,0.22);
       transition: background 0.25s, color 0.25s, box-shadow 0.25s;
-      position: relative; overflow: hidden;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
+      position: relative; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent;
     }
-    .wk::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 45%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.09) 0%, transparent 100%);
-      pointer-events: none;
-    }
+    .wk::before { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:linear-gradient(180deg,rgba(255,255,255,0.09)0%,transparent 100%); pointer-events:none; }
     .wk:active    { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.22); }
     .wk.wide      { max-width: 52px; font-size: 11px; }
-    /* colour states — applied after guesses */
-    .wk.st-correct { background: var(--green);     color: #fff;    box-shadow: 0 3px 0 var(--green-dark); }
-    .wk.st-present { background: var(--gold);      color: #2a1800; box-shadow: 0 3px 0 var(--gold-dark); }
-    .wk.st-absent  { background: #2c1d0e;          color: #6b4f32; box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
+    .wk.st-correct { background: var(--green); color: #fff; box-shadow: 0 3px 0 var(--green-dark); }
+    .wk.st-present { background: var(--gold); color: #2a1800; box-shadow: 0 3px 0 var(--gold-dark); }
+    .wk.st-absent  { background: #2c1d0e; color: #6b4f32; box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
+
+    /* ══════════════════════════════════════
+       TIC TAC TOE STYLES
+    ══════════════════════════════════════ */
+    .ttt-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 6px; width: clamp(180px, 50vw, 240px);
+      margin: 4px 0;
+    }
+    .ttt-cell {
+      aspect-ratio: 1; border: none; border-radius: 12px;
+      background: var(--bg); cursor: pointer;
+      font-family: 'Nunito', sans-serif; font-size: clamp(28px, 8vw, 38px);
+      font-weight: 900; color: var(--cream);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+      transition: background 0.15s, transform 0.1s;
+      position: relative; overflow: hidden;
+    }
+    .ttt-cell::before { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:linear-gradient(180deg,rgba(255,255,255,0.05)0%,transparent 100%); pointer-events:none; border-radius:12px 12px 0 0; }
+    .ttt-cell:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
+    .ttt-cell.ttt-x { color: var(--blue); }
+    .ttt-cell.ttt-o { color: var(--red); }
+    .ttt-cell.ttt-win { background: var(--green); color: #fff; box-shadow: 0 3px 0 var(--green-dark); animation: pop 0.4s ease; }
+    .ttt-status {
+      font-size: 14px; font-weight: 800; color: var(--tan);
+      min-height: 20px; text-align: center;
+      transition: color 0.2s;
+    }
+
+    /* ══════════════════════════════════════
+       BRANDING
+    ══════════════════════════════════════ */
+    .branding {
+      text-align: center; font-size: 13px; font-weight: 900;
+      color: var(--tan); letter-spacing: 1.5px; text-transform: uppercase;
+      margin-top: 12px; opacity: 0.9;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    }
+
+    /* ══════════════════════════════════════
+       MEMORY MATCH STYLES
+    ══════════════════════════════════════ */
+    .mem-grid { display: grid; gap: 6px; margin: 4px 0; justify-content: center; }
+    .mem-cols-3 { grid-template-columns: repeat(3, 1fr); width: clamp(160px, 45vw, 210px); }
+    .mem-cols-4 { grid-template-columns: repeat(4, 1fr); width: clamp(210px, 55vw, 280px); }
+    .mem-card {
+      aspect-ratio: 1; border: none; border-radius: 10px;
+      background: var(--brown-mid); cursor: pointer;
+      font-size: clamp(20px, 5.5vw, 28px);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+      transition: transform 0.3s, background 0.3s;
+      position: relative; user-select: none;
+    }
+    .mem-front, .mem-back { position: absolute; backface-visibility: hidden; }
+    .mem-front { color: var(--tan); font-weight: 900; font-size: 18px; }
+    .mem-back { opacity: 0; transition: opacity 0.2s; }
+    .mem-card.mem-flip .mem-front { opacity: 0; }
+    .mem-card.mem-flip .mem-back { opacity: 1; }
+    .mem-card.mem-flip { background: var(--bg); transform: scale(1.05); }
+    .mem-card.mem-matched { background: var(--green); box-shadow: 0 3px 0 var(--green-dark); animation: pop 0.4s ease; }
+    .mem-card.mem-matched .mem-back { opacity: 1; }
+    .mem-card.mem-matched .mem-front { opacity: 0; }
+    .mem-status { font-size: 13px; font-weight: 800; color: var(--tan); min-height: 18px; text-align: center; }
+
+    /* ══════════════════════════════════════
+       SIMON SAYS STYLES
+    ══════════════════════════════════════ */
+    .simon-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 8px; width: clamp(160px, 42vw, 200px); margin: 6px 0;
+    }
+    .simon-pad {
+      aspect-ratio: 1; border: none; border-radius: 16px;
+      cursor: pointer; opacity: 0.45;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+      transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+      user-select: none; -webkit-tap-highlight-color: transparent;
+    }
+    .simon-pad:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
+    .simon-pad.simon-lit { opacity: 1; box-shadow: 0 0 20px rgba(255,255,255,0.3); transform: scale(1.06); }
+    .simon-status { font-size: 14px; font-weight: 800; color: var(--tan); min-height: 20px; text-align: center; }
+    .simon-level { font-size: 12px; font-weight: 700; color: var(--brown-mid); text-align: center; }
+
+    /* ══════════════════════════════════════
+       REACTION TIME STYLES
+    ══════════════════════════════════════ */
+    .react-zone { display: flex; justify-content: center; margin: 8px 0; }
+    .react-circle {
+      width: clamp(120px, 32vw, 160px); height: clamp(120px, 32vw, 160px);
+      border-radius: 50%; background: var(--red);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 900; color: #fff;
+      cursor: pointer; user-select: none;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+      transition: background 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .react-circle:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0,0,0,0.2); }
+    .react-circle.react-go { background: var(--green); animation: pop 0.3s ease; }
+    .react-circle.react-fail { background: var(--red); }
+    .react-circle.react-success { background: var(--green); font-size: 28px; }
+    .react-circle.react-slow { background: var(--gold); color: #2a1800; font-size: 28px; }
+    .react-result { font-size: 14px; font-weight: 800; text-align: center; min-height: 20px; margin-top: 4px; }
+
+    /* ══════════════════════════════════════
+       WORD SCRAMBLE STYLES
+    ══════════════════════════════════════ */
+    .ws-hint { font-size: 12px; font-weight: 700; color: var(--gold); text-align: center; margin-bottom: 4px; }
+    .ws-answer, .ws-source { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; margin: 6px 0; }
+    .ws-tile {
+      width: clamp(36px, 9vw, 44px); height: clamp(36px, 9vw, 44px);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: clamp(16px, 4.5vw, 20px); font-weight: 900; font-family: 'Nunito', sans-serif;
+      user-select: none;
+    }
+    .ws-src {
+      background: var(--brown-mid); color: var(--cream); border: none; cursor: pointer;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.2); transition: transform 0.1s, opacity 0.2s;
+    }
+    .ws-src:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.2); }
+    .ws-src.ws-used { opacity: 0.25; pointer-events: none; }
+    .ws-slot { background: var(--bg); color: var(--cream); border: 2.5px dashed var(--brown-mid); }
+    .ws-slot.ws-filled { border-style: solid; border-color: var(--tan); cursor: pointer; }
+    .ws-slot.ws-correct { border-color: var(--green); background: var(--green); color: #fff; animation: pop 0.3s ease; }
+    .ws-status { font-size: 13px; font-weight: 800; text-align: center; min-height: 18px; }
+    .ws-shake { animation: wtShake 0.4s ease; }
+
+    /* ══════════════════════════════════════
+       SLIDE PUZZLE STYLES
+    ══════════════════════════════════════ */
+    .slide-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 4px; width: clamp(150px, 40vw, 195px); margin: 4px 0;
+    }
+    .slide-cell {
+      aspect-ratio: 1; border: none; border-radius: 10px;
+      background: var(--brown-mid); color: var(--cream);
+      font-family: 'Nunito', sans-serif; font-size: clamp(22px, 6vw, 30px); font-weight: 900;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+      transition: transform 0.12s, background 0.15s;
+    }
+    .slide-cell:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
+    .slide-empty { background: transparent; box-shadow: none; cursor: default; }
+    .slide-cell.slide-win { background: var(--green); color: #fff; box-shadow: 0 3px 0 var(--green-dark); animation: pop 0.4s ease; }
+    .slide-moves { font-size: 13px; font-weight: 800; color: var(--tan); text-align: center; min-height: 18px; }
+
+    /* ══════════════════════════════════════
+       COLOR SORT STYLES
+    ══════════════════════════════════════ */
+    .csort-pool { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin: 6px 0; }
+    .csort-tile {
+      width: clamp(42px, 11vw, 52px); height: clamp(42px, 11vw, 52px);
+      border-radius: 10px; border: none; cursor: pointer;
+      font-size: 10px; font-weight: 800; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+      transition: transform 0.1s, opacity 0.2s;
+      font-family: 'Nunito', sans-serif;
+    }
+    .csort-tile:active { transform: translateY(2px); }
+    .csort-tile.csort-used { opacity: 0.2; pointer-events: none; }
+    .csort-placed { display: flex; gap: 4px; justify-content: center; margin: 4px 0; min-height: 36px; }
+    .csort-placed-tile {
+      width: clamp(30px, 8vw, 38px); height: clamp(30px, 8vw, 38px);
+      border-radius: 8px; animation: pop 0.25s ease;
+    }
+    .csort-status { font-size: 13px; font-weight: 800; text-align: center; min-height: 18px; color: var(--tan); }
+
+    /* ══════════════════════════════════════
+       MATH RUSH STYLES
+    ══════════════════════════════════════ */
+    .mr-eq {
+      font-size: clamp(22px, 6vw, 30px); font-weight: 900;
+      color: var(--cream); text-align: center; min-height: 40px;
+      padding: 8px; border-radius: 12px; transition: background 0.2s, color 0.2s;
+    }
+    .mr-eq.mr-correct { background: var(--green); color: #fff; }
+    .mr-eq.mr-wrong { background: var(--red); color: #fff; }
+    .mr-timer { font-size: 16px; font-weight: 800; text-align: center; color: var(--cream); min-height: 22px; }
+    .mr-btns { display: flex; gap: 10px; justify-content: center; margin: 8px 0; }
+    .mr-btn {
+      flex: 1; max-width: 140px; height: 48px;
+      border: none; border-radius: 12px; cursor: pointer;
+      font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 900;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.2); transition: transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .mr-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
+    .mr-true { background: var(--green); color: #fff; }
+    .mr-false { background: var(--red); color: #fff; }
+    .mr-score { font-size: 14px; font-weight: 800; color: var(--tan); text-align: center; }
+    .mr-progress { display: flex; gap: 6px; justify-content: center; margin: 4px 0; }
+    .mr-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--brown-mid); }
+    .mr-dot-active { background: var(--gold); }
+    .mr-dot-done { background: var(--green); }
 
     /* ── Overlays ── */
     .streak-popup { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(58,41,24,0.85); z-index:200; opacity:0; pointer-events:none; transition:opacity 0.3s; }
@@ -410,7 +567,37 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════
+     SCRIPT LOADING ORDER:
+     1. questions.js  — core Q registry + shared utils
+     2. games/*.js    — each self-registers via Q.register()
+     3. module script — app logic (data.js import, feed, UI)
+
+     TO ADD A NEW QUESTION TYPE:
+     Just create games/myType.js and add a <script> tag here.
+     No changes to questions.js or this file's module script needed.
+═══════════════════════════════════════════════════ -->
 <script src="questions.js"></script>
+
+<!-- Game type plugins — add new ones here -->
+<script src="games/wordle.js"></script>
+<script src="games/ticTacToe.js"></script>
+<script src="games/numSeq.js"></script>
+<script src="games/letterSeq.js"></script>
+<script src="games/matrix.js"></script>
+<script src="games/math.js"></script>
+<script src="games/analogy.js"></script>
+<script src="games/oddOut.js"></script>
+<script src="games/riddle.js"></script>
+<script src="games/codeBreak.js"></script>
+<script src="games/logic.js"></script>
+<script src="games/memory.js"></script>
+<script src="games/simon.js"></script>
+<script src="games/reaction.js"></script>
+<script src="games/wordScramble.js"></script>
+<script src="games/slidePuzzle.js"></script>
+<script src="games/colorSort.js"></script>
+<script src="games/mathRush.js"></script>
 
 <script type="module">
   import { IQData, getEncouragement } from './data.js';
@@ -565,280 +752,30 @@
     const idx = slides++;
     const div = document.createElement('div');
     div.className = 'slide';
-    div.innerHTML = render(q, idx);
-    feed.appendChild(div);
-    // Wordle cards need JS state attached after the DOM exists
-    if (q.type === 'wordle') attachWordle(div, q, idx);
-    answerStart = Date.now();
-  }
 
-  // ══════════════════════════════════════════════════
-  //  WORDLE — render + logic
-  // ══════════════════════════════════════════════════
-
-  const KB_ROWS = [
-    ['Q','W','E','R','T','Y','U','I','O','P'],
-    ['A','S','D','F','G','H','J','K','L'],
-    ['ENTER','Z','X','C','V','B','N','M','⌫'],
-  ];
-
-  function renderWordle(q, idx) {
-    // 6×5 grid
-    let gridHTML = '';
-    for (let r = 0; r < 6; r++) {
-      let rowHTML = '';
-      for (let c = 0; c < 5; c++) {
-        rowHTML += `<div class="wordle-tile" id="wt-${idx}-${r}-${c}"></div>`;
-      }
-      gridHTML += `<div class="wordle-row">${rowHTML}</div>`;
-    }
-
-    // custom keyboard
-    const kbHTML = KB_ROWS.map(row => {
-      const keys = row.map(k => {
-        const wide = (k === 'ENTER' || k === '⌫') ? ' wide' : '';
-        return `<button class="wk${wide}" data-wk="${k}" data-wi="${idx}">${k}</button>`;
-      }).join('');
-      return `<div class="wordle-kb-row">${keys}</div>`;
-    }).join('');
-
-    return `
-      <div class="qcard">
-        <div class="category">🟩 Wordle</div>
-        <div class="question">Guess the 5-letter word</div>
-        <div class="wordle-grid">${gridHTML}</div>
-        <div class="wordle-msg" id="wm-${idx}"></div>
-        <div class="wordle-kb">${kbHTML}</div>
-        <div class="explain" id="exp-${idx}"></div>
-      </div>
-      <div class="scroll-hint" id="hint-${idx}">
-        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-        Swipe for next
-      </div>`;
-  }
-
-  function attachWordle(slideEl, q, idx) {
-    // Per-card mutable state
-    const st = {
-      answer:    q.answer,   // e.g. 'BRAIN'
-      category:  q.category,
-      difficulty:q.difficulty,
-      guesses:   [],         // array of { word, result }
-      current:   '',         // letters typed so far
-      done:      false,
-      keyColors: {},         // letter → 'correct'|'present'|'absent'
-    };
-
-    // ── tap on our custom keyboard ──
-    slideEl.addEventListener('click', e => {
-      const btn = e.target.closest('[data-wk]');
-      if (!btn || +btn.dataset.wi !== idx) return;
-      handleWKey(btn.dataset.wk, st, idx);
-    });
-
-    // ── physical / desktop keyboard (only when this slide is visible) ──
-    document.addEventListener('keydown', e => {
-      if (st.done) return;
-      const visIdx = Math.round(feed.scrollTop / (feed.clientHeight || 1));
-      if (feed.children[visIdx] !== slideEl) return;
-      if      (e.key === 'Enter')     handleWKey('ENTER', st, idx);
-      else if (e.key === 'Backspace') handleWKey('⌫',    st, idx);
-      else if (/^[a-zA-Z]$/.test(e.key)) handleWKey(e.key.toUpperCase(), st, idx);
-    });
-  }
-
-  // ---------- key handler ----------
-  function handleWKey(key, st, idx) {
-    if (st.done) return;
-    const msgEl = document.getElementById(`wm-${idx}`);
-
-    if (key === '⌫') {
-      st.current = st.current.slice(0, -1);
-      updateCurrentRow(st, idx);
-      msgEl.className = 'wordle-msg';
-      msgEl.textContent = '';
-      return;
-    }
-
-    if (key === 'ENTER') {
-      if (st.current.length < 5) {
-        msgEl.className = 'wordle-msg error';
-        msgEl.textContent = 'Not enough letters';
-        shakeRow(st.guesses.length, idx);
-        return;
-      }
-      submitGuess(st, idx);
-      return;
-    }
-
-    // letter
-    if (st.current.length < 5) {
-      st.current += key;
-      updateCurrentRow(st, idx);
-      msgEl.className = 'wordle-msg';
-      msgEl.textContent = '';
-    }
-  }
-
-  // ---------- live tile update as user types ----------
-  function updateCurrentRow(st, idx) {
-    const row = st.guesses.length;
-    for (let c = 0; c < 5; c++) {
-      const tile = document.getElementById(`wt-${idx}-${row}-${c}`);
-      if (!tile) continue;
-      const letter = st.current[c] || '';
-      tile.textContent = letter;
-      tile.className = 'wordle-tile' + (letter ? ' has-letter' : '');
-    }
-  }
-
-  function shakeRow(row, idx) {
-    for (let c = 0; c < 5; c++) {
-      const t = document.getElementById(`wt-${idx}-${row}-${c}`);
-      if (!t) continue;
-      t.classList.remove('shake');
-      // force reflow so animation restarts
-      void t.offsetWidth;
-      t.classList.add('shake');
-      setTimeout(() => t.classList.remove('shake'), 400);
-    }
-  }
-
-  // ---------- score a guess (returns array of 5 strings) ----------
-  function scoreGuess(guess, answer) {
-    const res  = Array(5).fill('absent');
-    const pool = answer.split('');
-    // pass 1: mark correct
-    for (let i = 0; i < 5; i++) {
-      if (guess[i] === pool[i]) { res[i] = 'correct'; pool[i] = null; }
-    }
-    // pass 2: mark present
-    for (let i = 0; i < 5; i++) {
-      if (res[i] === 'correct') continue;
-      const j = pool.indexOf(guess[i]);
-      if (j !== -1) { res[i] = 'present'; pool[j] = null; }
-    }
-    return res;
-  }
-
-  // ---------- submit + animate ----------
-  function submitGuess(st, idx) {
-    const guess  = st.current;
-    const result = scoreGuess(guess, st.answer);
-    const row    = st.guesses.length;
-    st.guesses.push({ word: guess, result });
-    st.current = '';
-
-    // Flip each tile: half-way through swap class + letter
-    const FLIP_HALF = 200; // ms to halfway point
-    const FLIP_DUR  = 400; // total flip duration per tile
-    const STAGGER   = 100; // delay between tiles
-
-    for (let c = 0; c < 5; c++) {
-      const tile  = document.getElementById(`wt-${idx}-${row}-${c}`);
-      if (!tile) continue;
-      const delay = c * STAGGER;
-
-      setTimeout(() => {
-        // animate out (tile face disappears)
-        tile.style.transition = `transform ${FLIP_HALF}ms ease-in`;
-        tile.style.transform  = 'rotateX(-90deg)';
-
-        setTimeout(() => {
-          // swap content + colour at halfway
-          tile.textContent = guess[c];
-          tile.className   = `wordle-tile reveal-${result[c]}`;
-          // animate back in
-          tile.style.transition = `transform ${FLIP_HALF}ms ease-out`;
-          tile.style.transform  = 'rotateX(0deg)';
-        }, FLIP_HALF);
-
-      }, delay);
-    }
-
-    // after all tiles have flipped, update keyboard + check game state
-    const allDone = 4 * STAGGER + FLIP_DUR + 50;
-    setTimeout(() => {
-      updateKeyboard(st, guess, result, idx);
-
-      const won  = result.every(r => r === 'correct');
-      const lost = !won && st.guesses.length >= 6;
-      if (won || lost) finishWordle(st, idx, won);
-    }, allDone);
-  }
-
-  // ---------- keyboard colour update ----------
-  function updateKeyboard(st, guess, result, idx) {
-    const priority = { correct: 3, present: 2, absent: 1 };
-    for (let i = 0; i < 5; i++) {
-      const l = guess[i];
-      if (!st.keyColors[l] || priority[result[i]] > priority[st.keyColors[l]]) {
-        st.keyColors[l] = result[i];
-      }
-    }
-    document.querySelectorAll(`[data-wi="${idx}"]`).forEach(btn => {
-      const state = st.keyColors[btn.dataset.wk];
-      if (!state) return;
-      // remove all state classes then add the right one
-      btn.classList.remove('st-correct', 'st-present', 'st-absent');
-      btn.classList.add(`st-${state}`);
-    });
-  }
-
-  // ---------- win / lose ----------
-  function finishWordle(st, idx, won) {
-    st.done = true;
-    const msgEl  = document.getElementById(`wm-${idx}`);
-    const expEl  = document.getElementById(`exp-${idx}`);
-    const hintEl = document.getElementById(`hint-${idx}`);
-
-    const ms     = Date.now() - answerStart;
-    const result = IQData.recordAnswer(st.category, won, st.difficulty, ms);
-
-    if (won) {
-      const byGuess = ['Ace! 🎯','Brilliant! 🧠','Nailed it! ⚡','Great! 🔥','Nice! 💡','Phew! 😅'];
-      msgEl.className  = 'wordle-msg success';
-      msgEl.textContent = byGuess[st.guesses.length - 1] || 'Yes!';
-      flashEl.className = 'flash green show';
-      spawnConfetti(st.guesses.length === 1 ? 30 : 14);
-      setTimeout(() => flashEl.className = 'flash', 350);
+    // Check if this type has a custom renderer registered
+    const customRenderer = Q._renderers && Q._renderers[q.type];
+    if (customRenderer) {
+      div.innerHTML = customRenderer.render(q, idx);
     } else {
-      msgEl.className  = 'wordle-msg error';
-      msgEl.textContent = `The word was ${st.answer}`;
-      flashEl.className = 'flash red show';
-      setTimeout(() => flashEl.className = 'flash', 350);
+      div.innerHTML = renderDefault(q, idx);
     }
 
-    if (expEl) {
-      expEl.textContent = won
-        ? `Solved in ${st.guesses.length} guess${st.guesses.length === 1 ? '' : 'es'}!`
-        : `The answer was "${st.answer}". Keep going!`;
-      setTimeout(() => expEl.classList.add('show'), 200);
-    }
-    setTimeout(() => hintEl?.classList.add('show'), 500);
-    updateUI(result);
+    feed.appendChild(div);
 
-    // streak milestone popup
-    if (won && result.streak > 0 && result.streak % 5 === 0) {
-      setTimeout(() => {
-        streakNum.textContent = result.streak;
-        streakPopup.classList.add('show');
-        spawnConfetti(25);
-        setTimeout(() => streakPopup.classList.remove('show'), 1800);
-      }, 600);
+    // If the type has a post-attach hook, call it
+    if (customRenderer && customRenderer.attach) {
+      customRenderer.attach(div, q, idx, { feed, flashEl, confettiEl, IQData, getEncouragement, updateUI, checkMore, spawnConfetti, answerStartRef: { get: () => answerStart, set: v => { answerStart = v; } } });
     }
 
-    checkMore();
     answerStart = Date.now();
   }
 
   // ══════════════════════════════════════════════════
-  //  REGULAR CARD — render
+  //  DEFAULT CARD RENDERER (sequence, matrix, text)
   // ══════════════════════════════════════════════════
 
-  function render(q, idx) {
-    if (q.type === 'wordle') return renderWordle(q, idx);
-
+  function renderDefault(q, idx) {
     let visual = '';
     if (q.visual === 'sequence' || q.visual === 'letterSequence') {
       const parts = q.sequence.map((n, i) => {
@@ -865,6 +802,7 @@
         </div>
         <div class="feedback" id="fb-${idx}"></div>
         <div class="explain"  id="exp-${idx}">${q.explanation}</div>
+        <div class="branding">braindeer.org</div>
       </div>
       <div class="scroll-hint" id="hint-${idx}">
         <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
@@ -872,7 +810,7 @@
       </div>`;
   }
 
-  // ── Answer handling (regular cards) ──
+  // ── Answer handling (default multiple-choice cards) ──
   document.addEventListener('click', e => {
     if (!e.target.classList.contains('opt')) return;
     const btn  = e.target;
