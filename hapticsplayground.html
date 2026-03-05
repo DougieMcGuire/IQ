@@ -1,44 +1,106 @@
 <!DOCTYPE html>
-<html>
-<body style="font-family:sans-serif;background:#111;color:white;text-align:center;padding:40px">
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Advanced iOS Haptic Playground</title>
+<style>
+body {
+  font-family:sans-serif;
+  background:#111;
+  color:white;
+  text-align:center;
+  padding:40px;
+}
+button {
+  padding:15px 25px;
+  margin:10px;
+  font-size:16px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  background:#222;
+  color:white;
+}
+button:hover { transform:scale(1.05); }
+</style>
+</head>
+<body>
 
-<h2>iOS Haptic Playground</h2>
+<h1>Advanced iOS Haptics</h1>
 
-<button onclick="iosHaptic([0])">Single Tap</button>
-<button onclick="iosHaptic([0,120])">Double Tap</button>
-<button onclick="iosHaptic([0,120,120])">Triple Tap</button>
-<button onclick="iosHaptic([0,80,80,80,80])">Rapid Pattern</button>
+<button onclick="patternSingle()">Single Tap</button>
+<button onclick="patternDouble()">Double Tap</button>
+<button onclick="patternSuccess()">Success</button>
+<button onclick="patternError()">Error / Heavy</button>
+<button onclick="patternCrazy()">Spammed / Layered</button>
 
 <script>
-
-function createSwitch(){
-  const id = "haptic_"+Math.random().toString(36).slice(2)
-
-  const el = document.createElement("div")
-
-  el.innerHTML =
-    '<input type="checkbox" id="'+id+'" switch />' +
-    '<label for="'+id+'"></label>'
-
-  el.style.display="none"
-
-  document.body.appendChild(el)
-
-  return el.querySelector("label")
+// helper: create a hidden switch
+function createSwitch() {
+  const id = "haptic_" + Math.random().toString(36).slice(2);
+  const el = document.createElement("div");
+  el.innerHTML = `<input type="checkbox" id="${id}" switch />
+                  <label for="${id}"></label>`;
+  el.style.display = "none";
+  document.body.appendChild(el);
+  return el.querySelector("label");
 }
 
-function iosHaptic(pattern){
+// trigger a pattern on a single switch
+function triggerPattern(label, times, interval) {
+  for (let i = 0; i < times.length; i++) {
+    setTimeout(() => {
+      label.click();
+    }, times[i]);
+  }
+}
 
-  const label = createSwitch()
+// helper: layered haptics
+function layeredPattern(patterns) {
+  const switches = [];
+  for (let i = 0; i < patterns.length; i++) {
+    switches.push(createSwitch());
+  }
+  for (let i = 0; i < patterns.length; i++) {
+    const times = patterns[i];
+    const label = switches[i];
+    times.forEach(t => {
+      setTimeout(()=> label.click(), t);
+    });
+  }
+}
 
-  pattern.forEach((delay,i)=>{
+// single tap
+function patternSingle() {
+  layeredPattern([[0]]);
+}
 
-    setTimeout(()=>{
-      label.click()
-    },delay)
+// double tap
+function patternDouble() {
+  layeredPattern([[0, 120]]);
+}
 
-  })
+// success (3 pulses)
+function patternSuccess() {
+  layeredPattern([[0, 120, 240]]);
+}
 
+// error / heavier feeling
+function patternError() {
+  // spam single switch multiple times quickly
+  const times = [];
+  for(let i=0;i<5;i++) times.push(i*60);
+  layeredPattern([times]);
+}
+
+// crazy / layered / heavy
+function patternCrazy() {
+  // three layers of switches, each spamming different timing
+  layeredPattern([
+    [0,50,100,150,200],
+    [20,70,120,170,220],
+    [40,90,140,190,240]
+  ]);
 }
 
 </script>
