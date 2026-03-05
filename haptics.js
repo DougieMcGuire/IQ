@@ -1,5 +1,19 @@
 // haptics.js
 const Haptics = (() => {
+  let iosFallbackEl;
+
+  // Create iOS "switch" fallback
+  function setupIOSFallback() {
+    if (iosFallbackEl) return;
+    iosFallbackEl = document.createElement('div');
+    iosFallbackEl.innerHTML =
+      '<input type="checkbox" id="haptic-ios-switch" switch />' +
+      '<label for="haptic-ios-switch"></label>';
+    iosFallbackEl.style.position = 'absolute';
+    iosFallbackEl.style.top = '-9999px';
+    document.body.appendChild(iosFallbackEl);
+  }
+
   const canVibrate = 'vibrate' in navigator;
 
   const patterns = {
@@ -12,8 +26,14 @@ const Haptics = (() => {
   };
 
   function vibrate(pattern) {
-    if (!canVibrate) return;
-    navigator.vibrate(pattern);
+    if (canVibrate) {
+      navigator.vibrate(pattern);
+    } else {
+      // iOS fallback
+      setupIOSFallback();
+      const checkbox = iosFallbackEl.querySelector('input');
+      checkbox.checked = !checkbox.checked; // toggle triggers haptic
+    }
   }
 
   return {
