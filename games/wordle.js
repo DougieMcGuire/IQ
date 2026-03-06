@@ -179,6 +179,7 @@
       var checkMore      = ctx.checkMore;
       var spawnConfetti  = ctx.spawnConfetti;
       var answerStartRef = ctx.answerStartRef;
+      var H              = ctx.Haptics || {};  // safe fallback if not available
 
       var st = {
         answer:     q.answer,
@@ -200,9 +201,9 @@
         if (st.done) return;
         var visIdx = Math.round(feed.scrollTop / (feed.clientHeight || 1));
         if (feed.children[visIdx] !== slideEl) return;
-        if      (e.key === 'Enter')             handleKey('ENTER');
-        else if (e.key === 'Backspace')         handleKey('⌫');
-        else if (/^[a-zA-Z]$/.test(e.key))     handleKey(e.key.toUpperCase());
+        if      (e.key === 'Enter')         handleKey('ENTER');
+        else if (e.key === 'Backspace')     handleKey('⌫');
+        else if (/^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toUpperCase());
       });
 
       function handleKey(key) {
@@ -210,6 +211,7 @@
         var msgEl = document.getElementById('wm-' + idx);
 
         if (key === '⌫') {
+          if (st.current.length > 0) H.light && H.light();
           st.current = st.current.slice(0, -1);
           updateCurrentRow();
           msgEl.className = 'wordle-msg';
@@ -219,12 +221,14 @@
 
         if (key === 'ENTER') {
           if (st.current.length < 5) {
+            H.warning && H.warning();
             msgEl.className = 'wordle-msg error';
             msgEl.textContent = 'Not enough letters';
             shakeRow(st.guesses.length);
             return;
           }
           if (!VALID_WORDS.has(st.current)) {
+            H.wordleWrong && H.wordleWrong();
             msgEl.className = 'wordle-msg error';
             msgEl.textContent = 'Not a valid word!';
             shakeRow(st.guesses.length);
@@ -235,6 +239,7 @@
         }
 
         if (st.current.length < 5) {
+          H.tilePop && H.tilePop();
           st.current += key;
           updateCurrentRow();
           msgEl.className = 'wordle-msg';
@@ -348,12 +353,14 @@
           var byGuess = ['Ace! 🎯','Brilliant! 🧠','Nailed it! ⚡','Great! 🔥','Nice! 💡','Phew! 😅'];
           msgEl.className   = 'wordle-msg success';
           msgEl.textContent = byGuess[st.guesses.length - 1] || 'Yes!';
+          st.guesses.length === 1 ? (H.streak && H.streak()) : (H.wordleWin && H.wordleWin());
           flashEl.className = 'flash green show';
           spawnConfetti(st.guesses.length === 1 ? 30 : 14);
           setTimeout(function () { flashEl.className = 'flash'; }, 350);
         } else {
           msgEl.className   = 'wordle-msg error';
           msgEl.textContent = 'The word was ' + st.answer;
+          H.error && H.error();
           flashEl.className = 'flash red show';
           setTimeout(function () { flashEl.className = 'flash'; }, 350);
         }
@@ -369,6 +376,7 @@
 
         if (won && data.streak > 0 && data.streak % 5 === 0) {
           setTimeout(function () {
+            H.streak && H.streak();
             var streakNum   = document.getElementById('streak-num');
             var streakPopup = document.getElementById('streak-popup');
             if (streakNum)   streakNum.textContent = data.streak;
