@@ -210,7 +210,10 @@
         var msgEl = document.getElementById('wm-' + idx);
 
         if (key === '⌫') {
-          st.current = st.current.slice(0, -1);
+          if (st.current.length > 0) {
+            Haptics.light();
+            st.current = st.current.slice(0, -1);
+          }
           updateCurrentRow();
           msgEl.className = 'wordle-msg';
           msgEl.textContent = '';
@@ -219,12 +222,14 @@
 
         if (key === 'ENTER') {
           if (st.current.length < 5) {
+            Haptics.warning();
             msgEl.className = 'wordle-msg error';
             msgEl.textContent = 'Not enough letters';
             shakeRow(st.guesses.length);
             return;
           }
           if (!VALID_WORDS.has(st.current)) {
+            Haptics.wordleWrong();
             msgEl.className = 'wordle-msg error';
             msgEl.textContent = 'Not a valid word!';
             shakeRow(st.guesses.length);
@@ -235,6 +240,8 @@
         }
 
         if (st.current.length < 5) {
+          // Each letter typed — tile pop
+          Haptics.tilePop();
           st.current += key;
           updateCurrentRow();
           msgEl.className = 'wordle-msg';
@@ -348,12 +355,15 @@
           var byGuess = ['Ace! 🎯','Brilliant! 🧠','Nailed it! ⚡','Great! 🔥','Nice! 💡','Phew! 😅'];
           msgEl.className   = 'wordle-msg success';
           msgEl.textContent = byGuess[st.guesses.length - 1] || 'Yes!';
+          // Ace/1-guess = mega celebration, otherwise standard win
+          st.guesses.length === 1 ? Haptics.streak() : Haptics.wordleWin();
           flashEl.className = 'flash green show';
           spawnConfetti(st.guesses.length === 1 ? 30 : 14);
           setTimeout(function () { flashEl.className = 'flash'; }, 350);
         } else {
           msgEl.className   = 'wordle-msg error';
           msgEl.textContent = 'The word was ' + st.answer;
+          Haptics.error();
           flashEl.className = 'flash red show';
           setTimeout(function () { flashEl.className = 'flash'; }, 350);
         }
@@ -369,6 +379,7 @@
 
         if (won && data.streak > 0 && data.streak % 5 === 0) {
           setTimeout(function () {
+            Haptics.streak();
             var streakNum   = document.getElementById('streak-num');
             var streakPopup = document.getElementById('streak-popup');
             if (streakNum)   streakNum.textContent = data.streak;
