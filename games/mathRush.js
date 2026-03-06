@@ -58,6 +58,7 @@
       var roundTimer = null;
 
       readyBtn.addEventListener('click', function () {
+        Haptics.medium();
         readyWrap.style.display = 'none';
         btnsEl.style.display = 'flex';
         ctx.answerStartRef.set(Date.now());
@@ -81,6 +82,8 @@
           timeLeft -= 0.1;
           if (timeLeft <= 0) {
             clearInterval(roundTimer);
+            // Time ran out — treat as wrong
+            Haptics.warning();
             eqEl.classList.add('mr-wrong');
             round++;
             scoreEl.textContent = score + '/' + q.equations.length;
@@ -98,8 +101,14 @@
         clearInterval(roundTimer);
         var ans = btn.dataset.rv === 'true';
         var correct = q.equations[round].correct === ans;
-        if (correct) { score++; eqEl.classList.add('mr-correct'); }
-        else { eqEl.classList.add('mr-wrong'); }
+        if (correct) {
+          Haptics.medium();
+          score++;
+          eqEl.classList.add('mr-correct');
+        } else {
+          Haptics.error();
+          eqEl.classList.add('mr-wrong');
+        }
         round++;
         scoreEl.textContent = score + '/' + q.equations.length;
         setTimeout(showRound, 500);
@@ -117,9 +126,11 @@
         timerEl.textContent = '';
         btnsEl.style.display = 'none';
         if (won) {
+          perfect ? Haptics.streak() : Haptics.success();
           ctx.flashEl.className = 'flash green show';
           ctx.spawnConfetti(perfect ? 22 : 10);
         } else {
+          Haptics.error();
           ctx.flashEl.className = 'flash red show';
         }
         setTimeout(function () { ctx.flashEl.className = 'flash'; }, 350);
