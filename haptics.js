@@ -167,4 +167,3 @@ const Haptics = (() => {
   };
 })();
 
-export default Haptics;
