@@ -296,6 +296,11 @@
         var FLIP_DUR  = 400;
         var STAGGER   = 100;
 
+        // 5 staggered haptics, one per tile flip
+        for (var t = 0; t < 5; t++) {
+          (function(i) { setTimeout(function() { H.tilePop && H.tilePop(); }, i * STAGGER); })(t);
+        }
+
         for (var c = 0; c < 5; c++) {
           (function (col) {
             var tile = document.getElementById('wt-' + idx + '-' + row + '-' + col);
@@ -309,7 +314,6 @@
                 tile.className   = 'wordle-tile reveal-' + result[col];
                 tile.style.transition = 'transform ' + FLIP_HALF + 'ms ease-out';
                 tile.style.transform  = 'rotateX(0deg)';
-                H.tilePop && H.tilePop(); // haptic on each card flip reveal
               }, FLIP_HALF);
             }, delay);
           })(c);
