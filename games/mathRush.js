@@ -52,12 +52,16 @@
       var progressEl = slideEl.querySelector('#mr-progress-' + idx);
       var readyWrap  = slideEl.querySelector('#mr-ready-wrap-' + idx);
       var readyBtn   = slideEl.querySelector('#mr-ready-' + idx);
+      var H = ctx.Haptics || {};
       if (!eqEl) return;
 
       var round = 0, score = 0, done = false;
       var roundTimer = null;
+      var tickTimer = null;
+      var lastTickSecond = -1;
 
       readyBtn.addEventListener('click', function () {
+        H.medium && H.medium();
         readyWrap.style.display = 'none';
         btnsEl.style.display = 'flex';
         ctx.answerStartRef.set(Date.now());
@@ -74,20 +78,38 @@
         }
         progressEl.innerHTML = dots;
         var timeLeft = 5.0;
+        lastTickSecond = 5;
         timerEl.textContent = '5.0s';
         timerEl.style.color = 'var(--cream)';
         clearInterval(roundTimer);
+        clearInterval(tickTimer);
+
         roundTimer = setInterval(function() {
           timeLeft -= 0.1;
           if (timeLeft <= 0) {
             clearInterval(roundTimer);
+            clearInterval(tickTimer);
+            // Time ran out — urgent warning
+            H.warning && H.warning();
             eqEl.classList.add('mr-wrong');
             round++;
             scoreEl.textContent = score + '/' + q.equations.length;
             setTimeout(showRound, 500);
           } else {
             timerEl.textContent = timeLeft.toFixed(1) + 's';
-            if (timeLeft < 2) timerEl.style.color = 'var(--red)';
+            // Tick haptic once per second
+            var currentSecond = Math.ceil(timeLeft);
+            if (currentSecond !== lastTickSecond) {
+              lastTickSecond = currentSecond;
+              if (timeLeft <= 2) {
+                // Last 2 seconds — urgent double tick
+                H.warning && H.warning();
+                timerEl.style.color = 'var(--red)';
+              } else {
+                // Normal tick
+                H.light && H.light();
+              }
+            }
           }
         }, 100);
       }
@@ -96,10 +118,17 @@
         var btn = e.target.closest('.mr-btn');
         if (!btn || done) return;
         clearInterval(roundTimer);
+        clearInterval(tickTimer);
         var ans = btn.dataset.rv === 'true';
         var correct = q.equations[round].correct === ans;
-        if (correct) { score++; eqEl.classList.add('mr-correct'); }
-        else { eqEl.classList.add('mr-wrong'); }
+        if (correct) {
+          H.medium && H.medium();
+          score++;
+          eqEl.classList.add('mr-correct');
+        } else {
+          H.error && H.error();
+          eqEl.classList.add('mr-wrong');
+        }
         round++;
         scoreEl.textContent = score + '/' + q.equations.length;
         setTimeout(showRound, 500);
@@ -108,6 +137,7 @@
       function finish() {
         done = true;
         clearInterval(roundTimer);
+        clearInterval(tickTimer);
         var ms = Date.now() - ctx.answerStartRef.get();
         var won = score >= 3;
         var perfect = score === q.equations.length;
@@ -117,9 +147,11 @@
         timerEl.textContent = '';
         btnsEl.style.display = 'none';
         if (won) {
+          perfect ? (H.streak && H.streak()) : (H.success && H.success());
           ctx.flashEl.className = 'flash green show';
           ctx.spawnConfetti(perfect ? 22 : 10);
         } else {
+          H.error && H.error();
           ctx.flashEl.className = 'flash red show';
         }
         setTimeout(function () { ctx.flashEl.className = 'flash'; }, 350);
