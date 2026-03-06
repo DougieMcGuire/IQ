@@ -446,18 +446,7 @@ const IQData = {
     this.save(d);
     this._maybeSync();
 
-    // ── Update daily tasks ──
-    const session   = DailyTasks.updateSessionStats(correct, ms);
-    const taskState = DailyTasks.onAnswer({
-      correct,
-      streak:             d.streak,
-      ms,
-      totalAnsweredToday: session.answered,
-      totalCorrectToday:  session.correct,
-      fastAnswersToday:   session.fast,
-    });
-
-    return { ...d, xpGain: xp, leveledUp: d.level > oldLvl, taskState };
+    return { ...d, xpGain: xp, leveledUp: d.level > oldLvl };
   },
 
   calcIQ(d) {
@@ -546,7 +535,7 @@ function getEncouragement(streak, correct) {
 }
 
 export {
-  IQData, DailyTasks, auth, db,
+  IQData, auth, db,
   authReady, requireAuth, redirectIfLoggedIn,
   iqToPercentile, formatPercentile, getEncouragement
 };
