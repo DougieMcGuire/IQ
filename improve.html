@@ -51,17 +51,28 @@
       height: calc(64px + env(safe-area-inset-bottom, 0px));
       background: var(--card); box-shadow: 0 -3px 0 rgba(0,0,0,0.15);
       display: flex; justify-content: center; align-items: flex-start;
-      padding-top: 6px; gap: 6px; z-index: 100;
+      padding-top: 6px; gap: 4px; z-index: 100;
     }
     .nav-btn {
-      padding: 8px 28px; background: none; border: none;
+      padding: 8px 20px; background: none; border: none;
       display: flex; flex-direction: column; align-items: center; gap: 2px;
       color: var(--brown-light); font-family: 'Nunito', sans-serif;
-      font-size: 12px; font-weight: 800; border-radius: 14px;
-      transition: all 0.15s; cursor: pointer;
+      font-size: 11px; font-weight: 800; border-radius: 14px;
+      transition: all 0.15s; cursor: pointer; position: relative;
     }
     .nav-btn svg { width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
     .nav-btn.active { color:var(--cream); background:var(--brown-mid); box-shadow:0 3px 0 rgba(0,0,0,0.15); }
+
+    /* Tasks nav badge */
+    .nav-badge {
+      position: absolute; top: 4px; right: 14px;
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--red); border: 2px solid var(--card);
+      display: none;
+      animation: badgePulse 2s ease infinite;
+    }
+    .nav-badge.show { display: block; }
+    @keyframes badgePulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
 
     /* ── Feed ── */
     main {
@@ -399,16 +410,155 @@
     #push-prompt .pp-title { font-size:15px; font-weight:900; color:var(--cream); margin-bottom:4px; }
     #push-prompt .pp-text { font-size:12px; font-weight:600; color:var(--tan); margin-bottom:12px; line-height:1.4; }
     #push-prompt .pp-btns { display:flex; gap:8px; }
-    #push-prompt .pp-yes {
-      flex:1; background:var(--green); color:#fff; border:none;
-      border-radius:12px; padding:10px; font-family:'Nunito',sans-serif;
-      font-size:14px; font-weight:900; cursor:pointer; box-shadow:0 3px 0 var(--green-dark);
+    #push-prompt .pp-yes { flex:1; background:var(--green); color:#fff; border:none; border-radius:12px; padding:10px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:900; cursor:pointer; box-shadow:0 3px 0 var(--green-dark); }
+    #push-prompt .pp-no { background:var(--brown-mid); color:var(--tan); border:none; border-radius:12px; padding:10px 16px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:900; cursor:pointer; }
+
+    /* ══════════════════════════════════════════
+       DAILY TASKS PANEL
+    ══════════════════════════════════════════ */
+    #tasks-panel {
+      position: fixed; inset: 0;
+      z-index: 400;
+      display: flex; flex-direction: column;
+      pointer-events: none; opacity: 0;
+      transition: opacity 0.25s ease;
     }
-    #push-prompt .pp-no {
-      background:var(--brown-mid); color:var(--tan); border:none;
-      border-radius:12px; padding:10px 16px; font-family:'Nunito',sans-serif;
-      font-size:14px; font-weight:900; cursor:pointer;
+    #tasks-panel.open { pointer-events: all; opacity: 1; }
+
+    .tasks-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(30, 18, 8, 0.7);
+      backdrop-filter: blur(2px);
     }
+
+    .tasks-sheet {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: var(--card); border-radius: 24px 24px 0 0;
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+      transform: translateY(100%);
+      transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 -6px 0 rgba(0,0,0,0.15);
+      max-height: 85dvh; overflow-y: auto;
+    }
+    #tasks-panel.open .tasks-sheet { transform: translateY(0); }
+
+    .tasks-handle {
+      width: 40px; height: 5px; border-radius: 3px;
+      background: var(--brown-mid); margin: 12px auto 0;
+    }
+
+    .tasks-header {
+      padding: 16px 20px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .tasks-title-wrap { display: flex; flex-direction: column; }
+    .tasks-title { font-size: 20px; font-weight: 900; color: var(--cream); }
+    .tasks-subtitle { font-size: 12px; font-weight: 700; color: var(--tan); margin-top: 2px; }
+
+    .tasks-resets { font-size: 11px; font-weight: 700; color: var(--brown-light); }
+
+    /* Overall progress bar */
+    .tasks-overall {
+      margin: 0 20px 16px;
+      background: var(--bg); border-radius: 10px; padding: 10px 14px;
+    }
+    .tasks-overall-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .tasks-overall-label { font-size: 12px; font-weight: 800; color: var(--tan); }
+    .tasks-overall-count { font-size: 12px; font-weight: 900; color: var(--gold); }
+    .tasks-overall-bar-outer { height: 8px; background: var(--brown-mid); border-radius: 4px; overflow: hidden; }
+    .tasks-overall-bar-inner {
+      height: 100%; background: var(--gold); border-radius: 4px;
+      transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative;
+    }
+    .tasks-overall-bar-inner::after { content:''; position:absolute; top:0;left:0;right:0;height:40%; background:rgba(255,255,255,0.3); border-radius:4px 4px 0 0; }
+
+    /* Task cards */
+    .tasks-list { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+
+    .task-card {
+      background: var(--bg); border-radius: 16px; padding: 14px;
+      display: flex; align-items: center; gap: 12px;
+      position: relative; overflow: hidden;
+      transition: opacity 0.3s;
+    }
+    .task-card.task-all-claimed { opacity: 0.5; }
+
+    .task-icon {
+      font-size: 28px; width: 44px; height: 44px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--card); border-radius: 12px;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+    }
+
+    .task-body { flex: 1; min-width: 0; }
+    .task-label { font-size: 14px; font-weight: 800; color: var(--cream); margin-bottom: 6px; line-height: 1.2; }
+    .task-progress-row { display: flex; align-items: center; gap: 8px; }
+    .task-bar-outer { flex: 1; height: 7px; background: var(--brown-mid); border-radius: 4px; overflow: hidden; }
+    .task-bar-inner {
+      height: 100%; border-radius: 4px;
+      background: var(--green);
+      transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative;
+    }
+    .task-bar-inner::after { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:rgba(255,255,255,0.25); border-radius:4px 4px 0 0; }
+    .task-bar-inner.bar-done { background: var(--gold); }
+    .task-progress-label { font-size: 11px; font-weight: 800; color: var(--tan); white-space: nowrap; }
+
+    /* Claim button */
+    .task-claim {
+      flex-shrink: 0; background: var(--gold); color: #2a1800; border: none;
+      border-radius: 12px; padding: 8px 12px;
+      font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 900;
+      cursor: pointer; box-shadow: 0 3px 0 var(--gold-dark);
+      transition: transform 0.1s, opacity 0.2s;
+      white-space: nowrap;
+    }
+    .task-claim:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--gold-dark); }
+    .task-claimed-badge {
+      flex-shrink: 0; font-size: 22px;
+      animation: pop 0.4s ease;
+    }
+
+    /* Completion banner */
+    .tasks-complete-banner {
+      margin: 0 20px 16px;
+      background: linear-gradient(135deg, var(--green) 0%, #46d400 100%);
+      border-radius: 16px; padding: 14px 16px;
+      display: none; align-items: center; gap: 12px;
+      box-shadow: 0 4px 0 var(--green-dark);
+      animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .tasks-complete-banner.show { display: flex; }
+    .tcb-icon { font-size: 32px; }
+    .tcb-text { flex: 1; }
+    .tcb-title { font-size: 15px; font-weight: 900; color: #fff; }
+    .tcb-sub { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.8); }
+
+    /* XP claim toast */
+    .xp-toast {
+      position: fixed; top: calc(env(safe-area-inset-top,0px) + 90px);
+      left: 50%; transform: translateX(-50%) translateY(-20px);
+      background: var(--gold); color: #2a1800;
+      border-radius: 20px; padding: 8px 18px;
+      font-size: 16px; font-weight: 900;
+      box-shadow: 0 4px 0 var(--gold-dark);
+      z-index: 500; opacity: 0;
+      transition: opacity 0.2s, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      pointer-events: none; white-space: nowrap;
+    }
+    .xp-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Daily streak row inside tasks panel */
+    .tasks-streak-row {
+      margin: 0 20px 14px;
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg); border-radius: 14px; padding: 10px 14px;
+    }
+    .tsr-icon { font-size: 22px; }
+    .tsr-text { flex: 1; }
+    .tsr-label { font-size: 12px; font-weight: 700; color: var(--tan); }
+    .tsr-val { font-size: 18px; font-weight: 900; color: var(--orange); }
   </style>
 </head>
 <body>
@@ -444,11 +594,66 @@
     <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
     Train
   </button>
+  <button class="nav-btn" id="tasks-nav-btn" onclick="openTasksPanel()">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    Tasks
+    <span class="nav-badge" id="tasks-badge"></span>
+  </button>
   <button class="nav-btn" onclick="navGo('profile')">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     Profile
   </button>
 </nav>
+
+<!-- ══ DAILY TASKS PANEL ══ -->
+<div id="tasks-panel">
+  <div class="tasks-backdrop" onclick="closeTasksPanel()"></div>
+  <div class="tasks-sheet">
+    <div class="tasks-handle"></div>
+    <div class="tasks-header">
+      <div class="tasks-title-wrap">
+        <div class="tasks-title">📋 Daily Tasks</div>
+        <div class="tasks-subtitle">Complete all 3 for a bonus!</div>
+      </div>
+      <div class="tasks-resets" id="tasks-resets">Resets in --</div>
+    </div>
+
+    <!-- Daily challenge streak -->
+    <div class="tasks-streak-row">
+      <div class="tsr-icon">📅</div>
+      <div class="tsr-text">
+        <div class="tsr-label">Daily Challenge Streak</div>
+        <div class="tsr-val" id="daily-streak-val">0 days</div>
+      </div>
+    </div>
+
+    <!-- Overall progress bar -->
+    <div class="tasks-overall">
+      <div class="tasks-overall-row">
+        <span class="tasks-overall-label">Today's Progress</span>
+        <span class="tasks-overall-count" id="tasks-overall-count">0 / 3</span>
+      </div>
+      <div class="tasks-overall-bar-outer">
+        <div class="tasks-overall-bar-inner" id="tasks-overall-bar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- All done banner -->
+    <div class="tasks-complete-banner" id="tasks-complete-banner">
+      <div class="tcb-icon">🎉</div>
+      <div class="tcb-text">
+        <div class="tcb-title">All tasks complete!</div>
+        <div class="tcb-sub">Come back tomorrow for more.</div>
+      </div>
+    </div>
+
+    <!-- Task list -->
+    <div class="tasks-list" id="tasks-list"></div>
+  </div>
+</div>
+
+<!-- XP Toast -->
+<div class="xp-toast" id="xp-toast"></div>
 
 <div class="streak-popup" id="streak-popup">
   <div class="streak-icon"><svg viewBox="0 0 24 24" fill="#ff9600" fill-opacity="0.5" stroke="#ff9600" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 2px 8px rgba(255,150,0,0.5))"><path d="M12 22c-4.97 0-8-3.58-8-7.5 0-3.07 1.74-5.25 3.53-7.28C9.18 5.38 10.34 3.7 10.34 2c0 0 1.77 2.18 2.34 4.18.27.94.5 1.82 1.32 1.82 0-2 1-3 1-3s1 1.5 1 3.5c.5-.5 1.5-1.5 1.5-1.5s1 2.5 1 5c0 3.92-3.03 7.5-8 7.5z"/></svg></div>
@@ -523,12 +728,11 @@
 <script src="games/mathRush.js"></script>
 
 <script type="module">
-  import { IQData, getEncouragement } from './data.js';
+  import { IQData, DailyTasks, getEncouragement } from './data.js';
   import Haptics from './haptics.js';
 
   if (window.parent !== window) parent.authCheck();
 
-  // Nav with haptics — exposed globally for inline onclick
   window.navGo = function(page) {
     Haptics.light();
     parent.goTo(page);
@@ -548,6 +752,8 @@
   const xpBar        = document.getElementById('xp-bar');
   const levelLabel   = document.getElementById('level-label');
   const xpLabel      = document.getElementById('xp-label');
+  const tasksBadge   = document.getElementById('tasks-badge');
+  const xpToast      = document.getElementById('xp-toast');
 
   let slides = 0, answerStart = 0;
   const questionQueue = [];
@@ -569,10 +775,7 @@
   }
 
   // ── Onboarding ──
-  ageSlider.oninput = () => {
-    ageDisplay.textContent = ageSlider.value;
-    Haptics.light();
-  };
+  ageSlider.oninput = () => { ageDisplay.textContent = ageSlider.value; Haptics.light(); };
   document.getElementById('start-btn').addEventListener('click', () => {
     Haptics.medium();
     IQData.setAge(parseInt(ageSlider.value));
@@ -581,7 +784,7 @@
     IQData.needsCalibration() ? startCalibration() : startFeed();
   });
 
-  // ── IQ Calibration Test ──
+  // ── IQ Calibration ──
   const CAL_QUESTIONS = [
     { q:'What comes next? 2, 6, 18, 54, ?', a:'162', w:['108','126','148'], cat:'patternRecognition', d:1.2 },
     { q:'If all Bloops are Razzies, and all Razzies are Lazzies, are all Bloops Lazzies?', a:'Yes', w:['No','Maybe','Not enough info'], cat:'logicalReasoning', d:1.1 },
@@ -596,8 +799,7 @@
     document.getElementById('calibration').classList.add('show');
     document.getElementById('cal-quiz').style.display = 'block';
     document.getElementById('cal-result').style.display = 'none';
-    renderCalDots();
-    renderCalQuestion();
+    renderCalDots(); renderCalQuestion();
   }
   function renderCalDots() {
     const dots = document.getElementById('cal-dots');
@@ -619,8 +821,7 @@
   }
   document.getElementById('cal-opts').addEventListener('click', e => {
     if (!e.target.classList.contains('cal-opt')) return;
-    const btn = e.target;
-    const par = btn.parentElement;
+    const btn = e.target, par = btn.parentElement;
     if (par.dataset.done) return;
     par.dataset.done = '1';
     const ok = btn.dataset.v === btn.dataset.ans;
@@ -631,12 +832,11 @@
       else o.classList.add('dim');
     });
     const dot = document.getElementById('cal-dot-' + calIdx);
-    dot.classList.remove('active');
-    dot.classList.add(ok ? 'done' : 'wrong-dot');
+    dot.classList.remove('active'); dot.classList.add(ok ? 'done' : 'wrong-dot');
     IQData.recordAnswer(CAL_QUESTIONS[calIdx].cat, ok, CAL_QUESTIONS[calIdx].d, 5000);
     setTimeout(() => {
       calIdx++;
-      if (calIdx >= CAL_QUESTIONS.length) { showCalResult(); }
+      if (calIdx >= CAL_QUESTIONS.length) showCalResult();
       else { par.dataset.done = ''; renderCalDots(); renderCalQuestion(); }
     }, 800);
   });
@@ -657,6 +857,9 @@
   function init() {
     const d = IQData.load();
     updateUI(d);
+    updateTasksBadge();
+    updateTasksResetTimer();
+    setInterval(updateTasksResetTimer, 60000);
     if      (IQData.needsOnboarding())   { onboard.classList.add('show'); }
     else if (IQData.needsCalibration())  { Q.setAge(d.age); startCalibration(); }
     else                                 { startFeed(); }
@@ -687,24 +890,25 @@
     const idx = slides++;
     const div = document.createElement('div');
     div.className = 'slide';
-
     const customRenderer = Q._renderers && Q._renderers[q.type];
     if (customRenderer) {
       div.innerHTML = customRenderer.render(q, idx);
     } else {
       div.innerHTML = renderDefault(q, idx);
     }
-
     feed.appendChild(div);
-
     if (customRenderer && customRenderer.attach) {
-      customRenderer.attach(div, q, idx, { feed, flashEl, confettiEl, IQData, getEncouragement, updateUI, checkMore, spawnConfetti, answerStartRef: { get: () => answerStart, set: v => { answerStart = v; } }, Haptics });
+      customRenderer.attach(div, q, idx, {
+        feed, flashEl, confettiEl, IQData, DailyTasks, getEncouragement,
+        updateUI, checkMore, spawnConfetti,
+        answerStartRef: { get: () => answerStart, set: v => { answerStart = v; } },
+        Haptics,
+        onTaskUpdate: refreshTasksPanel,
+      });
     }
-
     answerStart = Date.now();
   }
 
-  // ── Default card renderer ──
   function renderDefault(q, idx) {
     let visual = '';
     if (q.visual === 'sequence' || q.visual === 'letterSequence') {
@@ -761,21 +965,13 @@
 
     const result = IQData.recordAnswer(opts.dataset.cat, isCorrect, parseFloat(opts.dataset.diff), ms);
 
-    // ── Haptics on answer ──
     if (isCorrect) {
-      if (result.streak > 0 && result.streak % 5 === 0) {
-        Haptics.streak();
-      } else {
-        Haptics.success();
-      }
+      if (result.streak > 0 && result.streak % 5 === 0) Haptics.streak();
+      else Haptics.success();
     } else {
       Haptics.error();
     }
-
-    // Level up haptic
-    if (result.leveledUp) {
-      setTimeout(() => Haptics.levelUp(), 300);
-    }
+    if (result.leveledUp) setTimeout(() => Haptics.levelUp(), 300);
 
     const fb = document.getElementById(`fb-${idx}`);
     fb.textContent = getEncouragement(result.streak, isCorrect);
@@ -795,21 +991,139 @@
     }
 
     updateUI(result);
+    updateTasksBadge();
+    // Refresh panel if open
+    if (document.getElementById('tasks-panel').classList.contains('open')) {
+      refreshTasksPanel();
+    }
+
     checkMore();
     setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'),  250);
     setTimeout(() => document.getElementById(`hint-${idx}`)?.classList.add('show'), 500);
     answerStart = Date.now();
   });
 
+  // ══════════════════════════════════════════
+  // DAILY TASKS PANEL
+  // ══════════════════════════════════════════
+  window.openTasksPanel = function() {
+    Haptics.light();
+    refreshTasksPanel();
+    document.getElementById('tasks-panel').classList.add('open');
+  };
+
+  window.closeTasksPanel = function() {
+    Haptics.light();
+    document.getElementById('tasks-panel').classList.remove('open');
+  };
+
+  function updateTasksBadge() {
+    const hasBadge = DailyTasks.hasBadge();
+    tasksBadge.classList.toggle('show', hasBadge);
+  }
+
+  function updateTasksResetTimer() {
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    const diff = midnight - now;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    document.getElementById('tasks-resets').textContent = `Resets in ${h}h ${m}m`;
+  }
+
+  function refreshTasksPanel() {
+    const state = DailyTasks.getState();
+    const list  = document.getElementById('tasks-list');
+
+    // Daily streak
+    const streakDays = state.dailyStreak || 0;
+    document.getElementById('daily-streak-val').textContent =
+      streakDays === 1 ? '1 day' : `${streakDays} days`;
+
+    // Overall bar
+    const doneCount = state.tasks.filter(t => t.done).length;
+    document.getElementById('tasks-overall-count').textContent = `${doneCount} / ${state.tasks.length}`;
+    document.getElementById('tasks-overall-bar').style.width = `${(doneCount / state.tasks.length) * 100}%`;
+
+    // Complete banner
+    const banner = document.getElementById('tasks-complete-banner');
+    if (state.allDone) banner.classList.add('show');
+
+    // Render task cards
+    list.innerHTML = '';
+    state.tasks.forEach(task => {
+      const pct = Math.min(100, Math.round((task.progress / task.target) * 100));
+      const card = document.createElement('div');
+      card.className = 'task-card' + (task.claimed ? ' task-all-claimed' : '');
+
+      let rightEl = '';
+      if (task.claimed) {
+        rightEl = `<div class="task-claimed-badge">✅</div>`;
+      } else if (task.done) {
+        rightEl = `<button class="task-claim" data-task-id="${task.id}">+${task.xp} XP</button>`;
+      }
+
+      card.innerHTML = `
+        <div class="task-icon">${task.icon}</div>
+        <div class="task-body">
+          <div class="task-label">${task.label}</div>
+          <div class="task-progress-row">
+            <div class="task-bar-outer">
+              <div class="task-bar-inner${task.done ? ' bar-done' : ''}" style="width:${pct}%"></div>
+            </div>
+            <div class="task-progress-label">${task.progress}/${task.target}</div>
+          </div>
+        </div>
+        ${rightEl}
+      `;
+      list.appendChild(card);
+    });
+
+    // Claim button handler
+    list.querySelectorAll('.task-claim').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const taskId = btn.dataset.taskId;
+        const xp     = DailyTasks.claimTask(taskId);
+        if (xp === null) return;
+
+        Haptics.levelUp();
+        spawnConfetti(20);
+
+        // Add XP to IQData
+        const d = IQData.load();
+        d.xp   += xp;
+        const oldLvl = d.level;
+        d.level = Math.floor(d.xp / 150) + 1;
+        IQData.save(d);
+        updateUI(d);
+        if (d.level > oldLvl) setTimeout(() => Haptics.levelUp(), 300);
+
+        // Show toast
+        showXpToast(`+${xp} XP`);
+
+        // Refresh panel
+        refreshTasksPanel();
+        updateTasksBadge();
+      });
+    });
+  }
+
+  function showXpToast(msg) {
+    xpToast.textContent = msg;
+    xpToast.classList.add('show');
+    setTimeout(() => xpToast.classList.remove('show'), 2000);
+  }
+
   // ── Utils ──
   function spawnConfetti(n) {
     const colors = ['#58cc02','#ffc800','#ea2b2b','#1cb0f6','#ce82ff','#ff9600'];
     for (let i = 0; i < n; i++) {
       const p = document.createElement('i');
-      p.style.left            = Math.random() * 100 + '%';
-      p.style.top             = '-10px';
-      p.style.background      = colors[Math.floor(Math.random() * colors.length)];
-      p.style.animationDelay  = Math.random() * 0.2 + 's';
+      p.style.left           = Math.random() * 100 + '%';
+      p.style.top            = '-10px';
+      p.style.background     = colors[Math.floor(Math.random() * colors.length)];
+      p.style.animationDelay = Math.random() * 0.2 + 's';
       confettiEl.appendChild(p);
       setTimeout(() => p.classList.add('fall'), 10);
       setTimeout(() => p.remove(), 1400);
@@ -825,6 +1139,9 @@
     levelLabel.textContent = 'Lvl ' + d.level;
     xpLabel.textContent    = xpInLevel + '/150';
   }
+
+  // Also expose for game renderers
+  window.refreshTasksPanel = refreshTasksPanel;
 
   // ── Push Notifications ──
   const VAPID_PUBLIC_KEY = 'BCeif8Bk8ozGVFukIl2zE7UWB1YXN5eBPF0nHgNc0ELsEyNmZ0VE3xo15UCuqjgNg9dARdIKThXKakZL9ci8ZXI';
