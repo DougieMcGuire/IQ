@@ -1,14 +1,9 @@
-// ═══════════════════════════════════════════════════
 // games/ticTacToe.js — Tic Tac Toe vs Bot plugin
-// Self-registers with Q (questions.js must be loaded first)
-// ═══════════════════════════════════════════════════
-
 (function () {
 
   var DIFFS = [0.6, 1.0, 1.5];
   var LABELS = ['Easy', 'Medium', 'Hard'];
 
-  // ─── 1. Register the generator ──────────────────
   Q.register('ticTacToe', function () {
     var tier = this.rand(0, 2);
     return {
@@ -21,11 +16,10 @@
       options:       [],
       explanation:   '',
       visual:        'ticTacToe',
-      botLevel:      tier,  // 0=easy 1=medium 2=hard
+      botLevel:      tier,
     };
   }, 3);
 
-  // ─── 2. Register the custom renderer ────────────
   Q.registerRenderer('ticTacToe', {
 
     render: function (q, idx) {
@@ -52,27 +46,28 @@
       var flashEl        = ctx.flashEl;
       var updateUI       = ctx.updateUI;
       var checkMore      = ctx.checkMore;
-      var spawnConfetti   = ctx.spawnConfetti;
-      var answerStartRef  = ctx.answerStartRef;
+      var spawnConfetti  = ctx.spawnConfetti;
+      var answerStartRef = ctx.answerStartRef;
 
-      var board = [0,0,0,0,0,0,0,0,0]; // 0=empty, 1=X(player), 2=O(bot)
+      var board = [0,0,0,0,0,0,0,0,0];
       var done  = false;
-      var botLevel = q.botLevel; // 0,1,2
+      var botLevel = q.botLevel;
 
       var WINS = [
-        [0,1,2],[3,4,5],[6,7,8], // rows
-        [0,3,6],[1,4,7],[2,5,8], // cols
-        [0,4,8],[2,4,6],         // diags
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6],
       ];
 
-      // ── Player click ──
       slideEl.addEventListener('click', function (e) {
         var btn = e.target.closest('[data-tc]');
         if (!btn || +btn.dataset.ti !== idx || done) return;
         var cell = +btn.dataset.tc;
         if (board[cell] !== 0) return;
 
-        // Player move
+        // Player places X
+        Haptics.medium();
+
         board[cell] = 1;
         renderBoard();
 
@@ -80,13 +75,14 @@
         if (w) { finish(w); return; }
         if (isFull()) { finish('draw'); return; }
 
-        // Bot move after short delay
         setStatus("Bot thinking...");
-        done = true; // block clicks during bot turn
+        done = true;
         setTimeout(function () {
           done = false;
           var move = botMove();
           board[move] = 2;
+          // Bot's move — lighter feel
+          Haptics.light();
           renderBoard();
 
           var w2 = checkWin();
@@ -146,33 +142,26 @@
         return e;
       }
 
-      // ── Bot AI ──
       function botMove() {
         if (botLevel === 0) return botEasy();
         if (botLevel === 1) return botMedium();
         return botHard();
       }
 
-      // Easy: random
       function botEasy() {
         var e = empties();
         return e[Math.floor(Math.random() * e.length)];
       }
 
-      // Medium: win if can, block if must, else random
       function botMedium() {
-        // Can win?
         var w = findWinMove(2);
         if (w !== -1) return w;
-        // Must block?
         var b = findWinMove(1);
         if (b !== -1) return b;
-        // Take center
         if (board[4] === 0) return 4;
         return botEasy();
       }
 
-      // Hard: minimax
       function botHard() {
         var bestScore = -Infinity;
         var bestMove  = -1;
@@ -212,7 +201,6 @@
         }
       }
 
-      // Returns winner piece (1 or 2) or 0
       function checkWinner() {
         for (var i = 0; i < WINS.length; i++) {
           var a = WINS[i][0], b = WINS[i][1], c = WINS[i][2];
@@ -231,16 +219,22 @@
         return -1;
       }
 
-      // ── Finish ──
       function finish(result) {
         done = true;
         var won  = result === 'player';
         var draw = result === 'draw';
         var ms   = Date.now() - answerStartRef.get();
 
-        if (won)       setStatus("You win! 🎉");
-        else if (draw) setStatus("It's a draw! 🤝");
-        else           setStatus("Bot wins! 🤖");
+        if (won) {
+          setStatus("You win! 🎉");
+          Haptics.success();
+        } else if (draw) {
+          setStatus("It's a draw! 🤝");
+          Haptics.toggle(); // neutral click feel for draw
+        } else {
+          setStatus("Bot wins! 🤖");
+          Haptics.error();
+        }
 
         var data = IQData.recordAnswer(q.category, won, q.difficulty, ms);
 
@@ -262,9 +256,9 @@
         setTimeout(function () { if (hintEl) hintEl.classList.add('show'); }, 500);
         updateUI(data);
 
-        // streak popup
         if (won && data.streak > 0 && data.streak % 5 === 0) {
           setTimeout(function () {
+            Haptics.streak();
             var streakNum   = document.getElementById('streak-num');
             var streakPopup = document.getElementById('streak-popup');
             if (streakNum)   streakNum.textContent = data.streak;
