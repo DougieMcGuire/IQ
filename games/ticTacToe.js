@@ -1,14 +1,9 @@
-// ═══════════════════════════════════════════════════
 // games/ticTacToe.js — Tic Tac Toe vs Bot plugin
-// Self-registers with Q (questions.js must be loaded first)
-// ═══════════════════════════════════════════════════
-
 (function () {
 
   var DIFFS = [0.6, 1.0, 1.5];
   var LABELS = ['Easy', 'Medium', 'Hard'];
 
-  // ─── 1. Register the generator ──────────────────
   Q.register('ticTacToe', function () {
     var tier = this.rand(0, 2);
     return {
@@ -21,11 +16,10 @@
       options:       [],
       explanation:   '',
       visual:        'ticTacToe',
-      botLevel:      tier,  // 0=easy 1=medium 2=hard
+      botLevel:      tier,
     };
   }, 3);
 
-  // ─── 2. Register the custom renderer ────────────
   Q.registerRenderer('ticTacToe', {
 
     render: function (q, idx) {
@@ -33,7 +27,6 @@
       for (var i = 0; i < 9; i++) {
         cells += '<button class="ttt-cell" data-ti="' + idx + '" data-tc="' + i + '"></button>';
       }
-
       return '<div class="qcard">' +
         '<div class="category">❌ Tic Tac Toe</div>' +
         '<div class="question">' + q.question + '</div>' +
@@ -48,31 +41,33 @@
     },
 
     attach: function (slideEl, q, idx, ctx) {
-      var IQData         = ctx.IQData;
-      var flashEl        = ctx.flashEl;
-      var updateUI       = ctx.updateUI;
-      var checkMore      = ctx.checkMore;
-      var spawnConfetti   = ctx.spawnConfetti;
-      var answerStartRef  = ctx.answerStartRef;
+      var IQData        = ctx.IQData;
+      var flashEl       = ctx.flashEl;
+      var updateUI      = ctx.updateUI;
+      var checkMore     = ctx.checkMore;
+      var spawnConfetti = ctx.spawnConfetti;
+      var answerStartRef = ctx.answerStartRef;
+      var H             = ctx.Haptics || {};
 
-      var board = [0,0,0,0,0,0,0,0,0]; // 0=empty, 1=X(player), 2=O(bot)
+      var board = [0,0,0,0,0,0,0,0,0];
       var done  = false;
-      var botLevel = q.botLevel; // 0,1,2
+      var botLevel = q.botLevel;
 
       var WINS = [
-        [0,1,2],[3,4,5],[6,7,8], // rows
-        [0,3,6],[1,4,7],[2,5,8], // cols
-        [0,4,8],[2,4,6],         // diags
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6],
       ];
 
-      // ── Player click ──
       slideEl.addEventListener('click', function (e) {
         var btn = e.target.closest('[data-tc]');
         if (!btn || +btn.dataset.ti !== idx || done) return;
         var cell = +btn.dataset.tc;
         if (board[cell] !== 0) return;
 
-        // Player move
+        // Player places X — solid tap
+        H.medium && H.medium();
+
         board[cell] = 1;
         renderBoard();
 
@@ -80,19 +75,20 @@
         if (w) { finish(w); return; }
         if (isFull()) { finish('draw'); return; }
 
-        // Bot move after short delay
-        setStatus("Bot thinking...");
-        done = true; // block clicks during bot turn
+        setStatus('Bot thinking...');
+        done = true;
         setTimeout(function () {
           done = false;
           var move = botMove();
           board[move] = 2;
+          // Bot move — lighter feel
+          H.light && H.light();
           renderBoard();
 
           var w2 = checkWin();
           if (w2) { finish(w2); return; }
           if (isFull()) { finish('draw'); return; }
-          setStatus("Your turn (X)");
+          setStatus('Your turn (X)');
         }, 350);
       });
 
@@ -100,15 +96,8 @@
         for (var i = 0; i < 9; i++) {
           var el = slideEl.querySelector('[data-tc="' + i + '"]');
           if (!el) continue;
-          if (board[i] === 1) {
-            el.textContent = 'X';
-            el.classList.add('ttt-x');
-            el.classList.remove('ttt-o');
-          } else if (board[i] === 2) {
-            el.textContent = 'O';
-            el.classList.add('ttt-o');
-            el.classList.remove('ttt-x');
-          }
+          if (board[i] === 1) { el.textContent = 'X'; el.classList.add('ttt-x'); el.classList.remove('ttt-o'); }
+          else if (board[i] === 2) { el.textContent = 'O'; el.classList.add('ttt-o'); el.classList.remove('ttt-x'); }
         }
       }
 
@@ -146,36 +135,26 @@
         return e;
       }
 
-      // ── Bot AI ──
       function botMove() {
         if (botLevel === 0) return botEasy();
         if (botLevel === 1) return botMedium();
         return botHard();
       }
 
-      // Easy: random
       function botEasy() {
         var e = empties();
         return e[Math.floor(Math.random() * e.length)];
       }
 
-      // Medium: win if can, block if must, else random
       function botMedium() {
-        // Can win?
-        var w = findWinMove(2);
-        if (w !== -1) return w;
-        // Must block?
-        var b = findWinMove(1);
-        if (b !== -1) return b;
-        // Take center
+        var w = findWinMove(2); if (w !== -1) return w;
+        var b = findWinMove(1); if (b !== -1) return b;
         if (board[4] === 0) return 4;
         return botEasy();
       }
 
-      // Hard: minimax
       function botHard() {
-        var bestScore = -Infinity;
-        var bestMove  = -1;
+        var bestScore = -Infinity, bestMove = -1;
         var e = empties();
         for (var i = 0; i < e.length; i++) {
           board[e[i]] = 2;
@@ -191,28 +170,18 @@
         if (w === 2) return 10 - depth;
         if (w === 1) return depth - 10;
         if (isFull()) return 0;
-
         var e = empties();
         if (isMax) {
           var best = -Infinity;
-          for (var i = 0; i < e.length; i++) {
-            board[e[i]] = 2;
-            best = Math.max(best, minimax(false, depth + 1));
-            board[e[i]] = 0;
-          }
+          for (var i = 0; i < e.length; i++) { board[e[i]] = 2; best = Math.max(best, minimax(false, depth+1)); board[e[i]] = 0; }
           return best;
         } else {
           var best = Infinity;
-          for (var i = 0; i < e.length; i++) {
-            board[e[i]] = 1;
-            best = Math.min(best, minimax(true, depth + 1));
-            board[e[i]] = 0;
-          }
+          for (var i = 0; i < e.length; i++) { board[e[i]] = 1; best = Math.min(best, minimax(true, depth+1)); board[e[i]] = 0; }
           return best;
         }
       }
 
-      // Returns winner piece (1 or 2) or 0
       function checkWinner() {
         for (var i = 0; i < WINS.length; i++) {
           var a = WINS[i][0], b = WINS[i][1], c = WINS[i][2];
@@ -231,16 +200,15 @@
         return -1;
       }
 
-      // ── Finish ──
       function finish(result) {
         done = true;
         var won  = result === 'player';
         var draw = result === 'draw';
         var ms   = Date.now() - answerStartRef.get();
 
-        if (won)       setStatus("You win! 🎉");
-        else if (draw) setStatus("It's a draw! 🤝");
-        else           setStatus("Bot wins! 🤖");
+        if (won)       { setStatus('You win! 🎉'); H.success && H.success(); }
+        else if (draw) { setStatus("It's a draw! 🤝"); H.toggle && H.toggle(); }
+        else           { setStatus('Bot wins! 🤖'); H.error && H.error(); }
 
         var data = IQData.recordAnswer(q.category, won, q.difficulty, ms);
 
@@ -262,9 +230,9 @@
         setTimeout(function () { if (hintEl) hintEl.classList.add('show'); }, 500);
         updateUI(data);
 
-        // streak popup
         if (won && data.streak > 0 && data.streak % 5 === 0) {
           setTimeout(function () {
+            H.streak && H.streak();
             var streakNum   = document.getElementById('streak-num');
             var streakPopup = document.getElementById('streak-popup');
             if (streakNum)   streakNum.textContent = data.streak;
