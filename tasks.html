@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Daily Tasks – BrainDeer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #3a2918; --card: #4a3625; --card-glow: #5a4232;
+      --brown-mid: #6b4f32; --brown-light: #8f6b4a;
+      --tan: #c2a476; --cream: #f0e2cc;
+      --green: #58cc02; --green-dark: #46a302;
+      --red: #ea2b2b; --red-dark: #c42020;
+      --gold: #ffc800; --gold-dark: #d9aa00;
+      --orange: #ff9600;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg); color: var(--cream);
+    }
+
+    /* ── Layout ── */
+    .page {
+      display: flex; flex-direction: column;
+      height: 100%; overflow: hidden;
+    }
+
+    /* ── Top bar ── */
+    .top-bar {
+      padding: calc(env(safe-area-inset-top, 0px) + 14px) 18px 12px;
+      background: var(--bg); flex-shrink: 0;
+    }
+    .top-row {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-title { font-size: 22px; font-weight: 900; color: var(--cream); }
+    .resets-chip {
+      background: var(--card); border-radius: 12px; padding: 5px 12px;
+      font-size: 11px; font-weight: 800; color: var(--tan);
+      box-shadow: 0 2px 0 rgba(0,0,0,0.15);
+    }
+
+    /* ── Scrollable body ── */
+    .scroll-body {
+      flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding: 12px 18px calc(env(safe-area-inset-bottom, 0px) + 20px);
+    }
+    .scroll-body::-webkit-scrollbar { display: none; }
+
+    /* ── Daily streak card ── */
+    .streak-card {
+      background: var(--card); border-radius: 18px;
+      padding: 14px 16px; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 14px;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+      position: relative; overflow: hidden;
+    }
+    .streak-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    .streak-flame { font-size: 36px; }
+    .streak-info { flex: 1; }
+    .streak-label { font-size: 11px; font-weight: 800; color: var(--tan); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 3px; }
+    .streak-val { font-size: 28px; font-weight: 900; color: var(--orange); line-height: 1; }
+    .streak-sub { font-size: 12px; font-weight: 600; color: var(--tan); margin-top: 2px; }
+
+    /* ── Overall progress ── */
+    .overall-card {
+      background: var(--card); border-radius: 18px;
+      padding: 14px 16px; margin-bottom: 14px;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+      position: relative; overflow: hidden;
+    }
+    .overall-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    .overall-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .overall-label { font-size: 13px; font-weight: 800; color: var(--cream); }
+    .overall-count { font-size: 13px; font-weight: 900; color: var(--gold); }
+    .overall-bar-outer { height: 12px; background: var(--brown-mid); border-radius: 6px; overflow: hidden; }
+    .overall-bar-inner {
+      height: 100%; border-radius: 6px; background: var(--gold);
+      transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+    .overall-bar-inner::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
+      background: rgba(255,255,255,0.28); border-radius: 6px 6px 0 0;
+    }
+
+    /* ── Complete banner ── */
+    .complete-banner {
+      display: none; align-items: center; gap: 14px;
+      background: linear-gradient(135deg, #58cc02 0%, #46d400 100%);
+      border-radius: 18px; padding: 16px 18px; margin-bottom: 14px;
+      box-shadow: 0 5px 0 var(--green-dark);
+    }
+    .complete-banner.show { display: flex; animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+    .cb-icon { font-size: 36px; }
+    .cb-text .cb-title { font-size: 16px; font-weight: 900; color: #fff; }
+    .cb-text .cb-sub   { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.85); margin-top: 2px; }
+
+    /* ── Task section label ── */
+    .section-label {
+      font-size: 11px; font-weight: 800; color: var(--tan);
+      letter-spacing: 1.2px; text-transform: uppercase;
+      margin-bottom: 8px; padding-left: 2px;
+    }
+
+    /* ── Task cards ── */
+    .task-card {
+      background: var(--card); border-radius: 18px;
+      padding: 14px 14px 14px 14px;
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+      position: relative; overflow: hidden;
+      transition: opacity 0.4s;
+    }
+    .task-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+      pointer-events: none; border-radius: 18px 18px 0 0;
+    }
+    .task-card.is-claimed { opacity: 0.45; }
+
+    .task-icon {
+      width: 48px; height: 48px; flex-shrink: 0;
+      background: var(--bg); border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+    }
+
+    .task-body { flex: 1; min-width: 0; }
+    .task-label { font-size: 14px; font-weight: 800; color: var(--cream); margin-bottom: 8px; line-height: 1.25; }
+
+    .task-progress-row { display: flex; align-items: center; gap: 8px; }
+    .task-bar-outer {
+      flex: 1; height: 8px; background: var(--brown-mid);
+      border-radius: 4px; overflow: hidden;
+    }
+    .task-bar-inner {
+      height: 100%; border-radius: 4px; background: var(--green);
+      transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative;
+    }
+    .task-bar-inner::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
+      background: rgba(255,255,255,0.25); border-radius: 4px 4px 0 0;
+    }
+    .task-bar-inner.bar-done { background: var(--gold); }
+    .task-pct { font-size: 11px; font-weight: 800; color: var(--tan); white-space: nowrap; }
+
+    /* Claim btn */
+    .task-claim {
+      flex-shrink: 0;
+      background: var(--gold); color: #2a1800;
+      border: none; border-radius: 12px; padding: 10px 14px;
+      font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 900;
+      cursor: pointer; box-shadow: 0 4px 0 var(--gold-dark);
+      transition: transform 0.1s, box-shadow 0.1s;
+      white-space: nowrap; line-height: 1;
+    }
+    .task-claim:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--gold-dark); }
+
+    .task-done-badge { flex-shrink: 0; font-size: 26px; animation: popIn 0.3s ease; }
+
+    /* ── XP toast ── */
+    .xp-toast {
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 0px) + 16px);
+      left: 50%; transform: translateX(-50%) translateY(-16px);
+      background: var(--gold); color: #2a1800;
+      border-radius: 20px; padding: 8px 20px;
+      font-size: 17px; font-weight: 900;
+      box-shadow: 0 4px 0 var(--gold-dark);
+      z-index: 999; opacity: 0; pointer-events: none;
+      transition: opacity 0.2s, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      white-space: nowrap;
+    }
+    .xp-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── Confetti ── */
+    .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 800; overflow: hidden; }
+    .confetti i { position: absolute; width: 10px; height: 10px; opacity: 0; border-radius: 3px; }
+    .confetti i.fall { animation: confettiFall 1.3s ease-out forwards; }
+
+    /* ── Empty / loading ── */
+    .loading {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 12px;
+      padding: 60px 20px; color: var(--tan);
+      font-size: 14px; font-weight: 700;
+    }
+    .loading-spinner {
+      width: 36px; height: 36px; border: 4px solid var(--brown-mid);
+      border-top-color: var(--gold); border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    /* ── Animations ── */
+    @keyframes popIn {
+      0%   { transform: scale(0.85); opacity: 0; }
+      60%  { transform: scale(1.05); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes confettiFall {
+      0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-in { animation: slideUp 0.35s ease both; }
+    .delay-1 { animation-delay: 0.05s; }
+    .delay-2 { animation-delay: 0.1s; }
+    .delay-3 { animation-delay: 0.15s; }
+    .delay-4 { animation-delay: 0.2s; }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <div class="top-bar">
+    <div class="top-row">
+      <div class="page-title">📋 Daily Tasks</div>
+      <div class="resets-chip" id="resets-chip">Resets in --</div>
+    </div>
+  </div>
+
+  <div class="scroll-body" id="scroll-body">
+    <div class="loading" id="loading-state">
+      <div class="loading-spinner"></div>
+      Loading tasks…
+    </div>
+  </div>
+</div>
+
+<div class="xp-toast" id="xp-toast"></div>
+<div class="confetti" id="confetti"></div>
+
+<script type="module">
+// ════════════════════════════════════════════════════
+// INLINE DAILY TASKS LOGIC
+// (self-contained so this page needs no data.js import)
+// ════════════════════════════════════════════════════
+
+const TASK_POOL = [
+  { id: 'streak_5',       type: 'streak',   target: 5,   label: 'Get a streak of 5',          icon: '🔥', xp: 30  },
+  { id: 'streak_10',      type: 'streak',   target: 10,  label: 'Get a streak of 10',         icon: '🔥', xp: 60  },
+  { id: 'streak_15',      type: 'streak',   target: 15,  label: 'Get a streak of 15',         icon: '🔥', xp: 100 },
+  { id: 'correct_10',     type: 'correct',  target: 10,  label: 'Get 10 correct',              icon: '✅', xp: 25  },
+  { id: 'correct_25',     type: 'correct',  target: 25,  label: 'Get 25 correct',              icon: '✅', xp: 50  },
+  { id: 'correct_50',     type: 'correct',  target: 50,  label: 'Get 50 correct',              icon: '✅', xp: 90  },
+  { id: 'answer_20',      type: 'answered', target: 20,  label: 'Answer 20 questions',         icon: '🧠', xp: 20  },
+  { id: 'answer_50',      type: 'answered', target: 50,  label: 'Answer 50 questions',         icon: '🧠', xp: 45  },
+  { id: 'answer_100',     type: 'answered', target: 100, label: 'Answer 100 questions',        icon: '🧠', xp: 80  },
+  { id: 'accuracy_70',    type: 'accuracy', target: 70,  label: 'Hit 70% accuracy today',      icon: '🎯', xp: 35  },
+  { id: 'accuracy_80',    type: 'accuracy', target: 80,  label: 'Hit 80% accuracy today',      icon: '🎯', xp: 55  },
+  { id: 'play_wordle',    type: 'game', game: 'wordle',       target: 3, label: 'Play 3 Wordle rounds',      icon: '🟩', xp: 40 },
+  { id: 'play_math',      type: 'game', game: 'mathRush',     target: 3, label: 'Play 3 Math Rush rounds',   icon: '➕', xp: 40 },
+  { id: 'play_memory',    type: 'game', game: 'memory',       target: 2, label: 'Play 2 Memory games',       icon: '🃏', xp: 35 },
+  { id: 'play_reaction',  type: 'game', game: 'reaction',     target: 3, label: 'Play 3 Reaction tests',     icon: '⚡', xp: 30 },
+  { id: 'play_ttt',       type: 'game', game: 'ticTacToe',    target: 2, label: 'Play 2 Tic Tac Toe games',  icon: '⭕', xp: 30 },
+  { id: 'play_simon',     type: 'game', game: 'simon',        target: 2, label: 'Play 2 Simon Says rounds',  icon: '🔴', xp: 35 },
+  { id: 'play_scramble',  type: 'game', game: 'wordScramble', target: 3, label: 'Unscramble 3 words',        icon: '🔤', xp: 30 },
+  { id: 'fast_5',         type: 'fast',     target: 5,   label: 'Answer 5 in under 3.5s',      icon: '⚡', xp: 45  },
+  { id: 'fast_10',        type: 'fast',     target: 10,  label: 'Answer 10 in under 3.5s',     icon: '⚡', xp: 70  },
+];
+
+const TASKS_KEY   = 'bd_daily_tasks_v1';
+const SESSION_KEY = 'bd_session_today';
+const IQ_KEY      = 'iq_profile_v6';
+
+function getTodayKey() {
+  const n = new Date();
+  return `${n.getFullYear()}-${n.getMonth() + 1}-${n.getDate()}`;
+}
+
+function seededRandom(seed) {
+  let s = seed;
+  return () => {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    return (s >>> 0) / 0xffffffff;
+  };
+}
+
+function getDailyTaskDefs() {
+  const dateKey = getTodayKey();
+  const seed    = dateKey.split('-').reduce((a, n) => a * 31 + parseInt(n), 0);
+  const rng     = seededRandom(seed);
+  return [...TASK_POOL].sort(() => rng() - 0.5).slice(0, 3);
+}
+
+function wasYesterday(dateStr) {
+  if (!dateStr) return false;
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const prev      = new Date(y, m - 1, d);
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return prev.toDateString() === yesterday.toDateString();
+}
+
+function loadTaskState() {
+  try {
+    const raw = localStorage.getItem(TASKS_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function saveTaskState(s) {
+  localStorage.setItem(TASKS_KEY, JSON.stringify(s));
+}
+
+function getTaskState() {
+  const stored = loadTaskState();
+  const today  = getTodayKey();
+  if (stored && stored.date === today) return stored;
+
+  const prevStreak = (stored && stored.allDone && wasYesterday(stored.date))
+    ? (stored.dailyStreak || 0) + 1
+    : (stored && wasYesterday(stored.date) ? stored.dailyStreak || 0 : 0);
+
+  const fresh = {
+    date:       today,
+    tasks:      getDailyTaskDefs().map(def => ({ ...def, progress: 0, done: false, claimed: false })),
+    allDone:    false,
+    allClaimed: false,
+    dailyStreak: prevStreak,
+  };
+  saveTaskState(fresh);
+  return fresh;
+}
+
+function claimTask(taskId) {
+  const state = getTaskState();
+  const task  = state.tasks.find(t => t.id === taskId && t.done && !t.claimed);
+  if (!task) return null;
+  task.claimed = true;
+  if (state.tasks.every(t => t.claimed)) state.allClaimed = true;
+  saveTaskState(state);
+  return task.xp;
+}
+
+// Award XP directly into IQData store
+function awardXP(xp) {
+  try {
+    const raw = localStorage.getItem(IQ_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    d.xp    = (d.xp || 0) + xp;
+    d.level = Math.floor(d.xp / 150) + 1;
+    localStorage.setItem(IQ_KEY, JSON.stringify(d));
+    // Tell parent shell to re-render if it exists
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'xpAwarded', xp }, '*');
+    }
+  } catch (e) {
+    console.warn('[tasks] awardXP failed', e);
+  }
+}
+
+// ── Reset timer ──
+function updateResetTimer() {
+  const now      = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  const diff = midnight - now;
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  document.getElementById('resets-chip').textContent = `Resets in ${h}h ${m}m`;
+}
+
+// ── Confetti ──
+function spawnConfetti(n) {
+  const colors  = ['#58cc02','#ffc800','#ea2b2b','#1cb0f6','#ce82ff','#ff9600'];
+  const el      = document.getElementById('confetti');
+  for (let i = 0; i < n; i++) {
+    const p = document.createElement('i');
+    p.style.left           = Math.random() * 100 + '%';
+    p.style.top            = '-12px';
+    p.style.background     = colors[Math.floor(Math.random() * colors.length)];
+    p.style.animationDelay = Math.random() * 0.25 + 's';
+    el.appendChild(p);
+    setTimeout(() => p.classList.add('fall'), 10);
+    setTimeout(() => p.remove(), 1500);
+  }
+}
+
+// ── XP toast ──
+function showXpToast(msg) {
+  const t = document.getElementById('xp-toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── Haptics (via parent if available) ──
+function haptic(type) {
+  try {
+    if (window.parent !== window && window.parent.Haptics) {
+      window.parent.Haptics[type]?.();
+    }
+  } catch {}
+}
+
+// ════════════════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════════════════
+function render() {
+  const state = getTaskState();
+  const body  = document.getElementById('scroll-body');
+  const done  = state.tasks.filter(t => t.done).length;
+  const total = state.tasks.length;
+
+  body.innerHTML = '';
+
+  // ── Daily streak card ──
+  const streakCard = document.createElement('div');
+  streakCard.className = 'streak-card animate-in';
+  const streakDays = state.dailyStreak || 0;
+  const streakSub  = streakDays === 0
+    ? 'Complete all tasks today to start your streak!'
+    : streakDays === 1
+      ? 'Great start — keep it up tomorrow!'
+      : `${streakDays} days in a row — don't break it!`;
+  streakCard.innerHTML = `
+    <div class="streak-flame">📅</div>
+    <div class="streak-info">
+      <div class="streak-label">Daily Challenge Streak</div>
+      <div class="streak-val">${streakDays} ${streakDays === 1 ? 'day' : 'days'}</div>
+      <div class="streak-sub">${streakSub}</div>
+    </div>
+  `;
+  body.appendChild(streakCard);
+
+  // ── Overall progress ──
+  const overallCard = document.createElement('div');
+  overallCard.className = 'overall-card animate-in delay-1';
+  overallCard.innerHTML = `
+    <div class="overall-row">
+      <span class="overall-label">Today's Progress</span>
+      <span class="overall-count">${done} / ${total} complete</span>
+    </div>
+    <div class="overall-bar-outer">
+      <div class="overall-bar-inner" id="overall-bar" style="width:${(done/total)*100}%"></div>
+    </div>
+  `;
+  body.appendChild(overallCard);
+
+  // ── All done banner ──
+  if (state.allDone) {
+    const banner = document.createElement('div');
+    banner.className = 'complete-banner show animate-in delay-2';
+    banner.innerHTML = `
+      <div class="cb-icon">🎉</div>
+      <div class="cb-text">
+        <div class="cb-title">All tasks complete!</div>
+        <div class="cb-sub">Come back tomorrow for a new set.</div>
+      </div>
+    `;
+    body.appendChild(banner);
+  }
+
+  // ── Section label ──
+  const sectionLabel = document.createElement('div');
+  sectionLabel.className = 'section-label animate-in delay-2';
+  sectionLabel.textContent = "Today's Tasks";
+  body.appendChild(sectionLabel);
+
+  // ── Task cards ──
+  state.tasks.forEach((task, i) => {
+    const pct  = Math.min(100, Math.round((task.progress / task.target) * 100));
+    const card = document.createElement('div');
+    card.className = 'task-card animate-in' + (task.claimed ? ' is-claimed' : '') + ` delay-${Math.min(i + 3, 4)}`;
+
+    let rightEl = '';
+    if (task.claimed) {
+      rightEl = `<div class="task-done-badge">✅</div>`;
+    } else if (task.done) {
+      rightEl = `<button class="task-claim" data-id="${task.id}">+${task.xp} XP</button>`;
+    }
+
+    card.innerHTML = `
+      <div class="task-icon">${task.icon}</div>
+      <div class="task-body">
+        <div class="task-label">${task.label}</div>
+        <div class="task-progress-row">
+          <div class="task-bar-outer">
+            <div class="task-bar-inner${task.done ? ' bar-done' : ''}" style="width:${pct}%"></div>
+          </div>
+          <div class="task-pct">${task.progress} / ${task.target}</div>
+        </div>
+      </div>
+      ${rightEl}
+    `;
+
+    // Claim handler
+    const claimBtn = card.querySelector('.task-claim');
+    if (claimBtn) {
+      claimBtn.addEventListener('click', () => {
+        const xp = claimTask(claimBtn.dataset.id);
+        if (xp === null) return;
+        haptic('levelUp');
+        awardXP(xp);
+        spawnConfetti(22);
+        showXpToast(`+${xp} XP`);
+        // Re-render after short delay so animation feels good
+        setTimeout(render, 350);
+      });
+    }
+
+    body.appendChild(card);
+  });
+}
+
+// ════════════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════════════
+updateResetTimer();
+setInterval(updateResetTimer, 60000);
+
+// Slight delay so the loading state shows briefly, then render
+setTimeout(() => {
+  render();
+}, 80);
+
+// Listen for updates from parent (when improve.html records an answer)
+window.addEventListener('message', e => {
+  if (e.data?.type === 'tasksUpdated') render();
+});
+
+// Refresh when tab becomes visible (user switches back to Tasks)
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) render();
+});
+</script>
+</body>
+</html>
