@@ -32,6 +32,7 @@
       var zone      = slideEl.querySelector('#react-zone-' + idx);
       var circle    = slideEl.querySelector('#react-circle-' + idx);
       var result    = slideEl.querySelector('#react-result-' + idx);
+      var H = ctx.Haptics || {};
       if (!circle) return;
 
       var state = 'idle';
@@ -40,6 +41,7 @@
       var done = false;
 
       readyBtn.addEventListener('click', function () {
+        H.medium && H.medium();
         readyWrap.style.display = 'none';
         zone.style.display = 'flex';
         state = 'waiting';
@@ -50,6 +52,8 @@
           if (done) return;
           state = 'go';
           goTime = Date.now();
+          // Nudge fires when circle goes green — feel it before you see it
+          H.nudge && H.nudge();
           circle.classList.add('react-go');
           circle.textContent = 'TAP!';
         }, delay);
@@ -61,6 +65,7 @@
         if (state === 'waiting') {
           done = true;
           clearTimeout(timer);
+          H.error && H.error();
           circle.classList.add('react-fail');
           circle.textContent = 'Too early!';
           result.textContent = 'Wait for green next time';
@@ -71,6 +76,8 @@
           var reactionMs = Date.now() - goTime;
           var good = reactionMs < 400;
           var great = reactionMs < 250;
+          // Tap haptic fires immediately
+          H.reactionTap && H.reactionTap();
           circle.classList.remove('react-go');
           circle.classList.add(good ? 'react-success' : 'react-slow');
           circle.textContent = reactionMs + 'ms';
@@ -84,6 +91,10 @@
         var totalMs = Date.now() - ctx.answerStartRef.get();
         var data = ctx.IQData.recordAnswer(q.category, won, q.difficulty, totalMs);
         if (won) {
+          // Slight delay so reactionTap lands first, then success follows
+          setTimeout(function() {
+            ms < 250 ? (H.streak && H.streak()) : (H.success && H.success());
+          }, 120);
           ctx.flashEl.className = 'flash green show';
           ctx.spawnConfetti(ms < 250 ? 20 : 8);
         } else {
