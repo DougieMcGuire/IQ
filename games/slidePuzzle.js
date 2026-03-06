@@ -2,6 +2,7 @@
 (function () {
 
   Q.register('slidePuzzle', function () {
+    // Generate a solvable shuffled 3x3 (numbers 1-8 + 0 for blank)
     var goal = [1,2,3,4,5,6,7,8,0];
     var board;
     do {
@@ -63,25 +64,21 @@
         var ci = parseInt(btn.dataset.sc);
         var blank = board.indexOf(0);
 
+        // Check adjacency (same row ±1 or same col ±3)
         var canMove = false;
         if (ci === blank - 1 && Math.floor(ci / 3) === Math.floor(blank / 3)) canMove = true;
         if (ci === blank + 1 && Math.floor(ci / 3) === Math.floor(blank / 3)) canMove = true;
         if (ci === blank - 3 || ci === blank + 3) canMove = true;
 
-        if (!canMove) {
-          // Tapping an unmovable tile — light warning
-          Haptics.light();
-          return;
-        }
+        if (!canMove) return;
 
-        // Valid slide — satisfying medium tap
-        Haptics.medium();
-
+        // Swap
         board[blank] = board[ci];
         board[ci] = 0;
         moves++;
         movesEl.textContent = 'Moves: ' + moves;
 
+        // Re-render grid
         var cells = grid.querySelectorAll('.slide-cell');
         for (var i = 0; i < 9; i++) {
           cells[i].textContent = board[i] || '';
@@ -89,6 +86,7 @@
           cells[i].dataset.sc = i;
         }
 
+        // Check win
         var won = true;
         for (var j = 0; j < 9; j++) if (board[j] !== goal[j]) { won = false; break; }
         if (won) finish();
@@ -99,9 +97,9 @@
         var ms = Date.now() - ctx.answerStartRef.get();
         var optimal = moves <= 25;
         var data = ctx.IQData.recordAnswer(q.category, true, q.difficulty, ms);
-        optimal ? Haptics.streak() : Haptics.success();
         movesEl.textContent = 'Solved in ' + moves + ' moves!';
         movesEl.style.color = 'var(--green)';
+        // Highlight all cells
         grid.querySelectorAll('.slide-cell').forEach(function(c){ if(c.textContent) c.classList.add('slide-win'); });
         ctx.flashEl.className = 'flash green show';
         ctx.spawnConfetti(optimal ? 25 : 12);
