@@ -4,7 +4,7 @@
   var EMOJIS = ['🦌','🧠','⚡','🔥','🎯','💡','🌟','🎪','🎨','🎮','🏆','💎','🚀','🌈','🎵','🍕'];
 
   Q.register('memory', function () {
-    var size = Q.rand(0,2); // 0=easy(6 cards/3 pairs), 1=med(8/4), 2=hard(12/6)
+    var size = Q.rand(0,2);
     var pairs = [3,4,6][size];
     var picks = Q.shuffle(EMOJIS.slice()).slice(0, pairs);
     var cards = Q.shuffle(picks.concat(picks));
@@ -36,6 +36,7 @@
     attach: function (slideEl, q, idx, ctx) {
       var grid = slideEl.querySelector('#mem-grid-' + idx);
       var status = slideEl.querySelector('#mem-status-' + idx);
+      var H = ctx.Haptics || {};
       if (!grid) return;
       var flipped = [], matched = 0, moves = 0, locked = false;
       var totalPairs = q.pairs;
@@ -43,6 +44,10 @@
       grid.addEventListener('click', function (e) {
         var btn = e.target.closest('.mem-card');
         if (!btn || locked || btn.classList.contains('mem-flip') || btn.classList.contains('mem-matched')) return;
+
+        // Card flip feel
+        H.cardFlip && H.cardFlip();
+
         btn.classList.add('mem-flip');
         flipped.push(btn);
         if (flipped.length === 2) {
@@ -50,6 +55,8 @@
           locked = true;
           var a = flipped[0], b = flipped[1];
           if (a.dataset.mv === b.dataset.mv) {
+            // Pair matched — satisfying thud after short delay
+            setTimeout(function() { H.cardMatch && H.cardMatch(); }, 150);
             a.classList.add('mem-matched');
             b.classList.add('mem-matched');
             matched++;
@@ -61,6 +68,8 @@
               status.textContent = matched + '/' + totalPairs + ' pairs';
             }
           } else {
+            // No match — light error before they flip back
+            setTimeout(function() { H.light && H.light(); }, 300);
             setTimeout(function () {
               a.classList.remove('mem-flip');
               b.classList.remove('mem-flip');
@@ -75,6 +84,7 @@
         var ms = Date.now() - ctx.answerStartRef.get();
         var perfect = moves <= totalPairs + 1;
         var data = ctx.IQData.recordAnswer(q.category, won, q.difficulty, ms);
+        perfect ? (H.streak && H.streak()) : (H.success && H.success());
         status.textContent = 'Done in ' + moves + ' moves!';
         status.style.color = 'var(--green)';
         ctx.flashEl.className = 'flash green show';
