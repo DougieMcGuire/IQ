@@ -65,10 +65,10 @@
 <div class="screen" id="screen-auth"></div>
 <div class="screen" id="screen-improve"></div>
 <div class="screen" id="screen-profile"></div>
+<div class="screen" id="screen-leaderboard"></div>
 
 <div id="iosInstallBanner" role="alert"></div>
 
-<!-- Firebase v9 compat — same as before, untouched -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -86,7 +86,12 @@
   firebase.initializeApp(firebaseConfig);
 
   var WORKER_URL = 'https://braindeer.org/api/redeem-install-token';
-  var BG_COLORS  = { auth: '#3a2918', improve: '#4a3625', profile: '#4a3625' };
+  var BG_COLORS  = {
+    auth:        '#3a2918',
+    improve:     '#4a3625',
+    profile:     '#4a3625',
+    leaderboard: '#4a3625'
+  };
 
   function setScreenBg(page) {
     var color = BG_COLORS[page] || '#4a3625';
@@ -109,23 +114,25 @@
     });
   });
 
-  var currentScreen  = null;
-  var screensLoaded  = {};
+  var currentScreen = null;
+  var screensLoaded = {};
 
   function goTo(page) {
     document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
 
-    if (page === 'profile' && screensLoaded[page]) {
-      var old = document.querySelector('#screen-profile iframe');
+    // Always reload profile fresh; also reload leaderboard so data is fresh
+    if ((page === 'profile' || page === 'leaderboard') && screensLoaded[page]) {
+      var old = document.querySelector('#screen-' + page + ' iframe');
       if (old) old.remove();
       screensLoaded[page] = false;
     }
 
     if (!screensLoaded[page]) {
       var container = document.getElementById('screen-' + page);
-      var iframe    = document.createElement('iframe');
-      iframe.src    = page + '.html';
-      iframe.allow  = 'web-share';
+      if (!container) return; // safety guard
+      var iframe = document.createElement('iframe');
+      iframe.src = page + '.html';
+      iframe.allow = 'web-share';
       container.appendChild(iframe);
       screensLoaded[page] = true;
     }
@@ -144,7 +151,6 @@
 
   function authCheck() {}
 
-  // ── Generate install token (runs in Safari before user adds to homescreen) ──
   function generateInstallToken() {
     var user = firebase.auth().currentUser;
     if (!user) return Promise.resolve(null);
@@ -162,10 +168,9 @@
       .catch(function() { return null; });
   }
 
-  // ── iOS install banner ──
   function showIOSBanner(user) {
     var isStandalone = ('standalone' in navigator) && navigator.standalone;
-    if (isStandalone) return; // already installed, never show
+    if (isStandalone) return;
     var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
     if (!isIos) return;
     var dismissed = sessionStorage.getItem('iosBannerDismissed');
@@ -183,7 +188,6 @@
     }
 
     if (user) {
-      // Logged in: generate token so the PWA wakes up authenticated
       generateInstallToken().then(function(token) {
         var url = token
           ? 'https://braindeer.org/app.html?t=' + token
@@ -195,7 +199,6 @@
         );
       });
     } else {
-      // Not logged in: plain install prompt
       renderBanner(
         '📲 Tap <strong>Share ⬆️</strong> → <strong>Add to Home Screen</strong>' +
         '<span class="close-banner" id="closeBanner"> ✕</span>'
@@ -203,28 +206,9 @@
     }
   }
 
-  // ════════════════════════════════════════════════════════════
-  // APP INIT
-  //
-  // Two paths:
-  //
-  // A) Normal load (no ?t= token):
-  //    Just do normal Firebase auth check, load the right screen.
-  //
-  // B) PWA first launch with ?t= token:
-  //    1. Send token to Cloudflare Worker
-  //    2. Get back a Firebase custom token
-  //    3. Sign in — this writes the session to IndexedDB
-  //    4. RELOAD the page cleanly (no ?t= this time)
-  //    5. On the reload, path A runs, Firebase finds the session
-  //       in IndexedDB, onAuthStateChanged fires with the user,
-  //       iframes load already-authenticated. Clean, no races.
-  // ════════════════════════════════════════════════════════════
-
   (function() {
     localStorage.removeItem('iq_guest');
 
-    // Peek at localStorage to set the right splash bg immediately
     var looksLoggedIn = false;
     for (var i = 0; i < localStorage.length; i++) {
       if (localStorage.key(i).indexOf('firebase:authUser:') === 0) {
@@ -237,8 +221,6 @@
     var token  = params.get('t');
 
     if (token) {
-      // PATH B — PWA first launch, redeem token then reload
-      // Scrub token from URL so reload doesn't retrigger this
       window.history.replaceState({}, '', window.location.pathname);
 
       fetch(WORKER_URL, {
@@ -249,22 +231,14 @@
       .then(function(r) { return r.ok ? r.json() : null; })
       .then(function(body) {
         if (body && body.customToken) {
-          // Sign in with the custom token — persists session to IndexedDB
           return firebase.auth().signInWithCustomToken(body.customToken)
-            .then(function() {
-              // Session is now written to IndexedDB.
-              // Reload the page — on reload, normal auth flow picks it up
-              // and ALL iframes initialize with the user already signed in.
-              window.location.reload();
-            });
+            .then(function() { window.location.reload(); });
         }
-        // Token exchange failed — fall through to normal auth
         normalAuth();
       })
       .catch(function() { normalAuth(); });
 
     } else {
-      // PATH A — normal load, just check Firebase auth state
       normalAuth();
     }
 
@@ -272,13 +246,11 @@
       var unsubscribe = firebase.auth().onAuthStateChanged(function(user) {
         unsubscribe();
         goTo(user ? 'improve' : 'auth');
-        // Show install banner after auth is confirmed
         showIOSBanner(user);
       });
     }
   })();
 
-  // ── Android / Chrome PWA install prompt ──
   var deferredPrompt = null;
   window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
