@@ -54,7 +54,7 @@
       padding-top: 6px; gap: 4px; z-index: 100;
     }
     .nav-btn {
-      padding: 8px 20px; background: none; border: none;
+      padding: 8px 18px; background: none; border: none;
       display: flex; flex-direction: column; align-items: center; gap: 2px;
       color: var(--brown-light); font-family: 'Nunito', sans-serif;
       font-size: 11px; font-weight: 800; border-radius: 14px;
@@ -63,16 +63,15 @@
     .nav-btn svg { width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
     .nav-btn.active { color:var(--cream); background:var(--brown-mid); box-shadow:0 3px 0 rgba(0,0,0,0.15); }
 
-    /* Tasks nav badge */
+    /* Tasks badge */
     .nav-badge {
-      position: absolute; top: 4px; right: 14px;
+      position: absolute; top: 5px; right: 12px;
       width: 9px; height: 9px; border-radius: 50%;
       background: var(--red); border: 2px solid var(--card);
-      display: none;
-      animation: badgePulse 2s ease infinite;
+      display: none; animation: badgePulse 2s ease infinite;
     }
     .nav-badge.show { display: block; }
-    @keyframes badgePulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+    @keyframes badgePulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.35)} }
 
     /* ── Feed ── */
     main {
@@ -170,11 +169,9 @@
     .wordle-tile.shake { animation:wtShake 0.4s ease; }
     @keyframes wtPop   { 0%{transform:scale(1)} 40%{transform:scale(1.14)} 100%{transform:scale(1)} }
     @keyframes wtShake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-7px)} 40%,80%{transform:translateX(7px)} }
-
     .wordle-msg { font-size:13px; font-weight:800; color:var(--tan); min-height:18px; text-align:center; transition:color 0.2s; }
     .wordle-msg.error   { color:var(--red); animation:wtShake 0.3s ease; }
     .wordle-msg.success { color:var(--green); }
-
     .wordle-kb { display:flex; flex-direction:column; gap:6px; width:100%; max-width:340px; }
     .wordle-kb-row { display:flex; gap:5px; justify-content:center; }
     .wk {
@@ -235,11 +232,7 @@
 
     /* ══ SIMON SAYS ══ */
     .simon-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; width:clamp(160px,42vw,200px); margin:6px 0; }
-    .simon-pad {
-      aspect-ratio:1; border:none; border-radius:16px; cursor:pointer; opacity:0.45;
-      box-shadow:0 4px 0 rgba(0,0,0,0.2); transition:opacity 0.15s,transform 0.1s,box-shadow 0.15s;
-      user-select:none;
-    }
+    .simon-pad { aspect-ratio:1; border:none; border-radius:16px; cursor:pointer; opacity:0.45; box-shadow:0 4px 0 rgba(0,0,0,0.2); transition:opacity 0.15s,transform 0.1s,box-shadow 0.15s; user-select:none; }
     .simon-pad:active { transform:translateY(2px); box-shadow:0 2px 0 rgba(0,0,0,0.2); }
     .simon-pad.simon-lit { opacity:1; box-shadow:0 0 20px rgba(255,255,255,0.3); transform:scale(1.06); }
     .simon-status { font-size:14px; font-weight:800; color:var(--tan); min-height:20px; text-align:center; }
@@ -265,11 +258,7 @@
     /* ══ WORD SCRAMBLE ══ */
     .ws-hint { font-size:12px; font-weight:700; color:var(--gold); text-align:center; margin-bottom:4px; }
     .ws-answer, .ws-source { display:flex; gap:5px; justify-content:center; flex-wrap:wrap; margin:6px 0; }
-    .ws-tile {
-      width:clamp(36px,9vw,44px); height:clamp(36px,9vw,44px);
-      border-radius:8px; display:flex; align-items:center; justify-content:center;
-      font-size:clamp(16px,4.5vw,20px); font-weight:900; font-family:'Nunito',sans-serif; user-select:none;
-    }
+    .ws-tile { width:clamp(36px,9vw,44px); height:clamp(36px,9vw,44px); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:clamp(16px,4.5vw,20px); font-weight:900; font-family:'Nunito',sans-serif; user-select:none; }
     .ws-src { background:var(--brown-mid); color:var(--cream); border:none; cursor:pointer; box-shadow:0 3px 0 rgba(0,0,0,0.2); transition:transform 0.1s,opacity 0.2s; }
     .ws-src:active { transform:translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,0.2); }
     .ws-src.ws-used { opacity:0.25; pointer-events:none; }
@@ -281,13 +270,7 @@
 
     /* ══ SLIDE PUZZLE ══ */
     .slide-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; width:clamp(150px,40vw,195px); margin:4px 0; }
-    .slide-cell {
-      aspect-ratio:1; border:none; border-radius:10px;
-      background:var(--brown-mid); color:var(--cream);
-      font-family:'Nunito',sans-serif; font-size:clamp(22px,6vw,30px); font-weight:900;
-      cursor:pointer; display:flex; align-items:center; justify-content:center;
-      box-shadow:0 3px 0 rgba(0,0,0,0.15); transition:transform 0.12s,background 0.15s;
-    }
+    .slide-cell { aspect-ratio:1; border:none; border-radius:10px; background:var(--brown-mid); color:var(--cream); font-family:'Nunito',sans-serif; font-size:clamp(22px,6vw,30px); font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 0 rgba(0,0,0,0.15); transition:transform 0.12s,background 0.15s; }
     .slide-cell:active { transform:translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,0.15); }
     .slide-empty { background:transparent; box-shadow:none; cursor:default; }
     .slide-cell.slide-win { background:var(--green); color:#fff; box-shadow:0 3px 0 var(--green-dark); animation:pop 0.4s ease; }
@@ -295,14 +278,7 @@
 
     /* ══ COLOR SORT ══ */
     .csort-pool { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin:6px 0; }
-    .csort-tile {
-      width:clamp(42px,11vw,52px); height:clamp(42px,11vw,52px);
-      border-radius:10px; border:none; cursor:pointer;
-      font-size:10px; font-weight:800; color:#fff;
-      display:flex; align-items:center; justify-content:center;
-      box-shadow:0 3px 0 rgba(0,0,0,0.2); transition:transform 0.1s,opacity 0.2s;
-      font-family:'Nunito',sans-serif;
-    }
+    .csort-tile { width:clamp(42px,11vw,52px); height:clamp(42px,11vw,52px); border-radius:10px; border:none; cursor:pointer; font-size:10px; font-weight:800; color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 0 rgba(0,0,0,0.2); transition:transform 0.1s,opacity 0.2s; font-family:'Nunito',sans-serif; }
     .csort-tile:active { transform:translateY(2px); }
     .csort-tile.csort-used { opacity:0.2; pointer-events:none; }
     .csort-placed { display:flex; gap:4px; justify-content:center; margin:4px 0; min-height:36px; }
@@ -315,11 +291,7 @@
     .mr-eq.mr-wrong { background:var(--red); color:#fff; }
     .mr-timer { font-size:16px; font-weight:800; text-align:center; color:var(--cream); min-height:22px; }
     .mr-btns { display:flex; gap:10px; justify-content:center; margin:8px 0; }
-    .mr-btn {
-      flex:1; max-width:140px; height:48px; border:none; border-radius:12px; cursor:pointer;
-      font-family:'Nunito',sans-serif; font-size:16px; font-weight:900;
-      box-shadow:0 4px 0 rgba(0,0,0,0.2); transition:transform 0.1s;
-    }
+    .mr-btn { flex:1; max-width:140px; height:48px; border:none; border-radius:12px; cursor:pointer; font-family:'Nunito',sans-serif; font-size:16px; font-weight:900; box-shadow:0 4px 0 rgba(0,0,0,0.2); transition:transform 0.1s; }
     .mr-btn:active { transform:translateY(2px); box-shadow:0 2px 0 rgba(0,0,0,0.2); }
     .mr-true { background:var(--green); color:#fff; }
     .mr-false { background:var(--red); color:#fff; }
@@ -351,11 +323,7 @@
     /* ── Modals ── */
     .modal { position:fixed; inset:0; background:rgba(58,41,24,0.92); display:none; align-items:center; justify-content:center; z-index:300; padding:20px; }
     .modal.show { display:flex; }
-    .modal-box {
-      background:var(--card); border-radius:22px; padding:28px 22px;
-      width:100%; max-width:360px; text-align:center;
-      box-shadow:0 8px 0 rgba(0,0,0,0.15); position:relative; overflow:hidden;
-    }
+    .modal-box { background:var(--card); border-radius:22px; padding:28px 22px; width:100%; max-width:360px; text-align:center; box-shadow:0 8px 0 rgba(0,0,0,0.15); position:relative; overflow:hidden; }
     .modal-box::before { content:''; position:absolute; top:0;left:0;right:0;height:50%; background:linear-gradient(180deg,rgba(255,255,255,0.04)0%,transparent 100%); pointer-events:none; }
     .modal-mascot { font-size:48px; margin-bottom:8px; }
     .modal-title { font-size:22px; font-weight:900; margin-bottom:6px; color:var(--cream); }
@@ -363,15 +331,10 @@
     .age-num { font-size:48px; font-weight:900; margin:10px 0; color:var(--gold); text-shadow:0 3px 0 var(--gold-dark); }
     .age-slider { width:100%; height:12px; -webkit-appearance:none; background:var(--brown-mid); border-radius:6px; margin-bottom:22px; }
     .age-slider::-webkit-slider-thumb { -webkit-appearance:none; width:32px; height:32px; background:var(--gold); border-radius:50%; cursor:pointer; box-shadow:0 3px 0 var(--gold-dark); }
-    .btn-go {
-      background:var(--green); color:#fff; border:none; border-radius:16px;
-      padding:14px 40px; font-family:'Nunito',sans-serif; font-size:18px;
-      font-weight:900; cursor:pointer; text-transform:uppercase;
-      box-shadow:0 5px 0 var(--green-dark); transition:transform 0.1s;
-    }
+    .btn-go { background:var(--green); color:#fff; border:none; border-radius:16px; padding:14px 40px; font-family:'Nunito',sans-serif; font-size:18px; font-weight:900; cursor:pointer; text-transform:uppercase; box-shadow:0 5px 0 var(--green-dark); transition:transform 0.1s; }
     .btn-go:active { transform:translateY(4px); box-shadow:0 1px 0 var(--green-dark); }
 
-    /* ── Calibration Modal ── */
+    /* ── Calibration ── */
     #calibration .cal-progress { display:flex; gap:6px; margin-bottom:16px; justify-content:center; }
     #calibration .cal-dot { width:12px; height:12px; border-radius:50%; background:var(--brown-mid); transition:background 0.3s; }
     #calibration .cal-dot.done { background:var(--green); }
@@ -379,186 +342,25 @@
     #calibration .cal-dot.wrong-dot { background:var(--red); }
     #calibration .cal-question { font-size:16px; font-weight:800; color:var(--cream); margin-bottom:14px; line-height:1.4; min-height:48px; }
     #calibration .cal-opts { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    #calibration .cal-opt {
-      background:var(--card-glow); border:none; border-radius:14px;
-      padding:12px 10px; font-family:'Nunito',sans-serif; font-size:14px;
-      font-weight:800; color:var(--cream); cursor:pointer; text-align:center;
-      box-shadow:0 4px 0 rgba(0,0,0,0.15); transition:transform 0.1s;
-      position:relative; overflow:hidden;
-    }
+    #calibration .cal-opt { background:var(--card-glow); border:none; border-radius:14px; padding:12px 10px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; color:var(--cream); cursor:pointer; text-align:center; box-shadow:0 4px 0 rgba(0,0,0,0.15); transition:transform 0.1s; position:relative; overflow:hidden; }
     #calibration .cal-opt::before { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:linear-gradient(180deg,rgba(255,255,255,0.06)0%,transparent 100%); pointer-events:none; }
     #calibration .cal-opt:active { transform:translateY(3px); }
     #calibration .cal-opt.correct { background:var(--green); color:#fff; box-shadow:0 4px 0 var(--green-dark); }
     #calibration .cal-opt.wrong { background:var(--red); color:#fff; box-shadow:0 4px 0 var(--red-dark); }
     #calibration .cal-opt.dim { opacity:0.25; pointer-events:none; }
-
     #cal-result { display:none; }
     #cal-result .result-iq { font-size:64px; font-weight:900; color:var(--gold); text-shadow:0 4px 0 var(--gold-dark); margin:8px 0; }
     #cal-result .result-label { font-size:14px; font-weight:900; color:var(--brown-light); letter-spacing:4px; margin-bottom:12px; }
     #cal-result .result-text { font-size:14px; color:var(--tan); font-weight:600; margin-bottom:18px; line-height:1.5; }
 
     /* ── Push Prompt ── */
-    #push-prompt {
-      position:fixed; bottom:calc(80px + env(safe-area-inset-bottom,0px));
-      left:50%; transform:translateX(-50%);
-      background:var(--card); border-radius:18px; padding:16px 18px;
-      width:calc(100% - 32px); max-width:360px;
-      box-shadow:0 6px 0 rgba(0,0,0,0.2);
-      z-index:250; display:none; animation:slideUp 0.3s ease;
-    }
+    #push-prompt { position:fixed; bottom:calc(80px + env(safe-area-inset-bottom,0px)); left:50%; transform:translateX(-50%); background:var(--card); border-radius:18px; padding:16px 18px; width:calc(100% - 32px); max-width:360px; box-shadow:0 6px 0 rgba(0,0,0,0.2); z-index:250; display:none; animation:slideUp 0.3s ease; }
     #push-prompt.show { display:block; }
     #push-prompt .pp-title { font-size:15px; font-weight:900; color:var(--cream); margin-bottom:4px; }
     #push-prompt .pp-text { font-size:12px; font-weight:600; color:var(--tan); margin-bottom:12px; line-height:1.4; }
     #push-prompt .pp-btns { display:flex; gap:8px; }
     #push-prompt .pp-yes { flex:1; background:var(--green); color:#fff; border:none; border-radius:12px; padding:10px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:900; cursor:pointer; box-shadow:0 3px 0 var(--green-dark); }
     #push-prompt .pp-no { background:var(--brown-mid); color:var(--tan); border:none; border-radius:12px; padding:10px 16px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:900; cursor:pointer; }
-
-    /* ══════════════════════════════════════════
-       DAILY TASKS PANEL
-    ══════════════════════════════════════════ */
-    #tasks-panel {
-      position: fixed; inset: 0;
-      z-index: 400;
-      display: flex; flex-direction: column;
-      pointer-events: none; opacity: 0;
-      transition: opacity 0.25s ease;
-    }
-    #tasks-panel.open { pointer-events: all; opacity: 1; }
-
-    .tasks-backdrop {
-      position: absolute; inset: 0;
-      background: rgba(30, 18, 8, 0.7);
-      backdrop-filter: blur(2px);
-    }
-
-    .tasks-sheet {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      background: var(--card); border-radius: 24px 24px 0 0;
-      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
-      transform: translateY(100%);
-      transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1);
-      box-shadow: 0 -6px 0 rgba(0,0,0,0.15);
-      max-height: 85dvh; overflow-y: auto;
-    }
-    #tasks-panel.open .tasks-sheet { transform: translateY(0); }
-
-    .tasks-handle {
-      width: 40px; height: 5px; border-radius: 3px;
-      background: var(--brown-mid); margin: 12px auto 0;
-    }
-
-    .tasks-header {
-      padding: 16px 20px 12px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .tasks-title-wrap { display: flex; flex-direction: column; }
-    .tasks-title { font-size: 20px; font-weight: 900; color: var(--cream); }
-    .tasks-subtitle { font-size: 12px; font-weight: 700; color: var(--tan); margin-top: 2px; }
-
-    .tasks-resets { font-size: 11px; font-weight: 700; color: var(--brown-light); }
-
-    /* Overall progress bar */
-    .tasks-overall {
-      margin: 0 20px 16px;
-      background: var(--bg); border-radius: 10px; padding: 10px 14px;
-    }
-    .tasks-overall-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-    .tasks-overall-label { font-size: 12px; font-weight: 800; color: var(--tan); }
-    .tasks-overall-count { font-size: 12px; font-weight: 900; color: var(--gold); }
-    .tasks-overall-bar-outer { height: 8px; background: var(--brown-mid); border-radius: 4px; overflow: hidden; }
-    .tasks-overall-bar-inner {
-      height: 100%; background: var(--gold); border-radius: 4px;
-      transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1);
-      position: relative;
-    }
-    .tasks-overall-bar-inner::after { content:''; position:absolute; top:0;left:0;right:0;height:40%; background:rgba(255,255,255,0.3); border-radius:4px 4px 0 0; }
-
-    /* Task cards */
-    .tasks-list { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
-
-    .task-card {
-      background: var(--bg); border-radius: 16px; padding: 14px;
-      display: flex; align-items: center; gap: 12px;
-      position: relative; overflow: hidden;
-      transition: opacity 0.3s;
-    }
-    .task-card.task-all-claimed { opacity: 0.5; }
-
-    .task-icon {
-      font-size: 28px; width: 44px; height: 44px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--card); border-radius: 12px;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.15);
-    }
-
-    .task-body { flex: 1; min-width: 0; }
-    .task-label { font-size: 14px; font-weight: 800; color: var(--cream); margin-bottom: 6px; line-height: 1.2; }
-    .task-progress-row { display: flex; align-items: center; gap: 8px; }
-    .task-bar-outer { flex: 1; height: 7px; background: var(--brown-mid); border-radius: 4px; overflow: hidden; }
-    .task-bar-inner {
-      height: 100%; border-radius: 4px;
-      background: var(--green);
-      transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1);
-      position: relative;
-    }
-    .task-bar-inner::after { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:rgba(255,255,255,0.25); border-radius:4px 4px 0 0; }
-    .task-bar-inner.bar-done { background: var(--gold); }
-    .task-progress-label { font-size: 11px; font-weight: 800; color: var(--tan); white-space: nowrap; }
-
-    /* Claim button */
-    .task-claim {
-      flex-shrink: 0; background: var(--gold); color: #2a1800; border: none;
-      border-radius: 12px; padding: 8px 12px;
-      font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 900;
-      cursor: pointer; box-shadow: 0 3px 0 var(--gold-dark);
-      transition: transform 0.1s, opacity 0.2s;
-      white-space: nowrap;
-    }
-    .task-claim:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--gold-dark); }
-    .task-claimed-badge {
-      flex-shrink: 0; font-size: 22px;
-      animation: pop 0.4s ease;
-    }
-
-    /* Completion banner */
-    .tasks-complete-banner {
-      margin: 0 20px 16px;
-      background: linear-gradient(135deg, var(--green) 0%, #46d400 100%);
-      border-radius: 16px; padding: 14px 16px;
-      display: none; align-items: center; gap: 12px;
-      box-shadow: 0 4px 0 var(--green-dark);
-      animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .tasks-complete-banner.show { display: flex; }
-    .tcb-icon { font-size: 32px; }
-    .tcb-text { flex: 1; }
-    .tcb-title { font-size: 15px; font-weight: 900; color: #fff; }
-    .tcb-sub { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.8); }
-
-    /* XP claim toast */
-    .xp-toast {
-      position: fixed; top: calc(env(safe-area-inset-top,0px) + 90px);
-      left: 50%; transform: translateX(-50%) translateY(-20px);
-      background: var(--gold); color: #2a1800;
-      border-radius: 20px; padding: 8px 18px;
-      font-size: 16px; font-weight: 900;
-      box-shadow: 0 4px 0 var(--gold-dark);
-      z-index: 500; opacity: 0;
-      transition: opacity 0.2s, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-      pointer-events: none; white-space: nowrap;
-    }
-    .xp-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* Daily streak row inside tasks panel */
-    .tasks-streak-row {
-      margin: 0 20px 14px;
-      display: flex; align-items: center; gap: 10px;
-      background: var(--bg); border-radius: 14px; padding: 10px 14px;
-    }
-    .tsr-icon { font-size: 22px; }
-    .tsr-text { flex: 1; }
-    .tsr-label { font-size: 12px; font-weight: 700; color: var(--tan); }
-    .tsr-val { font-size: 18px; font-weight: 900; color: var(--orange); }
   </style>
 </head>
 <body>
@@ -594,7 +396,7 @@
     <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
     Train
   </button>
-  <button class="nav-btn" id="tasks-nav-btn" onclick="openTasksPanel()">
+  <button class="nav-btn" onclick="navGo('tasks')">
     <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
     Tasks
     <span class="nav-badge" id="tasks-badge"></span>
@@ -604,56 +406,6 @@
     Profile
   </button>
 </nav>
-
-<!-- ══ DAILY TASKS PANEL ══ -->
-<div id="tasks-panel">
-  <div class="tasks-backdrop" onclick="closeTasksPanel()"></div>
-  <div class="tasks-sheet">
-    <div class="tasks-handle"></div>
-    <div class="tasks-header">
-      <div class="tasks-title-wrap">
-        <div class="tasks-title">📋 Daily Tasks</div>
-        <div class="tasks-subtitle">Complete all 3 for a bonus!</div>
-      </div>
-      <div class="tasks-resets" id="tasks-resets">Resets in --</div>
-    </div>
-
-    <!-- Daily challenge streak -->
-    <div class="tasks-streak-row">
-      <div class="tsr-icon">📅</div>
-      <div class="tsr-text">
-        <div class="tsr-label">Daily Challenge Streak</div>
-        <div class="tsr-val" id="daily-streak-val">0 days</div>
-      </div>
-    </div>
-
-    <!-- Overall progress bar -->
-    <div class="tasks-overall">
-      <div class="tasks-overall-row">
-        <span class="tasks-overall-label">Today's Progress</span>
-        <span class="tasks-overall-count" id="tasks-overall-count">0 / 3</span>
-      </div>
-      <div class="tasks-overall-bar-outer">
-        <div class="tasks-overall-bar-inner" id="tasks-overall-bar" style="width:0%"></div>
-      </div>
-    </div>
-
-    <!-- All done banner -->
-    <div class="tasks-complete-banner" id="tasks-complete-banner">
-      <div class="tcb-icon">🎉</div>
-      <div class="tcb-text">
-        <div class="tcb-title">All tasks complete!</div>
-        <div class="tcb-sub">Come back tomorrow for more.</div>
-      </div>
-    </div>
-
-    <!-- Task list -->
-    <div class="tasks-list" id="tasks-list"></div>
-  </div>
-</div>
-
-<!-- XP Toast -->
-<div class="xp-toast" id="xp-toast"></div>
 
 <div class="streak-popup" id="streak-popup">
   <div class="streak-icon"><svg viewBox="0 0 24 24" fill="#ff9600" fill-opacity="0.5" stroke="#ff9600" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 2px 8px rgba(255,150,0,0.5))"><path d="M12 22c-4.97 0-8-3.58-8-7.5 0-3.07 1.74-5.25 3.53-7.28C9.18 5.38 10.34 3.7 10.34 2c0 0 1.77 2.18 2.34 4.18.27.94.5 1.82 1.32 1.82 0-2 1-3 1-3s1 1.5 1 3.5c.5-.5 1.5-1.5 1.5-1.5s1 2.5 1 5c0 3.92-3.03 7.5-8 7.5z"/></svg></div>
@@ -728,7 +480,8 @@
 <script src="games/mathRush.js"></script>
 
 <script type="module">
-  import { IQData, DailyTasks, getEncouragement } from './data.js';
+  // Only import what this page actually uses — no DailyTasks needed here
+  import { IQData, getEncouragement } from './data.js';
   import Haptics from './haptics.js';
 
   if (window.parent !== window) parent.authCheck();
@@ -738,28 +491,126 @@
     parent.goTo(page);
   };
 
-  const feed         = document.getElementById('feed');
-  const iqVal        = document.getElementById('iq-val');
-  const streakVal    = document.getElementById('streak-val');
-  const streakPill   = document.getElementById('streak-pill');
-  const streakPopup  = document.getElementById('streak-popup');
-  const streakNum    = document.getElementById('streak-num');
-  const onboard      = document.getElementById('onboard');
-  const ageSlider    = document.getElementById('age-slider');
-  const ageDisplay   = document.getElementById('age-display');
-  const flashEl      = document.getElementById('flash');
-  const confettiEl   = document.getElementById('confetti');
-  const xpBar        = document.getElementById('xp-bar');
-  const levelLabel   = document.getElementById('level-label');
-  const xpLabel      = document.getElementById('xp-label');
-  const tasksBadge   = document.getElementById('tasks-badge');
-  const xpToast      = document.getElementById('xp-toast');
+  const feed        = document.getElementById('feed');
+  const iqVal       = document.getElementById('iq-val');
+  const streakVal   = document.getElementById('streak-val');
+  const streakPill  = document.getElementById('streak-pill');
+  const streakPopup = document.getElementById('streak-popup');
+  const streakNum   = document.getElementById('streak-num');
+  const onboard     = document.getElementById('onboard');
+  const ageSlider   = document.getElementById('age-slider');
+  const ageDisplay  = document.getElementById('age-display');
+  const flashEl     = document.getElementById('flash');
+  const confettiEl  = document.getElementById('confetti');
+  const xpBar       = document.getElementById('xp-bar');
+  const levelLabel  = document.getElementById('level-label');
+  const xpLabel     = document.getElementById('xp-label');
+  const tasksBadge  = document.getElementById('tasks-badge');
+
+  // ── Tasks badge — reads the same localStorage key as tasks.html ──
+  const TASKS_KEY = 'bd_daily_tasks_v1';
+  function getTodayKey() {
+    const n = new Date();
+    return `${n.getFullYear()}-${n.getMonth() + 1}-${n.getDate()}`;
+  }
+  function updateTasksBadge() {
+    try {
+      const raw   = localStorage.getItem(TASKS_KEY);
+      const state = raw ? JSON.parse(raw) : null;
+      // Show badge if tasks exist for today and not all are claimed
+      const hasBadge = !state || state.date !== getTodayKey() || !state.allClaimed;
+      tasksBadge.classList.toggle('show', hasBadge);
+    } catch {
+      tasksBadge.classList.add('show');
+    }
+  }
+
+  // ── DailyTasks logic inline (no import needed — reads/writes same localStorage) ──
+  const SESSION_KEY = 'bd_session_today';
+
+  function getSessionStats() {
+    try {
+      const raw = localStorage.getItem(SESSION_KEY);
+      const s   = raw ? JSON.parse(raw) : null;
+      const today = getTodayKey();
+      if (!s || s.date !== today) {
+        const fresh = { date: today, answered: 0, correct: 0, fast: 0 };
+        localStorage.setItem(SESSION_KEY, JSON.stringify(fresh));
+        return fresh;
+      }
+      return s;
+    } catch { return { date: getTodayKey(), answered: 0, correct: 0, fast: 0 }; }
+  }
+
+  function updateSessionStats(correct, ms) {
+    const s = getSessionStats();
+    s.answered++;
+    if (correct) s.correct++;
+    if (correct && ms < 3500) s.fast++;
+    localStorage.setItem(SESSION_KEY, JSON.stringify(s));
+    return s;
+  }
+
+  function updateTaskProgress(streak, correct, ms, session) {
+    try {
+      const raw   = localStorage.getItem(TASKS_KEY);
+      if (!raw) return;
+      const state = JSON.parse(raw);
+      if (state.date !== getTodayKey()) return;
+
+      state.tasks.forEach(task => {
+        if (task.done) return;
+        switch (task.type) {
+          case 'streak':   task.progress = Math.max(task.progress, streak); break;
+          case 'correct':  task.progress = session.correct; break;
+          case 'answered': task.progress = session.answered; break;
+          case 'accuracy':
+            task.progress = session.answered > 0
+              ? Math.round((session.correct / session.answered) * 100) : 0; break;
+          case 'fast':     task.progress = session.fast; break;
+        }
+        if (task.progress >= task.target) task.done = true;
+      });
+
+      if (!state.allDone && state.tasks.every(t => t.done)) state.allDone = true;
+      localStorage.setItem(TASKS_KEY, JSON.stringify(state));
+
+      // Ping the tasks iframe if it's loaded in the shell
+      try {
+        if (window.parent !== window) {
+          window.parent.postMessage({ type: 'tasksUpdated' }, '*');
+        }
+      } catch {}
+    } catch (e) {
+      console.warn('[improve] updateTaskProgress failed', e);
+    }
+  }
+
+  // Call this from game renderers when a mini-game round ends
+  window.notifyGamePlayed = function(gameType) {
+    try {
+      const raw   = localStorage.getItem(TASKS_KEY);
+      if (!raw) return;
+      const state = JSON.parse(raw);
+      if (state.date !== getTodayKey()) return;
+      state.tasks.forEach(task => {
+        if (task.type !== 'game' || task.game !== gameType || task.done) return;
+        task.progress = Math.min(task.progress + 1, task.target);
+        if (task.progress >= task.target) task.done = true;
+      });
+      if (!state.allDone && state.tasks.every(t => t.done)) state.allDone = true;
+      localStorage.setItem(TASKS_KEY, JSON.stringify(state));
+      updateTasksBadge();
+      try { if (window.parent !== window) window.parent.postMessage({ type: 'tasksUpdated' }, '*'); } catch {}
+    } catch (e) {
+      console.warn('[improve] notifyGamePlayed failed', e);
+    }
+  };
 
   let slides = 0, answerStart = 0;
   const questionQueue = [];
   const QUEUE_TARGET  = 25;
 
-  // ── Queue ──
   function fillQueue() {
     while (questionQueue.length < QUEUE_TARGET) {
       const weakCat = IQData.getWeakestCategory();
@@ -774,7 +625,6 @@
     return q;
   }
 
-  // ── Onboarding ──
   ageSlider.oninput = () => { ageDisplay.textContent = ageSlider.value; Haptics.light(); };
   document.getElementById('start-btn').addEventListener('click', () => {
     Haptics.medium();
@@ -784,7 +634,6 @@
     IQData.needsCalibration() ? startCalibration() : startFeed();
   });
 
-  // ── IQ Calibration ──
   const CAL_QUESTIONS = [
     { q:'What comes next? 2, 6, 18, 54, ?', a:'162', w:['108','126','148'], cat:'patternRecognition', d:1.2 },
     { q:'If all Bloops are Razzies, and all Razzies are Lazzies, are all Bloops Lazzies?', a:'Yes', w:['No','Maybe','Not enough info'], cat:'logicalReasoning', d:1.1 },
@@ -853,13 +702,10 @@
     startFeed();
   });
 
-  // ── Boot ──
   function init() {
     const d = IQData.load();
     updateUI(d);
     updateTasksBadge();
-    updateTasksResetTimer();
-    setInterval(updateTasksResetTimer, 60000);
     if      (IQData.needsOnboarding())   { onboard.classList.add('show'); }
     else if (IQData.needsCalibration())  { Q.setAge(d.age); startCalibration(); }
     else                                 { startFeed(); }
@@ -899,11 +745,11 @@
     feed.appendChild(div);
     if (customRenderer && customRenderer.attach) {
       customRenderer.attach(div, q, idx, {
-        feed, flashEl, confettiEl, IQData, DailyTasks, getEncouragement,
+        feed, flashEl, confettiEl, IQData, getEncouragement,
         updateUI, checkMore, spawnConfetti,
         answerStartRef: { get: () => answerStart, set: v => { answerStart = v; } },
         Haptics,
-        onTaskUpdate: refreshTasksPanel,
+        notifyGamePlayed: window.notifyGamePlayed,
       });
     }
     answerStart = Date.now();
@@ -944,7 +790,6 @@
       </div>`;
   }
 
-  // ── Answer handling ──
   document.addEventListener('click', e => {
     if (!e.target.classList.contains('opt')) return;
     const btn  = e.target;
@@ -990,132 +835,18 @@
       }, 300);
     }
 
-    updateUI(result);
+    // Update task progress in localStorage (no import needed)
+    const session = updateSessionStats(isCorrect, ms);
+    updateTaskProgress(result.streak, isCorrect, ms, session);
     updateTasksBadge();
-    // Refresh panel if open
-    if (document.getElementById('tasks-panel').classList.contains('open')) {
-      refreshTasksPanel();
-    }
 
+    updateUI(result);
     checkMore();
     setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'),  250);
     setTimeout(() => document.getElementById(`hint-${idx}`)?.classList.add('show'), 500);
     answerStart = Date.now();
   });
 
-  // ══════════════════════════════════════════
-  // DAILY TASKS PANEL
-  // ══════════════════════════════════════════
-  window.openTasksPanel = function() {
-    Haptics.light();
-    refreshTasksPanel();
-    document.getElementById('tasks-panel').classList.add('open');
-  };
-
-  window.closeTasksPanel = function() {
-    Haptics.light();
-    document.getElementById('tasks-panel').classList.remove('open');
-  };
-
-  function updateTasksBadge() {
-    const hasBadge = DailyTasks.hasBadge();
-    tasksBadge.classList.toggle('show', hasBadge);
-  }
-
-  function updateTasksResetTimer() {
-    const now = new Date();
-    const midnight = new Date(now);
-    midnight.setHours(24, 0, 0, 0);
-    const diff = midnight - now;
-    const h = Math.floor(diff / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    document.getElementById('tasks-resets').textContent = `Resets in ${h}h ${m}m`;
-  }
-
-  function refreshTasksPanel() {
-    const state = DailyTasks.getState();
-    const list  = document.getElementById('tasks-list');
-
-    // Daily streak
-    const streakDays = state.dailyStreak || 0;
-    document.getElementById('daily-streak-val').textContent =
-      streakDays === 1 ? '1 day' : `${streakDays} days`;
-
-    // Overall bar
-    const doneCount = state.tasks.filter(t => t.done).length;
-    document.getElementById('tasks-overall-count').textContent = `${doneCount} / ${state.tasks.length}`;
-    document.getElementById('tasks-overall-bar').style.width = `${(doneCount / state.tasks.length) * 100}%`;
-
-    // Complete banner
-    const banner = document.getElementById('tasks-complete-banner');
-    if (state.allDone) banner.classList.add('show');
-
-    // Render task cards
-    list.innerHTML = '';
-    state.tasks.forEach(task => {
-      const pct = Math.min(100, Math.round((task.progress / task.target) * 100));
-      const card = document.createElement('div');
-      card.className = 'task-card' + (task.claimed ? ' task-all-claimed' : '');
-
-      let rightEl = '';
-      if (task.claimed) {
-        rightEl = `<div class="task-claimed-badge">✅</div>`;
-      } else if (task.done) {
-        rightEl = `<button class="task-claim" data-task-id="${task.id}">+${task.xp} XP</button>`;
-      }
-
-      card.innerHTML = `
-        <div class="task-icon">${task.icon}</div>
-        <div class="task-body">
-          <div class="task-label">${task.label}</div>
-          <div class="task-progress-row">
-            <div class="task-bar-outer">
-              <div class="task-bar-inner${task.done ? ' bar-done' : ''}" style="width:${pct}%"></div>
-            </div>
-            <div class="task-progress-label">${task.progress}/${task.target}</div>
-          </div>
-        </div>
-        ${rightEl}
-      `;
-      list.appendChild(card);
-    });
-
-    // Claim button handler
-    list.querySelectorAll('.task-claim').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const taskId = btn.dataset.taskId;
-        const xp     = DailyTasks.claimTask(taskId);
-        if (xp === null) return;
-
-        Haptics.levelUp();
-        spawnConfetti(20);
-
-        // Add XP to IQData
-        const d = IQData.load();
-        d.xp   += xp;
-        const oldLvl = d.level;
-        d.level = Math.floor(d.xp / 150) + 1;
-        IQData.save(d);
-        updateUI(d);
-        if (d.level > oldLvl) setTimeout(() => Haptics.levelUp(), 300);
-
-        // Show toast
-        showXpToast(`+${xp} XP`);
-
-        // Refresh panel
-        refreshTasksPanel();
-        updateTasksBadge();
-      });
-    });
-  }
-
-  function showXpToast(msg) {
-    xpToast.textContent = msg;
-    xpToast.classList.add('show');
-    setTimeout(() => xpToast.classList.remove('show'), 2000);
-  }
-
-  // ── Utils ──
   function spawnConfetti(n) {
     const colors = ['#58cc02','#ffc800','#ea2b2b','#1cb0f6','#ce82ff','#ff9600'];
     for (let i = 0; i < n; i++) {
@@ -1140,10 +871,6 @@
     xpLabel.textContent    = xpInLevel + '/150';
   }
 
-  // Also expose for game renderers
-  window.refreshTasksPanel = refreshTasksPanel;
-
-  // ── Push Notifications ──
   const VAPID_PUBLIC_KEY = 'BCeif8Bk8ozGVFukIl2zE7UWB1YXN5eBPF0nHgNc0ELsEyNmZ0VE3xo15UCuqjgNg9dARdIKThXKakZL9ci8ZXI';
 
   function maybeShowPushPrompt() {
@@ -1174,8 +901,7 @@
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
       });
-      const subPlain = sub.toJSON();
-      window.parent.postMessage({ type: 'savePushSub', sub: subPlain }, '*');
+      window.parent.postMessage({ type: 'savePushSub', sub: sub.toJSON() }, '*');
     } catch (err) {
       console.error('BrainDeer: push setup failed', err);
     }
