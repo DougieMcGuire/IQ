@@ -10,19 +10,15 @@
     :root {
       --bg: #3a2918; --card: #4a3625; --card-glow: #5a4232;
       --brown-mid: #6b4f32; --brown-light: #8f6b4a;
-      --tan: #c2a476; --cream: #f0e2cc; --ink: #f0e2cc; --ink-dim: #c2a476;
+      --tan: #c2a476; --cream: #f0e2cc;
       --green: #58cc02; --green-dark: #46a302;
-      --red: #ea2b2b; --red-dark: #c42020;
       --gold: #ffc800; --gold-dark: #d9aa00;
-      --blue: #1cb0f6; --blue-dark: #1899d6;
       --purple: #ce82ff; --orange: #ff9600;
-      --pink: #ff4b8a;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { width: 100%; height: 100%; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--ink); overflow: hidden; }
+    html, body { width: 100%; height: 100%; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--cream); overflow: hidden; }
     body { display: flex; flex-direction: column; }
 
-    /* ── Nav ── */
     nav {
       position: fixed; bottom: 0; left: 0; right: 0;
       height: calc(64px + env(safe-area-inset-bottom, 0px));
@@ -31,7 +27,7 @@
       padding-top: 6px; gap: 6px; z-index: 100;
     }
     .nav-btn {
-      padding: 8px 28px; background: none; border: none;
+      padding: 8px 20px; background: none; border: none;
       display: flex; flex-direction: column; align-items: center; gap: 2px;
       color: var(--brown-light); font-family: 'Nunito', sans-serif;
       font-size: 12px; font-weight: 800; border-radius: 14px;
@@ -40,20 +36,14 @@
     .nav-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
     .nav-btn.active { color: var(--cream); background: var(--brown-mid); box-shadow: 0 3px 0 rgba(0,0,0,0.15); }
 
-    /* ── Main ── */
     main {
       flex: 1; overflow-y: auto;
       padding: calc(env(safe-area-inset-top, 0px) + 12px) 14px calc(72px + env(safe-area-inset-bottom, 0px));
     }
     main::-webkit-scrollbar { display: none; }
 
-    /* ── Header ── */
-    .page-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 14px; padding-top: 4px;
-    }
-    .page-title { font-size: 20px; font-weight: 900; color: var(--cream); display: flex; align-items: center; gap: 8px; }
-    .page-title span { font-size: 22px; }
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-top: 4px; }
+    .page-title { font-size: 20px; font-weight: 900; color: var(--cream); }
     .refresh-btn {
       background: var(--card); border: none; border-radius: 12px;
       padding: 8px 12px; color: var(--tan); cursor: pointer;
@@ -62,104 +52,80 @@
       box-shadow: 0 3px 0 rgba(0,0,0,0.12); transition: transform 0.1s;
     }
     .refresh-btn:active { transform: translateY(2px); }
-    .refresh-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; transition: transform 0.5s; }
+    .refresh-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; transition: transform 0.6s ease; }
     .refresh-btn.spinning svg { transform: rotate(360deg); }
 
-    /* ── Filter Tabs ── */
-    .filter-row {
-      display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px;
-    }
-    .filter-row::-webkit-scrollbar { display: none; }
+    .filter-row { display: flex; gap: 6px; margin-bottom: 14px; }
     .filter-tab {
-      background: var(--card); border: none; border-radius: 20px;
-      padding: 7px 14px; font-family: 'Nunito', sans-serif;
+      flex: 1; background: var(--card); border: none; border-radius: 20px;
+      padding: 8px 4px; font-family: 'Nunito', sans-serif;
       font-size: 12px; font-weight: 800; color: var(--tan);
-      cursor: pointer; white-space: nowrap;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.12);
-      transition: all 0.15s; flex-shrink: 0;
+      cursor: pointer; text-align: center;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.12); transition: all 0.15s;
       position: relative; overflow: hidden;
     }
     .filter-tab::before { content:''; position:absolute; top:0;left:0;right:0;height:50%; background:linear-gradient(180deg,rgba(255,255,255,0.05)0%,transparent 100%); pointer-events:none; }
-    .filter-tab.active {
-      background: var(--gold); color: #2a1800;
-      box-shadow: 0 3px 0 var(--gold-dark);
-    }
+    .filter-tab[data-sort="iq"].active         { background: var(--purple); color: #fff; box-shadow: 0 3px 0 #9b5dcc; }
+    .filter-tab[data-sort="bestStreak"].active  { background: var(--gold);   color: #2a1800; box-shadow: 0 3px 0 var(--gold-dark); }
+    .filter-tab[data-sort="streak"].active      { background: var(--orange); color: #fff; box-shadow: 0 3px 0 #cc6f00; }
 
-    /* ── Podium ── */
-    .podium {
-      display: flex; align-items: flex-end; justify-content: center;
-      gap: 8px; margin-bottom: 18px; padding: 0 8px;
-    }
-    .podium-spot {
-      flex: 1; max-width: 110px;
-      display: flex; flex-direction: column; align-items: center;
-    }
-    .podium-avatar {
-      width: 52px; height: 52px; border-radius: 50%;
-      background: var(--brown-mid); overflow: hidden;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px; position: relative; margin-bottom: 6px;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.2);
-    }
-    .podium-avatar img { width: 100%; height: 100%; object-fit: cover; display: none; }
-    .podium-avatar.has-pic img { display: block; }
-    .podium-avatar.has-pic .avatar-emoji { display: none; }
-    .podium-crown {
-      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
-      font-size: 16px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
-    }
-    .podium-name {
-      font-size: 11px; font-weight: 900; color: var(--cream);
-      text-align: center; max-width: 90px; overflow: hidden;
-      text-overflow: ellipsis; white-space: nowrap; margin-bottom: 4px;
-    }
-    .podium-val {
-      font-size: 14px; font-weight: 900; margin-bottom: 6px; text-align: center;
-    }
-    .podium-block {
-      width: 100%; border-radius: 12px 12px 0 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px; font-weight: 900; color: rgba(255,255,255,0.7);
+    .your-rank-bar {
+      background: var(--card); border-radius: 16px; padding: 12px 16px;
+      margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.12); border: 2px solid rgba(255,200,0,0.15);
       position: relative; overflow: hidden;
-      box-shadow: 0 -3px 0 rgba(0,0,0,0.1) inset;
     }
-    .podium-block::before { content:''; position:absolute; top:0;left:0;right:0;height:40%; background:linear-gradient(180deg,rgba(255,255,255,0.12)0%,transparent 100%); pointer-events:none; }
-    .podium-spot:nth-child(1) .podium-block { background: var(--gold); height: 64px; }
-    .podium-spot:nth-child(1) .podium-val  { color: var(--gold); }
-    .podium-spot:nth-child(1) .podium-avatar { width: 60px; height: 60px; font-size: 26px; border: 3px solid var(--gold); }
-    .podium-spot:nth-child(2) .podium-block { background: var(--cream); height: 48px; }
-    .podium-spot:nth-child(2) .podium-val  { color: var(--cream); }
-    .podium-spot:nth-child(3) .podium-block { background: var(--orange); height: 36px; }
-    .podium-spot:nth-child(3) .podium-val  { color: var(--orange); }
+    .your-rank-bar::before { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:linear-gradient(180deg,rgba(255,255,255,0.04)0%,transparent 100%); pointer-events:none; }
+    .yrb-left { font-size: 13px; font-weight: 800; color: var(--tan); }
+    .yrb-rank { font-size: 24px; font-weight: 900; color: var(--gold); }
 
-    /* reorder for visual podium: 2nd, 1st, 3rd */
-    .podium { flex-direction: row; }
+    .podium { display: flex; align-items: flex-end; justify-content: center; gap: 8px; margin-bottom: 18px; }
+    .podium-spot { flex: 1; max-width: 115px; display: flex; flex-direction: column; align-items: center; }
     .podium-spot.rank-1 { order: 2; }
     .podium-spot.rank-2 { order: 1; }
     .podium-spot.rank-3 { order: 3; }
-
-    /* ── List ── */
-    .section-label {
-      font-size: 11px; font-weight: 900; color: var(--tan); letter-spacing: 2px;
-      text-transform: uppercase; margin-bottom: 8px; padding-left: 2px;
+    .podium-avatar {
+      width: 52px; height: 52px; border-radius: 50%; background: var(--brown-mid);
+      overflow: hidden; display: flex; align-items: center; justify-content: center;
+      font-size: 22px; position: relative; margin-bottom: 6px;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.2);
     }
+    .podium-spot.rank-1 .podium-avatar { width: 62px; height: 62px; font-size: 28px; }
+    .podium-avatar img { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .podium-avatar.has-pic img { display: block; }
+    .podium-avatar.has-pic .avatar-emoji { display: none; }
+    .podium-crown { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 16px; }
+    .podium-name { font-size: 11px; font-weight: 900; color: var(--cream); text-align: center; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 3px; }
+    .podium-val { font-size: 14px; font-weight: 900; margin-bottom: 5px; text-align: center; }
+    .podium-val.col-iq         { color: var(--purple); }
+    .podium-val.col-bestStreak { color: var(--gold); }
+    .podium-val.col-streak     { color: var(--orange); }
+    .podium-block {
+      width: 100%; border-radius: 12px 12px 0 0;
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+      position: relative; overflow: hidden;
+    }
+    .podium-block::before { content:''; position:absolute; top:0;left:0;right:0;height:40%; background:linear-gradient(180deg,rgba(255,255,255,0.14)0%,transparent 100%); pointer-events:none; }
+    .podium-spot.rank-1 .podium-block { height: 68px; }
+    .podium-spot.rank-2 .podium-block { height: 50px; }
+    .podium-spot.rank-3 .podium-block { height: 36px; }
+    .podium-block.col-iq         { background: var(--purple); }
+    .podium-block.col-bestStreak { background: var(--gold); }
+    .podium-block.col-streak     { background: var(--orange); }
+    .podium-spot.rank-1 .podium-avatar.col-iq         { border: 3px solid var(--purple); }
+    .podium-spot.rank-1 .podium-avatar.col-bestStreak { border: 3px solid var(--gold); }
+    .podium-spot.rank-1 .podium-avatar.col-streak     { border: 3px solid var(--orange); }
+
+    .section-label { font-size: 11px; font-weight: 900; color: var(--tan); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; padding-left: 2px; }
     .lb-list { display: flex; flex-direction: column; gap: 7px; }
     .lb-row {
       background: var(--card); border-radius: 16px;
       padding: 11px 14px; display: flex; align-items: center; gap: 12px;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.12);
-      position: relative; overflow: hidden;
-      transition: transform 0.1s;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.12); position: relative; overflow: hidden;
     }
     .lb-row::before { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:linear-gradient(180deg,rgba(255,255,255,0.04)0%,transparent 100%); pointer-events:none; border-radius:16px 16px 0 0; }
     .lb-row.me { background: var(--card-glow); box-shadow: 0 3px 0 rgba(0,0,0,0.12), inset 0 0 0 2px rgba(255,200,0,0.2); }
-
-    .lb-rank {
-      font-size: 14px; font-weight: 900; color: var(--brown-light);
-      min-width: 24px; text-align: center;
-    }
-    .lb-rank.top3 { color: var(--gold); }
-
+    .lb-rank { font-size: 14px; font-weight: 900; color: var(--brown-light); min-width: 24px; text-align: center; }
     .lb-avatar {
       width: 38px; height: 38px; border-radius: 50%; background: var(--brown-mid);
       overflow: hidden; display: flex; align-items: center; justify-content: center;
@@ -168,104 +134,52 @@
     .lb-avatar img { width: 100%; height: 100%; object-fit: cover; display: none; }
     .lb-avatar.has-pic img { display: block; }
     .lb-avatar.has-pic .avatar-emoji { display: none; }
-
     .lb-info { flex: 1; min-width: 0; }
-    .lb-name {
-      font-size: 14px; font-weight: 800; color: var(--cream);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .lb-sub { font-size: 11px; font-weight: 700; color: var(--tan); margin-top: 1px; }
+    .lb-name { font-size: 14px; font-weight: 800; color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lb-sub { font-size: 11px; font-weight: 700; color: var(--tan); margin-top: 2px; }
     .lb-sub span { margin-right: 8px; }
-
-    .lb-val {
-      font-size: 18px; font-weight: 900; text-align: right; flex-shrink: 0;
-    }
+    .lb-val { font-size: 18px; font-weight: 900; text-align: right; flex-shrink: 0; }
     .lb-val-label { font-size: 10px; font-weight: 800; color: var(--tan); text-align: right; }
+    .you-badge { background: var(--gold); color: #2a1800; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 6px; letter-spacing: 0.5px; margin-left: 5px; }
 
-    .you-badge {
-      background: var(--gold); color: #2a1800; font-size: 9px; font-weight: 900;
-      padding: 2px 6px; border-radius: 6px; letter-spacing: 0.5px; margin-left: 5px;
-    }
+    .skeleton { background: var(--card); border-radius: 16px; height: 62px; box-shadow: 0 3px 0 rgba(0,0,0,0.12); position: relative; overflow: hidden; }
+    .skeleton::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent); animation:shimmer 1.4s infinite; }
+    @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+    .lb-empty { text-align: center; padding: 32px 20px; color: var(--tan); font-size: 14px; font-weight: 700; line-height: 1.6; }
+    .lb-empty .emoji { font-size: 40px; display: block; margin-bottom: 10px; }
 
-    /* ── Empty / Loading ── */
-    .lb-empty {
-      text-align: center; padding: 40px 20px; color: var(--tan);
-      font-size: 14px; font-weight: 700; line-height: 1.6;
-    }
-    .lb-empty .emoji { font-size: 42px; display: block; margin-bottom: 10px; }
-
-    .skeleton {
-      background: var(--card); border-radius: 16px; height: 62px;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.12);
-      position: relative; overflow: hidden;
-    }
-    .skeleton::after {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
-      animation: shimmer 1.4s infinite;
-    }
-    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-
-    /* ── You section ── */
-    .your-rank-bar {
-      background: var(--card); border-radius: 16px; padding: 12px 16px;
-      margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.12);
-      border: 2px solid rgba(255,200,0,0.15);
-      position: relative; overflow: hidden;
-    }
-    .your-rank-bar::before { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:linear-gradient(180deg,rgba(255,255,255,0.04)0%,transparent 100%); pointer-events:none; }
-    .your-rank-bar .yrb-left { font-size: 13px; font-weight: 800; color: var(--tan); }
-    .your-rank-bar .yrb-rank { font-size: 24px; font-weight: 900; color: var(--gold); }
-    .your-rank-bar .yrb-right { font-size: 12px; font-weight: 700; color: var(--brown-light); text-align: right; }
-
-    /* ── Toast ── */
-    .toast {
-      position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%);
-      background: var(--green); color: #fff; padding: 10px 20px;
-      border-radius: 14px; font-size: 14px; font-weight: 800;
-      opacity: 0; transition: opacity 0.3s; z-index: 300; white-space: nowrap;
-      box-shadow: 0 3px 0 var(--green-dark); pointer-events: none;
-    }
+    .toast { position:fixed; bottom:84px; left:50%; transform:translateX(-50%); background:var(--green); color:#fff; padding:10px 20px; border-radius:14px; font-size:14px; font-weight:800; opacity:0; transition:opacity 0.3s; z-index:300; white-space:nowrap; box-shadow:0 3px 0 var(--green-dark); pointer-events:none; }
     .toast.show { opacity: 1; }
   </style>
 </head>
 <body>
 
-<main id="main">
+<main>
   <div class="page-header">
-    <div class="page-title"><span>🏆</span> Leaderboard</div>
+    <div class="page-title">🏆 Leaderboard</div>
     <button class="refresh-btn" id="refresh-btn">
       <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
       Refresh
     </button>
   </div>
 
-  <!-- Filter tabs -->
   <div class="filter-row" id="filter-row">
     <button class="filter-tab active" data-sort="iq">🧠 IQ</button>
-    <button class="filter-tab" data-sort="xp">⚡ XP</button>
-    <button class="filter-tab" data-sort="streak">🔥 Best Streak</button>
-    <button class="filter-tab" data-sort="accuracy">🎯 Accuracy</button>
-    <button class="filter-tab" data-sort="answered">📚 Questions</button>
+    <button class="filter-tab" data-sort="bestStreak">🏅 Best Streak</button>
+    <button class="filter-tab" data-sort="streak">🔥 Live Streak</button>
   </div>
 
-  <!-- Your rank bar -->
   <div class="your-rank-bar" id="your-rank-bar" style="display:none;">
     <div>
       <div class="yrb-left">Your Rank</div>
       <div class="yrb-rank" id="your-rank-num">#—</div>
     </div>
-    <div class="yrb-right" id="your-rank-right">Loading...</div>
+    <div id="your-rank-right" style="font-size:12px;font-weight:700;color:var(--brown-light);text-align:right;"></div>
   </div>
 
-  <!-- Podium (top 3) -->
   <div class="podium" id="podium"></div>
-
-  <!-- Rest of list -->
   <div class="section-label" id="rest-label" style="display:none;">Others</div>
   <div class="lb-list" id="lb-list">
-    <!-- skeletons while loading -->
     <div class="skeleton"></div>
     <div class="skeleton"></div>
     <div class="skeleton"></div>
@@ -275,13 +189,13 @@
 </main>
 
 <nav>
+  <button class="nav-btn active" onclick="parent.goTo('leaderboard')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+    Ranks
+  </button>
   <button class="nav-btn" onclick="parent.goTo('improve')">
     <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
     Train
-  </button>
-  <button class="nav-btn active" onclick="parent.goTo('leaderboard')">
-    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
-    Ranks
   </button>
   <button class="nav-btn" onclick="parent.goTo('profile')">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -292,23 +206,21 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
-  import { IQData, auth, db, authReady } from './data.js';
+  import { IQData, db, authReady } from './data.js';
   import { collection, getDocs, query, orderBy, limit, where }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   if (window.parent !== window) parent.authCheck();
 
+  const SORT_CONFIG = {
+    iq:         { field: 'iq',         label: 'IQ',          color: 'var(--purple)', min: 50, fmt: v => v },
+    bestStreak: { field: 'bestStreak', label: 'Best Streak',  color: 'var(--gold)',   min: 1,  fmt: v => v + ' 🏅' },
+    streak:     { field: 'streak',     label: 'Live Streak',  color: 'var(--orange)', min: 1,  fmt: v => v + ' 🔥' },
+  };
+
   let currentSort = 'iq';
   let allUsers = [];
   let myUid = null;
-
-  const SORT_CONFIG = {
-    iq:       { field: 'iq',       label: 'IQ',       color: '#ce82ff', suffix: '',   min: 50  },
-    xp:       { field: 'xp',       label: 'XP',       color: '#ffc800', suffix: 'xp', min: 0   },
-    streak:   { field: 'bestStreak',label: 'Streak',   color: '#ff9600', suffix: '🔥', min: 1   },
-    accuracy: { field: '_acc',      label: 'Accuracy', color: '#58cc02', suffix: '%',  min: 0   },
-    answered: { field: 'answered', label: 'Done',      color: '#1cb0f6', suffix: '',   min: 1   },
-  };
 
   function toast(msg) {
     const t = document.getElementById('toast');
@@ -316,47 +228,52 @@
     setTimeout(() => t.classList.remove('show'), 2000);
   }
 
-  // ── Fetch from Firestore ──
   async function fetchUsers() {
     const btn = document.getElementById('refresh-btn');
     btn.classList.add('spinning');
     try {
-      // Fetch top 100 users who have calibrated and have at least 5 answers
+      // Try with composite index first
       const q = query(
         collection(db, 'users'),
         where('calibrated', '==', true),
         orderBy('iq', 'desc'),
-        limit(100)
+        limit(200)
       );
       const snap = await getDocs(q);
-      allUsers = snap.docs.map(d => {
-        const data = d.data();
-        const acc = data.answered > 0 ? Math.round((data.correct / data.answered) * 100) : 0;
-        return { uid: d.id, ...data, _acc: acc };
-      }).filter(u => u.iq && u.answered >= 5);
+      allUsers = snap.docs
+        .map(d => ({ uid: d.id, ...d.data() }))
+        .filter(u => u.answered >= 5);
     } catch (e) {
-      console.warn('[Leaderboard] Fetch failed:', e);
-      toast('Could not load — check connection');
+      // Fallback if index isn't created yet — filter client side
+      try {
+        const q2 = query(collection(db, 'users'), orderBy('iq', 'desc'), limit(200));
+        const snap2 = await getDocs(q2);
+        allUsers = snap2.docs
+          .map(d => ({ uid: d.id, ...d.data() }))
+          .filter(u => u.calibrated && u.answered >= 5);
+      } catch (e2) {
+        console.error('[Leaderboard]', e2);
+        toast('Could not load — check connection');
+      }
     }
     btn.classList.remove('spinning');
     render();
   }
 
-  // ── Render ──
-  function render() {
+  function getSorted() {
     const cfg = SORT_CONFIG[currentSort];
-    const sorted = [...allUsers]
-      .filter(u => {
-        const v = u[cfg.field];
-        return v !== undefined && v !== null && v >= cfg.min;
-      })
+    return [...allUsers]
+      .filter(u => u[cfg.field] != null && Number(u[cfg.field]) >= cfg.min)
       .sort((a, b) => (b[cfg.field] || 0) - (a[cfg.field] || 0));
+  }
 
-    const myIdx = sorted.findIndex(u => u.uid === myUid);
+  function render() {
+    const sorted = getSorted();
+    const cfg = SORT_CONFIG[currentSort];
+    const myIdx = myUid ? sorted.findIndex(u => u.uid === myUid) : -1;
     renderYourRank(sorted, myIdx, cfg);
     renderPodium(sorted.slice(0, 3), cfg);
     renderList(sorted.slice(3), myIdx, cfg);
-
     document.getElementById('rest-label').style.display = sorted.length > 3 ? 'block' : 'none';
   }
 
@@ -366,52 +283,49 @@
     bar.style.display = 'flex';
     const me = sorted[myIdx];
     document.getElementById('your-rank-num').textContent = '#' + (myIdx + 1);
-    const val = fmtVal(me[cfg.field], cfg);
     document.getElementById('your-rank-right').innerHTML =
-      `<div style="font-size:18px;font-weight:900;color:${cfg.color}">${val}</div>
+      `<div style="font-size:20px;font-weight:900;color:${cfg.color}">${cfg.fmt(me[cfg.field])}</div>
        <div>${cfg.label}</div>`;
   }
 
   function renderPodium(top3, cfg) {
     const podium = document.getElementById('podium');
     if (!top3.length) { podium.innerHTML = ''; return; }
-    const ranks = [1, 2, 3];
-    podium.innerHTML = ranks.map(rank => {
+    const medals = ['👑','🥈','🥉'];
+    podium.innerHTML = [1,2,3].map(rank => {
       const u = top3[rank - 1];
       if (!u) return `<div class="podium-spot rank-${rank}"></div>`;
       const isMe = u.uid === myUid;
-      const val = fmtVal(u[cfg.field], cfg);
-      const emoji = avatarEmoji(u);
-      const crownMap = { 1: '👑', 2: '🥈', 3: '🥉' };
       return `
         <div class="podium-spot rank-${rank}">
-          <div class="podium-avatar${u.pic ? ' has-pic' : ''}">
-            ${rank === 1 ? `<div class="podium-crown">${crownMap[1]}</div>` : ''}
+          <div class="podium-avatar${u.pic ? ' has-pic' : ''} col-${currentSort}">
+            ${rank === 1 ? `<div class="podium-crown">👑</div>` : ''}
             <img src="${u.pic || ''}" alt="">
-            <span class="avatar-emoji">${emoji}</span>
+            <span class="avatar-emoji">${avatarEmoji(u)}</span>
           </div>
           <div class="podium-name">${esc(u.username || 'Anonymous')}${isMe ? ' 🫵' : ''}</div>
-          <div class="podium-val" style="color:${rank===1?'var(--gold)':rank===2?'var(--cream)':'var(--orange)'}">${val}</div>
-          <div class="podium-block">${crownMap[rank] || rank}</div>
+          <div class="podium-val col-${currentSort}">${cfg.fmt(u[cfg.field])}</div>
+          <div class="podium-block col-${currentSort}">${medals[rank - 1]}</div>
         </div>`;
     }).join('');
   }
 
   function renderList(rest, myIdx, cfg) {
     const list = document.getElementById('lb-list');
-    if (!rest.length) { list.innerHTML = ''; return; }
+    if (!rest.length) {
+      list.innerHTML = `<div class="lb-empty"><span class="emoji">🧠</span>Not enough data yet — keep training!</div>`;
+      return;
+    }
     list.innerHTML = rest.map((u, i) => {
       const rank = i + 4;
       const isMe = u.uid === myUid;
-      const val = fmtVal(u[cfg.field], cfg);
-      const emoji = avatarEmoji(u);
-      const acc = u._acc;
+      const acc = u.answered > 0 ? Math.round((u.correct / u.answered) * 100) : 0;
       return `
         <div class="lb-row${isMe ? ' me' : ''}">
-          <div class="lb-rank${rank <= 3 ? ' top3' : ''}">${rank}</div>
+          <div class="lb-rank">${rank}</div>
           <div class="lb-avatar${u.pic ? ' has-pic' : ''}">
             <img src="${u.pic || ''}" alt="">
-            <span class="avatar-emoji">${emoji}</span>
+            <span class="avatar-emoji">${avatarEmoji(u)}</span>
           </div>
           <div class="lb-info">
             <div class="lb-name">${esc(u.username || 'Anonymous')}${isMe ? `<span class="you-badge">YOU</span>` : ''}</div>
@@ -422,31 +336,17 @@
             </div>
           </div>
           <div>
-            <div class="lb-val" style="color:${cfg.color}">${val}</div>
+            <div class="lb-val" style="color:${cfg.color}">${cfg.fmt(u[cfg.field])}</div>
             <div class="lb-val-label">${cfg.label}</div>
           </div>
         </div>`;
     }).join('');
   }
 
-  function fmtVal(v, cfg) {
-    if (v === undefined || v === null) return '--';
-    if (cfg.suffix === '%') return v + '%';
-    if (cfg.suffix === '🔥') return v + ' 🔥';
-    if (cfg.suffix === 'xp') return v.toLocaleString();
-    return v;
-  }
-
   const EMOJIS = ['🦊','🐻','🦁','🐯','🦝','🐺','🦄','🐸','🐧','🦋','🦀','🐙'];
-  function avatarEmoji(u) {
-    if (!u.uid) return '🦌';
-    const idx = u.uid.charCodeAt(0) % EMOJIS.length;
-    return EMOJIS[idx];
-  }
-
+  function avatarEmoji(u) { return EMOJIS[(u.uid || 'x').charCodeAt(0) % EMOJIS.length]; }
   function esc(s) { return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-  // ── Filter tabs ──
   document.getElementById('filter-row').addEventListener('click', e => {
     const tab = e.target.closest('.filter-tab');
     if (!tab) return;
@@ -456,14 +356,11 @@
     render();
   });
 
-  // ── Refresh ──
-  document.getElementById('refresh-btn').addEventListener('click', () => fetchUsers());
+  document.getElementById('refresh-btn').addEventListener('click', fetchUsers);
 
-  // ── Boot ──
   async function init() {
     await authReady;
-    const user = IQData.getCurrentUser();
-    myUid = user?.uid || null;
+    myUid = IQData.getCurrentUser()?.uid || null;
     await fetchUsers();
   }
 
