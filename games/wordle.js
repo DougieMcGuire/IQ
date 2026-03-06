@@ -309,6 +309,7 @@
                 tile.className   = 'wordle-tile reveal-' + result[col];
                 tile.style.transition = 'transform ' + FLIP_HALF + 'ms ease-out';
                 tile.style.transform  = 'rotateX(0deg)';
+                H.tilePop && H.tilePop(); // haptic on each card flip reveal
               }, FLIP_HALF);
             }, delay);
           })(c);
