@@ -44,18 +44,48 @@
     }
     main::-webkit-scrollbar { display: none; }
 
-    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-top: 4px; }
-    .page-title { font-size: 20px; font-weight: 900; color: var(--cream); }
+    /* ── Header row ── */
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-top: 4px; gap: 8px; }
+    .page-title { font-size: 20px; font-weight: 900; color: var(--cream); flex-shrink: 0; }
+
+    .header-right { display: flex; align-items: center; gap: 7px; }
+
     .refresh-btn {
       background: var(--card); border: none; border-radius: 12px;
       padding: 8px 12px; color: var(--tan); cursor: pointer;
       font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 800;
       display: flex; align-items: center; gap: 5px;
       box-shadow: 0 3px 0 rgba(0,0,0,0.12); transition: transform 0.1s;
+      flex-shrink: 0;
     }
     .refresh-btn:active { transform: translateY(2px); }
     .refresh-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; transition: transform 0.6s ease; }
     .refresh-btn.spinning svg { transform: rotate(360deg); }
+
+    /* ── Privacy pill button — in the header ── */
+    .privacy-btn {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--card); border: none; border-radius: 12px;
+      padding: 8px 12px; cursor: pointer;
+      font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 800;
+      color: var(--tan); box-shadow: 0 3px 0 rgba(0,0,0,0.12);
+      transition: all 0.15s; flex-shrink: 0;
+      position: relative; overflow: hidden;
+    }
+    .privacy-btn::before { content:''; position:absolute; top:0;left:0;right:0;height:50%; background:linear-gradient(180deg,rgba(255,255,255,0.05)0%,transparent 100%); pointer-events:none; }
+    .privacy-btn:active { transform: translateY(2px); }
+    .privacy-btn.hidden-mode { background: rgba(234,43,43,0.15); color: var(--red); box-shadow: 0 3px 0 rgba(234,43,43,0.2); }
+    .privacy-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2.5; flex-shrink: 0; }
+
+    /* ── Hidden notice banner ── */
+    .hidden-notice {
+      background: rgba(234,43,43,0.1); border-radius: 14px; padding: 10px 14px;
+      margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+      border: 1.5px solid rgba(234,43,43,0.2);
+    }
+    .hidden-notice .hn-icon { font-size: 18px; flex-shrink: 0; }
+    .hidden-notice .hn-text { font-size: 12px; font-weight: 700; color: var(--tan); line-height: 1.4; }
+    .hidden-notice .hn-text strong { color: var(--red); }
 
     .filter-row { display: flex; gap: 6px; margin-bottom: 14px; }
     .filter-tab {
@@ -80,16 +110,6 @@
     .your-rank-bar::before { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:linear-gradient(180deg,rgba(255,255,255,0.04)0%,transparent 100%); pointer-events:none; }
     .yrb-left { font-size: 13px; font-weight: 800; color: var(--tan); }
     .yrb-rank { font-size: 24px; font-weight: 900; color: var(--gold); }
-
-    /* ── Hidden from leaderboard notice ── */
-    .hidden-notice {
-      background: var(--card); border-radius: 16px; padding: 12px 16px;
-      margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.12); border: 2px solid rgba(234,43,43,0.2);
-    }
-    .hidden-notice .hn-icon { font-size: 20px; flex-shrink: 0; }
-    .hidden-notice .hn-text { flex: 1; font-size: 12px; font-weight: 700; color: var(--tan); line-height: 1.4; }
-    .hidden-notice .hn-text strong { color: var(--cream); display: block; font-size: 13px; margin-bottom: 2px; }
 
     .podium { display: flex; align-items: flex-end; justify-content: center; gap: 8px; margin-bottom: 18px; }
     .podium-spot { flex: 1; max-width: 115px; display: flex; flex-direction: column; align-items: center; }
@@ -154,20 +174,6 @@
     .lb-val-label { font-size: 10px; font-weight: 800; color: var(--tan); text-align: right; }
     .you-badge { background: var(--gold); color: #2a1800; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 6px; letter-spacing: 0.5px; margin-left: 5px; }
 
-    /* ── Privacy button ── */
-    .privacy-btn {
-      display: flex; align-items: center; justify-content: center; gap: 7px;
-      width: 100%; margin-top: 18px; margin-bottom: 4px;
-      background: none; border: none; cursor: pointer;
-      font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
-      color: var(--brown-light); padding: 10px;
-      border-radius: 12px; transition: color 0.15s, background 0.15s;
-      opacity: 0.5;
-    }
-    .privacy-btn:active { opacity: 0.8; }
-    .privacy-btn.hidden-mode { color: var(--red); opacity: 0.7; }
-    .privacy-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; flex-shrink: 0; }
-
     .skeleton { background: var(--card); border-radius: 16px; height: 62px; box-shadow: 0 3px 0 rgba(0,0,0,0.12); position: relative; overflow: hidden; }
     .skeleton::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent); animation:shimmer 1.4s infinite; }
     @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
@@ -183,22 +189,28 @@
 <main>
   <div class="page-header">
     <div class="page-title">🏆 Leaderboard</div>
-    <button class="refresh-btn" id="refresh-btn">
-      <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-      Refresh
-    </button>
+    <div class="header-right">
+      <button class="privacy-btn" id="privacy-btn">
+        <svg id="privacy-icon" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        <span id="privacy-label">Hide me</span>
+      </button>
+      <button class="refresh-btn" id="refresh-btn">
+        <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Hidden notice -->
+  <div class="hidden-notice" id="hidden-notice" style="display:none;">
+    <div class="hn-icon">👻</div>
+    <div class="hn-text"><strong>You're hidden</strong> — others can't see you on the leaderboard</div>
   </div>
 
   <div class="filter-row" id="filter-row">
     <button class="filter-tab active" data-sort="iq">🧠 IQ</button>
     <button class="filter-tab" data-sort="bestStreak">🏅 Best Streak</button>
     <button class="filter-tab" data-sort="level">⚡ Level</button>
-  </div>
-
-  <!-- shown when user is hidden -->
-  <div class="hidden-notice" id="hidden-notice" style="display:none;">
-    <div class="hn-icon">👻</div>
-    <div class="hn-text"><strong>You're hidden</strong>Others can't see you on the leaderboard</div>
   </div>
 
   <div class="your-rank-bar" id="your-rank-bar" style="display:none;">
@@ -218,12 +230,6 @@
     <div class="skeleton"></div>
     <div class="skeleton"></div>
   </div>
-
-  <!-- Privacy toggle at the bottom -->
-  <button class="privacy-btn" id="privacy-btn">
-    <svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-    Hide me from leaderboard
-  </button>
 </main>
 
 <nav>
@@ -245,6 +251,7 @@
 
 <script type="module">
   import { IQData, db, authReady } from './data.js';
+  import Haptics from './haptics.js';
   import { collection, getDocs, query, orderBy, limit, where, doc, updateDoc }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -269,6 +276,28 @@
     setTimeout(() => t.classList.remove('show'), 2200);
   }
 
+  // ── Nav haptics ──
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('touchstart', () => Haptics.light(), { passive: true });
+  });
+
+  // ── Filter tabs haptics ──
+  document.getElementById('filter-row').addEventListener('click', e => {
+    const tab = e.target.closest('.filter-tab');
+    if (!tab) return;
+    Haptics.medium();
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentSort = tab.dataset.sort;
+    render();
+  });
+
+  // ── Refresh haptics ──
+  document.getElementById('refresh-btn').addEventListener('click', () => {
+    Haptics.medium();
+    fetchUsers();
+  });
+
   // ── Privacy toggle ──
   async function loadPrivacySetting() {
     const d = IQData.load();
@@ -277,36 +306,35 @@
   }
 
   async function togglePrivacy() {
-    const d = IQData.load();
     isHidden = !isHidden;
+    Haptics.toggle();
+    const d = IQData.load();
     d.hideFromLeaderboard = isHidden;
     IQData.save(d);
-
-    // Push to Firestore
     if (myUid) {
-      try {
-        await updateDoc(doc(db, 'users', myUid), { hideFromLeaderboard: isHidden });
-      } catch (e) {
-        console.warn('Privacy update failed', e);
-      }
+      try { await updateDoc(doc(db, 'users', myUid), { hideFromLeaderboard: isHidden }); }
+      catch (e) { console.warn('Privacy update failed', e); }
     }
-
     updatePrivacyUI();
-    toast(isHidden ? '👻 You\'re now hidden' : '👀 You\'re visible again', isHidden ? 'var(--red)' : 'var(--green)');
-    render(); // re-render to remove/add yourself
+    toast(isHidden ? '👻 Hidden from leaderboard' : '👀 You\'re visible again', isHidden ? 'var(--red)' : 'var(--green)');
+    render();
   }
 
   function updatePrivacyUI() {
     const btn = document.getElementById('privacy-btn');
+    const icon = document.getElementById('privacy-icon');
+    const label = document.getElementById('privacy-label');
     const notice = document.getElementById('hidden-notice');
     const rankBar = document.getElementById('your-rank-bar');
     if (isHidden) {
-      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Show me on leaderboard`;
+      icon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+      label.textContent = 'Show me';
       btn.classList.add('hidden-mode');
       notice.style.display = 'flex';
       rankBar.style.display = 'none';
     } else {
-      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg> Hide me from leaderboard`;
+      icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+      label.textContent = 'Hide me';
       btn.classList.remove('hidden-mode');
       notice.style.display = 'none';
     }
@@ -319,25 +347,17 @@
     const btn = document.getElementById('refresh-btn');
     btn.classList.add('spinning');
     try {
-      const q = query(
-        collection(db, 'users'),
-        where('calibrated', '==', true),
-        orderBy('iq', 'desc'),
-        limit(200)
-      );
+      const q = query(collection(db, 'users'), where('calibrated', '==', true), orderBy('iq', 'desc'), limit(200));
       const snap = await getDocs(q);
-      allUsers = snap.docs
-        .map(d => ({ uid: d.id, ...d.data() }))
-        .filter(u => u.answered >= 5 && !u.hideFromLeaderboard);
+      allUsers = snap.docs.map(d => ({ uid: d.id, ...d.data() })).filter(u => u.answered >= 5 && !u.hideFromLeaderboard);
     } catch (e) {
       try {
         const q2 = query(collection(db, 'users'), orderBy('iq', 'desc'), limit(200));
         const snap2 = await getDocs(q2);
-        allUsers = snap2.docs
-          .map(d => ({ uid: d.id, ...d.data() }))
-          .filter(u => u.calibrated && u.answered >= 5 && !u.hideFromLeaderboard);
+        allUsers = snap2.docs.map(d => ({ uid: d.id, ...d.data() })).filter(u => u.calibrated && u.answered >= 5 && !u.hideFromLeaderboard);
       } catch (e2) {
         console.error('[Leaderboard]', e2);
+        Haptics.error();
         toast('Could not load — check connection', 'var(--red)');
       }
     }
@@ -347,15 +367,12 @@
 
   function getSorted() {
     const cfg = SORT_CONFIG[currentSort];
-    return [...allUsers]
-      .filter(u => u[cfg.field] != null && Number(u[cfg.field]) >= cfg.min)
-      .sort((a, b) => (b[cfg.field] || 0) - (a[cfg.field] || 0));
+    return [...allUsers].filter(u => u[cfg.field] != null && Number(u[cfg.field]) >= cfg.min).sort((a, b) => (b[cfg.field] || 0) - (a[cfg.field] || 0));
   }
 
   function render() {
     const sorted = getSorted();
     const cfg = SORT_CONFIG[currentSort];
-    // Don't show your rank bar if hidden
     const myIdx = (myUid && !isHidden) ? sorted.findIndex(u => u.uid === myUid) : -1;
     renderYourRank(sorted, myIdx, cfg);
     renderPodium(sorted.slice(0, 3), cfg);
@@ -370,8 +387,7 @@
     const me = sorted[myIdx];
     document.getElementById('your-rank-num').textContent = '#' + (myIdx + 1);
     document.getElementById('your-rank-right').innerHTML =
-      `<div style="font-size:20px;font-weight:900;color:${cfg.color}">${cfg.fmt(me[cfg.field])}</div>
-       <div>${cfg.label}</div>`;
+      `<div style="font-size:20px;font-weight:900;color:${cfg.color}">${cfg.fmt(me[cfg.field])}</div><div>${cfg.label}</div>`;
   }
 
   function renderPodium(top3, cfg) {
@@ -386,8 +402,7 @@
         <div class="podium-spot rank-${rank}">
           <div class="podium-avatar${u.pic ? ' has-pic' : ''} col-${currentSort}">
             ${rank === 1 ? `<div class="podium-crown">👑</div>` : ''}
-            <img src="${u.pic || ''}" alt="">
-            <span class="avatar-emoji">${avatarEmoji(u)}</span>
+            <img src="${u.pic || ''}" alt=""><span class="avatar-emoji">${avatarEmoji(u)}</span>
           </div>
           <div class="podium-name">${esc(u.username || 'Anonymous')}${isMe ? ' 🫵' : ''}</div>
           <div class="podium-val col-${currentSort}">${cfg.fmt(u[cfg.field])}</div>
@@ -410,16 +425,11 @@
         <div class="lb-row${isMe ? ' me' : ''}">
           <div class="lb-rank">${rank}</div>
           <div class="lb-avatar${u.pic ? ' has-pic' : ''}">
-            <img src="${u.pic || ''}" alt="">
-            <span class="avatar-emoji">${avatarEmoji(u)}</span>
+            <img src="${u.pic || ''}" alt=""><span class="avatar-emoji">${avatarEmoji(u)}</span>
           </div>
           <div class="lb-info">
             <div class="lb-name">${esc(u.username || 'Anonymous')}${isMe ? `<span class="you-badge">YOU</span>` : ''}</div>
-            <div class="lb-sub">
-              <span>🧠 ${u.iq || '--'}</span>
-              <span>🎯 ${acc}%</span>
-              <span>⚡ Lvl ${u.level || 1}</span>
-            </div>
+            <div class="lb-sub"><span>🧠 ${u.iq || '--'}</span><span>🎯 ${acc}%</span><span>⚡ Lvl ${u.level || 1}</span></div>
           </div>
           <div>
             <div class="lb-val" style="color:${cfg.color}">${cfg.fmt(u[cfg.field])}</div>
@@ -432,17 +442,6 @@
   const EMOJIS = ['🦊','🐻','🦁','🐯','🦝','🐺','🦄','🐸','🐧','🦋','🦀','🐙'];
   function avatarEmoji(u) { return EMOJIS[(u.uid || 'x').charCodeAt(0) % EMOJIS.length]; }
   function esc(s) { return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-  document.getElementById('filter-row').addEventListener('click', e => {
-    const tab = e.target.closest('.filter-tab');
-    if (!tab) return;
-    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    currentSort = tab.dataset.sort;
-    render();
-  });
-
-  document.getElementById('refresh-btn').addEventListener('click', fetchUsers);
 
   async function init() {
     await authReady;
