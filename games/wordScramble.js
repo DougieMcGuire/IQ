@@ -50,7 +50,6 @@
     var tier = ['easy','medium','hard'][Q.rand(0,2)];
     var item = Q.pick(WORDS[tier]);
     var word = item.w;
-    // Scramble until it's different from the original
     var scrambled;
     do { scrambled = Q.shuffle(word.split('')).join(''); } while (scrambled === word);
     return {
@@ -96,6 +95,10 @@
       sourceEl.addEventListener('click', function (e) {
         var btn = e.target.closest('.ws-src');
         if (!btn || done || btn.classList.contains('ws-used')) return;
+
+        // Each letter tap — light tile pop
+        Haptics.tilePop();
+
         btn.classList.add('ws-used');
         var letter = btn.dataset.wl;
         placed.push({ letter: letter, btn: btn });
@@ -107,7 +110,8 @@
           if (attempt === q.word) {
             finish(true);
           } else {
-            // Wrong — shake and reset
+            // Wrong word — shake + error buzz
+            Haptics.wordleWrong();
             answerEl.classList.add('ws-shake');
             statusEl.textContent = 'Not quite! Try again.';
             statusEl.style.color = 'var(--red)';
@@ -122,12 +126,12 @@
         }
       });
 
-      // Tap a slot to undo
+      // Tap a slot to undo — light feel
       answerEl.addEventListener('click', function (e) {
         var slot = e.target.closest('.ws-slot');
         if (!slot || done || !slot.classList.contains('ws-filled')) return;
+        Haptics.light();
         var slotIdx = Array.from(slots).indexOf(slot);
-        // Remove from this slot to the end
         while (placed.length > slotIdx) {
           var p = placed.pop();
           p.btn.classList.remove('ws-used');
@@ -140,6 +144,7 @@
         done = true;
         var ms = Date.now() - ctx.answerStartRef.get();
         var data = ctx.IQData.recordAnswer(q.category, won, q.difficulty, ms);
+        Haptics.success();
         slots.forEach(function(s){ s.classList.add('ws-correct'); });
         statusEl.textContent = 'Nice! 🎉';
         statusEl.style.color = 'var(--green)';
