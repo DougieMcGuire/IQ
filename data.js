@@ -220,7 +220,6 @@ const IQData = {
         d.ratings[k] = { ...d.ratings[k] };
         d.ratings[k].history = (d.ratings[k].history || []).slice(-20);
       }
-      delete d.streak;
       delete d.sessionStart;
       d.lastSeen = serverTimestamp();
       await setDoc(doc(db, 'users', currentUser.uid), d, { merge: true });
