@@ -40,6 +40,7 @@
       var done = false;
 
       readyBtn.addEventListener('click', function () {
+        Haptics.medium();
         readyWrap.style.display = 'none';
         zone.style.display = 'flex';
         state = 'waiting';
@@ -50,6 +51,8 @@
           if (done) return;
           state = 'go';
           goTime = Date.now();
+          // Subtle nudge when circle goes green — player should feel it before they see it
+          Haptics.nudge();
           circle.classList.add('react-go');
           circle.textContent = 'TAP!';
         }, delay);
@@ -61,6 +64,8 @@
         if (state === 'waiting') {
           done = true;
           clearTimeout(timer);
+          // Too early — sharp error
+          Haptics.error();
           circle.classList.add('react-fail');
           circle.textContent = 'Too early!';
           result.textContent = 'Wait for green next time';
@@ -71,6 +76,8 @@
           var reactionMs = Date.now() - goTime;
           var good = reactionMs < 400;
           var great = reactionMs < 250;
+          // Distinct haptic for the actual tap
+          Haptics.reactionTap();
           circle.classList.remove('react-go');
           circle.classList.add(good ? 'react-success' : 'react-slow');
           circle.textContent = reactionMs + 'ms';
@@ -84,6 +91,8 @@
         var totalMs = Date.now() - ctx.answerStartRef.get();
         var data = ctx.IQData.recordAnswer(q.category, won, q.difficulty, totalMs);
         if (won) {
+          // Delay slightly so reactionTap fires first, then success follows
+          setTimeout(function () { ms < 250 ? Haptics.streak() : Haptics.success(); }, 120);
           ctx.flashEl.className = 'flash green show';
           ctx.spawnConfetti(ms < 250 ? 20 : 8);
         } else {
