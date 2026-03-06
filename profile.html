@@ -8,29 +8,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #3a2918;
-      --card: #4a3625;
-      --card-glow: #5a4232;
-      --brown-mid: #6b4f32;
-      --brown-light: #8f6b4a;
-      --tan: #c2a476;
-      --cream: #f0e2cc;
-      --green: #58cc02;
-      --green-dark: #46a302;
+      --bg: #3a2918; --card: #4a3625; --card-glow: #5a4232;
+      --brown-mid: #6b4f32; --brown-light: #8f6b4a;
+      --tan: #c2a476; --cream: #f0e2cc;
+      --green: #58cc02; --green-dark: #46a302;
       --red: #ea2b2b;
-      --gold: #ffc800;
-      --gold-dark: #d9aa00;
-      --blue: #1cb0f6;
-      --blue-dark: #1899d6;
-      --purple: #ce82ff;
-      --orange: #ff9600;
-      --pink: #ff4b8a;
+      --gold: #ffc800; --gold-dark: #d9aa00;
+      --blue: #1cb0f6; --blue-dark: #1899d6;
+      --purple: #ce82ff; --orange: #ff9600; --pink: #ff4b8a;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body { width: 100%; height: 100%; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--cream); }
     body { display: flex; flex-direction: column; }
 
-    /* ── Nav ── */
     nav {
       position: fixed; bottom: 0; left: 0; right: 0;
       height: calc(64px + env(safe-area-inset-bottom, 0px));
@@ -48,14 +38,12 @@
     .nav-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
     .nav-btn.active { color: var(--cream); background: var(--brown-mid); box-shadow: 0 3px 0 rgba(0,0,0,0.15); }
 
-    /* ── Main ── */
     main {
       flex: 1; overflow-y: auto;
       padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(72px + env(safe-area-inset-bottom, 0px));
     }
     main::-webkit-scrollbar { display: none; }
 
-    /* ── Header ── */
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .header-left { font-size: 14px; font-weight: 800; color: var(--tan); }
     .header-right { display: flex; gap: 8px; align-items: center; }
@@ -64,15 +52,13 @@
       padding: 8px 14px; font-family: 'Nunito', sans-serif;
       font-size: 13px; font-weight: 800; cursor: pointer;
       display: flex; align-items: center; gap: 5px;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.12);
-      transition: transform 0.1s;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.12); transition: transform 0.1s;
     }
     .share-btn { color: var(--cream); }
     .share-btn:active, .signout-btn:active { transform: translateY(2px); }
     .share-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
     .signout-btn { color: var(--brown-light); box-shadow: none; background: transparent; }
 
-    /* ── Profile Hero ── */
     .profile-hero {
       position: relative; display: flex; flex-direction: column;
       align-items: center; margin-bottom: 20px; padding: 20px 0;
@@ -82,9 +68,10 @@
       width: clamp(80px,22vw,100px); height: clamp(80px,22vw,100px);
       border-radius: 50%; background: var(--card);
       overflow: hidden; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.15);
-      position: relative;
+      cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.15); position: relative;
+      transition: transform 0.1s;
     }
+    .avatar:active { transform: scale(0.95); }
     .avatar::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
       background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%);
@@ -104,14 +91,8 @@
     .username-display { font-size: 15px; font-weight: 800; color: var(--tan); margin-bottom: 8px; }
     .iq-num { font-size: clamp(60px,18vw,80px); font-weight: 900; line-height: 1; color: var(--cream); text-shadow: 0 4px 0 rgba(0,0,0,0.2); }
     .iq-label { font-size: clamp(14px,4vw,18px); font-weight: 900; color: var(--brown-light); letter-spacing: 6px; text-transform: uppercase; margin-bottom: 8px; }
-    .pct-badge {
-      background: var(--gold); color: var(--bg);
-      font-size: 14px; font-weight: 900; padding: 5px 16px;
-      border-radius: 12px; box-shadow: 0 3px 0 var(--gold-dark);
-      text-transform: uppercase;
-    }
+    .pct-badge { background: var(--gold); color: var(--bg); font-size: 14px; font-weight: 900; padding: 5px 16px; border-radius: 12px; box-shadow: 0 3px 0 var(--gold-dark); text-transform: uppercase; }
 
-    /* ── Side stats ── */
     .side-stats {
       position: absolute; right: 0; top: 50%; transform: translateY(-50%);
       display: flex; flex-direction: column; gap: clamp(6px,1.5vw,8px); z-index: 1;
@@ -121,57 +102,32 @@
       padding: clamp(6px,1.5vw,10px) clamp(10px,2.5vw,14px);
       display: flex; flex-direction: column; align-items: center;
       min-width: clamp(60px,17vw,80px);
-      box-shadow: 0 3px 0 rgba(0,0,0,0.12);
-      position: relative; overflow: hidden;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.12); position: relative; overflow: hidden;
     }
-    .side-stat::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 100%);
-      pointer-events: none;
-    }
+    .side-stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%; background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 100%); pointer-events: none; }
     .side-stat .s-icon { width: 14px; height: 14px; margin-bottom: 2px; }
     .side-stat .s-icon svg { width: 100%; height: 100%; stroke: var(--tan); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
     .side-stat .s-val { font-size: clamp(16px,4.5vw,20px); font-weight: 900; line-height: 1.2; color: var(--cream); }
     .side-stat .s-lbl { font-size: clamp(10px,2.5vw,11px); font-weight: 800; color: var(--tan); }
 
-    /* ── Section ── */
-    .section-title {
-      font-size: 13px; font-weight: 900; color: var(--tan);
-      letter-spacing: 2px; text-transform: uppercase; margin: 16px 0 10px;
-    }
+    .section-title { font-size: 13px; font-weight: 900; color: var(--tan); letter-spacing: 2px; text-transform: uppercase; margin: 16px 0 10px; }
 
-    /* ── Abilities ── */
     .abilities-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .ability-card {
-      background: var(--card); border-radius: 14px;
-      padding: 12px 14px; box-shadow: 0 3px 0 rgba(0,0,0,0.12);
-      position: relative; overflow: hidden;
+      background: var(--card); border-radius: 14px; padding: 12px 14px;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.12); position: relative; overflow: hidden;
     }
-    .ability-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
-      pointer-events: none;
-    }
-    .ability-name {
-      font-size: clamp(10px,2.6vw,12px); font-weight: 900; color: var(--cream);
-      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;
-    }
-    .ability-bar-outer {
-      height: clamp(24px,6vw,30px); background: var(--brown-mid);
-      border-radius: 8px; overflow: hidden;
-    }
+    .ability-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%; background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%); pointer-events: none; }
+    .ability-name { font-size: clamp(10px,2.6vw,12px); font-weight: 900; color: var(--cream); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .ability-bar-outer { height: clamp(24px,6vw,30px); background: var(--brown-mid); border-radius: 8px; overflow: hidden; }
     .ability-bar-inner {
       height: 100%; border-radius: 8px;
       display: flex; align-items: center; padding-left: 10px;
       min-width: 32px; transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
       position: relative;
     }
-    .ability-bar-inner::after {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 40%;
-      background: rgba(255,255,255,0.2); border-radius: 8px 8px 0 0;
-    }
+    .ability-bar-inner::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 40%; background: rgba(255,255,255,0.2); border-radius: 8px 8px 0 0; }
     .ability-bar-inner span { font-size: 12px; font-weight: 900; color: #fff; position: relative; z-index: 1; }
-
     .bar-pattern  { background: var(--orange); }
     .bar-problem  { background: var(--red); }
     .bar-mental   { background: var(--green); }
@@ -181,33 +137,17 @@
     .bar-emotional{ background: var(--pink); }
     .bar-spatial  { background: var(--gold); }
 
-    /* ── Reset ── */
     .reset-btn {
       margin-top: 24px; background: none; border: none;
       font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700;
       color: var(--brown-light); cursor: pointer; opacity: 0.3;
-      display: block; width: 100%; text-align: center;
-      padding: 12px;
+      display: block; width: 100%; text-align: center; padding: 12px;
     }
 
-    /* ── Modal ── */
-    .modal {
-      position: fixed; inset: 0; background: rgba(58,41,24,0.9);
-      display: none; align-items: center; justify-content: center;
-      z-index: 200; padding: 16px;
-    }
+    .modal { position: fixed; inset: 0; background: rgba(58,41,24,0.9); display: none; align-items: center; justify-content: center; z-index: 200; padding: 16px; }
     .modal.show { display: flex; }
-    .modal-box {
-      background: var(--card); border-radius: 20px;
-      padding: 20px; width: 100%; max-width: 340px;
-      position: relative; box-shadow: 0 6px 0 rgba(0,0,0,0.15);
-    }
-    .modal-close {
-      position: absolute; top: 12px; right: 12px;
-      background: var(--brown-mid); border: none; border-radius: 50%;
-      width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-    }
+    .modal-box { background: var(--card); border-radius: 20px; padding: 20px; width: 100%; max-width: 340px; position: relative; box-shadow: 0 6px 0 rgba(0,0,0,0.15); }
+    .modal-close { position: absolute; top: 12px; right: 12px; background: var(--brown-mid); border: none; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     .modal-close svg { width: 14px; height: 14px; stroke: var(--cream); stroke-width: 2.5; }
     .modal-title { font-size: 18px; font-weight: 900; text-align: center; margin-bottom: 14px; color: var(--cream); }
     .share-preview { background: var(--bg); border-radius: 12px; overflow: hidden; }
@@ -217,21 +157,13 @@
       flex: 1; background: var(--card-glow); border: none; border-radius: 12px;
       padding: 12px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800;
       cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
-      color: var(--cream); box-shadow: 0 3px 0 rgba(0,0,0,0.12);
-      transition: transform 0.1s;
+      color: var(--cream); box-shadow: 0 3px 0 rgba(0,0,0,0.12); transition: transform 0.1s;
     }
     .share-btns button:active { transform: translateY(2px); }
     .share-btns button svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
     .share-btns button.primary { background: var(--green); color: #fff; box-shadow: 0 3px 0 var(--green-dark); }
 
-    /* ── Toast ── */
-    .toast {
-      position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%);
-      background: var(--green); color: #fff; padding: 10px 20px;
-      border-radius: 14px; font-size: 14px; font-weight: 800;
-      opacity: 0; transition: opacity 0.3s; z-index: 300; white-space: nowrap;
-      box-shadow: 0 3px 0 var(--green-dark);
-    }
+    .toast { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%); background: var(--green); color: #fff; padding: 10px 20px; border-radius: 14px; font-size: 14px; font-weight: 800; opacity: 0; transition: opacity 0.3s; z-index: 300; white-space: nowrap; box-shadow: 0 3px 0 var(--green-dark); }
     .toast.show { opacity: 1; }
   </style>
 </head>
@@ -291,15 +223,15 @@
 </main>
 
 <nav>
-  <button class="nav-btn" onclick="parent.goTo('leaderboard')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+  <button class="nav-btn" onclick="navGo('leaderboard')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
     Ranks
   </button>
-  <button class="nav-btn" onclick="parent.goTo('improve')">
+  <button class="nav-btn" onclick="navGo('improve')">
     <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
     Train
   </button>
-  <button class="nav-btn active" onclick="parent.goTo('profile')">
+  <button class="nav-btn active" onclick="navGo('profile')">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     Profile
   </button>
@@ -323,8 +255,15 @@
 
 <script type="module">
   import { IQData, iqToPercentile, formatPercentile } from './data.js';
+  import Haptics from './haptics.js';
 
   if (window.parent !== window) parent.authCheck();
+
+  // Nav with haptics
+  window.navGo = function(page) {
+    Haptics.light();
+    parent.goTo(page);
+  };
 
   const ABILITIES = [
     { key: 'patternRecognition', name: 'Pattern',        bar: 'pattern' },
@@ -405,6 +344,7 @@
         document.getElementById('avatar-img').src = url;
         document.getElementById('avatar-img').style.display = 'block';
         document.getElementById('avatar-icon').style.display = 'none';
+        Haptics.success();
         toast('Photo updated!');
       };
       img.src = e.target.result;
@@ -412,12 +352,33 @@
     reader.readAsDataURL(file);
   }
 
-  document.getElementById('avatar-tap').onclick = () => document.getElementById('avatar-input').click();
-  document.getElementById('avatar-edit-btn').onclick = () => document.getElementById('avatar-input').click();
+  document.getElementById('avatar-tap').onclick = () => {
+    Haptics.medium();
+    document.getElementById('avatar-input').click();
+  };
+  document.getElementById('avatar-edit-btn').onclick = () => {
+    Haptics.medium();
+    document.getElementById('avatar-input').click();
+  };
   document.getElementById('avatar-input').onchange = e => handleAvatarFile(e.target.files[0]);
-  document.getElementById('signout-btn').onclick = () => IQData.signOut();
+
+  document.getElementById('signout-btn').onclick = () => {
+    Haptics.warning();
+    IQData.signOut();
+  };
+
   document.getElementById('reset-btn').onclick = () => {
-    if (confirm('Reset all progress?')) { IQData.reset(); location.reload(); }
+    Haptics.warning();
+    if (confirm('Reset all progress?')) {
+      Haptics.error();
+      IQData.reset();
+      location.reload();
+    }
+  };
+
+  document.getElementById('share-btn').onclick = () => {
+    Haptics.medium();
+    openShare();
   };
 
   let shareCanvas = null;
@@ -426,9 +387,11 @@
     document.getElementById('share-modal').classList.add('show');
     genShareImg();
   }
-  function closeShare() { document.getElementById('share-modal').classList.remove('show'); }
+  function closeShare() {
+    Haptics.light();
+    document.getElementById('share-modal').classList.remove('show');
+  }
 
-  document.getElementById('share-btn').onclick = openShare;
   document.getElementById('share-close').onclick = closeShare;
   document.getElementById('share-modal').onclick = e => { if (e.target.id === 'share-modal') closeShare(); };
 
@@ -438,37 +401,21 @@
     const W = 480, H = 640;
     cv.width = W; cv.height = H;
     const ctx = cv.getContext('2d');
-
-    // Background
-    ctx.fillStyle = '#3a2918';
-    ctx.fillRect(0, 0, W, H);
-
-    // Card
+    ctx.fillStyle = '#3a2918'; ctx.fillRect(0, 0, W, H);
     rr(ctx, 20, 20, W - 40, H - 40, 24, '#4a3625', null);
-
-    // Glare
-    ctx.save();
-    ctx.beginPath();
-    rr_path(ctx, 20, 20, W - 40, (H - 40) * 0.45, 24);
-    ctx.fillStyle = 'rgba(255,255,255,0.03)';
-    ctx.fill();
-    ctx.restore();
+    ctx.save(); ctx.beginPath(); rr_path(ctx, 20, 20, W - 40, (H - 40) * 0.45, 24);
+    ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fill(); ctx.restore();
 
     const draw = () => {
-      // IQ
       ctx.font = '900 80px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc'; ctx.textAlign = 'center';
       ctx.fillText(d.iq || '--', W / 2, 190);
       ctx.font = '900 16px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a';
       ctx.fillText('I Q', W / 2, 215);
-
-      // Badge
       if (d.iq) {
         rr(ctx, W / 2 - 55, 225, 110, 30, 10, '#ffc800', null);
         ctx.font = '900 13px Nunito, sans-serif'; ctx.fillStyle = '#3a2918';
         ctx.fillText('TOP ' + formatPercentile(iqToPercentile(d.iq)).toUpperCase(), W / 2, 245);
       }
-
-      // Stats
       [{ v: d.answered, l: 'Done' }, { v: IQData.getAccuracy() + '%', l: 'Accuracy' }, { v: d.bestStreak, l: 'Best' }]
         .forEach((s, i) => {
           const x = 50 + ((W - 100) / 3) * i + (W - 100) / 6;
@@ -476,11 +423,8 @@
           ctx.font = '900 20px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc'; ctx.fillText(s.v, x, 296);
           ctx.font = '800 10px Nunito, sans-serif'; ctx.fillStyle = '#c2a476'; ctx.fillText(s.l, x, 314);
         });
-
-      // Abilities
       ctx.font = '900 11px Nunito, sans-serif'; ctx.fillStyle = '#c2a476'; ctx.textAlign = 'left';
       ctx.fillText('ABILITIES', 50, 365);
-
       const bars = [
         { n: 'Pattern', c: '#ff9600', k: 'patternRecognition' },
         { n: 'Problem Solving', c: '#ea2b2b', k: 'problemSolving' },
@@ -495,76 +439,60 @@
         ctx.font = '800 10px Nunito, sans-serif'; ctx.fillStyle = '#c2a476'; ctx.fillText(b.n, 50, y);
         rr(ctx, 50, y + 5, W - 100, 22, 6, '#6b4f32', null);
         rr(ctx, 50, y + 5, Math.max(30, (v / 100) * (W - 100)), 22, 6, b.c, null);
-        // Glare on bar
-        ctx.save();
-        ctx.globalAlpha = 0.2;
+        ctx.save(); ctx.globalAlpha = 0.2;
         rr(ctx, 50, y + 5, Math.max(30, (v / 100) * (W - 100)), 10, 6, '#fff', null);
-        ctx.globalAlpha = 1;
-        ctx.restore();
+        ctx.globalAlpha = 1; ctx.restore();
         ctx.font = '900 10px Nunito, sans-serif'; ctx.fillStyle = '#fff'; ctx.fillText(v, 58, y + 20);
       });
-
-      // Branding
       ctx.font = '900 18px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a'; ctx.textAlign = 'center';
       ctx.fillText('🦌 BrainDeer', W / 2, H - 45);
-
       shareCanvas = cv;
       const preview = document.getElementById('share-preview');
-      preview.innerHTML = '';
-      preview.appendChild(cv);
+      preview.innerHTML = ''; preview.appendChild(cv);
     };
 
     if (d.pic) {
       const img = new Image();
       img.onload = () => {
         ctx.save(); ctx.beginPath(); ctx.arc(W / 2, 80, 40, 0, Math.PI * 2); ctx.clip();
-        ctx.drawImage(img, W / 2 - 40, 40, 80, 80); ctx.restore();
-        draw();
+        ctx.drawImage(img, W / 2 - 40, 40, 80, 80); ctx.restore(); draw();
       };
       img.src = d.pic;
     } else {
       ctx.fillStyle = '#6b4f32'; ctx.beginPath(); ctx.arc(W / 2, 80, 40, 0, Math.PI * 2); ctx.fill();
-      ctx.font = '32px serif'; ctx.textAlign = 'center'; ctx.fillText('🦌', W / 2, 92);
-      draw();
+      ctx.font = '32px serif'; ctx.textAlign = 'center'; ctx.fillText('🦌', W / 2, 92); draw();
     }
   }
 
   function rr(ctx, x, y, w, h, r, fill, stroke, lw) {
     ctx.beginPath();
-    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
+    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
     if (fill) { ctx.fillStyle = fill; ctx.fill(); }
     if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw || 2; ctx.stroke(); }
   }
-
   function rr_path(ctx, x, y, w, h, r) {
-    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h);
-    ctx.lineTo(x, y + h);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
+    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h); ctx.lineTo(x, y + h); ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
   }
 
   document.getElementById('copy-btn').onclick = async () => {
     if (!shareCanvas) return;
+    Haptics.medium();
     try {
       const blob = await new Promise(r => shareCanvas.toBlob(r, 'image/png'));
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      Haptics.success();
       toast('Copied!');
-    } catch { toast('Copy failed'); }
+    } catch { Haptics.error(); toast('Copy failed'); }
   };
 
   document.getElementById('download-btn').onclick = () => {
     if (!shareCanvas) return;
+    Haptics.success();
     const a = document.createElement('a');
     a.download = 'braindeer-profile.png';
     a.href = shareCanvas.toDataURL('image/png');
