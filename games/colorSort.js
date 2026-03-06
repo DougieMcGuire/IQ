@@ -47,6 +47,7 @@
       var pool = slideEl.querySelector('#csort-pool-' + idx);
       var placed = slideEl.querySelector('#csort-placed-' + idx);
       var statusEl = slideEl.querySelector('#csort-status-' + idx);
+      var H = ctx.Haptics || {};
       if (!pool) return;
 
       var placedOrder = [];
@@ -56,6 +57,9 @@
         var btn = e.target.closest('.csort-tile');
         if (!btn || done || btn.classList.contains('csort-used')) return;
         btn.classList.add('csort-used');
+
+        // Each tile tap — satisfying medium click
+        H.medium && H.medium();
 
         var origIdx = parseInt(btn.dataset.origIdx);
         placedOrder.push(origIdx);
@@ -82,11 +86,13 @@
         var ms = Date.now() - ctx.answerStartRef.get();
         var data = ctx.IQData.recordAnswer(q.category, won, q.difficulty, ms);
         if (won) {
+          H.success && H.success();
           statusEl.textContent = 'Perfect! 🎨';
           statusEl.style.color = 'var(--green)';
           ctx.flashEl.className = 'flash green show';
           ctx.spawnConfetti(14);
         } else {
+          H.error && H.error();
           statusEl.textContent = 'Wrong order!';
           statusEl.style.color = 'var(--red)';
           ctx.flashEl.className = 'flash red show';
