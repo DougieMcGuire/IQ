@@ -43,6 +43,10 @@
       grid.addEventListener('click', function (e) {
         var btn = e.target.closest('.mem-card');
         if (!btn || locked || btn.classList.contains('mem-flip') || btn.classList.contains('mem-matched')) return;
+
+        // Card flip feel
+        Haptics.cardFlip();
+
         btn.classList.add('mem-flip');
         flipped.push(btn);
         if (flipped.length === 2) {
@@ -50,6 +54,8 @@
           locked = true;
           var a = flipped[0], b = flipped[1];
           if (a.dataset.mv === b.dataset.mv) {
+            // Pair matched
+            setTimeout(function () { Haptics.cardMatch(); }, 150);
             a.classList.add('mem-matched');
             b.classList.add('mem-matched');
             matched++;
@@ -61,6 +67,8 @@
               status.textContent = matched + '/' + totalPairs + ' pairs';
             }
           } else {
+            // No match — subtle warning before flip back
+            setTimeout(function () { Haptics.light(); }, 300);
             setTimeout(function () {
               a.classList.remove('mem-flip');
               b.classList.remove('mem-flip');
@@ -75,6 +83,7 @@
         var ms = Date.now() - ctx.answerStartRef.get();
         var perfect = moves <= totalPairs + 1;
         var data = ctx.IQData.recordAnswer(q.category, won, q.difficulty, ms);
+        perfect ? Haptics.streak() : Haptics.success();
         status.textContent = 'Done in ' + moves + ' moves!';
         status.style.color = 'var(--green)';
         ctx.flashEl.className = 'flash green show';
