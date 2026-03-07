@@ -179,7 +179,7 @@
       var checkMore      = ctx.checkMore;
       var spawnConfetti  = ctx.spawnConfetti;
       var answerStartRef = ctx.answerStartRef;
-      var H              = ctx.Haptics || {};  // safe fallback if not available
+      var H              = ctx.Haptics || {};
 
       var st = {
         answer:     q.answer,
@@ -296,7 +296,6 @@
         var FLIP_DUR  = 400;
         var STAGGER   = 100;
 
-        // 5 staggered haptics, one per tile flip
         for (var t = 0; t < 5; t++) {
           (function(i) { setTimeout(function() { H.tilePop && H.tilePop(); }, i * STAGGER); })(t);
         }
@@ -353,6 +352,9 @@
 
         var ms   = Date.now() - answerStartRef.get();
         var data = IQData.recordAnswer(st.category, won, st.difficulty, ms);
+
+        // Notify daily tasks — fires on both win and loss (completing a wordle counts)
+        if (ctx.notifyGamePlayed) ctx.notifyGamePlayed('wordle');
 
         if (won) {
           var byGuess = ['Ace! 🎯','Brilliant! 🧠','Nailed it! ⚡','Great! 🔥','Nice! 💡','Phew! 😅'];
