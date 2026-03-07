@@ -12,15 +12,16 @@
       --brown-mid: #6b4f32; --brown-light: #8f6b4a;
       --tan: #c2a476; --cream: #f0e2cc;
       --green: #58cc02; --green-dark: #46a302;
-      --red: #ea2b2b;
+      --red: #ea2b2b; --red-dark: #c42020;
       --gold: #ffc800; --gold-dark: #d9aa00;
       --blue: #1cb0f6; --blue-dark: #1899d6;
       --purple: #ce82ff; --orange: #ff9600; --pink: #ff4b8a;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { width: 100%; height: 100%; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--cream); }
+    html, body { width: 100%; height: 100%; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--cream); overflow: hidden; }
     body { display: flex; flex-direction: column; }
 
+    /* ── Nav ── */
     nav {
       position: fixed; bottom: 0; left: 0; right: 0;
       height: calc(64px + env(safe-area-inset-bottom, 0px));
@@ -37,195 +38,295 @@
     }
     .nav-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
     .nav-btn.active { color: var(--cream); background: var(--brown-mid); box-shadow: 0 3px 0 rgba(0,0,0,0.15); }
-    .nav-badge {
-      position: absolute; top: 5px; right: 12px;
-      width: 9px; height: 9px; border-radius: 50%;
-      background: var(--red); border: 2px solid var(--card);
-      display: none; animation: badgePulse 2s ease infinite;
-    }
+    .nav-badge { position: absolute; top: 5px; right: 12px; width: 9px; height: 9px; border-radius: 50%; background: var(--red); border: 2px solid var(--card); display: none; animation: badgePulse 2s ease infinite; }
     .nav-badge.show { display: block; }
     @keyframes badgePulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.35)} }
 
+    /* ── Main scroll ── */
     main {
-      flex: 1; overflow-y: auto;
-      padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(72px + env(safe-area-inset-bottom, 0px));
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px calc(80px + env(safe-area-inset-bottom, 0px));
     }
     main::-webkit-scrollbar { display: none; }
 
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .header-left { font-size: 14px; font-weight: 800; color: var(--tan); }
-    .header-right { display: flex; gap: 8px; align-items: center; }
-    .share-btn, .signout-btn {
-      background: var(--card); border: none; border-radius: 12px;
-      padding: 8px 14px; font-family: 'Nunito', sans-serif;
-      font-size: 13px; font-weight: 800; cursor: pointer;
-      display: flex; align-items: center; gap: 5px;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.12); transition: transform 0.1s;
+    /* ── Top bar ── */
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .topbar-title { font-size: 20px; font-weight: 900; color: var(--cream); }
+    .topbar-actions { display: flex; gap: 8px; }
+    .icon-btn {
+      width: 38px; height: 38px; border-radius: 12px; border: none;
+      background: var(--card); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 3px 0 rgba(0,0,0,0.12); transition: transform 0.1s;
+      color: var(--tan);
     }
-    .share-btn { color: var(--cream); }
-    .share-btn:active, .signout-btn:active { transform: translateY(2px); }
-    .share-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
-    .signout-btn { color: var(--brown-light); box-shadow: none; background: transparent; }
+    .icon-btn:active { transform: translateY(2px); }
+    .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .signout-btn { background: transparent; border: none; font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 800; color: var(--brown-light); cursor: pointer; padding: 8px; }
 
-    .profile-hero {
-      position: relative; display: flex; flex-direction: column;
-      align-items: center; margin-bottom: 20px; padding: 20px 0;
+    /* ── Hero card ── */
+    .hero-card {
+      background: var(--card); border-radius: 24px;
+      padding: 24px 20px 20px;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+      position: relative; overflow: hidden;
+      margin-bottom: 12px;
     }
-    .avatar-wrap { position: relative; margin-bottom: 12px; z-index: 2; }
+    .hero-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    /* Decorative circles */
+    .hero-card::after {
+      content: ''; position: absolute; right: -30px; top: -30px;
+      width: 140px; height: 140px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,200,0,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-top { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+
+    /* Avatar — keep exact same feel */
+    .avatar-wrap { position: relative; flex-shrink: 0; }
     .avatar {
-      width: clamp(80px,22vw,100px); height: clamp(80px,22vw,100px);
-      border-radius: 50%; background: var(--card);
-      overflow: hidden; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.15); position: relative;
-      transition: transform 0.1s;
+      width: 72px; height: 72px; border-radius: 50%;
+      background: var(--brown-mid); overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+      position: relative; transition: transform 0.1s;
     }
-    .avatar:active { transform: scale(0.95); }
+    .avatar:active { transform: scale(0.93); }
     .avatar::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
       border-radius: 50% 50% 0 0; pointer-events: none; z-index: 1;
     }
     .avatar img { width: 100%; height: 100%; object-fit: cover; display: none; }
-    .avatar svg { width: 40px; height: 40px; stroke: var(--brown-light); fill: none; stroke-width: 1.5; }
+    .avatar svg { width: 34px; height: 34px; stroke: var(--brown-light); fill: none; stroke-width: 1.5; }
     .avatar-edit {
-      position: absolute; bottom: 2px; right: 2px; width: 28px; height: 28px;
+      position: absolute; bottom: 0; right: 0; width: 24px; height: 24px;
       background: var(--blue); border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 3px 0 var(--blue-dark);
+      cursor: pointer; box-shadow: 0 2px 0 var(--blue-dark); z-index: 2;
     }
-    .avatar-edit svg { width: 12px; height: 12px; stroke: #fff; fill: none; stroke-width: 2.5; }
+    .avatar-edit svg { width: 11px; height: 11px; stroke: #fff; fill: none; stroke-width: 2.5; }
     #avatar-input { display: none; }
 
-    .username-display { font-size: 15px; font-weight: 800; color: var(--tan); margin-bottom: 8px; }
-    .iq-num { font-size: clamp(60px,18vw,80px); font-weight: 900; line-height: 1; color: var(--cream); text-shadow: 0 4px 0 rgba(0,0,0,0.2); }
-    .iq-label { font-size: clamp(14px,4vw,18px); font-weight: 900; color: var(--brown-light); letter-spacing: 6px; text-transform: uppercase; margin-bottom: 8px; }
-    .pct-badge { background: var(--gold); color: var(--bg); font-size: 14px; font-weight: 900; padding: 5px 16px; border-radius: 12px; box-shadow: 0 3px 0 var(--gold-dark); text-transform: uppercase; }
-
-    .side-stats {
-      position: absolute; right: 0; top: 50%; transform: translateY(-50%);
-      display: flex; flex-direction: column; gap: clamp(6px,1.5vw,8px); z-index: 1;
+    /* IQ section — preserved exactly */
+    .hero-iq { flex: 1; }
+    .iq-num { font-size: clamp(52px,14vw,68px); font-weight: 900; line-height: 1; color: var(--cream); text-shadow: 0 4px 0 rgba(0,0,0,0.2); }
+    .iq-label { font-size: clamp(13px,3.5vw,16px); font-weight: 900; color: var(--brown-light); letter-spacing: 6px; text-transform: uppercase; margin-bottom: 6px; }
+    .pct-badge {
+      display: none; background: var(--gold); color: var(--bg);
+      font-size: 12px; font-weight: 900; padding: 4px 12px;
+      border-radius: 10px; box-shadow: 0 3px 0 var(--gold-dark);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      width: fit-content;
     }
-    .side-stat {
-      background: var(--card); border-radius: 14px;
-      padding: clamp(6px,1.5vw,10px) clamp(10px,2.5vw,14px);
-      display: flex; flex-direction: column; align-items: center;
-      min-width: clamp(60px,17vw,80px);
-      box-shadow: 0 3px 0 rgba(0,0,0,0.12); position: relative; overflow: hidden;
+
+    /* Stats row */
+    .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .stat-pill {
+      background: var(--card-glow); border-radius: 14px;
+      padding: 10px 8px; text-align: center;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.12);
+      position: relative; overflow: hidden;
     }
-    .side-stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%; background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 100%); pointer-events: none; }
-    .side-stat .s-icon { width: 14px; height: 14px; margin-bottom: 2px; }
-    .side-stat .s-icon svg { width: 100%; height: 100%; stroke: var(--tan); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-    .side-stat .s-val { font-size: clamp(16px,4.5vw,20px); font-weight: 900; line-height: 1.2; color: var(--cream); }
-    .side-stat .s-lbl { font-size: clamp(10px,2.5vw,11px); font-weight: 800; color: var(--tan); }
+    .stat-pill::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 40%; background: rgba(255,255,255,0.04); pointer-events: none; }
+    .stat-val { font-size: clamp(18px,5vw,22px); font-weight: 900; color: var(--cream); line-height: 1.2; }
+    .stat-lbl { font-size: 10px; font-weight: 800; color: var(--tan); text-transform: uppercase; letter-spacing: 0.5px; }
 
-    .section-title { font-size: 13px; font-weight: 900; color: var(--tan); letter-spacing: 2px; text-transform: uppercase; margin: 16px 0 10px; }
+    /* ── Abilities ── */
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin: 16px 0 10px; }
+    .section-title { font-size: 12px; font-weight: 900; color: var(--tan); letter-spacing: 2px; text-transform: uppercase; }
 
-    .abilities-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .ability-card {
+    .abilities-list { display: flex; flex-direction: column; gap: 8px; }
+    .ability-row {
       background: var(--card); border-radius: 14px; padding: 12px 14px;
       box-shadow: 0 3px 0 rgba(0,0,0,0.12); position: relative; overflow: hidden;
     }
-    .ability-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%; background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%); pointer-events: none; }
-    .ability-name { font-size: clamp(10px,2.6vw,12px); font-weight: 900; color: var(--cream); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-    .ability-bar-outer { height: clamp(24px,6vw,30px); background: var(--brown-mid); border-radius: 8px; overflow: hidden; }
-    .ability-bar-inner {
-      height: 100%; border-radius: 8px;
-      display: flex; align-items: center; padding-left: 10px;
-      min-width: 32px; transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    .ability-row::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 40%; background: rgba(255,255,255,0.025); pointer-events: none; }
+    .ability-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+    .ability-name { font-size: 12px; font-weight: 900; color: var(--cream); text-transform: uppercase; letter-spacing: 0.5px; }
+    .ability-pct { font-size: 12px; font-weight: 900; }
+    .ability-track { height: 10px; background: var(--brown-mid); border-radius: 6px; overflow: hidden; }
+    .ability-fill {
+      height: 100%; border-radius: 6px; width: 0%;
+      transition: width 0.7s cubic-bezier(0.34,1.56,0.64,1);
       position: relative;
     }
-    .ability-bar-inner::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 40%; background: rgba(255,255,255,0.2); border-radius: 8px 8px 0 0; }
-    .ability-bar-inner span { font-size: 12px; font-weight: 900; color: #fff; position: relative; z-index: 1; }
-    .bar-pattern  { background: var(--orange); }
-    .bar-problem  { background: var(--red); }
-    .bar-mental   { background: var(--green); }
-    .bar-memory   { background: var(--purple); }
-    .bar-verbal   { background: var(--blue); }
-    .bar-logic    { background: var(--blue-dark); }
-    .bar-emotional{ background: var(--pink); }
-    .bar-spatial  { background: var(--gold); }
+    .ability-fill::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%; background: rgba(255,255,255,0.25); border-radius: 6px 6px 0 0; }
+
+    /* ── Share button — big CTA ── */
+    .share-cta {
+      margin-top: 16px; width: 100%; height: 52px;
+      background: linear-gradient(135deg, var(--green) 0%, #3db800 100%);
+      border: none; border-radius: 16px;
+      font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 900;
+      color: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      box-shadow: 0 5px 0 var(--green-dark); transition: transform 0.1s, box-shadow 0.1s;
+      letter-spacing: 0.3px;
+    }
+    .share-cta:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--green-dark); }
+    .share-cta svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2.5; }
 
     .reset-btn {
-      margin-top: 24px; background: none; border: none;
-      font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700;
-      color: var(--brown-light); cursor: pointer; opacity: 0.3;
-      display: block; width: 100%; text-align: center; padding: 12px;
+      margin-top: 8px; background: none; border: none;
+      font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700;
+      color: var(--brown-light); cursor: pointer; opacity: 0.35;
+      display: block; width: 100%; text-align: center; padding: 10px;
     }
 
-    .modal { position: fixed; inset: 0; background: rgba(58,41,24,0.9); display: none; align-items: center; justify-content: center; z-index: 200; padding: 16px; }
+    /* ── Share Modal — Spotify style ── */
+    .modal {
+      position: fixed; inset: 0; background: rgba(20,12,6,0.92);
+      display: none; align-items: flex-end; justify-content: center;
+      z-index: 200; padding: 0;
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    }
     .modal.show { display: flex; }
-    .modal-box { background: var(--card); border-radius: 20px; padding: 20px; width: 100%; max-width: 340px; position: relative; box-shadow: 0 6px 0 rgba(0,0,0,0.15); }
-    .modal-close { position: absolute; top: 12px; right: 12px; background: var(--brown-mid); border: none; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-    .modal-close svg { width: 14px; height: 14px; stroke: var(--cream); stroke-width: 2.5; }
-    .modal-title { font-size: 18px; font-weight: 900; text-align: center; margin-bottom: 14px; color: var(--cream); }
-    .share-preview { background: var(--bg); border-radius: 12px; overflow: hidden; }
-    .share-preview canvas { width: 100%; display: block; }
-    .share-btns { display: flex; gap: 8px; margin-top: 14px; }
-    .share-btns button {
-      flex: 1; background: var(--card-glow); border: none; border-radius: 12px;
-      padding: 12px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800;
-      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
-      color: var(--cream); box-shadow: 0 3px 0 rgba(0,0,0,0.12); transition: transform 0.1s;
+    .modal-sheet {
+      background: var(--card); border-radius: 28px 28px 0 0;
+      width: 100%; max-width: 480px;
+      padding: 0 0 calc(24px + env(safe-area-inset-bottom,0px));
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.4);
+      animation: sheetUp 0.32s cubic-bezier(0.22,1,0.36,1) both;
     }
-    .share-btns button:active { transform: translateY(2px); }
-    .share-btns button svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
-    .share-btns button.primary { background: var(--green); color: #fff; box-shadow: 0 3px 0 var(--green-dark); }
+    @keyframes sheetUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
 
-    .toast { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%); background: var(--green); color: #fff; padding: 10px 20px; border-radius: 14px; font-size: 14px; font-weight: 800; opacity: 0; transition: opacity 0.3s; z-index: 300; white-space: nowrap; box-shadow: 0 3px 0 var(--green-dark); }
-    .toast.show { opacity: 1; }
+    .sheet-handle { width: 36px; height: 4px; background: var(--brown-mid); border-radius: 2px; margin: 12px auto 0; }
+    .sheet-title { font-size: 16px; font-weight: 900; text-align: center; color: var(--cream); padding: 14px 20px 0; }
+    .sheet-subtitle { font-size: 12px; font-weight: 700; color: var(--tan); text-align: center; padding: 2px 20px 14px; }
+
+    /* Card preview */
+    .card-preview-wrap {
+      padding: 0 20px 16px; display: flex; justify-content: center;
+    }
+    .card-preview-inner {
+      border-radius: 20px; overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      width: 100%; max-width: 320px;
+    }
+    .card-preview-inner canvas { width: 100%; display: block; }
+
+    /* Share destinations */
+    .share-destinations {
+      display: flex; gap: 0; overflow-x: auto; padding: 0 16px 16px;
+      scrollbar-width: none;
+    }
+    .share-destinations::-webkit-scrollbar { display: none; }
+    .share-dest {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 8px 12px; cursor: pointer; flex-shrink: 0;
+      transition: transform 0.1s;
+    }
+    .share-dest:active { transform: scale(0.9); }
+    .dest-icon {
+      width: 52px; height: 52px; border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; position: relative; overflow: hidden;
+    }
+    .dest-icon::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%; background: rgba(255,255,255,0.15); pointer-events: none; }
+    .dest-label { font-size: 11px; font-weight: 800; color: var(--tan); }
+    .dest-snap  { background: #FFFC00; }
+    .dest-insta { background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+    .dest-msg   { background: #0084FF; }
+    .dest-x     { background: #000; }
+    .dest-more  { background: var(--card-glow); }
+    .dest-more svg { width: 22px; height: 22px; stroke: var(--tan); fill: none; stroke-width: 2.5; }
+
+    /* Bottom action buttons */
+    .sheet-actions { display: flex; gap: 10px; padding: 0 16px; }
+    .sheet-btn {
+      flex: 1; height: 48px; border: none; border-radius: 14px;
+      font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .sheet-btn:active { transform: translateY(2px); }
+    .sheet-btn.secondary { background: var(--card-glow); color: var(--cream); box-shadow: 0 3px 0 rgba(0,0,0,0.15); }
+    .sheet-btn.primary { background: var(--green); color: #fff; box-shadow: 0 3px 0 var(--green-dark); }
+    .sheet-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(8px);
+      background: var(--card); color: var(--cream); padding: 10px 20px;
+      border-radius: 14px; font-size: 13px; font-weight: 800;
+      opacity: 0; transition: opacity 0.25s, transform 0.25s; z-index: 300;
+      white-space: nowrap; box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+      border-left: 4px solid var(--green);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Entrance animations */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    .hero-card    { animation: fadeUp 0.4s cubic-bezier(0.22,1,0.36,1) 0.05s both; }
+    .abilities-list { animation: fadeUp 0.4s cubic-bezier(0.22,1,0.36,1) 0.12s both; }
+    .share-cta    { animation: fadeUp 0.4s cubic-bezier(0.22,1,0.36,1) 0.18s both; }
   </style>
 </head>
 <body>
 
 <main>
-  <div class="header">
-    <div class="header-left" id="username-display"></div>
-    <div class="header-right">
-      <button class="share-btn" id="share-btn">
-        <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-        Share
-      </button>
+  <div class="topbar">
+    <div class="topbar-title">Profile</div>
+    <div class="topbar-actions">
       <button class="signout-btn" id="signout-btn">Sign out</button>
     </div>
   </div>
 
-  <div class="profile-hero">
-    <div class="avatar-wrap">
-      <div class="avatar" id="avatar-tap">
-        <img id="avatar-img" src="" alt="">
-        <svg id="avatar-icon" viewBox="0 0 64 64"><circle cx="32" cy="22" r="12"/><path d="M8 58 C8 44 18 36 32 36 C46 36 56 44 56 58"/></svg>
+  <!-- Hero card -->
+  <div class="hero-card">
+    <div class="hero-top">
+      <div class="avatar-wrap">
+        <div class="avatar" id="avatar-tap">
+          <img id="avatar-img" src="" alt="">
+          <svg id="avatar-icon" viewBox="0 0 64 64"><circle cx="32" cy="22" r="12"/><path d="M8 58 C8 44 18 36 32 36 C46 36 56 44 56 58"/></svg>
+        </div>
+        <div class="avatar-edit" id="avatar-edit-btn">
+          <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </div>
+        <input type="file" id="avatar-input" accept="image/*">
       </div>
-      <div class="avatar-edit" id="avatar-edit-btn">
-        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+
+      <!-- IQ — preserved exactly -->
+      <div class="hero-iq">
+        <div class="iq-num" id="iq-num">--</div>
+        <div class="iq-label">I Q</div>
+        <div class="pct-badge" id="pct-badge"></div>
       </div>
-      <input type="file" id="avatar-input" accept="image/*">
     </div>
 
-    <div class="iq-num" id="iq-num">--</div>
-    <div class="iq-label">I Q</div>
-    <div class="pct-badge" id="pct-badge" style="display:none;"></div>
-
-    <div class="side-stats">
-      <div class="side-stat">
-        <div class="s-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
-        <div class="s-val" id="answered">0</div>
-        <div class="s-lbl">Done</div>
+    <!-- Stats row -->
+    <div class="stats-row">
+      <div class="stat-pill">
+        <div class="stat-val" id="stat-answered">0</div>
+        <div class="stat-lbl">Done</div>
       </div>
-      <div class="side-stat">
-        <div class="s-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none"/><path d="M12 6v6l4 2"/></svg></div>
-        <div class="s-val" id="accuracy">0%</div>
-        <div class="s-lbl">Acc</div>
+      <div class="stat-pill">
+        <div class="stat-val" id="stat-accuracy">0%</div>
+        <div class="stat-lbl">Accuracy</div>
       </div>
-      <div class="side-stat">
-        <div class="s-icon"><svg viewBox="0 0 24 24" fill="#ff9600" fill-opacity="0.2" stroke="#ff9600" stroke-width="2.5"><path d="M12 22c-4.97 0-8-3.58-8-7.5 0-3.07 1.74-5.25 3.53-7.28C9.18 5.38 10.34 3.7 10.34 2c0 0 1.77 2.18 2.34 4.18.27.94.5 1.82 1.32 1.82 0-2 1-3 1-3s1 1.5 1 3.5c.5-.5 1.5-1.5 1.5-1.5s1 2.5 1 5c0 3.92-3.03 7.5-8 7.5z"/></svg></div>
-        <div class="s-val" id="best-streak">0</div>
-        <div class="s-lbl">Best</div>
+      <div class="stat-pill">
+        <div class="stat-val" id="stat-streak">0</div>
+        <div class="stat-lbl">Best Streak</div>
       </div>
     </div>
   </div>
 
-  <div class="section-title">Abilities</div>
-  <div class="abilities-grid" id="abilities"></div>
+  <!-- Abilities -->
+  <div class="section-header">
+    <div class="section-title">Abilities</div>
+  </div>
+  <div class="abilities-list" id="abilities"></div>
+
+  <!-- Share CTA -->
+  <button class="share-cta" id="share-btn">
+    <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    Share Your Score
+  </button>
 
   <button class="reset-btn" id="reset-btn">Reset Progress</button>
 </main>
@@ -250,16 +351,52 @@
   </button>
 </nav>
 
+<!-- Share modal — Spotify card sheet -->
 <div class="modal" id="share-modal">
-  <div class="modal-box">
-    <button class="modal-close" id="share-close">
-      <svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <div class="modal-title">Share Your Stats</div>
-    <div class="share-preview" id="share-preview"></div>
-    <div class="share-btns">
-      <button id="copy-btn"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button>
-      <button class="primary" id="download-btn"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save</button>
+  <div class="modal-sheet" id="modal-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Share Your Brain Score</div>
+    <div class="sheet-subtitle" id="sheet-subtitle">Challenge your friends</div>
+
+    <div class="card-preview-wrap">
+      <div class="card-preview-inner" id="card-preview"></div>
+    </div>
+
+    <!-- Share destinations like Spotify -->
+    <div class="share-destinations">
+      <div class="share-dest" data-dest="snapchat">
+        <div class="dest-icon dest-snap">👻</div>
+        <div class="dest-label">Snapchat</div>
+      </div>
+      <div class="share-dest" data-dest="instagram">
+        <div class="dest-icon dest-insta">📸</div>
+        <div class="dest-label">Instagram</div>
+      </div>
+      <div class="share-dest" data-dest="messages">
+        <div class="dest-icon dest-msg">💬</div>
+        <div class="dest-label">Messages</div>
+      </div>
+      <div class="share-dest" data-dest="x">
+        <div class="dest-icon dest-x" style="font-size:20px;font-weight:900;color:#fff;font-family:serif;">𝕏</div>
+        <div class="dest-label">X / Twitter</div>
+      </div>
+      <div class="share-dest" data-dest="more">
+        <div class="dest-icon dest-more">
+          <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="var(--tan)"/><circle cx="12" cy="12" r="1.5" fill="var(--tan)"/><circle cx="19" cy="12" r="1.5" fill="var(--tan)"/></svg>
+        </div>
+        <div class="dest-label">More</div>
+      </div>
+    </div>
+
+    <div class="sheet-actions">
+      <button class="sheet-btn secondary" id="copy-btn">
+        <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy Image
+      </button>
+      <button class="sheet-btn primary" id="download-btn">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Save Image
+      </button>
     </div>
   </div>
 </div>
@@ -272,33 +409,34 @@
 
   if (window.parent !== window) parent.authCheck();
 
-  // Nav with haptics
   window.navGo = function(page) {
     Haptics.light();
     parent.goTo(page);
   };
 
   const ABILITIES = [
-    { key: 'patternRecognition', name: 'Pattern',        bar: 'pattern' },
-    { key: 'problemSolving',     name: 'Problem Solving', bar: 'problem' },
-    { key: 'mentalAgility',      name: 'Mental Agility',  bar: 'mental' },
-    { key: 'workingMemory',      name: 'Memory',          bar: 'memory' },
-    { key: 'verbalReasoning',    name: 'Verbal',          bar: 'verbal' },
-    { key: 'logicalReasoning',   name: 'Logic',           bar: 'logic' },
-    { key: 'spatialAwareness',   name: 'Emotional',       bar: 'emotional' },
-    { key: 'numericalReasoning', name: 'Spatial',         bar: 'spatial' },
+    { key: 'patternRecognition', name: 'Pattern Recognition', bar: '#ff9600' },
+    { key: 'problemSolving',     name: 'Problem Solving',     bar: '#ea2b2b' },
+    { key: 'mentalAgility',      name: 'Mental Agility',      bar: '#58cc02' },
+    { key: 'workingMemory',      name: 'Working Memory',      bar: '#ce82ff' },
+    { key: 'verbalReasoning',    name: 'Verbal Reasoning',    bar: '#1cb0f6' },
+    { key: 'logicalReasoning',   name: 'Logical Reasoning',   bar: '#1899d6' },
+    { key: 'spatialAwareness',   name: 'Spatial Awareness',   bar: '#ffc800' },
+    { key: 'numericalReasoning', name: 'Numerical Reasoning', bar: '#ff4b8a' },
   ];
 
-  function toast(msg) {
+  function toast(msg, color) {
     const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2000);
+    t.textContent = msg;
+    t.style.borderLeftColor = color || 'var(--green)';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
   }
+
+  let _shareCanvas = null;
 
   function load() {
     const d = IQData.load();
-    const uname = d.username || IQData.getCurrentUser()?.displayName || '';
-    document.getElementById('username-display').textContent = uname;
 
     if (d.iq) {
       document.getElementById('iq-num').textContent = d.iq;
@@ -308,9 +446,9 @@
       badge.style.display = 'inline-block';
     }
 
-    document.getElementById('answered').textContent = d.answered;
-    document.getElementById('accuracy').textContent = IQData.getAccuracy() + '%';
-    document.getElementById('best-streak').textContent = d.bestStreak;
+    document.getElementById('stat-answered').textContent = d.answered || 0;
+    document.getElementById('stat-accuracy').textContent = IQData.getAccuracy() + '%';
+    document.getElementById('stat-streak').textContent = d.bestStreak || 0;
 
     if (d.pic) {
       document.getElementById('avatar-img').src = d.pic;
@@ -318,29 +456,32 @@
       document.getElementById('avatar-icon').style.display = 'none';
     }
 
+    // Abilities
     const grid = document.getElementById('abilities');
     grid.innerHTML = '';
     ABILITIES.forEach(a => {
       const pct = IQData.getStatPercent(a.key);
-      const card = document.createElement('div');
-      card.className = 'ability-card';
-      card.innerHTML = `
-        <div class="ability-name">${a.name}</div>
-        <div class="ability-bar-outer">
-          <div class="ability-bar-inner bar-${a.bar}" style="width:0%">
-            <span>${pct}</span>
-          </div>
+      const row = document.createElement('div');
+      row.className = 'ability-row';
+      row.innerHTML = `
+        <div class="ability-top">
+          <div class="ability-name">${a.name}</div>
+          <div class="ability-pct" style="color:${a.bar}">${pct}%</div>
+        </div>
+        <div class="ability-track">
+          <div class="ability-fill" data-pct="${pct}" style="background:${a.bar};width:0%"></div>
         </div>`;
-      grid.appendChild(card);
+      grid.appendChild(row);
     });
+
     requestAnimationFrame(() => setTimeout(() => {
-      document.querySelectorAll('.ability-bar-inner').forEach(bar => {
-        const val = parseInt(bar.querySelector('span').textContent);
-        bar.style.width = Math.max(20, val) + '%';
+      document.querySelectorAll('.ability-fill').forEach(f => {
+        f.style.width = Math.max(8, parseInt(f.dataset.pct)) + '%';
       });
-    }, 80));
+    }, 100));
   }
 
+  // ── Avatar upload ──
   function handleAvatarFile(file) {
     if (!file) return;
     const reader = new FileReader();
@@ -351,167 +492,306 @@
         c.width = c.height = 200;
         const ctx = c.getContext('2d');
         const min = Math.min(img.width, img.height);
-        ctx.drawImage(img, (img.width - min) / 2, (img.height - min) / 2, min, min, 0, 0, 200, 200);
+        ctx.drawImage(img, (img.width-min)/2, (img.height-min)/2, min, min, 0, 0, 200, 200);
         const url = c.toDataURL('image/jpeg', 0.8);
         IQData.setProfilePic(url);
         document.getElementById('avatar-img').src = url;
         document.getElementById('avatar-img').style.display = 'block';
         document.getElementById('avatar-icon').style.display = 'none';
         Haptics.success();
-        toast('Photo updated!');
+        toast('Photo updated! ✓');
       };
       img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   }
 
-  document.getElementById('avatar-tap').onclick = () => {
-    Haptics.medium();
-    document.getElementById('avatar-input').click();
-  };
-  document.getElementById('avatar-edit-btn').onclick = () => {
-    Haptics.medium();
-    document.getElementById('avatar-input').click();
-  };
+  document.getElementById('avatar-tap').onclick = () => { Haptics.medium(); document.getElementById('avatar-input').click(); };
+  document.getElementById('avatar-edit-btn').onclick = () => { Haptics.medium(); document.getElementById('avatar-input').click(); };
   document.getElementById('avatar-input').onchange = e => handleAvatarFile(e.target.files[0]);
-
-  document.getElementById('signout-btn').onclick = () => {
-    Haptics.warning();
-    IQData.signOut();
-  };
-
+  document.getElementById('signout-btn').onclick = () => { Haptics.warning(); IQData.signOut(); };
   document.getElementById('reset-btn').onclick = () => {
     Haptics.warning();
-    if (confirm('Reset all progress?')) {
-      Haptics.error();
-      IQData.reset();
-      location.reload();
-    }
+    if (confirm('Reset all progress? This cannot be undone.')) { Haptics.error(); IQData.reset(); location.reload(); }
   };
 
-  document.getElementById('share-btn').onclick = () => {
-    Haptics.medium();
-    openShare();
-  };
-
-  let shareCanvas = null;
+  // ── Share ──
+  document.getElementById('share-btn').onclick = () => { Haptics.medium(); openShare(); };
 
   function openShare() {
+    const d = IQData.load();
+    const pct = d.iq ? iqToPercentile(d.iq) : null;
+    if (pct) {
+      document.getElementById('sheet-subtitle').textContent =
+        `You're smarter than ${100 - Math.round(pct)}% of people 🦌`;
+    }
     document.getElementById('share-modal').classList.add('show');
-    genShareImg();
+    generateShareCard(d);
   }
+
   function closeShare() {
     Haptics.light();
     document.getElementById('share-modal').classList.remove('show');
   }
 
-  document.getElementById('share-close').onclick = closeShare;
-  document.getElementById('share-modal').onclick = e => { if (e.target.id === 'share-modal') closeShare(); };
+  document.getElementById('share-modal').onclick = e => {
+    if (e.target.id === 'share-modal') closeShare();
+  };
 
-  function genShareImg() {
-    const d = IQData.load();
+  // Swipe down to close
+  let _sheetStartY = 0;
+  const sheet = document.getElementById('modal-sheet');
+  sheet.addEventListener('touchstart', e => { _sheetStartY = e.touches[0].clientY; }, { passive: true });
+  sheet.addEventListener('touchend', e => {
+    if (e.changedTouches[0].clientY - _sheetStartY > 60) closeShare();
+  }, { passive: true });
+
+  // ── Generate the share card — Spotify lyrics card style ──
+  function generateShareCard(d) {
+    const W = 540, H = 720;
     const cv = document.createElement('canvas');
-    const W = 480, H = 640;
     cv.width = W; cv.height = H;
     const ctx = cv.getContext('2d');
-    ctx.fillStyle = '#3a2918'; ctx.fillRect(0, 0, W, H);
-    rr(ctx, 20, 20, W - 40, H - 40, 24, '#4a3625', null);
-    ctx.save(); ctx.beginPath(); rr_path(ctx, 20, 20, W - 40, (H - 40) * 0.45, 24);
-    ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fill(); ctx.restore();
 
-    const draw = () => {
-      ctx.font = '900 80px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc'; ctx.textAlign = 'center';
-      ctx.fillText(d.iq || '--', W / 2, 190);
-      ctx.font = '900 16px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a';
-      ctx.fillText('I Q', W / 2, 215);
-      if (d.iq) {
-        rr(ctx, W / 2 - 55, 225, 110, 30, 10, '#ffc800', null);
-        ctx.font = '900 13px Nunito, sans-serif'; ctx.fillStyle = '#3a2918';
-        ctx.fillText('TOP ' + formatPercentile(iqToPercentile(d.iq)).toUpperCase(), W / 2, 245);
+    const pct = d.iq ? iqToPercentile(d.iq) : null;
+
+    // Background — rich gradient
+    const grad = ctx.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0, '#2a1f10');
+    grad.addColorStop(0.5, '#3a2918');
+    grad.addColorStop(1, '#1e140a');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle radial glow top-right
+    const glow = ctx.createRadialGradient(W * 0.8, H * 0.15, 0, W * 0.8, H * 0.15, W * 0.6);
+    glow.addColorStop(0, 'rgba(255,200,0,0.07)');
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    // Card background
+    rrFill(ctx, 24, 24, W-48, H-48, 28, '#4a3625');
+    // Glare
+    ctx.save();
+    rrClip(ctx, 24, 24, W-48, (H-48)*0.5, 28);
+    ctx.fillStyle = 'rgba(255,255,255,0.03)';
+    ctx.fillRect(24, 24, W-48, (H-48)*0.5);
+    ctx.restore();
+
+    // Decorative top stripe
+    rrFill(ctx, 24, 24, W-48, 6, 3, '#ffc800');
+
+    const drawContent = () => {
+      ctx.textAlign = 'center';
+
+      // BrainDeer branding top
+      ctx.font = '800 14px Nunito, sans-serif';
+      ctx.fillStyle = '#8f6b4a';
+      ctx.fillText('🦌  BRAINDEER', W/2, 75);
+
+      // IQ number — massive
+      ctx.font = '900 130px Nunito, sans-serif';
+      ctx.fillStyle = '#f0e2cc';
+      ctx.shadowColor = 'rgba(0,0,0,0.3)';
+      ctx.shadowBlur = 20;
+      ctx.fillText(d.iq || '--', W/2, 230);
+      ctx.shadowBlur = 0;
+
+      // IQ label
+      ctx.font = '900 18px Nunito, sans-serif';
+      ctx.fillStyle = '#8f6b4a';
+      ctx.letterSpacing = '8px';
+      ctx.fillText('I  Q', W/2, 260);
+      ctx.letterSpacing = '0px';
+
+      // Percentile badge
+      if (pct !== null) {
+        const badgeTxt = 'TOP ' + formatPercentile(pct).toUpperCase();
+        const bw = ctx.measureText(badgeTxt).width + 40;
+        rrFill(ctx, W/2 - bw/2, 272, bw, 34, 10, '#ffc800');
+        ctx.font = '900 13px Nunito, sans-serif';
+        ctx.fillStyle = '#3a2918';
+        ctx.fillText(badgeTxt, W/2, 294);
       }
-      [{ v: d.answered, l: 'Done' }, { v: IQData.getAccuracy() + '%', l: 'Accuracy' }, { v: d.bestStreak, l: 'Best' }]
-        .forEach((s, i) => {
-          const x = 50 + ((W - 100) / 3) * i + (W - 100) / 6;
-          rr(ctx, x - 36, 270, 72, 56, 10, '#5a4232', null);
-          ctx.font = '900 20px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc'; ctx.fillText(s.v, x, 296);
-          ctx.font = '800 10px Nunito, sans-serif'; ctx.fillStyle = '#c2a476'; ctx.fillText(s.l, x, 314);
-        });
-      ctx.font = '900 11px Nunito, sans-serif'; ctx.fillStyle = '#c2a476'; ctx.textAlign = 'left';
-      ctx.fillText('ABILITIES', 50, 365);
+
+      // Divider
+      ctx.strokeStyle = 'rgba(194,164,118,0.15)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(60, 328); ctx.lineTo(W-60, 328); ctx.stroke();
+
+      // Stats row
+      const stats = [
+        { v: d.answered || 0,               l: 'Questions' },
+        { v: (IQData.getAccuracy()) + '%',   l: 'Accuracy'  },
+        { v: d.bestStreak || 0,             l: 'Best Streak'},
+      ];
+      stats.forEach((s, i) => {
+        const x = 90 + ((W-180)/2)*i + (W-180)/4;
+        rrFill(ctx, x-48, 338, 96, 64, 12, '#5a4232');
+        ctx.font = '900 22px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
+        ctx.fillText(s.v, x, 367);
+        ctx.font = '800 11px Nunito, sans-serif'; ctx.fillStyle = '#c2a476';
+        ctx.fillText(s.l, x, 384);
+      });
+
+      // Abilities section
+      ctx.font = '900 11px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a';
+      ctx.textAlign = 'left';
+      ctx.fillText('ABILITIES', 60, 428);
+
       const bars = [
-        { n: 'Pattern', c: '#ff9600', k: 'patternRecognition' },
-        { n: 'Problem Solving', c: '#ea2b2b', k: 'problemSolving' },
-        { n: 'Mental Agility', c: '#58cc02', k: 'mentalAgility' },
-        { n: 'Memory', c: '#ce82ff', k: 'workingMemory' },
-        { n: 'Verbal', c: '#1cb0f6', k: 'verbalReasoning' },
-        { n: 'Logic', c: '#1899d6', k: 'logicalReasoning' },
+        { n: 'Pattern',       c: '#ff9600', k: 'patternRecognition' },
+        { n: 'Problem Solving', c: '#ea2b2b', k: 'problemSolving'   },
+        { n: 'Mental Agility', c: '#58cc02', k: 'mentalAgility'     },
+        { n: 'Memory',        c: '#ce82ff', k: 'workingMemory'      },
+        { n: 'Verbal',        c: '#1cb0f6', k: 'verbalReasoning'    },
+        { n: 'Logic',         c: '#1899d6', k: 'logicalReasoning'   },
       ];
       bars.forEach((b, i) => {
-        const y = 385 + i * 36;
+        const y = 444 + i * 34;
         const v = IQData.getStatPercent(b.k);
-        ctx.font = '800 10px Nunito, sans-serif'; ctx.fillStyle = '#c2a476'; ctx.fillText(b.n, 50, y);
-        rr(ctx, 50, y + 5, W - 100, 22, 6, '#6b4f32', null);
-        rr(ctx, 50, y + 5, Math.max(30, (v / 100) * (W - 100)), 22, 6, b.c, null);
+        const barW = W - 120;
+        ctx.font = '800 10px Nunito, sans-serif'; ctx.fillStyle = '#c2a476'; ctx.textAlign = 'left';
+        ctx.fillText(b.n.toUpperCase(), 60, y);
+        rrFill(ctx, 60, y+5, barW, 16, 5, '#6b4f32');
+        const fillW = Math.max(24, (v/100)*barW);
+        rrFill(ctx, 60, y+5, fillW, 16, 5, b.c);
+        // glare
         ctx.save(); ctx.globalAlpha = 0.2;
-        rr(ctx, 50, y + 5, Math.max(30, (v / 100) * (W - 100)), 10, 6, '#fff', null);
-        ctx.globalAlpha = 1; ctx.restore();
-        ctx.font = '900 10px Nunito, sans-serif'; ctx.fillStyle = '#fff'; ctx.fillText(v, 58, y + 20);
+        rrFill(ctx, 60, y+5, fillW, 7, 5, '#fff');
+        ctx.restore();
+        ctx.font = '900 9px Nunito, sans-serif'; ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
+        ctx.fillText(v + '%', 67, y+16);
       });
-      ctx.font = '900 18px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a'; ctx.textAlign = 'center';
-      ctx.fillText('🦌 BrainDeer', W / 2, H - 45);
-      shareCanvas = cv;
-      const preview = document.getElementById('share-preview');
-      preview.innerHTML = ''; preview.appendChild(cv);
+
+      // CTA footer
+      ctx.textAlign = 'center';
+      ctx.font = '800 13px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a';
+      ctx.fillText('Can you beat me? braindeer.org', W/2, H-38);
+
+      _shareCanvas = cv;
+      const preview = document.getElementById('card-preview');
+      preview.innerHTML = '';
+      preview.appendChild(cv);
     };
 
+    // Draw avatar if exists
     if (d.pic) {
       const img = new Image();
       img.onload = () => {
-        ctx.save(); ctx.beginPath(); ctx.arc(W / 2, 80, 40, 0, Math.PI * 2); ctx.clip();
-        ctx.drawImage(img, W / 2 - 40, 40, 80, 80); ctx.restore(); draw();
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(W/2, 118, 38, 0, Math.PI*2);
+        ctx.clip();
+        ctx.drawImage(img, W/2-38, 80, 76, 76);
+        ctx.restore();
+        // Ring around avatar
+        ctx.strokeStyle = '#ffc800'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(W/2, 118, 40, 0, Math.PI*2); ctx.stroke();
+        drawContent();
       };
+      img.onerror = drawContent;
       img.src = d.pic;
     } else {
-      ctx.fillStyle = '#6b4f32'; ctx.beginPath(); ctx.arc(W / 2, 80, 40, 0, Math.PI * 2); ctx.fill();
-      ctx.font = '32px serif'; ctx.textAlign = 'center'; ctx.fillText('🦌', W / 2, 92); draw();
+      // Deer emoji placeholder
+      rrFill(ctx, W/2-38, 80, 76, 76, 38, '#6b4f32');
+      ctx.font = '36px serif'; ctx.textAlign = 'center'; ctx.fillText('🦌', W/2, 126);
+      ctx.strokeStyle = '#ffc800'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(W/2, 118, 40, 0, Math.PI*2); ctx.stroke();
+      drawContent();
     }
   }
 
-  function rr(ctx, x, y, w, h, r, fill, stroke, lw) {
+  // Canvas helpers
+  function rrFill(ctx, x, y, w, h, r, fill) {
     ctx.beginPath();
-    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
-    if (fill) { ctx.fillStyle = fill; ctx.fill(); }
-    if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw || 2; ctx.stroke(); }
+    ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+    ctx.fillStyle = fill; ctx.fill();
   }
-  function rr_path(ctx, x, y, w, h, r) {
-    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h); ctx.lineTo(x, y + h); ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
+  function rrClip(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+    ctx.clip();
+  }
+
+  // ── Share destinations ──
+  async function getShareBlob() {
+    return new Promise(r => _shareCanvas.toBlob(r, 'image/png'));
+  }
+
+  document.querySelectorAll('.share-dest').forEach(el => {
+    el.onclick = async () => {
+      Haptics.medium();
+      const dest = el.dataset.dest;
+      const d = IQData.load();
+      const pct = d.iq ? iqToPercentile(d.iq) : null;
+      const text = `I scored ${d.iq || '?'} IQ on BrainDeer 🦌${pct ? ` — smarter than ${100-Math.round(pct)}% of people` : ''}! Can you beat me? braindeer.org`;
+
+      if (dest === 'more' || !navigator.share) {
+        // Native share sheet (iOS/Android — covers Snapchat, Instagram, etc.)
+        try {
+          const blob = await getShareBlob();
+          const file = new File([blob], 'braindeer-iq.png', { type: 'image/png' });
+          await navigator.share({ files: [file], text });
+          Haptics.success();
+        } catch {
+          // Fallback to download
+          downloadCard();
+        }
+        return;
+      }
+
+      if (dest === 'x') {
+        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+        window.open(tweetUrl, '_blank');
+        return;
+      }
+
+      // For Snap/Insta/Messages — use native share with file
+      try {
+        const blob = await getShareBlob();
+        const file = new File([blob], 'braindeer-iq.png', { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], text });
+          Haptics.success();
+        } else {
+          downloadCard();
+          toast('Image saved — share from your photos!');
+        }
+      } catch(e) {
+        if (e.name !== 'AbortError') { downloadCard(); toast('Saved to photos!'); }
+      }
+    };
+  });
+
+  function downloadCard() {
+    if (!_shareCanvas) return;
+    const a = document.createElement('a');
+    a.download = 'braindeer-iq.png';
+    a.href = _shareCanvas.toDataURL('image/png');
+    a.click();
+    toast('Image saved! ✓');
+    Haptics.success();
   }
 
   document.getElementById('copy-btn').onclick = async () => {
-    if (!shareCanvas) return;
+    if (!_shareCanvas) return;
     Haptics.medium();
     try {
-      const blob = await new Promise(r => shareCanvas.toBlob(r, 'image/png'));
+      const blob = await getShareBlob();
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-      Haptics.success();
-      toast('Copied!');
-    } catch { Haptics.error(); toast('Copy failed'); }
+      Haptics.success(); toast('Copied to clipboard! ✓');
+    } catch { Haptics.error(); downloadCard(); }
   };
 
-  document.getElementById('download-btn').onclick = () => {
-    if (!shareCanvas) return;
-    Haptics.success();
-    const a = document.createElement('a');
-    a.download = 'braindeer-profile.png';
-    a.href = shareCanvas.toDataURL('image/png');
-    a.click();
-    toast('Saved!');
-  };
+  document.getElementById('download-btn').onclick = () => downloadCard();
 
   load();
 </script>
