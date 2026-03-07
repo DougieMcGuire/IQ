@@ -45,7 +45,6 @@
         var btn = e.target.closest('.mem-card');
         if (!btn || locked || btn.classList.contains('mem-flip') || btn.classList.contains('mem-matched')) return;
 
-        // Card flip feel
         H.cardFlip && H.cardFlip();
 
         btn.classList.add('mem-flip');
@@ -55,7 +54,6 @@
           locked = true;
           var a = flipped[0], b = flipped[1];
           if (a.dataset.mv === b.dataset.mv) {
-            // Pair matched — satisfying thud after short delay
             setTimeout(function() { H.cardMatch && H.cardMatch(); }, 150);
             a.classList.add('mem-matched');
             b.classList.add('mem-matched');
@@ -68,7 +66,6 @@
               status.textContent = matched + '/' + totalPairs + ' pairs';
             }
           } else {
-            // No match — light error before they flip back
             setTimeout(function() { H.light && H.light(); }, 300);
             setTimeout(function () {
               a.classList.remove('mem-flip');
@@ -84,6 +81,11 @@
         var ms = Date.now() - ctx.answerStartRef.get();
         var perfect = moves <= totalPairs + 1;
         var data = ctx.IQData.recordAnswer(q.category, won, q.difficulty, ms);
+
+        // Notify game played + session stats
+        if (ctx.notifyGamePlayed) ctx.notifyGamePlayed('memory');
+        if (ctx.onAnswer) ctx.onAnswer(won, ms);
+
         perfect ? (H.streak && H.streak()) : (H.success && H.success());
         status.textContent = 'Done in ' + moves + ' moves!';
         status.style.color = 'var(--green)';
