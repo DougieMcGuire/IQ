@@ -173,6 +173,10 @@
     }
   };
 
+  // Called by improve.html via parent.authCheck() — must exist
+  function authCheck() {}
+  window.authCheck = authCheck;
+
   function generateInstallToken() {
     var user = firebase.auth().currentUser;
     if (!user) return Promise.resolve(null);
