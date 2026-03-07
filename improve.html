@@ -658,9 +658,6 @@
     } catch (e) { console.warn('[improve] updateTaskProgress failed', e); }
   }
 
-  // ── notifyGamePlayed: called by custom renderer games when a round finishes ──
-  // ANY game completion (win or lose) counts for game-type tasks.
-  // Also updates answered/correct session stats so those tasks progress too.
   window.notifyGamePlayed = async function(gameType) {
     if (!getFirebase()) return;
     try {
@@ -678,11 +675,8 @@
     } catch (e) { console.warn('[improve] notifyGamePlayed failed', e); }
   };
 
-  // ── NEW: onAnswer hook for custom renderer games ──
-  // Call this from any custom renderer finish() to count toward
-  // answered/correct/streak/accuracy/fast tasks.
   window.onAnswerForTasks = function(correct, ms) {
-    const result  = IQData.load(); // get current streak from IQData (already updated by recordAnswer)
+    const result  = IQData.load();
     const session = updateSessionStats(correct, ms);
     updateTaskProgress(result.streak, correct, ms, session);
     updateTasksBadge();
@@ -700,7 +694,6 @@
     });
   })();
 
-  // Handle XP awarded from tasks.html
   window.addEventListener('message', function(e) {
     if (!e.data || e.data.type !== 'xpAwarded') return;
     const xp = e.data.xp;
@@ -719,18 +712,45 @@
   let slides = 0, answerStart = 0;
   const questionQueue = [];
   const QUEUE_TARGET  = 25;
+  let _filling = false; // ← guard against concurrent fillQueue calls
 
   function fillQueue() {
-    while (questionQueue.length < QUEUE_TARGET) {
-      const weakCat = IQData.getWeakestCategory();
-      const diff = weakCat ? IQData.getDifficulty(weakCat) : 1.0;
-      questionQueue.push(Q.generate(diff));
+    if (_filling) return;
+    _filling = true;
+    try {
+      let attempts = 0;
+      while (questionQueue.length < QUEUE_TARGET) {
+        attempts++;
+        if (attempts > QUEUE_TARGET * 3) {
+          // Safety valve: never loop forever if generators are broken
+          console.warn('[BrainDeer] fillQueue hit safety limit');
+          break;
+        }
+        try {
+          const weakCat = IQData.getWeakestCategory();
+          const diff = weakCat ? IQData.getDifficulty(weakCat) : 1.0;
+          const q = Q.generate(diff);
+          if (q) questionQueue.push(q);
+        } catch (e) {
+          console.warn('[BrainDeer] Q.generate failed, skipping:', e);
+        }
+      }
+    } finally {
+      _filling = false;
     }
   }
+
   function nextQuestion() {
     if (!questionQueue.length) fillQueue();
+    // If still empty after fill attempt, generate a single fallback inline
+    if (!questionQueue.length) {
+      try { return Q.generate(1.0); } catch(e) { return null; }
+    }
     const q = questionQueue.shift();
-    if (questionQueue.length < QUEUE_TARGET / 2) requestAnimationFrame(fillQueue);
+    if (questionQueue.length < QUEUE_TARGET / 2) {
+      // Refill async so it never blocks the UI
+      setTimeout(fillQueue, 0);
+    }
     return q;
   }
 
@@ -827,43 +847,75 @@
     updateUI(d);
     fillQueue();
     for (let i = 0; i < 8; i++) addSlide();
-    feed.addEventListener('scroll',    checkMore, { passive: true });
-    feed.addEventListener('touchmove', checkMore, { passive: true });
-    setInterval(checkMore, 200);
+    feed.addEventListener('scroll',    onFeedScroll, { passive: true });
+    feed.addEventListener('touchmove', onFeedScroll, { passive: true });
+    // Polling fallback — checks every 250ms in case scroll events miss
+    setInterval(onFeedScroll, 250);
     setTimeout(maybeShowPushPrompt, 3000);
   }
 
-  function checkMore() {
-    const h = feed.clientHeight;
-    if (!h) return;
-    const idx = Math.round(feed.scrollTop / h);
-    while (slides < idx + 8) addSlide();
+  // ── FIXED: use pixels not slide index to decide how many slides to pre-load ──
+  function onFeedScroll() {
+    const slideH = feed.clientHeight;
+    if (!slideH) return;
+    // How many slides has the user scrolled past (0-based)?
+    const currentSlide = Math.floor(feed.scrollTop / slideH);
+    // Keep 10 slides ahead of wherever they are
+    const target = currentSlide + 10;
+    let added = 0;
+    while (slides < target) {
+      addSlide();
+      added++;
+      // Hard cap per tick so we don't freeze the UI adding 100 slides at once
+      if (added >= 5) break;
+    }
   }
 
   function addSlide() {
-    const q   = nextQuestion();
+    const q = nextQuestion();
+    if (!q) return; // nextQuestion returns null only if generators are fully broken
     const idx = slides++;
     const div = document.createElement('div');
     div.className = 'slide';
-    const customRenderer = Q._renderers && Q._renderers[q.type];
-    if (customRenderer) {
-      div.innerHTML = customRenderer.render(q, idx);
-    } else {
-      div.innerHTML = renderDefault(q, idx);
-    }
-    feed.appendChild(div);
-    if (customRenderer && customRenderer.attach) {
-      customRenderer.attach(div, q, idx, {
-        feed, flashEl, confettiEl, IQData, getEncouragement,
-        updateUI, checkMore, spawnConfetti,
-        answerStartRef: { get: () => answerStart, set: v => { answerStart = v; } },
-        Haptics,
-        notifyGamePlayed: window.notifyGamePlayed,
-        // NEW: custom renderers call this after recordAnswer to count toward session tasks
-        onAnswer: window.onAnswerForTasks,
-      });
+    try {
+      const customRenderer = Q._renderers && Q._renderers[q.type];
+      if (customRenderer) {
+        div.innerHTML = customRenderer.render(q, idx);
+      } else {
+        div.innerHTML = renderDefault(q, idx);
+      }
+      feed.appendChild(div);
+      if (customRenderer && customRenderer.attach) {
+        try {
+          customRenderer.attach(div, q, idx, {
+            feed, flashEl, confettiEl, IQData, getEncouragement,
+            updateUI, checkMore: onFeedScroll, spawnConfetti,
+            answerStartRef: { get: () => answerStart, set: v => { answerStart = v; } },
+            Haptics,
+            notifyGamePlayed: window.notifyGamePlayed,
+            onAnswer: window.onAnswerForTasks,
+          });
+        } catch (e) {
+          console.warn('[BrainDeer] customRenderer.attach failed for type:', q.type, e);
+        }
+      }
+    } catch (e) {
+      console.warn('[BrainDeer] addSlide render failed, inserting placeholder:', e);
+      // Insert a placeholder so the slide count stays correct and scrolling doesn't stall
+      div.innerHTML = renderFallback(idx);
+      feed.appendChild(div);
     }
     answerStart = Date.now();
+  }
+
+  function renderFallback(idx) {
+    // Shown only if a specific game renderer crashes — keeps scroll flowing
+    return `
+      <div class="qcard">
+        <div class="category">Brain Training</div>
+        <div class="question">Keep scrolling — more challenges ahead! 🦌</div>
+        <div class="branding">braindeer.org</div>
+      </div>`;
   }
 
   function renderDefault(q, idx) {
@@ -946,13 +998,12 @@
       }, 300);
     }
 
-    // Update session stats + task progress for default (opt-button) games
     const session = updateSessionStats(isCorrect, ms);
     updateTaskProgress(result.streak, isCorrect, ms, session);
     updateTasksBadge();
 
     updateUI(result);
-    checkMore();
+    onFeedScroll();
     setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'),  250);
     setTimeout(() => document.getElementById(`hint-${idx}`)?.classList.add('show'), 500);
     answerStart = Date.now();
