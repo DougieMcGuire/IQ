@@ -728,7 +728,7 @@
       `slides: ${slides}<br>` +
       `queue: ${questionQueue.length}<br>` +
       `cur slide: ${cur}<br>` +
-      `target: ${Math.max(cur + 15, slides + 3)}<br>` +
+      `target: ${cur + 12}<br>` +
       `fills: ${_dbgFillCalls}<br>` +
       `scrollEvts: ${_dbgScrollCalls}<br>` +
       `feedH: ${slideH}<br>` +
@@ -875,8 +875,8 @@
     for (let i = 0; i < 8; i++) addSlide();
     feed.addEventListener('scroll',    onFeedScroll, { passive: true });
     feed.addEventListener('touchmove', onFeedScroll, { passive: true });
-    // Interval always keeps slides growing even when scroll is snap-locked
-    setInterval(proactiveFill, 200);
+    // Interval is just a safety net for when scroll-snap locks scrollTop
+    setInterval(proactiveFill, 500);
     setTimeout(maybeShowPushPrompt, 3000);
   }
 
@@ -885,16 +885,13 @@
     proactiveFill();
   }
 
-  // Runs on every interval tick AND every scroll — always keeps 15 slides ahead
-  // of the LAST slide in the DOM, not just the current visible one.
-  // This way scroll-snap can't starve it — even if scrollTop is frozen on the
-  // last snap position, we still add more slides proactively.
   function proactiveFill() {
     const slideH = feed.clientHeight;
     if (!slideH) return;
     const currentSlide = Math.floor(feed.scrollTop / slideH);
-    // Fill to 15 ahead of current position OR just always keep slides growing
-    const target = Math.max(currentSlide + 15, slides + 3);
+    // If user is within 2 slides of the end, bump the target to unblock snap-lock
+    const nearEnd = slides - currentSlide <= 2;
+    const target = currentSlide + (nearEnd ? 8 : 12);
     while (slides < target) {
       addSlide();
     }
