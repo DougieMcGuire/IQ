@@ -904,13 +904,10 @@
     children.forEach(el => {
       const idx = parseInt(el.dataset.slideIdx);
       if (idx < cutoff) {
-        const h = el.offsetHeight; // exact rendered height before we wipe
         el.dataset.pruned = '1';
-        el.innerHTML = '';
-        el.style.height = h + 'px';
-        el.style.minHeight = 'unset';
-        el.style.flexShrink = '0';
-        el.style.scrollSnapAlign = 'start'; // keep snap points intact
+        // Don't touch dimensions at all — just tell the browser to skip
+        // painting and compositing this slide. Zero alignment risk.
+        el.style.contentVisibility = 'hidden';
       }
     });
     firstSlide = cutoff;
