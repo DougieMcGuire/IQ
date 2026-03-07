@@ -1,21 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Contact - Braindeer</title>
-</head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact – BrainDeer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#3a2918;--card:#4a3625;--card2:#5a4232;
+      --cream:#f0e2cc;--tan:#c2a476;--mid:#6b4f32;--light:#8f6b4a;
+      --green:#58cc02;--greend:#46a302;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{min-height:100%;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--cream)}
+    body{padding:0 0 60px}
 
+    nav{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:16px 24px;background:var(--card);
+      box-shadow:0 3px 0 rgba(0,0,0,.2);position:sticky;top:0;z-index:10;
+    }
+    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .nav-logo .mascot{font-size:28px;line-height:1}
+    .nav-logo .name{font-size:20px;font-weight:900;color:var(--cream)}
+    .nav-links{display:flex;gap:20px}
+    .nav-links a{font-size:14px;font-weight:700;color:var(--tan);text-decoration:none;transition:color .2s}
+    .nav-links a:hover{color:var(--cream)}
+
+    .hero{
+      text-align:center;padding:44px 24px 32px;
+      background:linear-gradient(180deg,var(--card) 0%,var(--bg) 100%);
+    }
+    .hero h1{font-size:28px;font-weight:900;margin-bottom:8px}
+    .hero p{font-size:15px;font-weight:600;color:var(--tan);line-height:1.6}
+
+    .content{max-width:560px;margin:0 auto;padding:0 20px}
+
+    .card{
+      background:var(--card);border-radius:20px;padding:26px 24px;
+      margin-top:20px;box-shadow:0 5px 0 rgba(0,0,0,.15);
+    }
+    .card h2{font-size:16px;font-weight:900;margin-bottom:16px;
+      padding-bottom:10px;border-bottom:2px solid var(--mid);}
+
+    /* Contact method */
+    .contact-method{
+      display:flex;align-items:center;gap:14px;
+      background:var(--card2);border-radius:14px;padding:16px;
+      text-decoration:none;transition:transform .12s,box-shadow .12s;
+      box-shadow:0 3px 0 rgba(0,0,0,.15);
+    }
+    .contact-method:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.15)}
+    .contact-method .icon{font-size:28px;flex-shrink:0}
+    .contact-method .label{font-size:12px;font-weight:800;color:var(--light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+    .contact-method .value{font-size:15px;font-weight:800;color:var(--cream)}
+
+    .topics{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+    .topic{
+      display:flex;align-items:flex-start;gap:12px;
+      background:var(--card2);border-radius:12px;padding:14px;
+    }
+    .topic .t-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+    .topic .t-title{font-size:14px;font-weight:900;margin-bottom:3px}
+    .topic .t-desc{font-size:13px;font-weight:600;color:var(--tan);line-height:1.5}
+
+    .response-note{
+      margin-top:16px;text-align:center;
+      font-size:13px;font-weight:700;color:var(--light);
+      background:var(--card2);border-radius:12px;padding:12px;
+    }
+
+    footer{
+      text-align:center;padding:28px 20px 0;
+      font-size:12px;font-weight:700;color:var(--light);line-height:2;
+    }
+    footer a{color:var(--tan);text-decoration:none}
+  </style>
+</head>
 <body>
 
-<h1>Contact</h1>
+<nav>
+  <a class="nav-logo" href="app.html">
+    <span class="mascot">🦌</span>
+    <span class="name">BrainDeer</span>
+  </a>
+  <div class="nav-links">
+    <a href="about.html">About</a>
+    <a href="privacy.html">Privacy</a>
+  </div>
+</nav>
 
-<p>If you have questions, feedback, or support requests regarding Braindeer, feel free to reach out.</p>
+<div class="hero">
+  <h1>✉️ Contact Us</h1>
+  <p>Got a question, bug report, or just want to say hi?<br>We'd love to hear from you.</p>
+</div>
 
-<p>Email:</p>
+<div class="content">
 
-<p><a href="mailto:contact@braindeer.org">contact@braindeer.org</a></p>
+  <div class="card">
+    <h2>Get in Touch</h2>
+    <a class="contact-method" href="mailto:contact@braindeer.org">
+      <span class="icon">📬</span>
+      <div>
+        <div class="label">Email</div>
+        <div class="value">contact@braindeer.org</div>
+      </div>
+    </a>
+    <div class="response-note">⏱ We aim to respond within 2–3 business days</div>
+  </div>
 
-<p>We aim to respond to inquiries as soon as possible.</p>
+  <div class="card">
+    <h2>What Can We Help With?</h2>
+    <div class="topics">
+      <div class="topic">
+        <span class="t-icon">🐛</span>
+        <div>
+          <div class="t-title">Bug reports</div>
+          <div class="t-desc">Found something broken? Let us know what happened and we'll fix it fast.</div>
+        </div>
+      </div>
+      <div class="topic">
+        <span class="t-icon">💡</span>
+        <div>
+          <div class="t-title">Feature suggestions</div>
+          <div class="t-desc">Have an idea for a new game or feature? We're always listening.</div>
+        </div>
+      </div>
+      <div class="topic">
+        <span class="t-icon">🔒</span>
+        <div>
+          <div class="t-title">Account or privacy issues</div>
+          <div class="t-desc">Need to delete your account or have a data request? Email us directly.</div>
+        </div>
+      </div>
+      <div class="topic">
+        <span class="t-icon">📣</span>
+        <div>
+          <div class="t-title">General feedback</div>
+          <div class="t-desc">We genuinely read every message. Tell us what you love or what we should do better.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  © 2026 BrainDeer &nbsp;·&nbsp; <a href="about.html">About</a> &nbsp;·&nbsp; <a href="privacy.html">Privacy Policy</a>
+</footer>
 
 </body>
 </html>
