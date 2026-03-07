@@ -480,7 +480,6 @@
 <script src="games/mathRush.js"></script>
 
 <script type="module">
-  // Only import what this page actually uses — no DailyTasks needed here
   import { IQData, getEncouragement } from './data.js';
   import Haptics from './haptics.js';
 
@@ -507,8 +506,7 @@
   const xpLabel     = document.getElementById('xp-label');
   const tasksBadge  = document.getElementById('tasks-badge');
 
-  // ── Daily Tasks (Firestore-backed) ──
-  // Session stats stay local (fast per-answer writes), task state goes to Firestore.
+  // ── Session stats (localStorage, fast per-answer writes) ──
   const SESSION_KEY = 'bd_session_today';
 
   let _tasksUid = null;
@@ -660,6 +658,9 @@
     } catch (e) { console.warn('[improve] updateTaskProgress failed', e); }
   }
 
+  // ── notifyGamePlayed: called by custom renderer games when a round finishes ──
+  // ANY game completion (win or lose) counts for game-type tasks.
+  // Also updates answered/correct session stats so those tasks progress too.
   window.notifyGamePlayed = async function(gameType) {
     if (!getFirebase()) return;
     try {
@@ -677,6 +678,16 @@
     } catch (e) { console.warn('[improve] notifyGamePlayed failed', e); }
   };
 
+  // ── NEW: onAnswer hook for custom renderer games ──
+  // Call this from any custom renderer finish() to count toward
+  // answered/correct/streak/accuracy/fast tasks.
+  window.onAnswerForTasks = function(correct, ms) {
+    const result  = IQData.load(); // get current streak from IQData (already updated by recordAnswer)
+    const session = updateSessionStats(correct, ms);
+    updateTaskProgress(result.streak, correct, ms, session);
+    updateTasksBadge();
+  };
+
   (function initTaskTracking() {
     const fb = window.firebase || (window.parent !== window && window.parent.firebase);
     if (!fb) return;
@@ -689,7 +700,7 @@
     });
   })();
 
-  // Handle XP awarded from tasks.html (claim button) — use IQData so it syncs properly
+  // Handle XP awarded from tasks.html
   window.addEventListener('message', function(e) {
     if (!e.data || e.data.type !== 'xpAwarded') return;
     const xp = e.data.xp;
@@ -848,6 +859,8 @@
         answerStartRef: { get: () => answerStart, set: v => { answerStart = v; } },
         Haptics,
         notifyGamePlayed: window.notifyGamePlayed,
+        // NEW: custom renderers call this after recordAnswer to count toward session tasks
+        onAnswer: window.onAnswerForTasks,
       });
     }
     answerStart = Date.now();
@@ -933,7 +946,7 @@
       }, 300);
     }
 
-    // Update task progress in localStorage (no import needed)
+    // Update session stats + task progress for default (opt-button) games
     const session = updateSessionStats(isCorrect, ms);
     updateTaskProgress(result.streak, isCorrect, ms, session);
     updateTasksBadge();
