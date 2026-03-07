@@ -89,7 +89,6 @@
           if (timeLeft <= 0) {
             clearInterval(roundTimer);
             clearInterval(tickTimer);
-            // Time ran out — urgent warning
             H.warning && H.warning();
             eqEl.classList.add('mr-wrong');
             round++;
@@ -97,16 +96,13 @@
             setTimeout(showRound, 500);
           } else {
             timerEl.textContent = timeLeft.toFixed(1) + 's';
-            // Tick haptic once per second
             var currentSecond = Math.ceil(timeLeft);
             if (currentSecond !== lastTickSecond) {
               lastTickSecond = currentSecond;
               if (timeLeft <= 2) {
-                // Last 2 seconds — urgent double tick
                 H.warning && H.warning();
                 timerEl.style.color = 'var(--red)';
               } else {
-                // Normal tick
                 H.light && H.light();
               }
             }
@@ -142,6 +138,11 @@
         var won = score >= 3;
         var perfect = score === q.equations.length;
         var data = ctx.IQData.recordAnswer(q.category, won, q.difficulty, ms);
+
+        // Notify game played + session stats
+        if (ctx.notifyGamePlayed) ctx.notifyGamePlayed('mathRush');
+        if (ctx.onAnswer) ctx.onAnswer(won, ms);
+
         eqEl.textContent = score + '/' + q.equations.length + (perfect ? ' Perfect!' : won ? ' Nice!' : ' Try harder!');
         eqEl.className = 'mr-eq ' + (won ? 'mr-correct' : 'mr-wrong');
         timerEl.textContent = '';
