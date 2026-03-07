@@ -1145,9 +1145,18 @@
 
       feed.scrollTo({ top: targetSlide * slideH, behavior: 'smooth' });
 
-      // Unlock after animation settles (~400ms) — ignore any wheel events mid-scroll
+      // Fire enter animation on the destination slide after scroll settles
       clearTimeout(_wheelCooldown);
-      _wheelCooldown = setTimeout(() => { _wheelLocked = false; }, 420);
+      _wheelCooldown = setTimeout(() => {
+        _wheelLocked = false;
+        const el = feed.querySelector(`.slide[data-slide-idx="${targetSlide}"]`);
+        if (el) {
+          el.classList.remove('entering');
+          void el.offsetWidth;
+          el.classList.add('entering');
+          _lastAnimatedSlide = targetSlide;
+        }
+      }, 380);
     }, { passive: false });
 
     attachSentinel();
