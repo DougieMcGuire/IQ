@@ -897,20 +897,20 @@
     }
   }
 
-  // Replace slides more than KEEP_BEHIND behind the user with empty spacers
   function pruneSlides(currentSlide) {
     const cutoff = currentSlide - KEEP_BEHIND;
     if (cutoff <= firstSlide) return;
-    const slideH = feed.clientHeight;
-    const children = feed.querySelectorAll('.slide');
+    const children = feed.querySelectorAll('.slide:not([data-pruned])');
     children.forEach(el => {
       const idx = parseInt(el.dataset.slideIdx);
-      if (idx < cutoff && !el.dataset.pruned) {
+      if (idx < cutoff) {
+        const h = el.offsetHeight; // exact rendered height before we wipe
         el.dataset.pruned = '1';
-        // Replace content with empty div of same height to preserve scroll position
         el.innerHTML = '';
-        el.style.height = slideH + 'px';
+        el.style.height = h + 'px';
+        el.style.minHeight = 'unset';
         el.style.flexShrink = '0';
+        el.style.scrollSnapAlign = 'start'; // keep snap points intact
       }
     });
     firstSlide = cutoff;
