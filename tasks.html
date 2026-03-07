@@ -295,13 +295,61 @@
 <div class="xp-toast" id="xp-toast"></div>
 <div class="confetti" id="confetti"></div>
 
-<script type="module">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
 // ════════════════════════════════════════════════════
-// INLINE DAILY TASKS LOGIC
-// (self-contained so this page needs no data.js import)
+// BrainDeer Daily Tasks — Firestore-backed
 // ════════════════════════════════════════════════════
 
-const TASK_POOL = [
+var firebaseConfig = {
+  apiKey:            "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
+  authDomain:        "braindeer-backend.firebaseapp.com",
+  projectId:         "braindeer-backend",
+  storageBucket:     "braindeer-backend.firebasestorage.app",
+  messagingSenderId: "331205139765",
+  appId:             "1:331205139765:web:20cfef8194af63fc55c07c"
+};
+
+// Only init if not already done (parent may have already inited)
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+var db  = firebase.firestore();
+var auth = firebase.auth();
+
+// ── Nav ──
+function navGo(page) {
+  if (window.parent !== window) window.parent.goTo(page);
+  else window.location.href = page + '.html';
+}
+
+// ── Helpers ──
+function getTodayKey() {
+  var n = new Date();
+  return n.getFullYear() + '-' + (n.getMonth() + 1) + '-' + n.getDate();
+}
+
+function wasYesterday(dateStr) {
+  if (!dateStr) return false;
+  var parts = dateStr.split('-').map(Number);
+  var prev  = new Date(parts[0], parts[1] - 1, parts[2]);
+  var yest  = new Date();
+  yest.setDate(yest.getDate() - 1);
+  return prev.toDateString() === yest.toDateString();
+}
+
+function seededRandom(seed) {
+  var s = seed;
+  return function() {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    return (s >>> 0) / 0xffffffff;
+  };
+}
+
+var TASK_POOL = [
   { id: 'streak_5',       type: 'streak',   target: 5,   label: 'Get a streak of 5',          icon: '🔥', xp: 30  },
   { id: 'streak_10',      type: 'streak',   target: 10,  label: 'Get a streak of 10',         icon: '🔥', xp: 60  },
   { id: 'streak_15',      type: 'streak',   target: 15,  label: 'Get a streak of 15',         icon: '🔥', xp: 100 },
@@ -324,254 +372,206 @@ const TASK_POOL = [
   { id: 'fast_10',        type: 'fast',     target: 10,  label: 'Answer 10 in under 3.5s',     icon: '⚡', xp: 70  },
 ];
 
-const TASKS_KEY   = 'bd_daily_tasks_v1';
-const SESSION_KEY = 'bd_session_today';
-const IQ_KEY      = 'iq_profile_v6';
-
-function getTodayKey() {
-  const n = new Date();
-  return `${n.getFullYear()}-${n.getMonth() + 1}-${n.getDate()}`;
-}
-
-function seededRandom(seed) {
-  let s = seed;
-  return () => {
-    s = (s * 1664525 + 1013904223) & 0xffffffff;
-    return (s >>> 0) / 0xffffffff;
-  };
-}
-
 function getDailyTaskDefs() {
-  const dateKey = getTodayKey();
-  const seed    = dateKey.split('-').reduce((a, n) => a * 31 + parseInt(n), 0);
-  const rng     = seededRandom(seed);
-  return [...TASK_POOL].sort(() => rng() - 0.5).slice(0, 3);
+  var dateKey = getTodayKey();
+  var seed    = dateKey.split('-').reduce(function(a, n) { return a * 31 + parseInt(n); }, 0);
+  var rng     = seededRandom(seed);
+  return TASK_POOL.slice().sort(function() { return rng() - 0.5; }).slice(0, 3);
 }
 
-function wasYesterday(dateStr) {
-  if (!dateStr) return false;
-  const [y, m, d] = dateStr.split('-').map(Number);
-  const prev      = new Date(y, m - 1, d);
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  return prev.toDateString() === yesterday.toDateString();
+function getTasksRef(uid) {
+  return db.collection('users').doc(uid).collection('dailyTasks').doc(getTodayKey());
 }
 
-function loadTaskState() {
-  try {
-    const raw = localStorage.getItem(TASKS_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch { return null; }
-}
+// ── Load or create today's task state ──
+async function loadTaskState(uid) {
+  var ref  = getTasksRef(uid);
+  var snap = await ref.get();
+  if (snap.exists) return snap.data();
 
-function saveTaskState(s) {
-  localStorage.setItem(TASKS_KEY, JSON.stringify(s));
-}
+  // Check yesterday's state for streak
+  var yestKey  = (function() {
+    var y = new Date(); y.setDate(y.getDate() - 1);
+    return y.getFullYear() + '-' + (y.getMonth() + 1) + '-' + y.getDate();
+  })();
+  var yestSnap = await db.collection('users').doc(uid).collection('dailyTasks').doc(yestKey).get();
+  var prevStreak = 0;
+  if (yestSnap.exists) {
+    var yd = yestSnap.data();
+    prevStreak = (yd.allDone ? (yd.dailyStreak || 0) + 1 : (yd.dailyStreak || 0));
+  }
 
-function getTaskState() {
-  const stored = loadTaskState();
-  const today  = getTodayKey();
-  if (stored && stored.date === today) return stored;
-
-  const prevStreak = (stored && stored.allDone && wasYesterday(stored.date))
-    ? (stored.dailyStreak || 0) + 1
-    : (stored && wasYesterday(stored.date) ? stored.dailyStreak || 0 : 0);
-
-  const fresh = {
-    date:       today,
-    tasks:      getDailyTaskDefs().map(def => ({ ...def, progress: 0, done: false, claimed: false })),
-    allDone:    false,
-    allClaimed: false,
+  var fresh = {
+    date:        getTodayKey(),
+    tasks:       getDailyTaskDefs().map(function(def) {
+      return Object.assign({}, def, { progress: 0, done: false, claimed: false });
+    }),
+    allDone:     false,
+    allClaimed:  false,
     dailyStreak: prevStreak,
   };
-  saveTaskState(fresh);
+  await ref.set(fresh);
   return fresh;
 }
 
-function claimTask(taskId) {
-  const state = getTaskState();
-  const task  = state.tasks.find(t => t.id === taskId && t.done && !t.claimed);
+async function claimTaskInFirestore(uid, taskId) {
+  var ref  = getTasksRef(uid);
+  var snap = await ref.get();
+  if (!snap.exists) return null;
+  var state = snap.data();
+  var task  = state.tasks.find(function(t) { return t.id === taskId && t.done && !t.claimed; });
   if (!task) return null;
   task.claimed = true;
-  if (state.tasks.every(t => t.claimed)) state.allClaimed = true;
-  saveTaskState(state);
+  if (state.tasks.every(function(t) { return t.claimed; })) state.allClaimed = true;
+  await ref.set(state);
   return task.xp;
 }
 
-// Award XP directly into IQData store
 function awardXP(xp) {
+  // Post to parent -> app.html relays to improve.html -> IQData handles it
   try {
-    const raw = localStorage.getItem(IQ_KEY);
-    if (!raw) return;
-    const d = JSON.parse(raw);
-    d.xp    = (d.xp || 0) + xp;
-    d.level = Math.floor(d.xp / 150) + 1;
-    localStorage.setItem(IQ_KEY, JSON.stringify(d));
-    // Tell parent shell to re-render if it exists
     if (window.parent !== window) {
-      window.parent.postMessage({ type: 'xpAwarded', xp }, '*');
+      window.parent.postMessage({ type: 'xpAwarded', xp: xp }, '*');
     }
-  } catch (e) {
-    console.warn('[tasks] awardXP failed', e);
-  }
+  } catch (e) { console.warn('[tasks] awardXP failed', e); }
 }
-
-// ── Nav ──
-function navGo(page) {
-  if (window.parent !== window) window.parent.goTo(page);
-  else window.location.href = page + '.html';
-}
-
-// ── Tasks badge — reads the same localStorage key as tasks.html ──
 
 // ── Reset timer ──
 function updateResetTimer() {
-  const now      = new Date();
-  const midnight = new Date(now);
+  var now      = new Date();
+  var midnight = new Date(now);
   midnight.setHours(24, 0, 0, 0);
-  const diff = midnight - now;
-  const h = Math.floor(diff / 3600000);
-  const m = Math.floor((diff % 3600000) / 60000);
-  document.getElementById('resets-chip').textContent = `Resets in ${h}h ${m}m`;
+  var diff = midnight - now;
+  var h = Math.floor(diff / 3600000);
+  var m = Math.floor((diff % 3600000) / 60000);
+  var chip = document.getElementById('resets-chip');
+  if (chip) chip.textContent = 'Resets in ' + h + 'h ' + m + 'm';
 }
 
 // ── Confetti ──
 function spawnConfetti(n) {
-  const colors  = ['#58cc02','#ffc800','#ea2b2b','#1cb0f6','#ce82ff','#ff9600'];
-  const el      = document.getElementById('confetti');
-  for (let i = 0; i < n; i++) {
-    const p = document.createElement('i');
+  var colors = ['#58cc02','#ffc800','#ea2b2b','#1cb0f6','#ce82ff','#ff9600'];
+  var el     = document.getElementById('confetti');
+  for (var i = 0; i < n; i++) {
+    var p = document.createElement('i');
     p.style.left           = Math.random() * 100 + '%';
     p.style.top            = '-12px';
     p.style.background     = colors[Math.floor(Math.random() * colors.length)];
     p.style.animationDelay = Math.random() * 0.25 + 's';
     el.appendChild(p);
-    setTimeout(() => p.classList.add('fall'), 10);
-    setTimeout(() => p.remove(), 1500);
+    setTimeout(function(el){ el.classList.add('fall'); }.bind(null, p), 10);
+    setTimeout(function(el){ el.remove(); }.bind(null, p), 1500);
   }
 }
 
 // ── XP toast ──
 function showXpToast(msg) {
-  const t = document.getElementById('xp-toast');
+  var t = document.getElementById('xp-toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
-}
-
-// ── Haptics (via parent if available) ──
-function haptic(type) {
-  try {
-    if (window.parent !== window && window.parent.Haptics) {
-      window.parent.Haptics[type]?.();
-    }
-  } catch {}
+  setTimeout(function() { t.classList.remove('show'); }, 2200);
 }
 
 // ════════════════════════════════════════════════════
 // RENDER
 // ════════════════════════════════════════════════════
-function render() {
-  const state = getTaskState();
-  const body  = document.getElementById('scroll-body');
-  const done  = state.tasks.filter(t => t.done).length;
-  const total = state.tasks.length;
+var _currentUid = null;
+
+function render(state) {
+  var body = document.getElementById('scroll-body');
+  var done  = state.tasks.filter(function(t) { return t.done; }).length;
+  var total = state.tasks.length;
 
   body.innerHTML = '';
 
   // ── Daily streak card ──
-  const streakCard = document.createElement('div');
+  var streakCard = document.createElement('div');
   streakCard.className = 'streak-card animate-in';
-  const streakDays = state.dailyStreak || 0;
-  const streakSub  = streakDays === 0
+  var streakDays = state.dailyStreak || 0;
+  var streakSub  = streakDays === 0
     ? 'Complete all tasks today to start your streak!'
-    : streakDays === 1
-      ? 'Great start — keep it up tomorrow!'
-      : `${streakDays} days in a row — don't break it!`;
-  streakCard.innerHTML = `
-    <div class="streak-flame">📅</div>
-    <div class="streak-info">
-      <div class="streak-label">Daily Challenge Streak</div>
-      <div class="streak-val">${streakDays} ${streakDays === 1 ? 'day' : 'days'}</div>
-      <div class="streak-sub">${streakSub}</div>
-    </div>
-  `;
+    : streakDays === 1 ? 'Great start — keep it up tomorrow!'
+    : streakDays + ' days in a row — don't break it!';
+  streakCard.innerHTML =
+    '<div class="streak-flame">📅</div>' +
+    '<div class="streak-info">' +
+      '<div class="streak-label">Daily Challenge Streak</div>' +
+      '<div class="streak-val">' + streakDays + ' ' + (streakDays === 1 ? 'day' : 'days') + '</div>' +
+      '<div class="streak-sub">' + streakSub + '</div>' +
+    '</div>';
   body.appendChild(streakCard);
 
   // ── Overall progress ──
-  const overallCard = document.createElement('div');
+  var overallCard = document.createElement('div');
   overallCard.className = 'overall-card animate-in delay-1';
-  overallCard.innerHTML = `
-    <div class="overall-row">
-      <span class="overall-label">Today's Progress</span>
-      <span class="overall-count">${done} / ${total} complete</span>
-    </div>
-    <div class="overall-bar-outer">
-      <div class="overall-bar-inner" id="overall-bar" style="width:${(done/total)*100}%"></div>
-    </div>
-  `;
+  overallCard.innerHTML =
+    '<div class="overall-row">' +
+      '<span class="overall-label">Today's Progress</span>' +
+      '<span class="overall-count">' + done + ' / ' + total + ' complete</span>' +
+    '</div>' +
+    '<div class="overall-bar-outer">' +
+      '<div class="overall-bar-inner" style="width:' + ((done / total) * 100) + '%"></div>' +
+    '</div>';
   body.appendChild(overallCard);
 
   // ── All done banner ──
   if (state.allDone) {
-    const banner = document.createElement('div');
+    var banner = document.createElement('div');
     banner.className = 'complete-banner show animate-in delay-2';
-    banner.innerHTML = `
-      <div class="cb-icon">🎉</div>
-      <div class="cb-text">
-        <div class="cb-title">All tasks complete!</div>
-        <div class="cb-sub">Come back tomorrow for a new set.</div>
-      </div>
-    `;
+    banner.innerHTML =
+      '<div class="cb-icon">🎉</div>' +
+      '<div class="cb-text">' +
+        '<div class="cb-title">All tasks complete!</div>' +
+        '<div class="cb-sub">Come back tomorrow for a new set.</div>' +
+      '</div>';
     body.appendChild(banner);
   }
 
   // ── Section label ──
-  const sectionLabel = document.createElement('div');
+  var sectionLabel = document.createElement('div');
   sectionLabel.className = 'section-label animate-in delay-2';
   sectionLabel.textContent = "Today's Tasks";
   body.appendChild(sectionLabel);
 
   // ── Task cards ──
-  state.tasks.forEach((task, i) => {
-    const pct  = Math.min(100, Math.round((task.progress / task.target) * 100));
-    const card = document.createElement('div');
-    card.className = 'task-card animate-in' + (task.claimed ? ' is-claimed' : '') + ` delay-${Math.min(i + 3, 4)}`;
+  state.tasks.forEach(function(task, i) {
+    var pct  = Math.min(100, Math.round((task.progress / task.target) * 100));
+    var card = document.createElement('div');
+    card.className = 'task-card animate-in' + (task.claimed ? ' is-claimed' : '') + ' delay-' + Math.min(i + 3, 4);
 
-    let rightEl = '';
+    var rightEl = '';
     if (task.claimed) {
-      rightEl = `<div class="task-done-badge">✅</div>`;
+      rightEl = '<div class="task-done-badge">✅</div>';
     } else if (task.done) {
-      rightEl = `<button class="task-claim" data-id="${task.id}">+${task.xp} XP</button>`;
+      rightEl = '<button class="task-claim" data-id="' + task.id + '">+' + task.xp + ' XP</button>';
     }
 
-    card.innerHTML = `
-      <div class="task-icon">${task.icon}</div>
-      <div class="task-body">
-        <div class="task-label">${task.label}</div>
-        <div class="task-progress-row">
-          <div class="task-bar-outer">
-            <div class="task-bar-inner${task.done ? ' bar-done' : ''}" style="width:${pct}%"></div>
-          </div>
-          <div class="task-pct">${task.progress} / ${task.target}</div>
-        </div>
-      </div>
-      ${rightEl}
-    `;
+    card.innerHTML =
+      '<div class="task-icon">' + task.icon + '</div>' +
+      '<div class="task-body">' +
+        '<div class="task-label">' + task.label + '</div>' +
+        '<div class="task-progress-row">' +
+          '<div class="task-bar-outer">' +
+            '<div class="task-bar-inner' + (task.done ? ' bar-done' : '') + '" style="width:' + pct + '%"></div>' +
+          '</div>' +
+          '<div class="task-pct">' + task.progress + ' / ' + task.target + '</div>' +
+        '</div>' +
+      '</div>' +
+      rightEl;
 
-    // Claim handler
-    const claimBtn = card.querySelector('.task-claim');
+    var claimBtn = card.querySelector('.task-claim');
     if (claimBtn) {
-      claimBtn.addEventListener('click', () => {
-        const xp = claimTask(claimBtn.dataset.id);
-        if (xp === null) return;
-        haptic('levelUp');
-        awardXP(xp);
-        spawnConfetti(22);
-        showXpToast(`+${xp} XP`);
-        // Re-render after short delay so animation feels good
-        setTimeout(render, 350);
-      });
+      (function(btn, uid) {
+        btn.addEventListener('click', async function() {
+          var xp = await claimTaskInFirestore(uid, btn.dataset.id);
+          if (xp === null) return;
+          awardXP(xp);
+          spawnConfetti(22);
+          showXpToast('+' + xp + ' XP');
+          var fresh = await loadTaskState(uid);
+          render(fresh);
+        });
+      })(claimBtn, _currentUid);
     }
 
     body.appendChild(card);
@@ -584,19 +584,36 @@ function render() {
 updateResetTimer();
 setInterval(updateResetTimer, 60000);
 
-// Slight delay so the loading state shows briefly, then render
-setTimeout(() => {
-  render();
-}, 80);
-
-// Listen for updates from parent (when improve.html records an answer)
-window.addEventListener('message', e => {
-  if (e.data?.type === 'tasksUpdated') render();
+auth.onAuthStateChanged(async function(user) {
+  if (!user) {
+    // Not logged in — show nothing, let app.html handle redirect
+    document.getElementById('loading-state').textContent = 'Please log in.';
+    return;
+  }
+  _currentUid = user.uid;
+  try {
+    var state = await loadTaskState(user.uid);
+    render(state);
+  } catch (e) {
+    console.error('[tasks] boot failed', e);
+    document.getElementById('loading-state').textContent = 'Failed to load tasks.';
+  }
 });
 
-// Refresh when tab becomes visible (user switches back to Tasks)
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) render();
+// Listen for updates from improve.html (via app.html relay)
+window.addEventListener('message', async function(e) {
+  if (e.data && e.data.type === 'tasksUpdated' && _currentUid) {
+    var fresh = await loadTaskState(_currentUid);
+    render(fresh);
+  }
+});
+
+// Refresh when tab becomes visible
+document.addEventListener('visibilitychange', async function() {
+  if (!document.hidden && _currentUid) {
+    var fresh = await loadTaskState(_currentUid);
+    render(fresh);
+  }
 });
 </script>
 </body>
