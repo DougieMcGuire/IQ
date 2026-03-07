@@ -449,30 +449,20 @@
   // Only runs when leaderboard/snapshot doesn't exist yet.
   async function migrateSnapshotFromUsers() {
     try {
-      const { collection, getDocs, query, orderBy, limit, where } =
+      const { collection, getDocs, query, limit } =
         await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
 
-      let snap;
-      try {
-        snap = await getDocs(query(
-          collection(db, 'users'),
-          where('calibrated', '==', true),
-          orderBy('iq', 'desc'),
-          limit(200)
-        ));
-      } catch {
-        snap = await getDocs(query(
-          collection(db, 'users'),
-          orderBy('iq', 'desc'),
-          limit(200)
-        ));
-      }
+      // Grab ALL users with no filters — let the map below handle filtering
+      // This avoids index issues and catches users regardless of calibrated flag
+      const snap = await getDocs(query(collection(db, 'users'), limit(500)));
+
+      console.log('[leaderboard] migration found ' + snap.docs.length + ' total user docs');
 
       const users = snap.docs
         .map(d => ({ uid: d.id, ...d.data() }))
-        .filter(u => u.calibrated && (u.answered || 0) >= 5 && !u.hideFromLeaderboard)
+        .filter(u => !u.hideFromLeaderboard && (u.iq || 0) > 0)  // just needs an IQ score
         .map(u => ({
-          uid:        u.uid,
+          uid:        u.uid        || u.id || '',
           username:   u.username   || 'Anonymous',
           iq:         u.iq         || 0,
           level:      u.level      || 1,
@@ -482,7 +472,8 @@
           pic:        u.pic        || '',
           hidden:     false,
           updatedAt:  Date.now(),
-        }));
+        }))
+        .filter(u => u.uid); // drop any docs without a uid
 
       users.sort((a, b) => (b.iq || 0) - (a.iq || 0));
       const ref = doc(db, 'leaderboard', 'snapshot');
