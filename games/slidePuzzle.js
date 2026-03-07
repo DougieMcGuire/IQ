@@ -70,12 +70,10 @@
         if (ci === blank - 3 || ci === blank + 3) canMove = true;
 
         if (!canMove) {
-          // Can't move — light tap to acknowledge
           H.light && H.light();
           return;
         }
 
-        // Valid slide — solid click
         H.medium && H.medium();
 
         board[blank] = board[ci];
@@ -100,6 +98,10 @@
         var ms = Date.now() - ctx.answerStartRef.get();
         var optimal = moves <= 25;
         var data = ctx.IQData.recordAnswer(q.category, true, q.difficulty, ms);
+
+        // Notify daily tasks
+        if (ctx.notifyGamePlayed) ctx.notifyGamePlayed('slidePuzzle');
+
         optimal ? (H.streak && H.streak()) : (H.success && H.success());
         movesEl.textContent = 'Solved in ' + moves + ' moves!';
         movesEl.style.color = 'var(--green)';
