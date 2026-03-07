@@ -106,7 +106,6 @@
   window.addEventListener('message', function(e) {
     if (!e.data) return;
 
-    // Push subscription save
     if (e.data.type === 'savePushSub') {
       var sub = e.data.sub;
       firebase.auth().onAuthStateChanged(function(user) {
@@ -119,7 +118,6 @@
       });
     }
 
-    // Forward tasksUpdated to the tasks iframe so it re-renders live
     if (e.data.type === 'tasksUpdated') {
       var tasksContainer = document.getElementById('screen-tasks');
       if (tasksContainer) {
@@ -130,7 +128,6 @@
       }
     }
 
-    // XP awarded from tasks.html — update improve iframe's UI if it's loaded
     if (e.data.type === 'xpAwarded') {
       var improveContainer = document.getElementById('screen-improve');
       if (improveContainer) {
@@ -148,7 +145,6 @@
   window.goTo = function goTo(page) {
     document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
 
-    // Always reload profile and leaderboard fresh; tasks reloads too for fresh data
     if ((page === 'profile' || page === 'leaderboard') && screensLoaded[page]) {
       var old = document.querySelector('#screen-' + page + ' iframe');
       if (old) old.remove();
@@ -157,7 +153,7 @@
 
     if (!screensLoaded[page]) {
       var container = document.getElementById('screen-' + page);
-      if (!container) return; // safety guard — page not registered
+      if (!container) return;
       var iframe = document.createElement('iframe');
       iframe.src = page + '.html';
       iframe.allow = 'web-share';
@@ -175,9 +171,7 @@
       splash.classList.add('hide');
       setTimeout(function() { if (splash.parentNode) splash.remove(); }, 400);
     }
-  }
-
-  function authCheck() {}
+  };
 
   function generateInstallToken() {
     var user = firebase.auth().currentUser;
@@ -234,6 +228,34 @@
     }
   }
 
+  // ── Redeem a Google auth session token (from bridge.html) ──────────────────
+  // Uses signInWithCredential + the stored idToken — no Worker needed.
+  function redeemSessionToken(sessionId) {
+    return firebase.firestore()
+      .collection('authSessions')
+      .doc(sessionId)
+      .get()
+      .then(function(snap) {
+        if (!snap.exists) throw new Error('Session not found');
+        var data = snap.data();
+
+        if (data.used) throw new Error('Session already used');
+
+        var exp = data.expiresAt && data.expiresAt.toDate
+          ? data.expiresAt.toDate()
+          : new Date(data.expiresAt);
+        if (new Date() > exp) throw new Error('Session expired');
+
+        // Mark used immediately to prevent replays
+        snap.ref.update({ used: true });
+
+        // Sign in with the stored Google idToken — no backend required
+        var credential = firebase.auth.GoogleAuthProvider.credential(data.idToken);
+        return firebase.auth().signInWithCredential(credential);
+      });
+  }
+
+  // ── Boot ───────────────────────────────────────────────────────────────────
   (function() {
     localStorage.removeItem('iq_guest');
 
@@ -245,16 +267,30 @@
     }
     setScreenBg(looksLoggedIn ? 'improve' : 'auth');
 
-    var params = new URLSearchParams(window.location.search);
-    var token  = params.get('t');
+    var params    = new URLSearchParams(window.location.search);
+    var tToken    = params.get('t');        // existing install token
+    var sessionId = params.get('session');  // new Google auth session
 
-    if (token) {
+    // Clean URL immediately regardless of which token type
+    if (tToken || sessionId) {
       window.history.replaceState({}, '', window.location.pathname);
+    }
 
+    if (sessionId) {
+      // Google auth handoff from bridge.html
+      redeemSessionToken(sessionId)
+        .then(function() { normalAuth(); })
+        .catch(function(e) {
+          console.warn('Session redeem failed:', e);
+          normalAuth();
+        });
+
+    } else if (tToken) {
+      // Existing install token flow (unchanged)
       fetch(WORKER_URL, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ token: token })
+        body:    JSON.stringify({ token: tToken })
       })
       .then(function(r) { return r.ok ? r.json() : null; })
       .then(function(body) {
