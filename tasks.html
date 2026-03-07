@@ -491,7 +491,7 @@ function render(state) {
   var streakSub  = streakDays === 0
     ? 'Complete all tasks today to start your streak!'
     : streakDays === 1 ? 'Great start — keep it up tomorrow!'
-    : streakDays + ' days in a row — don't break it!';
+    : streakDays + ' days in a row \u2014 don\'t break it!';
   streakCard.innerHTML =
     '<div class="streak-flame">📅</div>' +
     '<div class="streak-info">' +
@@ -506,7 +506,7 @@ function render(state) {
   overallCard.className = 'overall-card animate-in delay-1';
   overallCard.innerHTML =
     '<div class="overall-row">' +
-      '<span class="overall-label">Today's Progress</span>' +
+      '<span class="overall-label">Today\'s Progress</span>' +
       '<span class="overall-count">' + done + ' / ' + total + ' complete</span>' +
     '</div>' +
     '<div class="overall-bar-outer">' +
