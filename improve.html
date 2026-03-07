@@ -854,38 +854,40 @@
     setTimeout(maybeShowPushPrompt, 3000);
   }
 
-  // ── FIXED: use pixels not slide index to decide how many slides to pre-load ──
   function onFeedScroll() {
     const slideH = feed.clientHeight;
     if (!slideH) return;
-    // How many slides has the user scrolled past (0-based)?
     const currentSlide = Math.floor(feed.scrollTop / slideH);
-    // Keep 10 slides ahead of wherever they are
     const target = currentSlide + 10;
     let added = 0;
-    while (slides < target) {
+    while (slides < target && added < 5) {
       addSlide();
       added++;
-      // Hard cap per tick so we don't freeze the UI adding 100 slides at once
-      if (added >= 5) break;
     }
   }
 
   function addSlide() {
-    const q = nextQuestion();
-    if (!q) return; // nextQuestion returns null only if generators are fully broken
+    // Increment slides FIRST — this must always happen so onFeedScroll's
+    // "while (slides < target)" never spins forever on a failed render.
     const idx = slides++;
     const div = document.createElement('div');
     div.className = 'slide';
+
+    let q = null;
+    try { q = nextQuestion(); } catch(e) { console.warn('[BrainDeer] nextQuestion threw:', e); }
+
+    if (!q) {
+      // Generator failed — show a placeholder so the slide exists in the DOM
+      div.innerHTML = renderFallback(idx);
+      feed.appendChild(div);
+      return;
+    }
+
     try {
       const customRenderer = Q._renderers && Q._renderers[q.type];
       if (customRenderer) {
         div.innerHTML = customRenderer.render(q, idx);
-      } else {
-        div.innerHTML = renderDefault(q, idx);
-      }
-      feed.appendChild(div);
-      if (customRenderer && customRenderer.attach) {
+        feed.appendChild(div);
         try {
           customRenderer.attach(div, q, idx, {
             feed, flashEl, confettiEl, IQData, getEncouragement,
@@ -896,15 +898,18 @@
             onAnswer: window.onAnswerForTasks,
           });
         } catch (e) {
-          console.warn('[BrainDeer] customRenderer.attach failed for type:', q.type, e);
+          console.warn('[BrainDeer] attach failed for type:', q.type, e);
         }
+      } else {
+        div.innerHTML = renderDefault(q, idx);
+        feed.appendChild(div);
       }
     } catch (e) {
-      console.warn('[BrainDeer] addSlide render failed, inserting placeholder:', e);
-      // Insert a placeholder so the slide count stays correct and scrolling doesn't stall
+      console.warn('[BrainDeer] render failed for type:', q && q.type, e);
       div.innerHTML = renderFallback(idx);
       feed.appendChild(div);
     }
+
     answerStart = Date.now();
   }
 
