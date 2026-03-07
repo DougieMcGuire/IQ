@@ -200,11 +200,15 @@
     </button>
   `;
 
-  onAuthStateChanged(auth, u => { if (u) navigate(); });
+  // Use postMessage to parent — more reliable than calling goTo() directly across iframe boundary
+  onAuthStateChanged(auth, u => {
+    if (u) navigate();
+  });
 
   function navigate() {
-    if (window.parent && window.parent !== window && typeof window.parent.goTo === 'function') {
-      window.parent.goTo('improve');
+    if (window.parent && window.parent !== window) {
+      // postMessage is more reliable than direct goTo() call across iframe boundary
+      window.parent.postMessage({ type: 'authSuccess' }, '*');
     } else {
       window.location.href = 'improve.html';
     }
@@ -263,7 +267,7 @@
     try {
       const result = await signInWithPopup(auth, gp);
       await ensure(result.user);
-      navigate();
+      // Don't call navigate() here — onAuthStateChanged will fire and handle it
     } catch (e) {
       setLoading('btn-google', false);
       if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
