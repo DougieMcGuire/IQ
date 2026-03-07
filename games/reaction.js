@@ -89,8 +89,9 @@
         var totalMs = Date.now() - ctx.answerStartRef.get();
         var data = ctx.IQData.recordAnswer(q.category, won, q.difficulty, totalMs);
 
-        // Notify daily tasks
+        // Notify game played + session stats
         if (ctx.notifyGamePlayed) ctx.notifyGamePlayed('reaction');
+        if (ctx.onAnswer) ctx.onAnswer(won, totalMs);
 
         if (won) {
           setTimeout(function() {
