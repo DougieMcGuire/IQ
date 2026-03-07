@@ -413,9 +413,6 @@
   <div class="txt">Streak!</div>
 </div>
 
-<!-- DEBUG OVERLAY — remove before release -->
-<div id="dbg" style="position:fixed;top:80px;right:8px;z-index:9999;background:rgba(0,0,0,0.85);color:#0f0;font:11px/1.5 monospace;padding:8px 10px;border-radius:10px;max-width:180px;pointer-events:none;"></div>
-
 <div class="flash" id="flash"></div>
 <div class="confetti" id="confetti"></div>
 
@@ -715,33 +712,9 @@
   let slides = 0, answerStart = 0;
   const questionQueue = [];
   const QUEUE_TARGET  = 25;
-  let _dbgLastErr = '—';
-  let _dbgFillCalls = 0;
-  let _dbgScrollCalls = 0;
-
-  function dbg() {
-    const el = document.getElementById('dbg');
-    if (!el) return;
-    const slideH = feed.clientHeight;
-    const cur = slideH ? Math.floor(feed.scrollTop / slideH) : 0;
-    el.innerHTML =
-      `slides: ${slides}<br>` +
-      `queue: ${questionQueue.length}<br>` +
-      `cur slide: ${cur}<br>` +
-      `target: ${cur + 12}<br>` +
-      `fills: ${_dbgFillCalls}<br>` +
-      `scrollEvts: ${_dbgScrollCalls}<br>` +
-      `feedH: ${slideH}<br>` +
-      `scrollTop: ${Math.round(feed.scrollTop)}<br>` +
-      `staleTicks: ${_staleTicks}<br>` +
-      `lastErr: ${_dbgLastErr}`;
-  }
-  setInterval(dbg, 300);
-
   let _filling = false;
 
   function fillQueue() {
-    _dbgFillCalls++;
     if (_filling) return;
     _filling = true;
     try {
@@ -882,7 +855,6 @@
   }
 
   function onFeedScroll() {
-    _dbgScrollCalls++;
     const slideH = feed.clientHeight;
     if (!slideH) return;
     const currentSlide = Math.floor(feed.scrollTop / slideH);
@@ -936,7 +908,7 @@
     div.className = 'slide';
 
     let q = null;
-    try { q = nextQuestion(); } catch(e) { _dbgLastErr = 'nextQ:' + e.message; console.warn('[BrainDeer] nextQuestion threw:', e); }
+    try { q = nextQuestion(); } catch(e) { console.warn('[BrainDeer] nextQuestion threw:', e); }
 
     if (!q) {
       // Generator failed — show a placeholder so the slide exists in the DOM
@@ -967,7 +939,6 @@
         feed.appendChild(div);
       }
     } catch (e) {
-      _dbgLastErr = 'render:' + (q && q.type) + ':' + e.message;
       console.warn('[BrainDeer] render failed for type:', q && q.type, e);
       div.innerHTML = renderFallback(idx);
       feed.appendChild(div);
