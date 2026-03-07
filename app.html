@@ -66,6 +66,7 @@
 <div class="screen" id="screen-improve"></div>
 <div class="screen" id="screen-profile"></div>
 <div class="screen" id="screen-leaderboard"></div>
+<div class="screen" id="screen-tasks"></div>
 
 <div id="iosInstallBanner" role="alert"></div>
 
@@ -90,7 +91,8 @@
     auth:        '#3a2918',
     improve:     '#4a3625',
     profile:     '#4a3625',
-    leaderboard: '#4a3625'
+    leaderboard: '#4a3625',
+    tasks:       '#3a2918'
   };
 
   function setScreenBg(page) {
@@ -102,16 +104,42 @@
   }
 
   window.addEventListener('message', function(e) {
-    if (!e.data || e.data.type !== 'savePushSub') return;
-    var sub = e.data.sub;
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (!user) return;
-      firebase.firestore().collection('pushSubscriptions').doc(user.uid).set({
-        subscription: sub,
-        uid: user.uid,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).catch(function(err) { console.error('push sub failed', err); });
-    });
+    if (!e.data) return;
+
+    // Push subscription save
+    if (e.data.type === 'savePushSub') {
+      var sub = e.data.sub;
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (!user) return;
+        firebase.firestore().collection('pushSubscriptions').doc(user.uid).set({
+          subscription: sub,
+          uid: user.uid,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(function(err) { console.error('push sub failed', err); });
+      });
+    }
+
+    // Forward tasksUpdated to the tasks iframe so it re-renders live
+    if (e.data.type === 'tasksUpdated') {
+      var tasksContainer = document.getElementById('screen-tasks');
+      if (tasksContainer) {
+        var tasksIframe = tasksContainer.querySelector('iframe');
+        if (tasksIframe && tasksIframe.contentWindow) {
+          tasksIframe.contentWindow.postMessage({ type: 'tasksUpdated' }, '*');
+        }
+      }
+    }
+
+    // XP awarded from tasks.html — update improve iframe's UI if it's loaded
+    if (e.data.type === 'xpAwarded') {
+      var improveContainer = document.getElementById('screen-improve');
+      if (improveContainer) {
+        var improveIframe = improveContainer.querySelector('iframe');
+        if (improveIframe && improveIframe.contentWindow) {
+          improveIframe.contentWindow.postMessage({ type: 'xpAwarded', xp: e.data.xp }, '*');
+        }
+      }
+    }
   });
 
   var currentScreen = null;
@@ -120,7 +148,7 @@
   function goTo(page) {
     document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
 
-    // Always reload profile fresh; also reload leaderboard so data is fresh
+    // Always reload profile and leaderboard fresh; tasks reloads too for fresh data
     if ((page === 'profile' || page === 'leaderboard') && screensLoaded[page]) {
       var old = document.querySelector('#screen-' + page + ' iframe');
       if (old) old.remove();
@@ -129,7 +157,7 @@
 
     if (!screensLoaded[page]) {
       var container = document.getElementById('screen-' + page);
-      if (!container) return; // safety guard
+      if (!container) return; // safety guard — page not registered
       var iframe = document.createElement('iframe');
       iframe.src = page + '.html';
       iframe.allow = 'web-share';
