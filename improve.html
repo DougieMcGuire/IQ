@@ -507,31 +507,116 @@
   const xpLabel     = document.getElementById('xp-label');
   const tasksBadge  = document.getElementById('tasks-badge');
 
-  // ── Tasks badge — reads the same localStorage key as tasks.html ──
-  const TASKS_KEY = 'bd_daily_tasks_v1';
+  // ── Daily Tasks (Firestore-backed) ──
+  // Session stats stay local (fast per-answer writes), task state goes to Firestore.
+  const SESSION_KEY = 'bd_session_today';
+
+  let _tasksUid = null;
+  let _tasksDb  = null;
+
+  function getFirebase() {
+    try {
+      if (_tasksDb && _tasksUid) return true;
+      const fb = window.firebase || (window.parent !== window && window.parent.firebase);
+      if (!fb) return false;
+      _tasksDb  = fb.firestore();
+      const u   = fb.auth().currentUser;
+      if (u) _tasksUid = u.uid;
+      return !!(_tasksDb && _tasksUid);
+    } catch { return false; }
+  }
+
   function getTodayKey() {
     const n = new Date();
     return `${n.getFullYear()}-${n.getMonth() + 1}-${n.getDate()}`;
   }
+
   function updateTasksBadge() {
+    tasksBadge.classList.add('show');
+  }
+
+  const TASK_POOL = [
+    { id: 'streak_5',       type: 'streak',   target: 5,   label: 'Get a streak of 5',          icon: '🔥', xp: 30  },
+    { id: 'streak_10',      type: 'streak',   target: 10,  label: 'Get a streak of 10',         icon: '🔥', xp: 60  },
+    { id: 'streak_15',      type: 'streak',   target: 15,  label: 'Get a streak of 15',         icon: '🔥', xp: 100 },
+    { id: 'correct_10',     type: 'correct',  target: 10,  label: 'Get 10 correct',              icon: '✅', xp: 25  },
+    { id: 'correct_25',     type: 'correct',  target: 25,  label: 'Get 25 correct',              icon: '✅', xp: 50  },
+    { id: 'correct_50',     type: 'correct',  target: 50,  label: 'Get 50 correct',              icon: '✅', xp: 90  },
+    { id: 'answer_20',      type: 'answered', target: 20,  label: 'Answer 20 questions',         icon: '🧠', xp: 20  },
+    { id: 'answer_50',      type: 'answered', target: 50,  label: 'Answer 50 questions',         icon: '🧠', xp: 45  },
+    { id: 'answer_100',     type: 'answered', target: 100, label: 'Answer 100 questions',        icon: '🧠', xp: 80  },
+    { id: 'accuracy_70',    type: 'accuracy', target: 70,  label: 'Hit 70% accuracy today',      icon: '🎯', xp: 35  },
+    { id: 'accuracy_80',    type: 'accuracy', target: 80,  label: 'Hit 80% accuracy today',      icon: '🎯', xp: 55  },
+    { id: 'play_wordle',    type: 'game', game: 'wordle',       target: 3, label: 'Play 3 Wordle rounds',      icon: '🟩', xp: 40 },
+    { id: 'play_math',      type: 'game', game: 'mathRush',     target: 3, label: 'Play 3 Math Rush rounds',   icon: '➕', xp: 40 },
+    { id: 'play_memory',    type: 'game', game: 'memory',       target: 2, label: 'Play 2 Memory games',       icon: '🃏', xp: 35 },
+    { id: 'play_reaction',  type: 'game', game: 'reaction',     target: 3, label: 'Play 3 Reaction tests',     icon: '⚡', xp: 30 },
+    { id: 'play_ttt',       type: 'game', game: 'ticTacToe',    target: 2, label: 'Play 2 Tic Tac Toe games',  icon: '⭕', xp: 30 },
+    { id: 'play_simon',     type: 'game', game: 'simon',        target: 2, label: 'Play 2 Simon Says rounds',  icon: '🔴', xp: 35 },
+    { id: 'play_scramble',  type: 'game', game: 'wordScramble', target: 3, label: 'Unscramble 3 words',        icon: '🔤', xp: 30 },
+    { id: 'fast_5',         type: 'fast',     target: 5,   label: 'Answer 5 in under 3.5s',      icon: '⚡', xp: 45  },
+    { id: 'fast_10',        type: 'fast',     target: 10,  label: 'Answer 10 in under 3.5s',     icon: '⚡', xp: 70  },
+  ];
+
+  function seededRandom(seed) {
+    let s = seed;
+    return () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+  }
+  function getDailyTaskDefs() {
+    const dateKey = getTodayKey();
+    const seed    = dateKey.split('-').reduce((a, n) => a * 31 + parseInt(n), 0);
+    const rng     = seededRandom(seed);
+    return [...TASK_POOL].sort(() => rng() - 0.5).slice(0, 3);
+  }
+
+  let _taskStateCache = null;
+
+  function getTasksRef() {
+    if (!_tasksDb || !_tasksUid) return null;
+    return _tasksDb.collection('users').doc(_tasksUid).collection('dailyTasks').doc(getTodayKey());
+  }
+
+  async function loadTaskState() {
+    if (!getFirebase()) return null;
     try {
-      const raw   = localStorage.getItem(TASKS_KEY);
-      const state = raw ? JSON.parse(raw) : null;
-      // Show badge if tasks exist for today and not all are claimed
-      const hasBadge = !state || state.date !== getTodayKey() || !state.allClaimed;
-      tasksBadge.classList.toggle('show', hasBadge);
-    } catch {
-      tasksBadge.classList.add('show');
+      const ref  = getTasksRef();
+      if (!ref) return null;
+      const snap = await ref.get();
+      if (snap.exists) {
+        _taskStateCache = snap.data();
+        return _taskStateCache;
+      }
+      const fresh = {
+        date:        getTodayKey(),
+        tasks:       getDailyTaskDefs().map(def => ({ ...def, progress: 0, done: false, claimed: false })),
+        allDone:     false,
+        allClaimed:  false,
+        dailyStreak: 0,
+      };
+      await ref.set(fresh);
+      _taskStateCache = fresh;
+      return fresh;
+    } catch (e) {
+      console.warn('[tasks] loadTaskState failed', e);
+      return null;
     }
   }
 
-  // ── DailyTasks logic inline (no import needed — reads/writes same localStorage) ──
-  const SESSION_KEY = 'bd_session_today';
+  function saveTaskState(state) {
+    _taskStateCache = state;
+    const ref = getTasksRef();
+    if (!ref) return;
+    ref.set(state).catch(e => console.warn('[tasks] saveTaskState failed', e));
+  }
+
+  function notifyTasksPage() {
+    try { if (window.parent !== window) window.parent.postMessage({ type: 'tasksUpdated' }, '*'); } catch {}
+  }
 
   function getSessionStats() {
     try {
-      const raw = localStorage.getItem(SESSION_KEY);
-      const s   = raw ? JSON.parse(raw) : null;
+      const raw   = localStorage.getItem(SESSION_KEY);
+      const s     = raw ? JSON.parse(raw) : null;
       const today = getTodayKey();
       if (!s || s.date !== today) {
         const fresh = { date: today, answered: 0, correct: 0, fast: 0 };
@@ -551,13 +636,11 @@
     return s;
   }
 
-  function updateTaskProgress(streak, correct, ms, session) {
+  async function updateTaskProgress(streak, correct, ms, session) {
+    if (!getFirebase()) return;
     try {
-      const raw   = localStorage.getItem(TASKS_KEY);
-      if (!raw) return;
-      const state = JSON.parse(raw);
-      if (state.date !== getTodayKey()) return;
-
+      let state = _taskStateCache || await loadTaskState();
+      if (!state || state.date !== getTodayKey()) return;
       state.tasks.forEach(task => {
         if (task.done) return;
         switch (task.type) {
@@ -571,43 +654,57 @@
         }
         if (task.progress >= task.target) task.done = true;
       });
-
       if (!state.allDone && state.tasks.every(t => t.done)) state.allDone = true;
-      localStorage.setItem(TASKS_KEY, JSON.stringify(state));
-
-      // Ping the tasks iframe if it's loaded in the shell
-      try {
-        if (window.parent !== window) {
-          window.parent.postMessage({ type: 'tasksUpdated' }, '*');
-        }
-      } catch {}
-    } catch (e) {
-      console.warn('[improve] updateTaskProgress failed', e);
-    }
+      saveTaskState(state);
+      notifyTasksPage();
+    } catch (e) { console.warn('[improve] updateTaskProgress failed', e); }
   }
 
-  // Call this from game renderers when a mini-game round ends
-  window.notifyGamePlayed = function(gameType) {
+  window.notifyGamePlayed = async function(gameType) {
+    if (!getFirebase()) return;
     try {
-      const raw   = localStorage.getItem(TASKS_KEY);
-      if (!raw) return;
-      const state = JSON.parse(raw);
-      if (state.date !== getTodayKey()) return;
+      let state = _taskStateCache || await loadTaskState();
+      if (!state || state.date !== getTodayKey()) return;
       state.tasks.forEach(task => {
         if (task.type !== 'game' || task.game !== gameType || task.done) return;
         task.progress = Math.min(task.progress + 1, task.target);
         if (task.progress >= task.target) task.done = true;
       });
       if (!state.allDone && state.tasks.every(t => t.done)) state.allDone = true;
-      localStorage.setItem(TASKS_KEY, JSON.stringify(state));
+      saveTaskState(state);
       updateTasksBadge();
-      try { if (window.parent !== window) window.parent.postMessage({ type: 'tasksUpdated' }, '*'); } catch {}
-    } catch (e) {
-      console.warn('[improve] notifyGamePlayed failed', e);
-    }
+      notifyTasksPage();
+    } catch (e) { console.warn('[improve] notifyGamePlayed failed', e); }
   };
 
-  let slides = 0, answerStart = 0;
+  (function initTaskTracking() {
+    const fb = window.firebase || (window.parent !== window && window.parent.firebase);
+    if (!fb) return;
+    fb.auth().onAuthStateChanged(async u => {
+      if (!u) return;
+      _tasksUid = u.uid;
+      _tasksDb  = fb.firestore();
+      await loadTaskState();
+      updateTasksBadge();
+    });
+  })();
+
+  // Handle XP awarded from tasks.html (claim button) — use IQData so it syncs properly
+  window.addEventListener('message', function(e) {
+    if (!e.data || e.data.type !== 'xpAwarded') return;
+    const xp = e.data.xp;
+    if (!xp) return;
+    try {
+      const d = IQData.load();
+      d.xp += xp;
+      d.level = Math.floor(d.xp / 150) + 1;
+      IQData.save(d);
+      IQData._maybeSync && IQData._maybeSync();
+      updateUI({ xp: d.xp, level: d.level, xpGain: xp, leveledUp: false, streak: d.streak, iq: d.iq });
+    } catch (e) { console.warn('[improve] xpAwarded handler failed', e); }
+  });
+
+
   const questionQueue = [];
   const QUEUE_TARGET  = 25;
 
