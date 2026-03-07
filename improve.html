@@ -728,7 +728,7 @@
       `slides: ${slides}<br>` +
       `queue: ${questionQueue.length}<br>` +
       `cur slide: ${cur}<br>` +
-      `target: ${cur + 10}<br>` +
+      `target: ${cur + 11}<br>` +
       `fills: ${_dbgFillCalls}<br>` +
       `scrollEvts: ${_dbgScrollCalls}<br>` +
       `feedH: ${slideH}<br>` +
@@ -885,9 +885,9 @@
     const slideH = feed.clientHeight;
     if (!slideH) return;
     const currentSlide = Math.floor(feed.scrollTop / slideH);
-    const target = currentSlide + 10;
+    // <= not < so we always stay AHEAD, never exactly equal and stuck
     let added = 0;
-    while (slides < target && added < 5) {
+    while (slides <= currentSlide + 10 && added < 5) {
       addSlide();
       added++;
     }
