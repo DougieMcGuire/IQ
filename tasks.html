@@ -14,7 +14,8 @@
       --green: #58cc02; --green-dark: #46a302;
       --red: #ea2b2b; --red-dark: #c42020;
       --gold: #ffc800; --gold-dark: #d9aa00;
-      --orange: #ff9600;
+      --orange: #ff9600; --orange-dark: #d97e00;
+      --blue: #1cb0f6;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body {
@@ -23,176 +24,210 @@
       background: var(--bg); color: var(--cream);
     }
 
-    /* ── Layout ── */
-    .page {
-      display: flex; flex-direction: column;
-      height: 100%; overflow: hidden;
-    }
+    .page { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
 
     /* ── Top bar ── */
     .top-bar {
       padding: calc(env(safe-area-inset-top, 0px) + 14px) 18px 12px;
       background: var(--bg); flex-shrink: 0;
     }
-    .top-row {
-      display: flex; align-items: center; justify-content: space-between;
-    }
+    .top-row { display: flex; align-items: center; justify-content: space-between; }
     .page-title { font-size: 22px; font-weight: 900; color: var(--cream); }
-    .resets-chip {
-      background: var(--card); border-radius: 12px; padding: 5px 12px;
-      font-size: 11px; font-weight: 800; color: var(--tan);
-      box-shadow: 0 2px 0 rgba(0,0,0,0.15);
+
+    /* Countdown chip */
+    .countdown-chip {
+      background: var(--card); border-radius: 12px; padding: 6px 12px;
+      font-size: 12px; font-weight: 800; color: var(--tan);
+      box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+      display: flex; align-items: center; gap: 5px;
     }
+    .countdown-chip .chip-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+      animation: chipPulse 2s ease infinite;
+    }
+    @keyframes chipPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
     /* ── Scrollable body ── */
     .scroll-body {
       flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-      padding: 12px 18px calc(env(safe-area-inset-bottom, 0px) + 84px);
+      padding: 10px 16px calc(env(safe-area-inset-bottom, 0px) + 84px);
     }
     .scroll-body::-webkit-scrollbar { display: none; }
 
-    /* ── Daily streak card ── */
+    /* ── Streak card ── */
     .streak-card {
-      background: var(--card); border-radius: 18px;
-      padding: 14px 16px; margin-bottom: 14px;
-      display: flex; align-items: center; gap: 14px;
-      box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+      background: var(--card); border-radius: 20px;
+      padding: 16px; margin-bottom: 10px;
+      box-shadow: 0 5px 0 rgba(0,0,0,0.2);
       position: relative; overflow: hidden;
     }
     .streak-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,150,0,0.08) 0%, transparent 60%);
       pointer-events: none;
     }
-    .streak-flame { font-size: 36px; }
+    .streak-inner { display: flex; align-items: center; gap: 14px; }
+    .streak-flame-wrap {
+      width: 56px; height: 56px; flex-shrink: 0;
+      background: rgba(255,150,0,0.15); border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 30px;
+    }
     .streak-info { flex: 1; }
-    .streak-label { font-size: 11px; font-weight: 800; color: var(--tan); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 3px; }
-    .streak-val { font-size: 28px; font-weight: 900; color: var(--orange); line-height: 1; }
-    .streak-sub { font-size: 12px; font-weight: 600; color: var(--tan); margin-top: 2px; }
+    .streak-label { font-size: 10px; font-weight: 800; color: var(--tan); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
+    .streak-val { font-size: 30px; font-weight: 900; color: var(--orange); line-height: 1; }
+    .streak-sub { font-size: 11px; font-weight: 700; color: var(--tan); margin-top: 3px; line-height: 1.3; }
 
-    /* ── Overall progress ── */
-    .overall-card {
-      background: var(--card); border-radius: 18px;
-      padding: 14px 16px; margin-bottom: 14px;
-      box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+    /* Streak pip row */
+    .streak-pips { display: flex; gap: 5px; margin-top: 12px; }
+    .streak-pip {
+      flex: 1; height: 6px; border-radius: 3px;
+      background: var(--brown-mid);
+      transition: background 0.4s;
+    }
+    .streak-pip.active { background: var(--orange); }
+    .streak-pip.done   { background: var(--green); }
+
+    /* ── Progress card ── */
+    .progress-card {
+      background: var(--card); border-radius: 20px;
+      padding: 16px; margin-bottom: 10px;
+      box-shadow: 0 5px 0 rgba(0,0,0,0.2);
       position: relative; overflow: hidden;
     }
-    .overall-card::before {
+    .progress-card::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
       background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
       pointer-events: none;
     }
-    .overall-row {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 10px;
+    .progress-top {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
     }
-    .overall-label { font-size: 13px; font-weight: 800; color: var(--cream); }
-    .overall-count { font-size: 13px; font-weight: 900; color: var(--gold); }
-    .overall-bar-outer { height: 12px; background: var(--brown-mid); border-radius: 6px; overflow: hidden; }
-    .overall-bar-inner {
-      height: 100%; border-radius: 6px; background: var(--gold);
-      transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    .progress-label { font-size: 13px; font-weight: 800; color: var(--cream); }
+    .progress-count { font-size: 13px; font-weight: 900; color: var(--gold); }
+    .progress-bar-outer { height: 14px; background: var(--brown-mid); border-radius: 7px; overflow: hidden; }
+    .progress-bar-inner {
+      height: 100%; border-radius: 7px;
+      background: linear-gradient(90deg, var(--green) 0%, #7eea00 100%);
+      transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
       position: relative;
     }
-    .overall-bar-inner::after {
+    .progress-bar-inner::after {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
-      background: rgba(255,255,255,0.28); border-radius: 6px 6px 0 0;
+      background: rgba(255,255,255,0.3); border-radius: 7px 7px 0 0;
+    }
+    .progress-bar-inner.all-done {
+      background: linear-gradient(90deg, var(--gold) 0%, #ffdd55 100%);
     }
 
-    /* ── Complete banner ── */
+    /* ── All done banner ── */
     .complete-banner {
-      display: none; align-items: center; gap: 14px;
-      background: linear-gradient(135deg, #58cc02 0%, #46d400 100%);
-      border-radius: 18px; padding: 16px 18px; margin-bottom: 14px;
-      box-shadow: 0 5px 0 var(--green-dark);
+      display: none;
+      background: linear-gradient(135deg, #46a302 0%, #58cc02 100%);
+      border-radius: 20px; padding: 18px 16px; margin-bottom: 10px;
+      box-shadow: 0 5px 0 #2d7000;
+      align-items: center; gap: 14px;
     }
     .complete-banner.show { display: flex; animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1); }
-    .cb-icon { font-size: 36px; }
-    .cb-text .cb-title { font-size: 16px; font-weight: 900; color: #fff; }
-    .cb-text .cb-sub   { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.85); margin-top: 2px; }
+    .cb-emoji { font-size: 40px; }
+    .cb-text .cb-title { font-size: 17px; font-weight: 900; color: #fff; }
+    .cb-text .cb-sub   { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.85); margin-top: 3px; line-height: 1.3; }
 
-    /* ── Task section label ── */
+    /* ── Section label ── */
     .section-label {
-      font-size: 11px; font-weight: 800; color: var(--tan);
-      letter-spacing: 1.2px; text-transform: uppercase;
-      margin-bottom: 8px; padding-left: 2px;
+      font-size: 10px; font-weight: 800; color: var(--tan);
+      letter-spacing: 1.5px; text-transform: uppercase;
+      margin: 4px 0 8px 2px;
     }
 
     /* ── Task cards ── */
     .task-card {
-      background: var(--card); border-radius: 18px;
-      padding: 14px 14px 14px 14px;
-      margin-bottom: 10px;
+      background: var(--card); border-radius: 20px;
+      padding: 14px; margin-bottom: 10px;
       display: flex; align-items: center; gap: 12px;
-      box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+      box-shadow: 0 5px 0 rgba(0,0,0,0.2);
       position: relative; overflow: hidden;
-      transition: opacity 0.4s;
+      transition: opacity 0.5s, transform 0.3s;
     }
     .task-card::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
       background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
-      pointer-events: none; border-radius: 18px 18px 0 0;
+      pointer-events: none; border-radius: 20px 20px 0 0;
     }
-    .task-card.is-claimed { opacity: 0.45; }
+    .task-card.is-claimed { opacity: 0.4; }
 
-    .task-icon {
-      width: 48px; height: 48px; flex-shrink: 0;
+    /* Done glow strip on left edge */
+    .task-card.task-ready::after {
+      content: ''; position: absolute; left: 0; top: 12px; bottom: 12px;
+      width: 4px; border-radius: 0 3px 3px 0;
+      background: var(--gold);
+      box-shadow: 0 0 8px var(--gold);
+    }
+
+    .task-icon-wrap {
+      width: 52px; height: 52px; flex-shrink: 0;
       background: var(--bg); border-radius: 14px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 26px; box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+      font-size: 28px; box-shadow: 0 3px 0 rgba(0,0,0,0.2);
     }
+    .task-icon-wrap.icon-done { background: rgba(88,204,2,0.12); }
 
     .task-body { flex: 1; min-width: 0; }
     .task-label { font-size: 14px; font-weight: 800; color: var(--cream); margin-bottom: 8px; line-height: 1.25; }
 
     .task-progress-row { display: flex; align-items: center; gap: 8px; }
     .task-bar-outer {
-      flex: 1; height: 8px; background: var(--brown-mid);
-      border-radius: 4px; overflow: hidden;
+      flex: 1; height: 9px; background: var(--brown-mid); border-radius: 5px; overflow: hidden;
     }
     .task-bar-inner {
-      height: 100%; border-radius: 4px; background: var(--green);
+      height: 100%; border-radius: 5px;
+      background: linear-gradient(90deg, var(--blue) 0%, #55d0ff 100%);
       transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1);
       position: relative;
     }
     .task-bar-inner::after {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
-      background: rgba(255,255,255,0.25); border-radius: 4px 4px 0 0;
+      background: rgba(255,255,255,0.28); border-radius: 5px 5px 0 0;
     }
-    .task-bar-inner.bar-done { background: var(--gold); }
-    .task-pct { font-size: 11px; font-weight: 800; color: var(--tan); white-space: nowrap; }
+    .task-bar-inner.bar-done {
+      background: linear-gradient(90deg, var(--gold) 0%, #ffdd55 100%);
+    }
+    .task-pct { font-size: 11px; font-weight: 800; color: var(--tan); white-space: nowrap; min-width: 36px; text-align: right; }
 
-    /* Claim btn */
+    /* Claim button */
     .task-claim {
       flex-shrink: 0;
       background: var(--gold); color: #2a1800;
-      border: none; border-radius: 12px; padding: 10px 14px;
+      border: none; border-radius: 14px; padding: 10px 14px;
       font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 900;
       cursor: pointer; box-shadow: 0 4px 0 var(--gold-dark);
-      transition: transform 0.1s, box-shadow 0.1s;
+      transition: transform 0.1s, box-shadow 0.1s, opacity 0.2s;
       white-space: nowrap; line-height: 1;
+      position: relative; overflow: hidden;
     }
-    .task-claim:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--gold-dark); }
+    .task-claim::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
+      background: rgba(255,255,255,0.2); border-radius: 14px 14px 0 0; pointer-events: none;
+    }
+    .task-claim:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--gold-dark); }
+    .task-claim:disabled { opacity: 0.5; cursor: default; }
 
-    .task-done-badge { flex-shrink: 0; font-size: 26px; animation: popIn 0.3s ease; }
+    .task-done-badge { flex-shrink: 0; font-size: 28px; animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
 
     /* ── XP toast ── */
     .xp-toast {
       position: fixed;
       top: calc(env(safe-area-inset-top, 0px) + 16px);
-      left: 50%; transform: translateX(-50%) translateY(-16px);
+      left: 50%; transform: translateX(-50%) translateY(-20px);
       background: var(--gold); color: #2a1800;
-      border-radius: 20px; padding: 8px 20px;
-      font-size: 17px; font-weight: 900;
+      border-radius: 20px; padding: 9px 22px;
+      font-size: 18px; font-weight: 900;
       box-shadow: 0 4px 0 var(--gold-dark);
       z-index: 999; opacity: 0; pointer-events: none;
-      transition: opacity 0.2s, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      transition: opacity 0.25s, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
       white-space: nowrap;
     }
-    .xp-toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
+    .xp-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     /* ── Confetti ── */
     .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 800; overflow: hidden; }
@@ -217,7 +252,7 @@
     .nav-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
     .nav-btn.active { color: var(--cream); background: #6b4f32; box-shadow: 0 3px 0 rgba(0,0,0,0.15); }
 
-    /* ── Empty / loading ── */
+    /* ── Loading ── */
     .loading {
       display: flex; flex-direction: column; align-items: center;
       justify-content: center; gap: 12px;
@@ -232,27 +267,25 @@
 
     /* ── Animations ── */
     @keyframes popIn {
-      0%   { transform: scale(0.85); opacity: 0; }
-      60%  { transform: scale(1.05); }
+      0%   { transform: scale(0.8); opacity: 0; }
+      60%  { transform: scale(1.06); }
       100% { transform: scale(1); opacity: 1; }
     }
     @keyframes confettiFall {
       0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
       100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes slideUp {
-      from { opacity: 0; transform: translateY(12px); }
+      from { opacity: 0; transform: translateY(14px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
     .animate-in { animation: slideUp 0.35s ease both; }
-    .delay-1 { animation-delay: 0.05s; }
-    .delay-2 { animation-delay: 0.1s; }
-    .delay-3 { animation-delay: 0.15s; }
-    .delay-4 { animation-delay: 0.2s; }
+    .d1 { animation-delay: 0.04s; }
+    .d2 { animation-delay: 0.08s; }
+    .d3 { animation-delay: 0.12s; }
+    .d4 { animation-delay: 0.16s; }
+    .d5 { animation-delay: 0.20s; }
   </style>
 </head>
 <body>
@@ -261,7 +294,10 @@
   <div class="top-bar">
     <div class="top-row">
       <div class="page-title">📋 Daily Tasks</div>
-      <div class="resets-chip" id="resets-chip">Resets in --</div>
+      <div class="countdown-chip" id="countdown-chip">
+        <div class="chip-dot"></div>
+        <span id="countdown-text">--:--:--</span>
+      </div>
     </div>
   </div>
 
@@ -300,7 +336,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
 // ════════════════════════════════════════════════════
-// BrainDeer Daily Tasks — Firestore-backed
+// BrainDeer Daily Tasks
 // ════════════════════════════════════════════════════
 
 var firebaseConfig = {
@@ -312,15 +348,11 @@ var firebaseConfig = {
   appId:             "1:331205139765:web:20cfef8194af63fc55c07c"
 };
 
-// Only init if not already done (parent may have already inited)
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
-var db  = firebase.firestore();
+var db   = firebase.firestore();
 var auth = firebase.auth();
 
-// ── Nav ──
 function navGo(page) {
   if (window.parent !== window) window.parent.goTo(page);
   else window.location.href = page + '.html';
@@ -330,15 +362,6 @@ function navGo(page) {
 function getTodayKey() {
   var n = new Date();
   return n.getFullYear() + '-' + (n.getMonth() + 1) + '-' + n.getDate();
-}
-
-function wasYesterday(dateStr) {
-  if (!dateStr) return false;
-  var parts = dateStr.split('-').map(Number);
-  var prev  = new Date(parts[0], parts[1] - 1, parts[2]);
-  var yest  = new Date();
-  yest.setDate(yest.getDate() - 1);
-  return prev.toDateString() === yest.toDateString();
 }
 
 function seededRandom(seed) {
@@ -383,22 +406,25 @@ function getTasksRef(uid) {
   return db.collection('users').doc(uid).collection('dailyTasks').doc(getTodayKey());
 }
 
+function getYesterdayKey() {
+  var y = new Date();
+  y.setDate(y.getDate() - 1);
+  return y.getFullYear() + '-' + (y.getMonth() + 1) + '-' + y.getDate();
+}
+
 // ── Load or create today's task state ──
 async function loadTaskState(uid) {
   var ref  = getTasksRef(uid);
   var snap = await ref.get();
   if (snap.exists) return snap.data();
 
-  // Check yesterday's state for streak
-  var yestKey  = (function() {
-    var y = new Date(); y.setDate(y.getDate() - 1);
-    return y.getFullYear() + '-' + (y.getMonth() + 1) + '-' + y.getDate();
-  })();
-  var yestSnap = await db.collection('users').doc(uid).collection('dailyTasks').doc(yestKey).get();
+  // Check yesterday for streak continuity
+  var yestSnap   = await db.collection('users').doc(uid).collection('dailyTasks').doc(getYesterdayKey()).get();
   var prevStreak = 0;
   if (yestSnap.exists) {
     var yd = yestSnap.data();
-    prevStreak = (yd.allDone ? (yd.dailyStreak || 0) + 1 : (yd.dailyStreak || 0));
+    // Only carry streak if yesterday was fully completed
+    prevStreak = yd.allDone ? (yd.dailyStreak || 0) : 0;
   }
 
   var fresh = {
@@ -406,29 +432,82 @@ async function loadTaskState(uid) {
     tasks:       getDailyTaskDefs().map(function(def) {
       return Object.assign({}, def, { progress: 0, done: false, claimed: false });
     }),
-    allDone:     false,
-    allClaimed:  false,
+    allDone:    false,
+    allClaimed: false,
     dailyStreak: prevStreak,
   };
   await ref.set(fresh);
   return fresh;
 }
 
-async function claimTaskInFirestore(uid, taskId) {
-  var ref  = getTasksRef(uid);
-  var snap = await ref.get();
-  if (!snap.exists) return null;
-  var state = snap.data();
-  var task  = state.tasks.find(function(t) { return t.id === taskId && t.done && !t.claimed; });
-  if (!task) return null;
-  task.claimed = true;
-  if (state.tasks.every(function(t) { return t.claimed; })) state.allClaimed = true;
-  await ref.set(state);
-  return task.xp;
+// ── Claim a task — bulletproof single-claim via Firestore transaction ──
+// Uses a Firestore transaction so even rapid double-taps are safe
+var _claimInFlight = {}; // local lock per taskId
+
+async function claimTask(uid, taskId) {
+  // Local lock — prevent double-tap before server responds
+  if (_claimInFlight[taskId]) return null;
+  _claimInFlight[taskId] = true;
+
+  try {
+    var ref = getTasksRef(uid);
+    var earnedXP = null;
+
+    await db.runTransaction(async function(tx) {
+      var snap  = await tx.get(ref);
+      if (!snap.exists) throw new Error('no state');
+
+      var state = snap.data();
+      var task  = state.tasks.find(function(t) { return t.id === taskId; });
+
+      // Guard: must be done but NOT yet claimed
+      if (!task || !task.done || task.claimed) {
+        earnedXP = null;
+        return; // abort — don't write anything
+      }
+
+      task.claimed = true;
+      earnedXP     = task.xp;
+
+      // Check if all tasks are now claimed
+      if (state.tasks.every(function(t) { return t.claimed; })) {
+        state.allClaimed = true;
+      }
+
+      tx.set(ref, state);
+    });
+
+    return earnedXP;
+  } catch (e) {
+    console.warn('[tasks] claimTask failed', e);
+    return null;
+  } finally {
+    delete _claimInFlight[taskId];
+  }
+}
+
+// ── FIX: Streak — increment as soon as allDone flips true today ──
+// Called right after we detect allDone just became true (not already set before)
+async function incrementStreakToday(uid) {
+  var ref = getTasksRef(uid);
+  try {
+    await db.runTransaction(async function(tx) {
+      var snap = await tx.get(ref);
+      if (!snap.exists) return;
+      var state = snap.data();
+      // Only increment if allDone is true and we haven't already bumped it
+      // We track this with streakBumped flag to prevent double increments
+      if (!state.allDone || state.streakBumped) return;
+      state.streakBumped = true;
+      state.dailyStreak  = (state.dailyStreak || 0) + 1;
+      tx.set(ref, state);
+    });
+  } catch (e) {
+    console.warn('[tasks] incrementStreakToday failed', e);
+  }
 }
 
 function awardXP(xp) {
-  // Post to parent -> app.html relays to improve.html -> IQData handles it
   try {
     if (window.parent !== window) {
       window.parent.postMessage({ type: 'xpAwarded', xp: xp }, '*');
@@ -436,16 +515,18 @@ function awardXP(xp) {
   } catch (e) { console.warn('[tasks] awardXP failed', e); }
 }
 
-// ── Reset timer ──
-function updateResetTimer() {
+// ── Countdown timer ──
+function updateCountdown() {
   var now      = new Date();
   var midnight = new Date(now);
   midnight.setHours(24, 0, 0, 0);
   var diff = midnight - now;
-  var h = Math.floor(diff / 3600000);
-  var m = Math.floor((diff % 3600000) / 60000);
-  var chip = document.getElementById('resets-chip');
-  if (chip) chip.textContent = 'Resets in ' + h + 'h ' + m + 'm';
+  var h  = Math.floor(diff / 3600000);
+  var m  = Math.floor((diff % 3600000) / 60000);
+  var s  = Math.floor((diff % 60000) / 1000);
+  var pad = function(n) { return String(n).padStart(2, '0'); };
+  var el = document.getElementById('countdown-text');
+  if (el) el.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
 }
 
 // ── Confetti ──
@@ -457,10 +538,10 @@ function spawnConfetti(n) {
     p.style.left           = Math.random() * 100 + '%';
     p.style.top            = '-12px';
     p.style.background     = colors[Math.floor(Math.random() * colors.length)];
-    p.style.animationDelay = Math.random() * 0.25 + 's';
+    p.style.animationDelay = Math.random() * 0.3 + 's';
     el.appendChild(p);
-    setTimeout(function(el){ el.classList.add('fall'); }.bind(null, p), 10);
-    setTimeout(function(el){ el.remove(); }.bind(null, p), 1500);
+    setTimeout(function(el) { el.classList.add('fall'); }.bind(null, p), 10);
+    setTimeout(function(el) { el.remove(); }.bind(null, p), 1600);
   }
 }
 
@@ -469,7 +550,7 @@ function showXpToast(msg) {
   var t = document.getElementById('xp-toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, 2200);
+  setTimeout(function() { t.classList.remove('show'); }, 2400);
 }
 
 // ════════════════════════════════════════════════════
@@ -478,97 +559,137 @@ function showXpToast(msg) {
 var _currentUid = null;
 
 function render(state) {
-  var body = document.getElementById('scroll-body');
+  var body  = document.getElementById('scroll-body');
   var done  = state.tasks.filter(function(t) { return t.done; }).length;
   var total = state.tasks.length;
+  var allDone = state.allDone;
 
   body.innerHTML = '';
 
-  // ── Daily streak card ──
-  var streakCard = document.createElement('div');
-  streakCard.className = 'streak-card animate-in';
+  // ── Streak card ──
   var streakDays = state.dailyStreak || 0;
   var streakSub  = streakDays === 0
-    ? 'Complete all tasks today to start your streak!'
-    : streakDays === 1 ? 'Great start — keep it up tomorrow!'
-    : streakDays + ' days in a row \u2014 don\'t break it!';
+    ? 'Complete all tasks to start your streak!'
+    : streakDays === 1
+      ? 'First day done — keep it going!'
+      : streakDays + ' days in a row — don\'t break it!';
+
+  // Show 7 pips max, filled based on streak mod 7
+  var pipCount   = 7;
+  var pipsFilled = Math.min(streakDays % pipCount || (streakDays > 0 && streakDays % pipCount === 0 ? pipCount : 0), pipCount);
+  var pipsHtml   = '';
+  for (var p = 0; p < pipCount; p++) {
+    pipsHtml += '<div class="streak-pip' + (p < pipsFilled ? ' done' : (p === pipsFilled ? ' active' : '')) + '"></div>';
+  }
+
+  var streakCard = document.createElement('div');
+  streakCard.className = 'streak-card animate-in';
   streakCard.innerHTML =
-    '<div class="streak-flame">📅</div>' +
-    '<div class="streak-info">' +
-      '<div class="streak-label">Daily Challenge Streak</div>' +
-      '<div class="streak-val">' + streakDays + ' ' + (streakDays === 1 ? 'day' : 'days') + '</div>' +
-      '<div class="streak-sub">' + streakSub + '</div>' +
-    '</div>';
+    '<div class="streak-inner">' +
+      '<div class="streak-flame-wrap">' + (streakDays > 0 ? '🔥' : '📅') + '</div>' +
+      '<div class="streak-info">' +
+        '<div class="streak-label">Daily Streak</div>' +
+        '<div class="streak-val">' + streakDays + ' ' + (streakDays === 1 ? 'day' : 'days') + '</div>' +
+        '<div class="streak-sub">' + streakSub + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="streak-pips">' + pipsHtml + '</div>';
   body.appendChild(streakCard);
 
-  // ── Overall progress ──
-  var overallCard = document.createElement('div');
-  overallCard.className = 'overall-card animate-in delay-1';
-  overallCard.innerHTML =
-    '<div class="overall-row">' +
-      '<span class="overall-label">Today\'s Progress</span>' +
-      '<span class="overall-count">' + done + ' / ' + total + ' complete</span>' +
+  // ── Progress card ──
+  var progressCard = document.createElement('div');
+  progressCard.className = 'progress-card animate-in d1';
+  progressCard.innerHTML =
+    '<div class="progress-top">' +
+      '<span class="progress-label">Today\'s Progress</span>' +
+      '<span class="progress-count">' + done + ' / ' + total + '</span>' +
     '</div>' +
-    '<div class="overall-bar-outer">' +
-      '<div class="overall-bar-inner" style="width:' + ((done / total) * 100) + '%"></div>' +
+    '<div class="progress-bar-outer">' +
+      '<div class="progress-bar-inner' + (allDone ? ' all-done' : '') + '" style="width:' + Math.round((done / total) * 100) + '%"></div>' +
     '</div>';
-  body.appendChild(overallCard);
+  body.appendChild(progressCard);
 
   // ── All done banner ──
-  if (state.allDone) {
+  if (allDone) {
     var banner = document.createElement('div');
-    banner.className = 'complete-banner show animate-in delay-2';
+    banner.className = 'complete-banner show animate-in d2';
     banner.innerHTML =
-      '<div class="cb-icon">🎉</div>' +
+      '<div class="cb-emoji">🎉</div>' +
       '<div class="cb-text">' +
         '<div class="cb-title">All tasks complete!</div>' +
-        '<div class="cb-sub">Come back tomorrow for a new set.</div>' +
+        '<div class="cb-sub">Streak updated. New tasks in <strong id="banner-countdown">--:--:--</strong></div>' +
       '</div>';
     body.appendChild(banner);
   }
 
   // ── Section label ──
-  var sectionLabel = document.createElement('div');
-  sectionLabel.className = 'section-label animate-in delay-2';
-  sectionLabel.textContent = "Today's Tasks";
-  body.appendChild(sectionLabel);
+  var lbl = document.createElement('div');
+  lbl.className = 'section-label animate-in d2';
+  lbl.textContent = "Today's Tasks";
+  body.appendChild(lbl);
 
   // ── Task cards ──
   state.tasks.forEach(function(task, i) {
     var pct  = Math.min(100, Math.round((task.progress / task.target) * 100));
     var card = document.createElement('div');
-    card.className = 'task-card animate-in' + (task.claimed ? ' is-claimed' : '') + ' delay-' + Math.min(i + 3, 4);
+    var delayClass = 'd' + Math.min(i + 3, 5);
+
+    var isReady = task.done && !task.claimed;
+    card.className = 'task-card animate-in ' + delayClass +
+      (task.claimed ? ' is-claimed' : '') +
+      (isReady     ? ' task-ready'  : '');
 
     var rightEl = '';
     if (task.claimed) {
       rightEl = '<div class="task-done-badge">✅</div>';
     } else if (task.done) {
-      rightEl = '<button class="task-claim" data-id="' + task.id + '">+' + task.xp + ' XP</button>';
+      rightEl = '<button class="task-claim" data-id="' + task.id + '" data-xp="' + task.xp + '">+' + task.xp + ' XP</button>';
     }
 
     card.innerHTML =
-      '<div class="task-icon">' + task.icon + '</div>' +
+      '<div class="task-icon-wrap' + (task.done ? ' icon-done' : '') + '">' + task.icon + '</div>' +
       '<div class="task-body">' +
         '<div class="task-label">' + task.label + '</div>' +
         '<div class="task-progress-row">' +
           '<div class="task-bar-outer">' +
             '<div class="task-bar-inner' + (task.done ? ' bar-done' : '') + '" style="width:' + pct + '%"></div>' +
           '</div>' +
-          '<div class="task-pct">' + task.progress + ' / ' + task.target + '</div>' +
+          '<div class="task-pct">' + task.progress + '/' + task.target + '</div>' +
         '</div>' +
       '</div>' +
       rightEl;
 
+    // Attach claim handler
     var claimBtn = card.querySelector('.task-claim');
     if (claimBtn) {
       (function(btn, uid) {
         btn.addEventListener('click', async function() {
-          var xp = await claimTaskInFirestore(uid, btn.dataset.id);
-          if (xp === null) return;
+          // Immediately disable to prevent any double-tap
+          btn.disabled = true;
+          btn.textContent = '…';
+
+          var xp = await claimTask(uid, btn.dataset.id);
+
+          if (xp === null) {
+            // Already claimed (race condition) — just re-render
+            var fresh = await loadTaskState(uid);
+            render(fresh);
+            return;
+          }
+
           awardXP(xp);
-          spawnConfetti(22);
-          showXpToast('+' + xp + ' XP');
+          spawnConfetti(18);
+          showXpToast('+' + xp + ' XP 🎉');
+
+          // Re-load state and check if allDone just became true
           var fresh = await loadTaskState(uid);
+
+          // FIX: If all tasks are claimed and streak hasn't been bumped yet — bump it now
+          if (fresh.allDone && !fresh.streakBumped) {
+            await incrementStreakToday(uid);
+            fresh = await loadTaskState(uid); // reload with updated streak
+          }
+
           render(fresh);
         });
       })(claimBtn, _currentUid);
@@ -581,12 +702,11 @@ function render(state) {
 // ════════════════════════════════════════════════════
 // BOOT
 // ════════════════════════════════════════════════════
-updateResetTimer();
-setInterval(updateResetTimer, 60000);
+updateCountdown();
+setInterval(updateCountdown, 1000);
 
 auth.onAuthStateChanged(async function(user) {
   if (!user) {
-    // Not logged in — show nothing, let app.html handle redirect
     document.getElementById('loading-state').textContent = 'Please log in.';
     return;
   }
@@ -600,7 +720,7 @@ auth.onAuthStateChanged(async function(user) {
   }
 });
 
-// Listen for updates from improve.html (via app.html relay)
+// Listen for progress updates from improve.html
 window.addEventListener('message', async function(e) {
   if (e.data && e.data.type === 'tasksUpdated' && _currentUid) {
     var fresh = await loadTaskState(_currentUid);
