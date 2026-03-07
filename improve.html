@@ -728,7 +728,7 @@
       `slides: ${slides}<br>` +
       `queue: ${questionQueue.length}<br>` +
       `cur slide: ${cur}<br>` +
-      `target: ${cur + 11}<br>` +
+      `target: ${cur + 15}<br>` +
       `fills: ${_dbgFillCalls}<br>` +
       `scrollEvts: ${_dbgScrollCalls}<br>` +
       `feedH: ${slideH}<br>` +
@@ -885,11 +885,9 @@
     const slideH = feed.clientHeight;
     if (!slideH) return;
     const currentSlide = Math.floor(feed.scrollTop / slideH);
-    // <= not < so we always stay AHEAD, never exactly equal and stuck
-    let added = 0;
-    while (slides <= currentSlide + 10 && added < 5) {
+    // Always fill until we have 15 slides beyond current — no cap
+    while (slides < currentSlide + 15) {
       addSlide();
-      added++;
     }
   }
 
