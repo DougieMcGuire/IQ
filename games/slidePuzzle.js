@@ -99,8 +99,9 @@
         var optimal = moves <= 25;
         var data = ctx.IQData.recordAnswer(q.category, true, q.difficulty, ms);
 
-        // Notify daily tasks
+        // Notify game played + session stats
         if (ctx.notifyGamePlayed) ctx.notifyGamePlayed('slidePuzzle');
+        if (ctx.onAnswer) ctx.onAnswer(true, ms);
 
         optimal ? (H.streak && H.streak()) : (H.success && H.success());
         movesEl.textContent = 'Solved in ' + moves + ' moves!';
