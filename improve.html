@@ -733,6 +733,7 @@
       `scrollEvts: ${_dbgScrollCalls}<br>` +
       `feedH: ${slideH}<br>` +
       `scrollTop: ${Math.round(feed.scrollTop)}<br>` +
+      `staleTicks: ${_staleTicks}<br>` +
       `lastErr: ${_dbgLastErr}`;
   }
   setInterval(dbg, 300);
@@ -885,22 +886,32 @@
     const slideH = feed.clientHeight;
     if (!slideH) return;
     const currentSlide = Math.floor(feed.scrollTop / slideH);
-    // Keep 12 ahead while scrolling normally
     while (slides < currentSlide + 12) {
       addSlide();
     }
   }
 
-  // Safety net for snap-lock: if user is near the end of loaded slides,
-  // add more unconditionally — don't check scrollTop, just check the gap
+  let _lastScrollTop = -1;
+  let _staleTicks = 0;
+
   function proactiveFill() {
     const slideH = feed.clientHeight;
     if (!slideH) return;
-    const currentSlide = Math.floor(feed.scrollTop / slideH);
-    const buffer = slides - currentSlide;
-    if (buffer < 5) {
-      // Snap-lock is starving the feed — force-add a batch
-      for (let i = 0; i < 8; i++) addSlide();
+    const st = feed.scrollTop;
+    const currentSlide = Math.floor(st / slideH);
+
+    if (st === _lastScrollTop) {
+      _staleTicks++;
+    } else {
+      _staleTicks = 0;
+      _lastScrollTop = st;
+    }
+
+    // If scrollTop hasn't moved for 2 ticks (1s), user is snap-locked on the
+    // last slide — force add more so they can swipe forward
+    if (_staleTicks >= 2 && slides < currentSlide + 20) {
+      while (slides < currentSlide + 20) addSlide();
+      _staleTicks = 0;
     }
   }
 
