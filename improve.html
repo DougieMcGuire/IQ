@@ -876,8 +876,8 @@
     for (let i = 0; i < 8; i++) addSlide();
     feed.addEventListener('scroll',    onFeedScroll, { passive: true });
     feed.addEventListener('touchmove', onFeedScroll, { passive: true });
-    // Interval is just a safety net for when scroll-snap locks scrollTop
     setInterval(proactiveFill, 500);
+    attachSentinel();
     setTimeout(maybeShowPushPrompt, 3000);
   }
 
@@ -886,31 +886,44 @@
     const slideH = feed.clientHeight;
     if (!slideH) return;
     const currentSlide = Math.floor(feed.scrollTop / slideH);
-    while (slides < currentSlide + 12) {
-      addSlide();
-    }
+    while (slides < currentSlide + 12) addSlide();
   }
 
   let _lastScrollTop = -1;
   let _staleTicks = 0;
+  let _sentinel = null;
+
+  function attachSentinel() {
+    // Remove old sentinel if any
+    if (_sentinel) _sentinel.remove();
+    // Place a tiny invisible div after the last slide
+    _sentinel = document.createElement('div');
+    _sentinel.style.cssText = 'height:1px;width:100%;flex-shrink:0;';
+    feed.appendChild(_sentinel);
+
+    const obs = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        obs.disconnect();
+        // User can see the end — add more and reattach sentinel
+        for (let i = 0; i < 10; i++) addSlide();
+        attachSentinel();
+      }
+    }, { root: feed, threshold: 0 });
+    obs.observe(_sentinel);
+  }
 
   function proactiveFill() {
-    const slideH = feed.clientHeight;
-    if (!slideH) return;
     const st = feed.scrollTop;
-    const currentSlide = Math.floor(st / slideH);
-
     if (st === _lastScrollTop) {
       _staleTicks++;
     } else {
       _staleTicks = 0;
       _lastScrollTop = st;
     }
-
-    // If scrollTop hasn't moved for 2 ticks (1s), user is snap-locked on the
-    // last slide — force add more so they can swipe forward
-    if (_staleTicks >= 2 && slides < currentSlide + 20) {
-      while (slides < currentSlide + 20) addSlide();
+    // Stale for 1s — force add regardless
+    if (_staleTicks >= 2) {
+      for (let i = 0; i < 10; i++) addSlide();
+      attachSentinel();
       _staleTicks = 0;
     }
   }
