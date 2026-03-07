@@ -144,8 +144,9 @@
         var ms = Date.now() - ctx.answerStartRef.get();
         var data = ctx.IQData.recordAnswer(q.category, won, q.difficulty, ms);
 
-        // Notify daily tasks
+        // Notify game played + session stats
         if (ctx.notifyGamePlayed) ctx.notifyGamePlayed('wordScramble');
+        if (ctx.onAnswer) ctx.onAnswer(won, ms);
 
         H.success && H.success();
         slots.forEach(function(s){ s.classList.add('ws-correct'); });
