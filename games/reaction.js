@@ -52,7 +52,6 @@
           if (done) return;
           state = 'go';
           goTime = Date.now();
-          // Nudge fires when circle goes green — feel it before you see it
           H.nudge && H.nudge();
           circle.classList.add('react-go');
           circle.textContent = 'TAP!';
@@ -76,7 +75,6 @@
           var reactionMs = Date.now() - goTime;
           var good = reactionMs < 400;
           var great = reactionMs < 250;
-          // Tap haptic fires immediately
           H.reactionTap && H.reactionTap();
           circle.classList.remove('react-go');
           circle.classList.add(good ? 'react-success' : 'react-slow');
@@ -90,8 +88,11 @@
       function finish(won, ms) {
         var totalMs = Date.now() - ctx.answerStartRef.get();
         var data = ctx.IQData.recordAnswer(q.category, won, q.difficulty, totalMs);
+
+        // Notify daily tasks
+        if (ctx.notifyGamePlayed) ctx.notifyGamePlayed('reaction');
+
         if (won) {
-          // Slight delay so reactionTap lands first, then success follows
           setTimeout(function() {
             ms < 250 ? (H.streak && H.streak()) : (H.success && H.success());
           }, 120);
