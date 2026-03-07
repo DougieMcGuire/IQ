@@ -97,7 +97,6 @@
         var btn = e.target.closest('.ws-src');
         if (!btn || done || btn.classList.contains('ws-used')) return;
 
-        // Each letter tap
         H.tilePop && H.tilePop();
 
         btn.classList.add('ws-used');
@@ -111,7 +110,6 @@
           if (attempt === q.word) {
             finish(true);
           } else {
-            // Wrong — buzzy shake
             H.wordleWrong && H.wordleWrong();
             answerEl.classList.add('ws-shake');
             statusEl.textContent = 'Not quite! Try again.';
@@ -145,6 +143,10 @@
         done = true;
         var ms = Date.now() - ctx.answerStartRef.get();
         var data = ctx.IQData.recordAnswer(q.category, won, q.difficulty, ms);
+
+        // Notify daily tasks
+        if (ctx.notifyGamePlayed) ctx.notifyGamePlayed('wordScramble');
+
         H.success && H.success();
         slots.forEach(function(s){ s.classList.add('ws-correct'); });
         statusEl.textContent = 'Nice! 🎉';
