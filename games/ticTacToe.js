@@ -65,7 +65,6 @@
         var cell = +btn.dataset.tc;
         if (board[cell] !== 0) return;
 
-        // Player places X — solid tap
         H.medium && H.medium();
 
         board[cell] = 1;
@@ -81,7 +80,6 @@
           done = false;
           var move = botMove();
           board[move] = 2;
-          // Bot move — lighter feel
           H.light && H.light();
           renderBoard();
 
@@ -211,6 +209,12 @@
         else           { setStatus('Bot wins! 🤖'); H.error && H.error(); }
 
         var data = IQData.recordAnswer(q.category, won, q.difficulty, ms);
+
+        // ── FIXED: notify game played (counts for ticTacToe task regardless of win/loss) ──
+        if (ctx.notifyGamePlayed) ctx.notifyGamePlayed('ticTacToe');
+
+        // ── FIXED: count toward answered/correct/streak tasks ──
+        if (ctx.onAnswer) ctx.onAnswer(won, ms);
 
         if (won) {
           flashEl.className = 'flash green show';
