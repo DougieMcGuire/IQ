@@ -106,6 +106,12 @@
   window.addEventListener('message', function(e) {
     if (!e.data) return;
 
+    // Auth completed inside the auth iframe — switch to improve
+    if (e.data.type === 'authSuccess') {
+      goTo('improve');
+      return;
+    }
+
     if (e.data.type === 'savePushSub') {
       var sub = e.data.sub;
       firebase.auth().onAuthStateChanged(function(user) {
