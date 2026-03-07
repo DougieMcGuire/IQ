@@ -1116,6 +1116,27 @@
     feed.addEventListener('scroll',    onFeedScroll, { passive: true });
     feed.addEventListener('touchmove', onFeedScroll, { passive: true });
 
+    // ── TikTok-style wheel: one slide per scroll tick ──
+    let _wheelLocked   = false;
+    let _wheelCooldown = null;
+    feed.addEventListener('wheel', (e) => {
+      e.preventDefault();
+
+      if (_wheelLocked) return;
+      _wheelLocked = true;
+
+      const slideH       = feed.clientHeight;
+      const currentSlide = Math.round(feed.scrollTop / slideH);
+      const dir          = e.deltaY > 0 ? 1 : -1;
+      const targetSlide  = Math.max(0, currentSlide + dir);
+
+      feed.scrollTo({ top: targetSlide * slideH, behavior: 'smooth' });
+
+      // Unlock after animation settles (~400ms) — ignore any wheel events mid-scroll
+      clearTimeout(_wheelCooldown);
+      _wheelCooldown = setTimeout(() => { _wheelLocked = false; }, 420);
+    }, { passive: false });
+
     attachSentinel();
     setTimeout(maybeShowPushPrompt, 3000);
 
