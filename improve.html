@@ -710,8 +710,11 @@
 
 
   let slides = 0, answerStart = 0;
+  let firstSlide = 0; // tracks how many slides have been pruned from the top
   const questionQueue = [];
   const QUEUE_TARGET  = 25;
+  const KEEP_BEHIND   = 4;  // slides to keep behind current (for back-scroll)
+  const KEEP_AHEAD    = 12; // slides to keep ahead
   let _filling = false;
 
   function fillQueue() {
@@ -858,7 +861,10 @@
     const slideH = feed.clientHeight;
     if (!slideH) return;
     const currentSlide = Math.floor(feed.scrollTop / slideH);
-    while (slides < currentSlide + 12) addSlide();
+    // Add ahead
+    while (slides < currentSlide + KEEP_AHEAD) addSlide();
+    // Prune behind — replace old slide nodes with cheap spacers
+    pruneSlides(currentSlide);
   }
 
   let _lastScrollTop = -1;
@@ -866,18 +872,14 @@
   let _sentinel = null;
 
   function attachSentinel() {
-    // Remove old sentinel if any
     if (_sentinel) _sentinel.remove();
-    // Place a tiny invisible div after the last slide
     _sentinel = document.createElement('div');
     _sentinel.style.cssText = 'height:1px;width:100%;flex-shrink:0;';
     feed.appendChild(_sentinel);
-
     const obs = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting) {
         obs.disconnect();
-        // User can see the end — add more and reattach sentinel
-        for (let i = 0; i < 10; i++) addSlide();
+        for (let i = 0; i < KEEP_AHEAD; i++) addSlide();
         attachSentinel();
       }
     }, { root: feed, threshold: 0 });
@@ -886,32 +888,44 @@
 
   function proactiveFill() {
     const st = feed.scrollTop;
-    if (st === _lastScrollTop) {
-      _staleTicks++;
-    } else {
-      _staleTicks = 0;
-      _lastScrollTop = st;
-    }
-    // Stale for 1s — force add regardless
+    if (st === _lastScrollTop) { _staleTicks++; }
+    else { _staleTicks = 0; _lastScrollTop = st; }
     if (_staleTicks >= 2) {
-      for (let i = 0; i < 10; i++) addSlide();
+      for (let i = 0; i < KEEP_AHEAD; i++) addSlide();
       attachSentinel();
       _staleTicks = 0;
     }
   }
 
+  // Replace slides more than KEEP_BEHIND behind the user with empty spacers
+  function pruneSlides(currentSlide) {
+    const cutoff = currentSlide - KEEP_BEHIND;
+    if (cutoff <= firstSlide) return;
+    const slideH = feed.clientHeight;
+    const children = feed.querySelectorAll('.slide');
+    children.forEach(el => {
+      const idx = parseInt(el.dataset.slideIdx);
+      if (idx < cutoff && !el.dataset.pruned) {
+        el.dataset.pruned = '1';
+        // Replace content with empty div of same height to preserve scroll position
+        el.innerHTML = '';
+        el.style.height = slideH + 'px';
+        el.style.flexShrink = '0';
+      }
+    });
+    firstSlide = cutoff;
+  }
+
   function addSlide() {
-    // Increment slides FIRST — this must always happen so onFeedScroll's
-    // "while (slides < target)" never spins forever on a failed render.
     const idx = slides++;
     const div = document.createElement('div');
     div.className = 'slide';
+    div.dataset.slideIdx = idx; // needed for pruning
 
     let q = null;
     try { q = nextQuestion(); } catch(e) { console.warn('[BrainDeer] nextQuestion threw:', e); }
 
     if (!q) {
-      // Generator failed — show a placeholder so the slide exists in the DOM
       div.innerHTML = renderFallback(idx);
       feed.appendChild(div);
       return;
