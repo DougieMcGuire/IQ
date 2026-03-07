@@ -47,7 +47,7 @@
     /* ── Scrollable body ── */
     .scroll-body {
       flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-      padding: 12px 18px calc(env(safe-area-inset-bottom, 0px) + 20px);
+      padding: 12px 18px calc(env(safe-area-inset-bottom, 0px) + 84px);
     }
     .scroll-body::-webkit-scrollbar { display: none; }
 
@@ -199,6 +199,24 @@
     .confetti i { position: absolute; width: 10px; height: 10px; opacity: 0; border-radius: 3px; }
     .confetti i.fall { animation: confettiFall 1.3s ease-out forwards; }
 
+    /* ── Nav ── */
+    nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: calc(64px + env(safe-area-inset-bottom, 0px));
+      background: var(--card); box-shadow: 0 -3px 0 rgba(0,0,0,0.15);
+      display: flex; justify-content: center; align-items: flex-start;
+      padding-top: 6px; gap: 4px; z-index: 100; flex-shrink: 0;
+    }
+    .nav-btn {
+      padding: 8px 18px; background: none; border: none;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      color: #6b4f32; font-family: 'Nunito', sans-serif;
+      font-size: 11px; font-weight: 800; border-radius: 14px;
+      transition: all 0.15s; cursor: pointer; position: relative;
+    }
+    .nav-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .nav-btn.active { color: var(--cream); background: #6b4f32; box-shadow: 0 3px 0 rgba(0,0,0,0.15); }
+
     /* ── Empty / loading ── */
     .loading {
       display: flex; flex-direction: column; align-items: center;
@@ -254,6 +272,25 @@
     </div>
   </div>
 </div>
+
+<nav>
+  <button class="nav-btn" onclick="navGo('leaderboard')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+    Ranks
+  </button>
+  <button class="nav-btn" onclick="navGo('improve')">
+    <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+    Train
+  </button>
+  <button class="nav-btn active" onclick="navGo('tasks')">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    Tasks
+  </button>
+  <button class="nav-btn" onclick="navGo('profile')">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </button>
+</nav>
 
 <div class="xp-toast" id="xp-toast"></div>
 <div class="confetti" id="confetti"></div>
@@ -378,6 +415,14 @@ function awardXP(xp) {
     console.warn('[tasks] awardXP failed', e);
   }
 }
+
+// ── Nav ──
+function navGo(page) {
+  if (window.parent !== window) window.parent.goTo(page);
+  else window.location.href = page + '.html';
+}
+
+// ── Tasks badge — reads the same localStorage key as tasks.html ──
 
 // ── Reset timer ──
 function updateResetTimer() {
