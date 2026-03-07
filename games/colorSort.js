@@ -58,7 +58,6 @@
         if (!btn || done || btn.classList.contains('csort-used')) return;
         btn.classList.add('csort-used');
 
-        // Each tile tap — satisfying medium click
         H.medium && H.medium();
 
         var origIdx = parseInt(btn.dataset.origIdx);
@@ -85,6 +84,10 @@
         done = true;
         var ms = Date.now() - ctx.answerStartRef.get();
         var data = ctx.IQData.recordAnswer(q.category, won, q.difficulty, ms);
+
+        // Notify session stats
+        if (ctx.onAnswer) ctx.onAnswer(won, ms);
+
         if (won) {
           H.success && H.success();
           statusEl.textContent = 'Perfect! 🎨';
