@@ -57,22 +57,17 @@ async function redirectIfLoggedIn() {
 // DAILY TASKS — task pool
 // ═══════════════════════════════════════════════════
 const TASK_POOL = [
-  // Streak tasks
   { id: 'streak_5',       type: 'streak',   target: 5,   label: 'Get a streak of 5',        icon: '🔥', xp: 30  },
   { id: 'streak_10',      type: 'streak',   target: 10,  label: 'Get a streak of 10',       icon: '🔥', xp: 60  },
   { id: 'streak_15',      type: 'streak',   target: 15,  label: 'Get a streak of 15',       icon: '🔥', xp: 100 },
-  // Correct answers
   { id: 'correct_10',     type: 'correct',  target: 10,  label: 'Get 10 correct',            icon: '✅', xp: 25  },
   { id: 'correct_25',     type: 'correct',  target: 25,  label: 'Get 25 correct',            icon: '✅', xp: 50  },
   { id: 'correct_50',     type: 'correct',  target: 50,  label: 'Get 50 correct',            icon: '✅', xp: 90  },
-  // Total questions
   { id: 'answer_20',      type: 'answered', target: 20,  label: 'Answer 20 questions',       icon: '🧠', xp: 20  },
   { id: 'answer_50',      type: 'answered', target: 50,  label: 'Answer 50 questions',       icon: '🧠', xp: 45  },
   { id: 'answer_100',     type: 'answered', target: 100, label: 'Answer 100 questions',      icon: '🧠', xp: 80  },
-  // Accuracy
   { id: 'accuracy_70',    type: 'accuracy', target: 70,  label: 'Hit 70% accuracy today',    icon: '🎯', xp: 35  },
   { id: 'accuracy_80',    type: 'accuracy', target: 80,  label: 'Hit 80% accuracy today',    icon: '🎯', xp: 55  },
-  // Specific game types
   { id: 'play_wordle',    type: 'game', game: 'wordle',      target: 3, label: 'Play 3 Wordle rounds',     icon: '🟩', xp: 40 },
   { id: 'play_math',      type: 'game', game: 'mathRush',    target: 3, label: 'Play 3 Math Rush rounds',  icon: '➕', xp: 40 },
   { id: 'play_memory',    type: 'game', game: 'memory',      target: 2, label: 'Play 2 Memory games',      icon: '🃏', xp: 35 },
@@ -80,12 +75,10 @@ const TASK_POOL = [
   { id: 'play_ttt',       type: 'game', game: 'ticTacToe',   target: 2, label: 'Play 2 Tic Tac Toe games', icon: '⭕', xp: 30 },
   { id: 'play_simon',     type: 'game', game: 'simon',       target: 2, label: 'Play 2 Simon Says rounds', icon: '🔴', xp: 35 },
   { id: 'play_scramble',  type: 'game', game: 'wordScramble',target: 3, label: 'Unscramble 3 words',       icon: '🔤', xp: 30 },
-  // Speed
   { id: 'fast_5',         type: 'fast',     target: 5,   label: 'Answer 5 in under 3.5s',    icon: '⚡', xp: 45  },
   { id: 'fast_10',        type: 'fast',     target: 10,  label: 'Answer 10 in under 3.5s',   icon: '⚡', xp: 70  },
 ];
 
-// Seeded RNG — same 3 tasks for everyone on the same calendar day
 function _seededRandom(seed) {
   let s = seed;
   return () => {
@@ -126,14 +119,12 @@ const DailyTasks = {
     localStorage.setItem(TASKS_KEY, JSON.stringify(data));
   },
 
-  // Returns today's task state, resetting if it's a new day
   getState() {
     const stored = this._load();
     const today  = _getTodayKey();
 
     if (stored && stored.date === today) return stored;
 
-    // Carry forward daily streak if yesterday was completed
     const prevStreak = (stored && stored.allDone && this._wasYesterday(stored.date))
       ? (stored.dailyStreak || 0) + 1
       : (stored && this._wasYesterday(stored.date) ? stored.dailyStreak || 0 : 0);
@@ -158,13 +149,11 @@ const DailyTasks = {
     return prev.toDateString() === yesterday.toDateString();
   },
 
-  // Is there a ! badge? True when there are incomplete tasks (always show until all done+claimed)
   hasBadge() {
     const s = this.getState();
     return !s.allClaimed;
   },
 
-  // ── Session stats (answered/correct/fast today) ──
   getSessionStats() {
     try {
       const raw = localStorage.getItem(SESSION_KEY);
@@ -189,7 +178,6 @@ const DailyTasks = {
     return s;
   },
 
-  // ── Called after every answer ──
   onAnswer({ correct, streak, ms, totalAnsweredToday, totalCorrectToday, fastAnswersToday }) {
     const state   = this.getState();
     let changed   = false;
@@ -206,7 +194,6 @@ const DailyTasks = {
           task.progress = totalAnsweredToday > 0
             ? Math.round((totalCorrectToday / totalAnsweredToday) * 100) : 0;         break;
         case 'fast':     task.progress = fastAnswersToday;                            break;
-        // 'game' type is handled by onGamePlayed
       }
 
       if (task.progress !== prev) changed = true;
@@ -222,7 +209,6 @@ const DailyTasks = {
     return state;
   },
 
-  // ── Called when a mini-game round finishes ──
   onGamePlayed(gameType) {
     const state = this.getState();
     let changed = false;
@@ -243,7 +229,6 @@ const DailyTasks = {
     return state;
   },
 
-  // ── Claim XP for a completed task — returns xp amount or null ──
   claimTask(taskId) {
     const state = this.getState();
     const task  = state.tasks.find(t => t.id === taskId && t.done && !t.claimed);
@@ -256,7 +241,66 @@ const DailyTasks = {
 };
 
 // ═══════════════════════════════════════════════════
-// IQDATA — all local storage + cloud sync logic
+// LEADERBOARD SNAPSHOT HELPER
+// ═══════════════════════════════════════════════════
+// Writes only the current user's entry into leaderboard/snapshot.
+// Called after stats change — debounced so rapid answers don't spam writes.
+// Cost: 1 read + 1 write, at most once per SNAPSHOT_DEBOUNCE_MS window.
+
+const SNAPSHOT_DEBOUNCE_MS = 30_000; // at most 1 snapshot write per 30s per session
+let _snapshotTimer = null;
+let _snapshotDirty = false;
+
+async function _flushSnapshotEntry() {
+  _snapshotTimer = null;
+  if (!currentUser) return;
+  const d = IQData.load();
+  if (!d.calibrated || (d.answered || 0) < 5) return;
+
+  const myEntry = {
+    uid:        currentUser.uid,
+    username:   d.username   || 'Anonymous',
+    iq:         d.iq         || 0,
+    level:      d.level      || 1,
+    bestStreak: d.bestStreak || 0,
+    answered:   d.answered   || 0,
+    correct:    d.correct    || 0,
+    pic:        d.pic        || '',
+    hidden:     !!d.hideFromLeaderboard,
+    updatedAt:  Date.now(),
+  };
+
+  try {
+    const ref      = doc(db, 'leaderboard', 'snapshot');
+    const snap     = await getDoc(ref);                                    // 1 read
+    let users      = snap.exists() ? (snap.data().users || []) : [];
+    users          = users.filter(u => u.uid !== currentUser.uid);        // remove stale entry
+    if (!myEntry.hidden) users.push(myEntry);                             // add updated entry
+    users.sort((a, b) => (b.iq || 0) - (a.iq || 0));
+    if (users.length > 500) users = users.slice(0, 500);
+    await setDoc(ref, { users, updatedAt: Date.now() });                   // 1 write
+    // Bust leaderboard session cache so next view is fresh
+    try { sessionStorage.removeItem('bd_lb_snapshot'); } catch {}
+  } catch (e) {
+    console.warn('[data.js] snapshot flush failed:', e.message);
+  }
+}
+
+function _scheduleSnapshotFlush() {
+  // If a timer is already pending, just mark dirty — it'll flush when it fires
+  if (_snapshotTimer) { _snapshotDirty = true; return; }
+  _snapshotTimer = setTimeout(async () => {
+    await _flushSnapshotEntry();
+    // If more writes came in while we were flushing, schedule one more
+    if (_snapshotDirty) {
+      _snapshotDirty = false;
+      _scheduleSnapshotFlush();
+    }
+  }, SNAPSHOT_DEBOUNCE_MS);
+}
+
+// ═══════════════════════════════════════════════════
+// IQDATA
 // ═══════════════════════════════════════════════════
 const SYNC_EVERY = 10;
 let _pendingAnswers = 0;
@@ -328,12 +372,22 @@ const IQData = {
 
   markCalibrated(iq) {
     const d = this.load(); d.calibrated = true; d.iq = iq;
-    this.save(d); this._pushToCloud(d);
+    this.save(d);
+    this._pushToCloud(d);
+    _scheduleSnapshotFlush(); // ← snapshot hook: calibration sets up initial entry
   },
 
-  setAge(age)         { const d = this.load(); d.age = age;       this.save(d); this._pushToCloud(d); },
-  setProfilePic(url)  { const d = this.load(); d.pic = url;       this.save(d); this._pushToCloud(d); },
-  setUsername(name)   { const d = this.load(); d.username = name; this.save(d); this._pushToCloud(d); },
+  setAge(age)        { const d = this.load(); d.age = age;       this.save(d); this._pushToCloud(d); },
+  setProfilePic(url) {
+    const d = this.load(); d.pic = url; this.save(d);
+    this._pushToCloud(d);
+    _scheduleSnapshotFlush(); // ← snapshot hook: pic change should show on leaderboard
+  },
+  setUsername(name)  {
+    const d = this.load(); d.username = name; this.save(d);
+    this._pushToCloud(d);
+    _scheduleSnapshotFlush(); // ← snapshot hook: username change should show on leaderboard
+  },
 
   async _syncFromCloud() {
     if (!currentUser) return;
@@ -446,6 +500,10 @@ const IQData = {
     this.save(d);
     this._maybeSync();
 
+    // ← Snapshot hook: schedule a debounced leaderboard update after stats change.
+    // Debounced to 30s so answering 100 questions = 1 snapshot write, not 100.
+    _scheduleSnapshotFlush();
+
     return { ...d, xpGain: xp, leveledUp: d.level > oldLvl };
   },
 
@@ -493,7 +551,16 @@ const IQData = {
     this.save(d);
   },
 
-  endSession() { _pendingAnswers = 0; this._pushToCloud(); },
+  endSession() {
+    _pendingAnswers = 0;
+    this._pushToCloud();
+    // Flush any pending snapshot immediately on session end (tab close / nav away)
+    if (_snapshotTimer) {
+      clearTimeout(_snapshotTimer);
+      _snapshotTimer = null;
+      _flushSnapshotEntry(); // fire-and-forget on unload
+    }
+  },
 
   reset() {
     localStorage.removeItem(this.KEY);
@@ -503,6 +570,8 @@ const IQData = {
 
 window.addEventListener('beforeunload', () => {
   if (currentUser && _pendingAnswers > 0) IQData._pushToCloud();
+  // Also flush snapshot if dirty
+  if (_snapshotTimer) { clearTimeout(_snapshotTimer); _flushSnapshotEntry(); }
 });
 
 // ═══════════════════════════════════════════════════
