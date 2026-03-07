@@ -20,8 +20,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body { width: 100%; height: 100%; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--cream); }
     body { display: flex; flex-direction: column; }
-
-    /* ── Nav (IDENTICAL) ── */
     nav {
       position: fixed; bottom: 0; left: 0; right: 0;
       height: calc(64px + env(safe-area-inset-bottom, 0px));
@@ -46,27 +44,19 @@
     }
     .nav-badge.show { display: block; }
     @keyframes badgePulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.35)} }
-
-    /* ── Main ── */
     main {
       flex: 1; overflow-y: auto;
       padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(72px + env(safe-area-inset-bottom, 0px));
     }
     main::-webkit-scrollbar { display: none; }
-
-    /* ── Header ── */
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .header-left { font-size: 14px; font-weight: 800; color: var(--tan); }
-    .header-right { display: flex; gap: 8px; align-items: center; }
     .signout-btn {
-      background: none; border: none; border-radius: 12px;
-      padding: 8px 14px; font-family: 'Nunito', sans-serif;
-      font-size: 13px; font-weight: 800; cursor: pointer;
-      color: var(--brown-light); transition: transform 0.1s;
+      background: none; border: none; padding: 8px 14px;
+      font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
+      color: var(--brown-light); cursor: pointer;
     }
-    .signout-btn:active { transform: translateY(2px); }
-
-    /* ── Profile Hero (centered: avatar, IQ, label) ── */
+    .signout-btn:active { opacity: 0.6; }
     .profile-hero {
       display: flex; flex-direction: column;
       align-items: center; margin-bottom: 24px; padding: 8px 0 16px;
@@ -90,15 +80,10 @@
     }
     .avatar-edit svg { width: 12px; height: 12px; stroke: #fff; fill: none; stroke-width: 2.5; }
     #avatar-input { display: none; }
-
     .iq-num { font-size: clamp(64px, 20vw, 88px); font-weight: 900; line-height: 1; color: var(--cream); text-shadow: 0 4px 0 rgba(0,0,0,0.2); }
     .iq-label { font-size: clamp(14px, 4vw, 18px); font-weight: 900; color: var(--brown-light); letter-spacing: 6px; text-transform: uppercase; margin-bottom: 10px; }
     .pct-badge { background: var(--gold); color: var(--bg); font-size: 14px; font-weight: 900; padding: 5px 16px; border-radius: 12px; box-shadow: 0 3px 0 var(--gold-dark); text-transform: uppercase; }
-
-    /* ── Stats Row ── */
-    .stats-row {
-      display: flex; gap: 8px; width: 100%; margin-bottom: 24px;
-    }
+    .stats-row { display: flex; gap: 8px; width: 100%; margin-bottom: 24px; }
     .stat-pill {
       flex: 1; background: var(--card); border-radius: 14px;
       padding: 12px 8px; display: flex; flex-direction: column;
@@ -108,28 +93,17 @@
     .stat-pill .sp-icon svg { width: 16px; height: 16px; stroke: var(--tan); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
     .stat-pill .sp-val { font-size: clamp(18px, 5vw, 22px); font-weight: 900; color: var(--cream); line-height: 1.2; }
     .stat-pill .sp-lbl { font-size: 11px; font-weight: 800; color: var(--tan); }
-
-    /* ── Section Title ── */
     .section-title { font-size: 12px; font-weight: 900; color: var(--tan); letter-spacing: 2px; text-transform: uppercase; margin: 0 0 10px; }
-
-    /* ── Abilities ── */
-    .abilities-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
-    .ability-row {
-      background: var(--card); border-radius: 12px; padding: 10px 14px;
-      display: flex; align-items: center; gap: 12px;
-    }
+    .abilities-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px; }
+    .ability-row { background: var(--card); border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; }
     .ability-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
     .ability-info { flex: 1; min-width: 0; }
     .ability-name { font-size: 12px; font-weight: 800; color: var(--cream); margin-bottom: 5px; }
     .ability-track { height: 8px; background: var(--brown-mid); border-radius: 4px; overflow: hidden; }
-    .ability-fill {
-      height: 100%; border-radius: 4px; transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
+    .ability-fill { height: 100%; border-radius: 4px; transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .ability-val { font-size: 13px; font-weight: 900; color: var(--cream); min-width: 32px; text-align: right; }
-
-    /* ── Share Button (floating pill) ── */
     .share-fab {
-      display: flex; align-items: center; justify-content: center; gap: 6px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
       width: 100%; padding: 14px; margin-bottom: 12px;
       background: var(--cream); color: var(--bg); border: none; border-radius: 14px;
       font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 900;
@@ -138,56 +112,44 @@
     }
     .share-fab:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
     .share-fab svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; }
-
     .reset-btn {
       margin-top: 12px; background: none; border: none;
       font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700;
       color: var(--brown-light); cursor: pointer; opacity: 0.3;
       display: block; width: 100%; text-align: center; padding: 12px;
     }
-
-    /* ── Share Modal ── */
     .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-      display: none; align-items: flex-end; justify-content: center;
-      z-index: 200; padding: 0;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      display: none; align-items: flex-end; justify-content: center; z-index: 200;
     }
     .modal-overlay.show { display: flex; }
     .modal-sheet {
-      background: var(--card); border-radius: 24px 24px 0 0;
-      width: 100%; max-width: 420px; max-height: 90vh;
-      overflow-y: auto; padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px));
-      animation: sheetUp 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+      background: var(--card); border-radius: 20px 20px 0 0;
+      width: 100%; max-width: 440px;
+      padding: 10px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+      animation: sheetUp 0.28s cubic-bezier(0.32, 0.72, 0, 1);
     }
     @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .sheet-handle { width: 36px; height: 4px; background: var(--brown-mid); border-radius: 2px; margin: 0 auto 16px; }
-
-    /* ── Share Card Styles ── */
-    .card-selector { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 4px; }
-    .card-selector::-webkit-scrollbar { display: none; }
-    .card-opt {
-      flex-shrink: 0; width: 48px; height: 48px; border-radius: 12px;
-      border: 3px solid transparent; cursor: pointer; transition: border-color 0.2s;
+    .card-preview { background: var(--bg); border-radius: 16px; overflow: hidden; margin-bottom: 16px; }
+    .card-preview canvas { width: 100%; display: block; }
+    .share-link-bar { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; }
+    .share-link-url {
+      flex: 1; background: var(--bg); border: none; border-radius: 10px;
+      padding: 11px 14px; font-family: 'Nunito', sans-serif;
+      font-size: 13px; font-weight: 700; color: var(--cream);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .card-opt.active { border-color: var(--cream); }
-    .card-opt-dark { background: #2a1c10; }
-    .card-opt-light { background: #f0e2cc; }
-    .card-opt-green { background: #1a3a1a; }
-    .card-opt-blue { background: #0d2137; }
-    .card-opt-warm { background: #4a2020; }
-
-    .card-preview-wrap {
-      border-radius: 16px; overflow: hidden; margin-bottom: 16px;
-      aspect-ratio: 1 / 1.1;
+    .share-link-copy {
+      background: var(--cream); color: var(--bg); border: none;
+      border-radius: 10px; padding: 11px 16px;
+      font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 900;
+      cursor: pointer; white-space: nowrap; transition: transform 0.1s;
     }
-    .card-preview-wrap canvas { width: 100%; height: 100%; display: block; }
-
-    /* ── Share Destinations ── */
-    .share-dest-label { font-size: 11px; font-weight: 800; color: var(--tan); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
-    .share-destinations {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px;
-    }
+    .share-link-copy:active { transform: scale(0.95); }
+    .share-label { font-size: 11px; font-weight: 800; color: var(--tan); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+    .share-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
     .share-dest {
       background: var(--bg); border: none; border-radius: 14px;
       padding: 12px 4px; display: flex; flex-direction: column;
@@ -195,175 +157,116 @@
       font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 800;
       color: var(--cream); transition: transform 0.1s;
     }
-    .share-dest:active { transform: scale(0.94); }
-    .share-dest .sd-icon {
-      width: 40px; height: 40px; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-    }
+    .share-dest:active { transform: scale(0.93); }
+    .share-dest .sd-icon { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
     .share-dest .sd-icon svg { width: 20px; height: 20px; fill: #fff; }
-
     .sd-x .sd-icon { background: #000; }
+    .sd-imsg .sd-icon { background: #34c759; }
     .sd-snap .sd-icon { background: #FFFC00; }
     .sd-snap .sd-icon svg { fill: #000; }
-    .sd-ig .sd-icon { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
     .sd-more .sd-icon { background: var(--brown-mid); }
-
-    .share-actions { display: flex; gap: 8px; }
-    .share-actions button {
-      flex: 1; padding: 14px; border: none; border-radius: 14px;
+    .sd-more .sd-icon svg { fill: none; stroke: #fff; stroke-width: 2.5; }
+    .save-row { display: flex; gap: 8px; }
+    .save-row button {
+      flex: 1; padding: 13px; border: none; border-radius: 12px;
       font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800;
       cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
-      transition: transform 0.1s;
+      transition: transform 0.1s; background: var(--bg); color: var(--cream);
     }
-    .share-actions button:active { transform: translateY(2px); }
-    .btn-copy { background: var(--bg); color: var(--cream); }
-    .btn-save { background: var(--cream); color: var(--bg); }
-    .share-actions button svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.5; }
-
-    /* ── Toast ── */
+    .save-row button:active { transform: translateY(2px); }
+    .save-row button svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.5; }
     .toast {
       position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%) translateY(20px);
       background: var(--green); color: #fff; padding: 10px 20px; border-radius: 14px;
       font-size: 14px; font-weight: 800; opacity: 0; transition: all 0.3s;
-      z-index: 300; white-space: nowrap; box-shadow: 0 3px 0 var(--green-dark);
-      pointer-events: none;
+      z-index: 300; white-space: nowrap; box-shadow: 0 3px 0 var(--green-dark); pointer-events: none;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
-
 <main>
   <div class="header">
     <div class="header-left" id="username-display"></div>
-    <div class="header-right">
-      <button class="signout-btn" id="signout-btn">Sign out</button>
-    </div>
+    <div class="header-right"><button class="signout-btn" id="signout-btn">Sign out</button></div>
   </div>
-
   <div class="profile-hero">
     <div class="avatar-wrap">
       <div class="avatar" id="avatar-tap">
         <img id="avatar-img" src="" alt="">
         <svg id="avatar-icon" viewBox="0 0 64 64"><circle cx="32" cy="22" r="12"/><path d="M8 58 C8 44 18 36 32 36 C46 36 56 44 56 58"/></svg>
       </div>
-      <div class="avatar-edit" id="avatar-edit-btn">
-        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-      </div>
+      <div class="avatar-edit" id="avatar-edit-btn"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
       <input type="file" id="avatar-input" accept="image/*">
     </div>
     <div class="iq-num" id="iq-num">--</div>
     <div class="iq-label">I Q</div>
     <div class="pct-badge" id="pct-badge" style="display:none;"></div>
   </div>
-
   <div class="stats-row">
     <div class="stat-pill">
       <div class="sp-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
-      <div class="sp-val" id="answered">0</div>
-      <div class="sp-lbl">Done</div>
+      <div class="sp-val" id="answered">0</div><div class="sp-lbl">Done</div>
     </div>
     <div class="stat-pill">
       <div class="sp-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none"/><path d="M12 6v6l4 2"/></svg></div>
-      <div class="sp-val" id="accuracy">0%</div>
-      <div class="sp-lbl">Accuracy</div>
+      <div class="sp-val" id="accuracy">0%</div><div class="sp-lbl">Accuracy</div>
     </div>
     <div class="stat-pill">
       <div class="sp-icon"><svg viewBox="0 0 24 24" fill="#ff9600" fill-opacity="0.2" stroke="#ff9600" stroke-width="2.5"><path d="M12 22c-4.97 0-8-3.58-8-7.5 0-3.07 1.74-5.25 3.53-7.28C9.18 5.38 10.34 3.7 10.34 2c0 0 1.77 2.18 2.34 4.18.27.94.5 1.82 1.32 1.82 0-2 1-3 1-3s1 1.5 1 3.5c.5-.5 1.5-1.5 1.5-1.5s1 2.5 1 5c0 3.92-3.03 7.5-8 7.5z"/></svg></div>
-      <div class="sp-val" id="best-streak">0</div>
-      <div class="sp-lbl">Best</div>
+      <div class="sp-val" id="best-streak">0</div><div class="sp-lbl">Best</div>
     </div>
   </div>
-
   <div class="section-title">Abilities</div>
   <div class="abilities-list" id="abilities"></div>
-
   <button class="share-fab" id="share-btn">
     <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-    Share Stats Card
+    Share Stats
   </button>
-
   <button class="reset-btn" id="reset-btn">Reset Progress</button>
 </main>
-
-<!-- NAV (IDENTICAL) -->
 <nav>
-  <button class="nav-btn" onclick="navGo('leaderboard')">
-    <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
-    Ranks
-  </button>
-  <button class="nav-btn" onclick="navGo('improve')">
-    <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-    Train
-  </button>
-  <button class="nav-btn" onclick="navGo('tasks')">
-    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-    Tasks
-    <span class="nav-badge" id="tasks-badge"></span>
-  </button>
-  <button class="nav-btn active" onclick="navGo('profile')">
-    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    Profile
-  </button>
+  <button class="nav-btn" onclick="navGo('leaderboard')"><svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>Ranks</button>
+  <button class="nav-btn" onclick="navGo('improve')"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Train</button>
+  <button class="nav-btn" onclick="navGo('tasks')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tasks<span class="nav-badge" id="tasks-badge"></span></button>
+  <button class="nav-btn active" onclick="navGo('profile')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
 </nav>
-
-<!-- SHARE SHEET -->
 <div class="modal-overlay" id="share-modal">
   <div class="modal-sheet">
     <div class="sheet-handle"></div>
-
-    <div class="card-selector" id="card-selector">
-      <div class="card-opt card-opt-dark active" data-theme="dark"></div>
-      <div class="card-opt card-opt-light" data-theme="light"></div>
-      <div class="card-opt card-opt-green" data-theme="forest"></div>
-      <div class="card-opt card-opt-blue" data-theme="ocean"></div>
-      <div class="card-opt card-opt-warm" data-theme="ember"></div>
+    <div class="card-preview" id="card-preview"></div>
+    <div class="share-link-bar">
+      <input class="share-link-url" id="share-url" readonly value="">
+      <button class="share-link-copy" id="copy-link">Copy link</button>
     </div>
-
-    <div class="card-preview-wrap" id="card-preview"></div>
-
-    <div class="share-dest-label">Share to</div>
-    <div class="share-destinations">
+    <div class="share-label">Share to</div>
+    <div class="share-grid">
       <button class="share-dest sd-x" id="share-x">
-        <div class="sd-icon"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></div>
-        X
+        <div class="sd-icon"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></div>X
+      </button>
+      <button class="share-dest sd-imsg" id="share-imsg">
+        <div class="sd-icon"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="#fff" stroke="none"/></svg></div>iMessage
       </button>
       <button class="share-dest sd-snap" id="share-snap">
-        <div class="sd-icon"><svg viewBox="0 0 24 24"><path d="M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.075.045.203.09.401.09.3-.016.659-.12 1.033-.301a.603.603 0 0 1 .274-.074c.12 0 .24.03.345.09.225.12.39.36.385.636.015.24-.075.494-.51.735-.105.06-.345.15-.765.27-.51.14-.76.27-.855.42a.378.378 0 0 0-.03.273c.067.27.3.705.39.885.27.57.54 1.125.54 1.74 0 .03 0 .075-.015.12-.105.69-.615 1.065-1.35 1.29-.225.06-.435.09-.6.12-.135.015-.24.03-.3.045-.06.03-.12.12-.18.27-.045.12-.06.195-.06.27 0 .15.06.285.15.39.135.165.36.255.615.255h.03c.255 0 .525-.03.78-.06.15-.015.315-.03.48-.03.21 0 .42.015.63.06.57.12 1.065.45 1.47.96.45.57.615 1.29.39 2.04-.36 1.17-1.32 2.04-2.31 2.085a1.5 1.5 0 0 1-.21.015c-.255 0-.54-.045-.855-.135a4.844 4.844 0 0 0-1.02-.18c-.12 0-.24.015-.36.03-.54.075-1.14.165-1.8.165-.66 0-1.26-.09-1.8-.165a2.452 2.452 0 0 0-.36-.03c-.36 0-.72.06-1.02.18-.315.09-.6.135-.855.135a1.5 1.5 0 0 1-.21-.015c-.99-.045-1.95-.915-2.31-2.085-.225-.75-.06-1.47.39-2.04.405-.51.9-.84 1.47-.96.21-.045.42-.06.63-.06.165 0 .33.015.48.03.255.03.525.06.78.06h.03c.255 0 .48-.09.615-.255a.576.576 0 0 0 .15-.39c0-.075-.015-.15-.06-.27-.06-.15-.12-.24-.18-.27a2.67 2.67 0 0 0-.3-.045 5.073 5.073 0 0 1-.6-.12c-.735-.225-1.245-.6-1.35-1.29a.799.799 0 0 1-.015-.12c0-.615.27-1.17.54-1.74.09-.18.33-.615.39-.885a.378.378 0 0 0-.03-.273c-.09-.15-.345-.27-.855-.42-.42-.12-.66-.21-.765-.27-.435-.24-.525-.495-.51-.735a.65.65 0 0 1 .385-.636.48.48 0 0 1 .345-.09c.075 0 .18.03.274.074.374.18.733.302 1.033.302.198 0 .326-.046.401-.091a27.772 27.772 0 0 1-.03-.51l-.003-.06c-.105-1.628-.23-3.654.3-4.847C7.86 1.069 11.216.793 12.206.793z"/></svg></div>
-        Snap
-      </button>
-      <button class="share-dest sd-ig" id="share-ig">
-        <div class="sd-icon"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></div>
-        Story
+        <div class="sd-icon"><svg viewBox="0 0 24 24"><path d="M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.075.045.203.09.401.09.3-.016.659-.12 1.033-.301a.603.603 0 0 1 .274-.074c.12 0 .24.03.345.09.225.12.39.36.385.636.015.24-.075.494-.51.735-.105.06-.345.15-.765.27-.51.14-.76.27-.855.42a.378.378 0 0 0-.03.273c.067.27.3.705.39.885.27.57.54 1.125.54 1.74 0 .03 0 .075-.015.12-.105.69-.615 1.065-1.35 1.29-.225.06-.435.09-.6.12-.135.015-.24.03-.3.045-.06.03-.12.12-.18.27-.045.12-.06.195-.06.27 0 .15.06.285.15.39.135.165.36.255.615.255h.03c.255 0 .525-.03.78-.06.15-.015.315-.03.48-.03.21 0 .42.015.63.06.57.12 1.065.45 1.47.96.45.57.615 1.29.39 2.04-.36 1.17-1.32 2.04-2.31 2.085a1.5 1.5 0 0 1-.21.015c-.255 0-.54-.045-.855-.135a4.844 4.844 0 0 0-1.02-.18c-.12 0-.24.015-.36.03-.54.075-1.14.165-1.8.165-.66 0-1.26-.09-1.8-.165a2.452 2.452 0 0 0-.36-.03c-.36 0-.72.06-1.02.18-.315.09-.6.135-.855.135a1.5 1.5 0 0 1-.21-.015c-.99-.045-1.95-.915-2.31-2.085-.225-.75-.06-1.47.39-2.04.405-.51.9-.84 1.47-.96.21-.045.42-.06.63-.06.165 0 .33.015.48.03.255.03.525.06.78.06h.03c.255 0 .48-.09.615-.255a.576.576 0 0 0 .15-.39c0-.075-.015-.15-.06-.27-.06-.15-.12-.24-.18-.27a2.67 2.67 0 0 0-.3-.045 5.073 5.073 0 0 1-.6-.12c-.735-.225-1.245-.6-1.35-1.29a.799.799 0 0 1-.015-.12c0-.615.27-1.17.54-1.74.09-.18.33-.615.39-.885a.378.378 0 0 0-.03-.273c-.09-.15-.345-.27-.855-.42-.42-.12-.66-.21-.765-.27-.435-.24-.525-.495-.51-.735a.65.65 0 0 1 .385-.636.48.48 0 0 1 .345-.09c.075 0 .18.03.274.074.374.18.733.302 1.033.302.198 0 .326-.046.401-.091a27.772 27.772 0 0 1-.03-.51l-.003-.06c-.105-1.628-.23-3.654.3-4.847C7.86 1.069 11.216.793 12.206.793z"/></svg></div>Snap
       </button>
       <button class="share-dest sd-more" id="share-native">
-        <div class="sd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg></div>
-        More
+        <div class="sd-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></div>More
       </button>
     </div>
-
-    <div class="share-actions">
-      <button class="btn-copy" id="copy-btn">
-        <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        Copy
-      </button>
-      <button class="btn-save" id="download-btn">
-        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Save Image
-      </button>
+    <div class="save-row">
+      <button id="save-img-btn"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save image</button>
     </div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script type="module">
   import { IQData, iqToPercentile, formatPercentile } from './data.js';
   import Haptics from './haptics.js';
-
   if (window.parent !== window) parent.authCheck();
-
   window.navGo = function(page) { Haptics.light(); parent.goTo(page); };
+
+  const OG_WORKER_BASE = 'https://braindeer.org/share';
 
   const ABILITIES = [
     { key: 'patternRecognition', name: 'Pattern',        color: '#ff9600' },
@@ -376,16 +279,6 @@
     { key: 'numericalReasoning', name: 'Spatial',         color: '#ffc800' },
   ];
 
-  /* ── Card Themes ── */
-  const THEMES = {
-    dark:   { bg: '#2a1c10', card: '#3a2918', text: '#f0e2cc', sub: '#8f6b4a', accent: '#ffc800', bar: '#4a3625' },
-    light:  { bg: '#f0e2cc', card: '#e0d0b8', text: '#3a2918', sub: '#8f6b4a', accent: '#ff9600', bar: '#d4c4aa' },
-    forest: { bg: '#0f2618', card: '#1a3a28', text: '#d4f0d0', sub: '#6b9f70', accent: '#58cc02', bar: '#264a32' },
-    ocean:  { bg: '#0a1929', card: '#132f4c', text: '#d0e8f8', sub: '#5090b0', accent: '#1cb0f6', bar: '#1a3f60' },
-    ember:  { bg: '#2a0f0f', card: '#3f1a1a', text: '#ffd8d0', sub: '#b06050', accent: '#ea2b2b', bar: '#4a2222' },
-  };
-  let currentTheme = 'dark';
-
   function toast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg; t.classList.add('show');
@@ -396,7 +289,6 @@
     const d = IQData.load();
     const uname = d.username || IQData.getCurrentUser()?.displayName || '';
     document.getElementById('username-display').textContent = uname;
-
     if (d.iq) {
       document.getElementById('iq-num').textContent = d.iq;
       const pct = iqToPercentile(d.iq);
@@ -404,32 +296,21 @@
       badge.textContent = 'Top ' + formatPercentile(pct);
       badge.style.display = 'inline-block';
     }
-
     document.getElementById('answered').textContent = d.answered;
     document.getElementById('accuracy').textContent = IQData.getAccuracy() + '%';
     document.getElementById('best-streak').textContent = d.bestStreak;
-
     if (d.pic) {
       document.getElementById('avatar-img').src = d.pic;
       document.getElementById('avatar-img').style.display = 'block';
       document.getElementById('avatar-icon').style.display = 'none';
     }
-
     const list = document.getElementById('abilities');
     list.innerHTML = '';
     ABILITIES.forEach(a => {
       const pct = IQData.getStatPercent(a.key);
       const row = document.createElement('div');
       row.className = 'ability-row';
-      row.innerHTML = `
-        <div class="ability-dot" style="background:${a.color}"></div>
-        <div class="ability-info">
-          <div class="ability-name">${a.name}</div>
-          <div class="ability-track">
-            <div class="ability-fill" style="background:${a.color};width:0%" data-val="${pct}"></div>
-          </div>
-        </div>
-        <div class="ability-val">${pct}</div>`;
+      row.innerHTML = '<div class="ability-dot" style="background:'+a.color+'"></div><div class="ability-info"><div class="ability-name">'+a.name+'</div><div class="ability-track"><div class="ability-fill" style="background:'+a.color+';width:0%" data-val="'+pct+'"></div></div></div><div class="ability-val">'+pct+'</div>';
       list.appendChild(row);
     });
     requestAnimationFrame(() => setTimeout(() => {
@@ -439,7 +320,6 @@
     }, 60));
   }
 
-  /* ── Avatar ── */
   function handleAvatarFile(file) {
     if (!file) return;
     const reader = new FileReader();
@@ -466,237 +346,154 @@
   document.getElementById('avatar-edit-btn').onclick = () => { Haptics.medium(); document.getElementById('avatar-input').click(); };
   document.getElementById('avatar-input').onchange = e => handleAvatarFile(e.target.files[0]);
   document.getElementById('signout-btn').onclick = () => { Haptics.warning(); IQData.signOut(); };
-  document.getElementById('reset-btn').onclick = () => {
-    Haptics.warning();
-    if (confirm('Reset all progress?')) { Haptics.error(); IQData.reset(); location.reload(); }
-  };
+  document.getElementById('reset-btn').onclick = () => { Haptics.warning(); if (confirm('Reset all progress?')) { Haptics.error(); IQData.reset(); location.reload(); } };
 
-  /* ═══════════════════════════════════════════
-     SHARE CARD SYSTEM
-     ═══════════════════════════════════════════ */
   let shareCanvas = null;
+  let shareUrl = '';
 
-  document.getElementById('share-btn').onclick = () => { Haptics.medium(); openShare(); };
-
-  function openShare() {
-    document.getElementById('share-modal').classList.add('show');
-    genShareCard();
+  function getShareUrl() {
+    const user = IQData.getCurrentUser();
+    if (!user) return 'https://braindeer.org';
+    return OG_WORKER_BASE + '/' + user.uid;
   }
-  function closeShare() {
-    Haptics.light();
-    document.getElementById('share-modal').classList.remove('show');
-  }
-  document.getElementById('share-modal').onclick = e => { if (e.target.id === 'share-modal') closeShare(); };
 
-  /* ── Theme selector ── */
-  document.querySelectorAll('.card-opt').forEach(opt => {
-    opt.onclick = () => {
-      Haptics.light();
-      document.querySelectorAll('.card-opt').forEach(o => o.classList.remove('active'));
-      opt.classList.add('active');
-      currentTheme = opt.dataset.theme;
-      genShareCard();
-    };
-  });
-
-  /* ── Generate Share Card Canvas ── */
-  function genShareCard() {
+  async function writeShareData() {
     const d = IQData.load();
-    const T = THEMES[currentTheme];
-    const cv = document.createElement('canvas');
-    const W = 540, H = 600;
-    cv.width = W; cv.height = H;
-    const ctx = cv.getContext('2d');
-
-    // Background
-    ctx.fillStyle = T.bg;
-    ctx.fillRect(0, 0, W, H);
-
-    // Inner card
-    rr(ctx, 20, 20, W - 40, H - 40, 28, T.card);
-
-    const cx = W / 2;
-
-    const drawContent = () => {
-      // Avatar circle
-      if (d.pic) {
-        // already drawn via img.onload
-      } else {
-        ctx.fillStyle = T.bar;
-        ctx.beginPath(); ctx.arc(cx, 82, 34, 0, Math.PI * 2); ctx.fill();
-        ctx.font = '28px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText('🦌', cx, 84);
-      }
-
-      // IQ Number
-      ctx.font = '900 72px Nunito, sans-serif';
-      ctx.fillStyle = T.text; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(d.iq || '--', cx, 172);
-
-      // IQ Label
-      ctx.font = '900 14px Nunito, sans-serif';
-      ctx.fillStyle = T.sub; ctx.letterSpacing = '4px';
-      ctx.fillText('I Q', cx, 204);
-
-      // Percentile badge
-      if (d.iq) {
-        const badgeText = 'TOP ' + formatPercentile(iqToPercentile(d.iq)).toUpperCase();
-        ctx.font = '900 12px Nunito, sans-serif';
-        const tw = ctx.measureText(badgeText).width + 28;
-        rr(ctx, cx - tw / 2, 216, tw, 26, 8, T.accent);
-        ctx.fillStyle = T.bg; ctx.textAlign = 'center';
-        ctx.fillText(badgeText, cx, 233);
-      }
-
-      // Stats row
-      const stats = [
-        { v: String(d.answered), l: 'Done' },
-        { v: IQData.getAccuracy() + '%', l: 'Accuracy' },
-        { v: String(d.bestStreak), l: 'Best' },
-      ];
-      const rowY = 262;
-      stats.forEach((s, i) => {
-        const sx = 60 + ((W - 120) / 3) * i + (W - 120) / 6;
-        rr(ctx, sx - 50, rowY, 100, 50, 10, T.bar);
-        ctx.font = '900 20px Nunito, sans-serif'; ctx.fillStyle = T.text;
-        ctx.textAlign = 'center'; ctx.fillText(s.v, sx, rowY + 22);
-        ctx.font = '800 10px Nunito, sans-serif'; ctx.fillStyle = T.sub;
-        ctx.fillText(s.l, sx, rowY + 40);
-      });
-
-      // Ability bars
-      ctx.font = '900 10px Nunito, sans-serif'; ctx.fillStyle = T.sub;
-      ctx.textAlign = 'left';
-      ctx.fillText('ABILITIES', 50, 340);
-
-      const barAbilities = ABILITIES.slice(0, 6);
-      barAbilities.forEach((a, i) => {
-        const y = 356 + i * 34;
-        const v = IQData.getStatPercent(a.key);
-
-        // Label
-        ctx.font = '800 10px Nunito, sans-serif'; ctx.fillStyle = T.sub;
-        ctx.textAlign = 'left'; ctx.fillText(a.name.toUpperCase(), 50, y + 2);
-
-        // Track
-        const trackY = y + 8;
-        rr(ctx, 50, trackY, W - 100, 16, 5, T.bar);
-
-        // Fill
-        const fillW = Math.max(24, (v / 100) * (W - 100));
-        rr(ctx, 50, trackY, fillW, 16, 5, a.color);
-
-        // Value
-        ctx.font = '900 9px Nunito, sans-serif'; ctx.fillStyle = '#fff';
-        ctx.textAlign = 'left'; ctx.fillText(String(v), 56, trackY + 12);
-      });
-
-      // Branding
-      ctx.font = '900 16px Nunito, sans-serif'; ctx.fillStyle = T.sub;
-      ctx.textAlign = 'center';
-      ctx.fillText('🦌 braindeer.org', cx, H - 42);
-
-      shareCanvas = cv;
-      const preview = document.getElementById('card-preview');
-      preview.innerHTML = ''; preview.appendChild(cv);
+    const user = IQData.getCurrentUser();
+    if (!user) return;
+    const shareData = {
+      iq: d.iq || null, answered: d.answered || 0,
+      accuracy: IQData.getAccuracy(), bestStreak: d.bestStreak || 0,
+      username: d.username || user.displayName || 'Brain',
+      abilities: {}, updatedAt: Date.now()
     };
+    ABILITIES.forEach(a => { shareData.abilities[a.key] = IQData.getStatPercent(a.key); });
+    try {
+      const db = firebase.firestore();
+      await db.collection('shares').doc(user.uid).set(shareData, { merge: true });
+    } catch (e) { console.warn('Share write failed:', e); }
+  }
 
-    if (d.pic) {
-      const img = new Image();
-      img.onload = () => {
-        ctx.save();
-        ctx.beginPath(); ctx.arc(cx, 82, 34, 0, Math.PI * 2); ctx.clip();
-        ctx.drawImage(img, cx - 34, 48, 68, 68);
-        ctx.restore();
-        drawContent();
-      };
-      img.src = d.pic;
-    } else {
-      drawContent();
+  function genPreviewCard() {
+    const d = IQData.load();
+    const cv = document.createElement('canvas');
+    const W = 600, H = 315;
+    cv.width = W * 2; cv.height = H * 2;
+    const ctx = cv.getContext('2d');
+    ctx.scale(2, 2);
+    ctx.fillStyle = '#2a1c10'; ctx.fillRect(0, 0, W, H);
+    rr(ctx, 16, 16, W - 32, H - 32, 16, '#3a2918');
+    const cx = W / 2;
+    const uname = d.username || IQData.getCurrentUser()?.displayName || 'Brain';
+    ctx.font = '700 13px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a'; ctx.textAlign = 'center';
+    ctx.fillText(uname, cx, 48);
+    ctx.font = '900 56px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
+    ctx.fillText(d.iq || '--', cx, 110);
+    ctx.font = '900 11px Nunito, sans-serif'; ctx.fillStyle = '#6b4f32';
+    ctx.fillText('I Q', cx, 126);
+    if (d.iq) {
+      const pctText = 'TOP ' + formatPercentile(iqToPercentile(d.iq)).toUpperCase();
+      ctx.font = '900 10px Nunito, sans-serif';
+      const tw = ctx.measureText(pctText).width + 20;
+      rr(ctx, cx - tw / 2, 133, tw, 20, 6, '#ffc800');
+      ctx.fillStyle = '#2a1c10'; ctx.fillText(pctText, cx, 147);
     }
+    [{ v: String(d.answered), l: 'Done' }, { v: IQData.getAccuracy() + '%', l: 'Accuracy' }, { v: String(d.bestStreak), l: 'Streak' }]
+      .forEach((s, i) => {
+        const sx = 80 + ((W - 160) / 3) * i + (W - 160) / 6;
+        rr(ctx, sx - 40, 162, 80, 38, 8, '#4a3625');
+        ctx.font = '900 15px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
+        ctx.textAlign = 'center'; ctx.fillText(s.v, sx, 181);
+        ctx.font = '800 8px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a';
+        ctx.fillText(s.l, sx, 194);
+      });
+    const barAbilities = ABILITIES.slice(0, 6);
+    const barW = 150, barH = 10, barGap = 24;
+    barAbilities.forEach((a, i) => {
+      const col = i % 3, row = Math.floor(i / 3);
+      const bx = 40 + col * (barW + 20), by = 214 + row * barGap;
+      const v = IQData.getStatPercent(a.key);
+      ctx.font = '800 7px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a'; ctx.textAlign = 'left';
+      ctx.fillText(a.name.toUpperCase(), bx, by - 2);
+      rr(ctx, bx, by, barW, barH, 3, '#4a3625');
+      rr(ctx, bx, by, Math.max(8, (v / 100) * barW), barH, 3, a.color);
+    });
+    ctx.font = '800 11px Nunito, sans-serif'; ctx.fillStyle = '#6b4f32'; ctx.textAlign = 'center';
+    ctx.fillText('braindeer.org', cx, H - 22);
+    shareCanvas = cv;
+    const preview = document.getElementById('card-preview');
+    preview.innerHTML = ''; preview.appendChild(cv);
   }
 
   function rr(ctx, x, y, w, h, r, fill) {
     ctx.beginPath();
     ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
     ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
     ctx.closePath();
     if (fill) { ctx.fillStyle = fill; ctx.fill(); }
   }
 
-  /* ── Get blob from canvas ── */
-  async function getShareBlob() {
-    if (!shareCanvas) return null;
-    return new Promise(r => shareCanvas.toBlob(r, 'image/png'));
+  async function openShare() {
+    document.getElementById('share-modal').classList.add('show');
+    shareUrl = getShareUrl();
+    document.getElementById('share-url').value = shareUrl;
+    genPreviewCard();
+    writeShareData();
   }
+  function closeShare() { Haptics.light(); document.getElementById('share-modal').classList.remove('show'); }
 
-  /* ── Native Web Share ── */
-  async function nativeShare() {
-    const blob = await getShareBlob();
-    if (!blob) return;
-    const file = new File([blob], 'braindeer-stats.png', { type: 'image/png' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({
-          title: 'My BrainDeer IQ',
-          text: 'Check out my brain stats on BrainDeer! 🦌',
-          files: [file],
-          url: 'https://braindeer.org'
-        });
-        Haptics.success();
-      } catch (e) {
-        if (e.name !== 'AbortError') { Haptics.error(); toast('Share failed'); }
-      }
-    } else {
-      // Fallback: download
-      downloadImage();
-    }
-  }
+  document.getElementById('share-btn').onclick = () => { Haptics.medium(); openShare(); };
+  document.getElementById('share-modal').onclick = e => { if (e.target.id === 'share-modal') closeShare(); };
 
-  /* ── Share to X (Twitter) ── */
-  function shareToX() {
+  document.getElementById('copy-link').onclick = async () => {
+    Haptics.medium();
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      Haptics.success();
+      document.getElementById('copy-link').textContent = 'Copied!';
+      toast('Link copied!');
+      setTimeout(() => document.getElementById('copy-link').textContent = 'Copy link', 2000);
+    } catch { Haptics.error(); toast('Copy failed'); }
+  };
+
+  document.getElementById('share-x').onclick = () => {
     Haptics.medium();
     const d = IQData.load();
     const text = d.iq
-      ? `My IQ is ${d.iq} on BrainDeer! 🦌🧠 Top ${formatPercentile(iqToPercentile(d.iq))} — think you can beat me?`
-      : `Training my brain on BrainDeer! 🦌🧠`;
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent('https://braindeer.org')}`;
-    window.open(url, '_blank');
-  }
+      ? 'My IQ is ' + d.iq + ' on BrainDeer! Top ' + formatPercentile(iqToPercentile(d.iq)) + ' — think you can beat me?'
+      : 'Training my brain on BrainDeer!';
+    window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(shareUrl), '_blank');
+  };
 
-  /* ── Share to Snapchat ── */
-  async function shareToSnap() {
+  document.getElementById('share-imsg').onclick = () => {
     Haptics.medium();
-    // Snapchat doesn't have a web share URL, use native share or fallback
-    await nativeShare();
-  }
+    const d = IQData.load();
+    const body = d.iq
+      ? 'Check out my BrainDeer IQ: ' + d.iq + '! ' + shareUrl
+      : 'I am training my brain on BrainDeer! ' + shareUrl;
+    window.location.href = 'sms:&body=' + encodeURIComponent(body);
+  };
 
-  /* ── Share to Instagram Stories ── */
-  async function shareToIG() {
+  document.getElementById('share-snap').onclick = async () => {
     Haptics.medium();
-    // Instagram also requires native share on mobile
-    await nativeShare();
-  }
+    if (navigator.share) {
+      try { await navigator.share({ title: 'My BrainDeer IQ', text: 'Think you can beat me?', url: shareUrl }); Haptics.success(); }
+      catch (e) { if (e.name !== 'AbortError') toast('Share cancelled'); }
+    } else { await navigator.clipboard.writeText(shareUrl); toast('Link copied — paste in Snapchat!'); }
+  };
 
-  /* ── Copy Image ── */
-  async function copyImage() {
-    const blob = await getShareBlob();
-    if (!blob) return;
+  document.getElementById('share-native').onclick = async () => {
     Haptics.medium();
-    try {
-      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-      Haptics.success(); toast('Copied to clipboard!');
-    } catch { Haptics.error(); toast('Copy failed'); }
-  }
+    if (navigator.share) {
+      try { await navigator.share({ title: 'My BrainDeer IQ', text: 'Think you can beat me?', url: shareUrl }); Haptics.success(); }
+      catch (e) { if (e.name !== 'AbortError') toast('Share cancelled'); }
+    } else { await navigator.clipboard.writeText(shareUrl); toast('Link copied!'); }
+  };
 
-  /* ── Download ── */
-  function downloadImage() {
+  document.getElementById('save-img-btn').onclick = () => {
     if (!shareCanvas) return;
     Haptics.success();
     const a = document.createElement('a');
@@ -704,15 +501,7 @@
     a.href = shareCanvas.toDataURL('image/png');
     a.click();
     toast('Image saved!');
-  }
-
-  /* ── Wire up buttons ── */
-  document.getElementById('share-x').onclick = shareToX;
-  document.getElementById('share-snap').onclick = shareToSnap;
-  document.getElementById('share-ig').onclick = shareToIG;
-  document.getElementById('share-native').onclick = () => { Haptics.medium(); nativeShare(); };
-  document.getElementById('copy-btn').onclick = copyImage;
-  document.getElementById('download-btn').onclick = downloadImage;
+  };
 
   load();
 </script>
