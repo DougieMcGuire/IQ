@@ -94,6 +94,16 @@
       padding: 12px 16px;
     }
 
+    /* Pruned spacer — same height, zero render cost */
+    .slide-spacer {
+      height: calc(100dvh - 78px - 64px - env(safe-area-inset-bottom, 0px));
+      min-height: 0;
+      flex-shrink: 0;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      contain: strict;
+    }
+
     /* ── Card ── */
     .qcard {
       background: var(--card); border-radius: 20px;
@@ -506,7 +516,7 @@
   const xpLabel     = document.getElementById('xp-label');
   const tasksBadge  = document.getElementById('tasks-badge');
 
-  // ── Session stats (localStorage, fast per-answer writes) ──
+  // ── Session stats ──
   const SESSION_KEY = 'bd_session_today';
 
   let _tasksUid = null;
@@ -708,55 +718,302 @@
     } catch (e) { console.warn('[improve] xpAwarded handler failed', e); }
   });
 
+  // ─────────────────────────────────────────────────────────────────
+  // PERFORMANCE-OPTIMISED FEED ENGINE
+  //
+  // Key changes vs original:
+  //  1. QUEUE_TARGET reduced to 8 (generate just-in-time, not upfront)
+  //  2. fillQueue is chunked via requestIdleCallback so it never
+  //     blocks the main thread / scroll animation
+  //  3. Scroll handler is throttled with rAF (max once per frame)
+  //  4. Pruned slides are REPLACED with lightweight spacer divs —
+  //     this actually frees memory instead of just hiding nodes
+  //  5. No setInterval polling — replaced by IntersectionObserver only
+  //  6. Slide count cap: only keep MAX_DOM_SLIDES real nodes live at once
+  // ─────────────────────────────────────────────────────────────────
 
-  let slides = 0, answerStart = 0;
-  let firstSlide = 0; // tracks how many slides have been pruned from the top
+  const QUEUE_TARGET   = 8;   // small buffer — fill lazily
+  const KEEP_BEHIND    = 3;   // real slides to keep behind viewport
+  const KEEP_AHEAD     = 6;   // real slides to keep ahead of viewport
+  const MAX_DOM_SLIDES = KEEP_BEHIND + KEEP_AHEAD + 1; // ~10 real nodes max
+
+  let slides       = 0;        // total slides ever created (grows forever)
+  let firstSlide   = 0;        // lowest slide index still in DOM as real slide
+  let answerStart  = 0;
+
   const questionQueue = [];
-  const QUEUE_TARGET  = 25;
-  const KEEP_BEHIND   = 4;  // slides to keep behind current (for back-scroll)
-  const KEEP_AHEAD    = 12; // slides to keep ahead
-  let _filling = false;
+  let _filling        = false;
+  let _fillScheduled  = false;
 
-  function fillQueue() {
-    if (_filling) return;
-    _filling = true;
-    try {
-      let attempts = 0;
-      while (questionQueue.length < QUEUE_TARGET) {
-        attempts++;
-        if (attempts > QUEUE_TARGET * 3) {
-          // Safety valve: never loop forever if generators are broken
-          console.warn('[BrainDeer] fillQueue hit safety limit');
-          break;
+  // Chunk-fill via rIC so it never janks scroll
+  function scheduleFill() {
+    if (_fillScheduled) return;
+    _fillScheduled = true;
+    const doFill = (deadline) => {
+      _fillScheduled = false;
+      if (_filling) return;
+      _filling = true;
+      try {
+        let safety = 0;
+        while (questionQueue.length < QUEUE_TARGET) {
+          if (++safety > QUEUE_TARGET * 4) { console.warn('[BrainDeer] fillQueue safety'); break; }
+          // Use deadline if available so we don't overrun the idle window
+          if (deadline && deadline.timeRemaining && deadline.timeRemaining() < 2 && questionQueue.length >= 3) break;
+          try {
+            const weakCat = IQData.getWeakestCategory();
+            const diff    = weakCat ? IQData.getDifficulty(weakCat) : 1.0;
+            const q       = Q.generate(diff);
+            if (q) questionQueue.push(q);
+          } catch (e) {
+            console.warn('[BrainDeer] Q.generate error:', e);
+          }
         }
-        try {
-          const weakCat = IQData.getWeakestCategory();
-          const diff = weakCat ? IQData.getDifficulty(weakCat) : 1.0;
-          const q = Q.generate(diff);
-          if (q) questionQueue.push(q);
-        } catch (e) {
-          console.warn('[BrainDeer] Q.generate failed, skipping:', e);
-        }
+      } finally {
+        _filling = false;
       }
-    } finally {
-      _filling = false;
+      // If still below target, schedule another fill
+      if (questionQueue.length < QUEUE_TARGET) scheduleFill();
+    };
+
+    if (typeof requestIdleCallback === 'function') {
+      requestIdleCallback(doFill, { timeout: 300 });
+    } else {
+      setTimeout(() => doFill(null), 16);
     }
   }
 
   function nextQuestion() {
-    if (!questionQueue.length) fillQueue();
-    // If still empty after fill attempt, generate a single fallback inline
-    if (!questionQueue.length) {
-      try { return Q.generate(1.0); } catch(e) { return null; }
+    if (questionQueue.length === 0) {
+      // Synchronous fallback — generate one right now so scroll never stalls
+      try {
+        const q = Q.generate(1.0);
+        scheduleFill(); // replenish async
+        return q;
+      } catch(e) { return null; }
     }
     const q = questionQueue.shift();
-    if (questionQueue.length < QUEUE_TARGET / 2) {
-      // Refill async so it never blocks the UI
-      setTimeout(fillQueue, 0);
-    }
+    if (questionQueue.length < Math.ceil(QUEUE_TARGET / 2)) scheduleFill();
     return q;
   }
 
+  // ── rAF-throttled scroll handler ──
+  let _rafPending = false;
+  function onFeedScroll() {
+    if (_rafPending) return;
+    _rafPending = true;
+    requestAnimationFrame(() => {
+      _rafPending = false;
+      handleScroll();
+    });
+  }
+
+  function handleScroll() {
+    const slideH = feed.clientHeight;
+    if (!slideH) return;
+    const currentSlide = Math.floor((feed.scrollTop + slideH * 0.5) / slideH);
+    // Add slides ahead
+    const targetSlides = currentSlide + KEEP_AHEAD + 1;
+    while (slides < targetSlides) addSlide();
+    // Prune old slides
+    pruneSlides(currentSlide);
+    // Replenish queue if low
+    if (questionQueue.length < Math.ceil(QUEUE_TARGET / 2)) scheduleFill();
+  }
+
+  // ── IntersectionObserver sentinel (bottom of feed) ──
+  let _sentinel = null;
+  function attachSentinel() {
+    if (_sentinel) _sentinel.remove();
+    _sentinel = document.createElement('div');
+    _sentinel.style.cssText = 'height:1px;width:100%;flex-shrink:0;';
+    feed.appendChild(_sentinel);
+    const obs = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        obs.disconnect();
+        for (let i = 0; i < KEEP_AHEAD; i++) addSlide();
+        attachSentinel();
+      }
+    }, { root: feed, threshold: 0 });
+    obs.observe(_sentinel);
+  }
+
+  // ── Real DOM pruning — replace with spacer divs ──
+  function pruneSlides(currentSlide) {
+    const cutoff = currentSlide - KEEP_BEHIND;
+    if (cutoff <= firstSlide) return;
+
+    for (let idx = firstSlide; idx < cutoff; idx++) {
+      const el = feed.querySelector(`.slide[data-slide-idx="${idx}"]`);
+      if (!el) continue;
+      // Replace real slide with a cheap spacer of identical height
+      const spacer = document.createElement('div');
+      spacer.className = 'slide-spacer';
+      spacer.dataset.slideIdx = idx;
+      feed.replaceChild(spacer, el);
+    }
+    firstSlide = cutoff;
+  }
+
+  function addSlide() {
+    const idx = slides++;
+    const div = document.createElement('div');
+    div.className = 'slide';
+    div.dataset.slideIdx = idx;
+
+    let q = null;
+    try { q = nextQuestion(); } catch(e) { console.warn('[BrainDeer] nextQuestion threw:', e); }
+
+    if (!q) {
+      div.innerHTML = renderFallback(idx);
+      feed.appendChild(div);
+      return;
+    }
+
+    try {
+      const customRenderer = Q._renderers && Q._renderers[q.type];
+      if (customRenderer) {
+        div.innerHTML = customRenderer.render(q, idx);
+        // Insert before sentinel if it exists, otherwise just append
+        if (_sentinel && _sentinel.parentNode === feed) {
+          feed.insertBefore(div, _sentinel);
+        } else {
+          feed.appendChild(div);
+        }
+        try {
+          customRenderer.attach(div, q, idx, {
+            feed, flashEl, confettiEl, IQData, getEncouragement,
+            updateUI, checkMore: handleScroll, spawnConfetti,
+            answerStartRef: { get: () => answerStart, set: v => { answerStart = v; } },
+            Haptics,
+            notifyGamePlayed: window.notifyGamePlayed,
+            onAnswer: window.onAnswerForTasks,
+          });
+        } catch (e) {
+          console.warn('[BrainDeer] attach failed for type:', q.type, e);
+        }
+      } else {
+        div.innerHTML = renderDefault(q, idx);
+        if (_sentinel && _sentinel.parentNode === feed) {
+          feed.insertBefore(div, _sentinel);
+        } else {
+          feed.appendChild(div);
+        }
+      }
+    } catch (e) {
+      console.warn('[BrainDeer] render failed for type:', q && q.type, e);
+      div.innerHTML = renderFallback(idx);
+      if (_sentinel && _sentinel.parentNode === feed) {
+        feed.insertBefore(div, _sentinel);
+      } else {
+        feed.appendChild(div);
+      }
+    }
+
+    answerStart = Date.now();
+  }
+
+  function renderFallback(idx) {
+    return `
+      <div class="qcard">
+        <div class="category">Brain Training</div>
+        <div class="question">Keep scrolling — more challenges ahead! 🦌</div>
+        <div class="branding">braindeer.org</div>
+      </div>`;
+  }
+
+  function renderDefault(q, idx) {
+    let visual = '';
+    if (q.visual === 'sequence' || q.visual === 'letterSequence') {
+      const parts = q.sequence.map((n, i) => {
+        if (n === '?') return `<span class="blank">?</span>`;
+        const arrow = i < q.sequence.length - 1 ? `<span class="arrow">→</span>` : '';
+        return `<span>${n}</span>${arrow}`;
+      });
+      if (q.sequence[q.sequence.length - 1] !== '?')
+        parts.push(`<span class="arrow">→</span><span class="blank">?</span>`);
+      visual = `<div class="sequence">${parts.join('')}</div>`;
+    } else if (q.visual === 'matrix') {
+      visual = `<div class="matrix">${q.grid.map(c =>
+        `<div class="matrix-cell${c === '?' ? ' blank' : ''}">${c}</div>`
+      ).join('')}</div>`;
+    }
+    const wide = q.options.some(o => String(o).length > 20);
+    return `
+      <div class="qcard">
+        <div class="category">${q.categoryLabel}</div>
+        <div class="question">${q.question}</div>
+        ${visual}
+        <div class="options${wide ? ' wide' : ''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">
+          ${q.options.map(o => `<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}
+        </div>
+        <div class="feedback" id="fb-${idx}"></div>
+        <div class="explain"  id="exp-${idx}">${q.explanation}</div>
+        <div class="branding">braindeer.org</div>
+      </div>
+      <div class="scroll-hint" id="hint-${idx}">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        Swipe for next
+      </div>`;
+  }
+
+  // ── Answer handler ──
+  document.addEventListener('click', e => {
+    if (!e.target.classList.contains('opt')) return;
+    const btn  = e.target;
+    const opts = btn.parentElement;
+    if (opts.dataset.done) return;
+    opts.dataset.done = '1';
+
+    const idx       = parseInt(opts.dataset.idx);
+    const correct   = opts.dataset.ans;
+    const isCorrect = btn.dataset.v === correct;
+    const ms        = Date.now() - answerStart;
+
+    opts.querySelectorAll('.opt').forEach(o => {
+      if      (o.dataset.v === correct) o.classList.add(isCorrect ? 'correct' : 'show-correct');
+      else if (o === btn)               o.classList.add('wrong');
+      else                              o.classList.add('dim');
+    });
+
+    const result = IQData.recordAnswer(opts.dataset.cat, isCorrect, parseFloat(opts.dataset.diff), ms);
+
+    if (isCorrect) {
+      if (result.streak > 0 && result.streak % 5 === 0) Haptics.streak();
+      else Haptics.success();
+    } else {
+      Haptics.error();
+    }
+    if (result.leveledUp) setTimeout(() => Haptics.levelUp(), 300);
+
+    const fb = document.getElementById(`fb-${idx}`);
+    fb.textContent = getEncouragement(result.streak, isCorrect);
+    fb.className   = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
+
+    if (isCorrect) { flashEl.className = 'flash green show'; spawnConfetti(8); }
+    else           { flashEl.className = 'flash red show'; }
+    setTimeout(() => flashEl.className = 'flash', 350);
+
+    if (isCorrect && result.streak > 0 && result.streak % 5 === 0) {
+      setTimeout(() => {
+        streakNum.textContent = result.streak;
+        streakPopup.classList.add('show');
+        spawnConfetti(25);
+        setTimeout(() => streakPopup.classList.remove('show'), 1800);
+      }, 300);
+    }
+
+    const session = updateSessionStats(isCorrect, ms);
+    updateTaskProgress(result.streak, isCorrect, ms, session);
+    updateTasksBadge();
+
+    updateUI(result);
+    handleScroll();
+    setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'),  250);
+    setTimeout(() => document.getElementById(`hint-${idx}`)?.classList.add('show'), 500);
+    answerStart = Date.now();
+  });
+
+  // ── Onboarding / calibration ──
   ageSlider.oninput = () => { ageDisplay.textContent = ageSlider.value; Haptics.light(); };
   document.getElementById('start-btn').addEventListener('click', () => {
     Haptics.medium();
@@ -834,13 +1091,14 @@
     startFeed();
   });
 
+  // ── Init ──
   function init() {
     const d = IQData.load();
     updateUI(d);
     updateTasksBadge();
-    if      (IQData.needsOnboarding())   { onboard.classList.add('show'); }
-    else if (IQData.needsCalibration())  { Q.setAge(d.age); startCalibration(); }
-    else                                 { startFeed(); }
+    if      (IQData.needsOnboarding())  { onboard.classList.add('show'); }
+    else if (IQData.needsCalibration()) { Q.setAge(d.age); startCalibration(); }
+    else                                { startFeed(); }
   }
 
   function startFeed() {
@@ -848,229 +1106,38 @@
     Q.setAge(d.age || 25);
     IQData.startSession();
     updateUI(d);
-    fillQueue();
-    for (let i = 0; i < 8; i++) addSlide();
+
+    // Seed queue with just a few questions upfront — rest fills lazily
+    scheduleFill();
+
+    // Render initial batch (small — just enough to fill screen + 1 ahead)
+    for (let i = 0; i < 3; i++) addSlide();
+
     feed.addEventListener('scroll',    onFeedScroll, { passive: true });
     feed.addEventListener('touchmove', onFeedScroll, { passive: true });
-    setInterval(proactiveFill, 500);
+
     attachSentinel();
     setTimeout(maybeShowPushPrompt, 3000);
+
+    // Kick off first real fill now that feed is visible
+    scheduleFill();
   }
 
-  function onFeedScroll() {
-    const slideH = feed.clientHeight;
-    if (!slideH) return;
-    const currentSlide = Math.floor(feed.scrollTop / slideH);
-    // Add ahead
-    while (slides < currentSlide + KEEP_AHEAD) addSlide();
-    // Prune behind — replace old slide nodes with cheap spacers
-    pruneSlides(currentSlide);
-  }
-
-  let _lastScrollTop = -1;
-  let _staleTicks = 0;
-  let _sentinel = null;
-
-  function attachSentinel() {
-    if (_sentinel) _sentinel.remove();
-    _sentinel = document.createElement('div');
-    _sentinel.style.cssText = 'height:1px;width:100%;flex-shrink:0;';
-    feed.appendChild(_sentinel);
-    const obs = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        obs.disconnect();
-        for (let i = 0; i < KEEP_AHEAD; i++) addSlide();
-        attachSentinel();
-      }
-    }, { root: feed, threshold: 0 });
-    obs.observe(_sentinel);
-  }
-
-  function proactiveFill() {
-    const st = feed.scrollTop;
-    if (st === _lastScrollTop) { _staleTicks++; }
-    else { _staleTicks = 0; _lastScrollTop = st; }
-    if (_staleTicks >= 2) {
-      for (let i = 0; i < KEEP_AHEAD; i++) addSlide();
-      attachSentinel();
-      _staleTicks = 0;
-    }
-  }
-
-  function pruneSlides(currentSlide) {
-    const cutoff = currentSlide - KEEP_BEHIND;
-    if (cutoff <= firstSlide) return;
-    const children = feed.querySelectorAll('.slide:not([data-pruned])');
-    children.forEach(el => {
-      const idx = parseInt(el.dataset.slideIdx);
-      if (idx < cutoff) {
-        el.dataset.pruned = '1';
-        // Don't touch dimensions at all — just tell the browser to skip
-        // painting and compositing this slide. Zero alignment risk.
-        el.style.contentVisibility = 'hidden';
-      }
-    });
-    firstSlide = cutoff;
-  }
-
-  function addSlide() {
-    const idx = slides++;
-    const div = document.createElement('div');
-    div.className = 'slide';
-    div.dataset.slideIdx = idx; // needed for pruning
-
-    let q = null;
-    try { q = nextQuestion(); } catch(e) { console.warn('[BrainDeer] nextQuestion threw:', e); }
-
-    if (!q) {
-      div.innerHTML = renderFallback(idx);
-      feed.appendChild(div);
-      return;
-    }
-
-    try {
-      const customRenderer = Q._renderers && Q._renderers[q.type];
-      if (customRenderer) {
-        div.innerHTML = customRenderer.render(q, idx);
-        feed.appendChild(div);
-        try {
-          customRenderer.attach(div, q, idx, {
-            feed, flashEl, confettiEl, IQData, getEncouragement,
-            updateUI, checkMore: onFeedScroll, spawnConfetti,
-            answerStartRef: { get: () => answerStart, set: v => { answerStart = v; } },
-            Haptics,
-            notifyGamePlayed: window.notifyGamePlayed,
-            onAnswer: window.onAnswerForTasks,
-          });
-        } catch (e) {
-          console.warn('[BrainDeer] attach failed for type:', q.type, e);
-        }
-      } else {
-        div.innerHTML = renderDefault(q, idx);
-        feed.appendChild(div);
-      }
-    } catch (e) {
-      console.warn('[BrainDeer] render failed for type:', q && q.type, e);
-      div.innerHTML = renderFallback(idx);
-      feed.appendChild(div);
-    }
-
-    answerStart = Date.now();
-  }
-
-  function renderFallback(idx) {
-    // Shown only if a specific game renderer crashes — keeps scroll flowing
-    return `
-      <div class="qcard">
-        <div class="category">Brain Training</div>
-        <div class="question">Keep scrolling — more challenges ahead! 🦌</div>
-        <div class="branding">braindeer.org</div>
-      </div>`;
-  }
-
-  function renderDefault(q, idx) {
-    let visual = '';
-    if (q.visual === 'sequence' || q.visual === 'letterSequence') {
-      const parts = q.sequence.map((n, i) => {
-        if (n === '?') return `<span class="blank">?</span>`;
-        const arrow = i < q.sequence.length - 1 ? `<span class="arrow">→</span>` : '';
-        return `<span>${n}</span>${arrow}`;
-      });
-      if (q.sequence[q.sequence.length - 1] !== '?')
-        parts.push(`<span class="arrow">→</span><span class="blank">?</span>`);
-      visual = `<div class="sequence">${parts.join('')}</div>`;
-    } else if (q.visual === 'matrix') {
-      visual = `<div class="matrix">${q.grid.map(c =>
-        `<div class="matrix-cell${c === '?' ? ' blank' : ''}">${c}</div>`
-      ).join('')}</div>`;
-    }
-    const wide = q.options.some(o => String(o).length > 20);
-    return `
-      <div class="qcard">
-        <div class="category">${q.categoryLabel}</div>
-        <div class="question">${q.question}</div>
-        ${visual}
-        <div class="options${wide ? ' wide' : ''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">
-          ${q.options.map(o => `<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}
-        </div>
-        <div class="feedback" id="fb-${idx}"></div>
-        <div class="explain"  id="exp-${idx}">${q.explanation}</div>
-        <div class="branding">braindeer.org</div>
-      </div>
-      <div class="scroll-hint" id="hint-${idx}">
-        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-        Swipe for next
-      </div>`;
-  }
-
-  document.addEventListener('click', e => {
-    if (!e.target.classList.contains('opt')) return;
-    const btn  = e.target;
-    const opts = btn.parentElement;
-    if (opts.dataset.done) return;
-    opts.dataset.done = '1';
-
-    const idx       = parseInt(opts.dataset.idx);
-    const correct   = opts.dataset.ans;
-    const isCorrect = btn.dataset.v === correct;
-    const ms        = Date.now() - answerStart;
-
-    opts.querySelectorAll('.opt').forEach(o => {
-      if      (o.dataset.v === correct) o.classList.add(isCorrect ? 'correct' : 'show-correct');
-      else if (o === btn)               o.classList.add('wrong');
-      else                              o.classList.add('dim');
-    });
-
-    const result = IQData.recordAnswer(opts.dataset.cat, isCorrect, parseFloat(opts.dataset.diff), ms);
-
-    if (isCorrect) {
-      if (result.streak > 0 && result.streak % 5 === 0) Haptics.streak();
-      else Haptics.success();
-    } else {
-      Haptics.error();
-    }
-    if (result.leveledUp) setTimeout(() => Haptics.levelUp(), 300);
-
-    const fb = document.getElementById(`fb-${idx}`);
-    fb.textContent = getEncouragement(result.streak, isCorrect);
-    fb.className   = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
-
-    if (isCorrect) { flashEl.className = 'flash green show'; spawnConfetti(8); }
-    else           { flashEl.className = 'flash red show'; }
-    setTimeout(() => flashEl.className = 'flash', 350);
-
-    if (isCorrect && result.streak > 0 && result.streak % 5 === 0) {
-      setTimeout(() => {
-        streakNum.textContent = result.streak;
-        streakPopup.classList.add('show');
-        spawnConfetti(25);
-        setTimeout(() => streakPopup.classList.remove('show'), 1800);
-      }, 300);
-    }
-
-    const session = updateSessionStats(isCorrect, ms);
-    updateTaskProgress(result.streak, isCorrect, ms, session);
-    updateTasksBadge();
-
-    updateUI(result);
-    onFeedScroll();
-    setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'),  250);
-    setTimeout(() => document.getElementById(`hint-${idx}`)?.classList.add('show'), 500);
-    answerStart = Date.now();
-  });
-
+  // ── Confetti ──
   function spawnConfetti(n) {
     const colors = ['#58cc02','#ffc800','#ea2b2b','#1cb0f6','#ce82ff','#ff9600'];
+    const frag = document.createDocumentFragment();
     for (let i = 0; i < n; i++) {
       const p = document.createElement('i');
       p.style.left           = Math.random() * 100 + '%';
       p.style.top            = '-10px';
       p.style.background     = colors[Math.floor(Math.random() * colors.length)];
       p.style.animationDelay = Math.random() * 0.2 + 's';
-      confettiEl.appendChild(p);
+      frag.appendChild(p);
       setTimeout(() => p.classList.add('fall'), 10);
       setTimeout(() => p.remove(), 1400);
     }
+    confettiEl.appendChild(frag);
   }
 
   function updateUI(d) {
@@ -1083,6 +1150,7 @@
     xpLabel.textContent    = xpInLevel + '/150';
   }
 
+  // ── Push ──
   const VAPID_PUBLIC_KEY = 'BCeif8Bk8ozGVFukIl2zE7UWB1YXN5eBPF0nHgNc0ELsEyNmZ0VE3xo15UCuqjgNg9dARdIKThXKakZL9ci8ZXI';
 
   function maybeShowPushPrompt() {
