@@ -145,7 +145,7 @@
   var currentScreen = null;
   var screensLoaded = {};
 
-  function goTo(page) {
+  window.goTo = function goTo(page) {
     document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
 
     // Always reload profile and leaderboard fresh; tasks reloads too for fresh data
