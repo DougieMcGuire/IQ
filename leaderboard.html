@@ -445,7 +445,57 @@
   // Expose so data.js / improve.html can call after recording an answer
   window.updateLeaderboardSnapshot = pushMyEntryToSnapshot;
 
-  // ── Fetch the snapshot (1 read) ──
+  // ── One-time migration: build snapshot from all existing users/{uid} docs ──
+  // Only runs when leaderboard/snapshot doesn't exist yet.
+  async function migrateSnapshotFromUsers() {
+    try {
+      const { collection, getDocs, query, orderBy, limit, where } =
+        await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+
+      let snap;
+      try {
+        snap = await getDocs(query(
+          collection(db, 'users'),
+          where('calibrated', '==', true),
+          orderBy('iq', 'desc'),
+          limit(200)
+        ));
+      } catch {
+        snap = await getDocs(query(
+          collection(db, 'users'),
+          orderBy('iq', 'desc'),
+          limit(200)
+        ));
+      }
+
+      const users = snap.docs
+        .map(d => ({ uid: d.id, ...d.data() }))
+        .filter(u => u.calibrated && (u.answered || 0) >= 5 && !u.hideFromLeaderboard)
+        .map(u => ({
+          uid:        u.uid,
+          username:   u.username   || 'Anonymous',
+          iq:         u.iq         || 0,
+          level:      u.level      || 1,
+          bestStreak: u.bestStreak || 0,
+          answered:   u.answered   || 0,
+          correct:    u.correct    || 0,
+          pic:        u.pic        || '',
+          hidden:     false,
+          updatedAt:  Date.now(),
+        }));
+
+      users.sort((a, b) => (b.iq || 0) - (a.iq || 0));
+      const ref = doc(db, 'leaderboard', 'snapshot');
+      await setDoc(ref, { users, updatedAt: Date.now(), migrated: true });
+      console.log('[leaderboard] migrated ' + users.length + ' users into snapshot');
+      return users;
+    } catch (e) {
+      console.warn('[leaderboard] migration failed:', e.message);
+      return [];
+    }
+  }
+
+  // ── Fetch the snapshot (1 read normally, N reads only on very first load) ──
   async function fetchSnapshot(forced = false) {
     const btn = document.getElementById('refresh-btn');
     btn.classList.add('spinning');
@@ -464,23 +514,27 @@
         }
       }
 
-      // 1 Firestore read total
+      // 1 Firestore read
       const ref  = doc(db, 'leaderboard', 'snapshot');
       const snap = await getDoc(ref);
 
       if (snap.exists()) {
         const data = snap.data();
-        allUsers = (data.users || []).filter(u => !u.hidden && u.iq >= 50 && u.answered >= 5);
+        allUsers = (data.users || []).filter(u => !u.hidden && (u.iq || 0) >= 50 && (u.answered || 0) >= 5);
         setCached({ users: allUsers });
         snapshotAge = 0;
       } else {
-        allUsers = [];
+        // Snapshot doesn't exist — run one-time migration from users collection
+        console.log('[leaderboard] snapshot missing, running one-time migration...');
+        const migrated = await migrateSnapshotFromUsers();
+        allUsers = migrated.filter(u => (u.iq || 0) >= 50 && (u.answered || 0) >= 5);
+        setCached({ users: allUsers });
+        snapshotAge = 0;
       }
     } catch (e) {
-      console.error('[leaderboard] fetchSnapshot failed', e);
+      console.error('[leaderboard] fetchSnapshot failed:', e.message);
       Haptics.error && Haptics.error();
       toast('Could not load — check connection', 'var(--red)');
-      // Fall back to cached if available
       const cached = getCached();
       if (cached && cached.users) allUsers = cached.users;
     }
