@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>BrainDeer — Signing in…</title>
+  <title>BrainDeer — Sign in with Google</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
@@ -15,7 +15,8 @@
     }
     .mascot{font-size:52px;animation:bob 1.2s ease-in-out infinite}
     .title{font-size:22px;font-weight:900;margin:10px 0 4px}
-    .sub{font-size:14px;font-weight:700;color:#c2a476;margin-bottom:24px;line-height:1.5}
+    .sub{font-size:14px;font-weight:700;color:#c2a476;margin-bottom:24px;line-height:1.5;max-width:300px}
+
     .dots{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
     .dots span{
       width:8px;height:8px;border-radius:50%;background:#6b4f32;
@@ -23,6 +24,20 @@
     }
     .dots span:nth-child(2){animation-delay:.15s}
     .dots span:nth-child(3){animation-delay:.3s}
+
+    .btn-go{
+      padding:15px 36px;border:none;border-radius:14px;
+      background:#58cc02;color:#fff;font-size:16px;font-weight:900;
+      font-family:'Nunito',sans-serif;cursor:pointer;
+      box-shadow:0 5px 0 #46a302;
+      transition:transform .1s,box-shadow .1s;
+      display:none;margin-bottom:16px;
+    }
+    .btn-go:active{transform:translateY(4px);box-shadow:0 1px 0 #46a302}
+    .btn-go.show{display:inline-flex;align-items:center;gap:10px}
+
+    .btn-go svg{width:20px;height:20px;flex-shrink:0}
+
     .err{
       background:#ea2b2b;color:#fff;padding:12px 18px;
       border-radius:12px;font-size:14px;font-weight:700;
@@ -30,14 +45,9 @@
       box-shadow:0 3px 0 #c42020;
     }
     .err.show{display:block}
-    .btn-retry{
-      margin-top:14px;padding:12px 28px;border:none;border-radius:12px;
-      background:#58cc02;color:#fff;font-size:15px;font-weight:800;
-      font-family:'Nunito',sans-serif;cursor:pointer;display:none;
-      box-shadow:0 4px 0 #46a302;
-    }
-    .btn-retry:active{transform:translateY(3px);box-shadow:0 1px 0 #46a302}
-    .btn-retry.show{display:inline-block}
+
+    .hidden{display:none!important}
+
     @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
     @keyframes dotPulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
   </style>
@@ -46,15 +56,25 @@
 
 <div class="mascot">🦌</div>
 <div class="title">BrainDeer</div>
-<div class="sub">Connecting to Google…</div>
-<div class="dots"><span></span><span></span><span></span></div>
+<div class="sub" id="sub">Preparing sign-in…</div>
+<div class="dots" id="dots"><span></span><span></span><span></span></div>
+
+<button class="btn-go" id="btnGo" onclick="doRedirect()">
+  <svg viewBox="0 0 48 48">
+    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+  </svg>
+  Continue with Google
+</button>
+
 <div class="err" id="err"></div>
-<button class="btn-retry" id="retryBtn" onclick="startAuth()">Try Again</button>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import {
-    getAuth, signInWithPopup, GoogleAuthProvider
+    getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import {
     getFirestore, doc, setDoc, serverTimestamp
@@ -77,41 +97,86 @@
   const params    = new URLSearchParams(window.location.search);
   const sessionId = params.get('session');
 
+  const sub  = document.getElementById('sub');
+  const dots = document.getElementById('dots');
+  const errEl = document.getElementById('err');
+  const btn  = document.getElementById('btnGo');
+
   function showError(msg) {
-    const el = document.getElementById('err');
-    el.textContent = msg;
-    el.classList.add('show');
-    document.getElementById('retryBtn').classList.add('show');
-    document.querySelector('.dots').style.display = 'none';
-    document.querySelector('.sub').textContent = 'Something went wrong';
+    errEl.textContent = msg;
+    errEl.classList.add('show');
+    dots.classList.add('hidden');
+    sub.textContent = 'Something went wrong';
+    btn.classList.add('show');
+    btn.innerHTML = 'Try Again';
   }
 
-  if (!sessionId) {
+  function showLoading(msg) {
+    errEl.classList.remove('show');
+    dots.classList.remove('hidden');
+    btn.classList.remove('show');
+    sub.textContent = msg;
+  }
+
+  function showButton(msg) {
+    dots.classList.add('hidden');
+    sub.textContent = msg;
+    btn.classList.add('show');
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  //  FLOW (iOS standalone PWA → Safari bridge):
+  //
+  //  1. auth.html detects iOS standalone, redirects here with ?session=ID
+  //     (this opens in Safari, escaping the sandboxed WKWebView)
+  //  2. We store sessionId in sessionStorage for persistence across redirect
+  //  3. User taps "Continue with Google" → signInWithRedirect kicks off
+  //  4. Google auth completes, Safari redirects back to this page
+  //  5. getRedirectResult() picks up the credential + idToken
+  //  6. We write idToken to Firestore authSessions doc
+  //  7. Redirect to app.html?session=ID — app.html redeems it
+  // ═══════════════════════════════════════════════════════════════════════
+
+  // Store session ID so it survives the Google redirect round-trip
+  if (sessionId) {
+    sessionStorage.setItem('bd_session', sessionId);
+  }
+  const activeSession = sessionId || sessionStorage.getItem('bd_session');
+
+  if (!activeSession) {
     showError('Missing session — please go back to BrainDeer and try again.');
   }
 
-  window.startAuth = async function() {
-    // Reset UI
-    document.getElementById('err').classList.remove('show');
-    document.getElementById('retryBtn').classList.remove('show');
-    document.querySelector('.dots').style.display = 'flex';
-    document.querySelector('.sub').textContent = 'Connecting to Google…';
+  // ── Check if returning from Google redirect ──────────────────────────
+  getRedirectResult(auth).then(async (result) => {
+    if (!result || !result.user) {
+      // First visit — no redirect result yet. Show button.
+      if (activeSession) {
+        showButton('Tap below to sign in with Google');
+      }
+      return;
+    }
+
+    // ── We have a result! Extract idToken ─────────────────────────────
+    showLoading('Signed in! Returning to app…');
+
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const idToken = credential ? credential.idToken : null;
+
+    if (!idToken) {
+      showError('Could not get Google token. Please try again.');
+      return;
+    }
+
+    const sid = activeSession;
+    if (!sid) {
+      showError('Session lost. Please go back to BrainDeer and try again.');
+      return;
+    }
 
     try {
-      // Do Google auth in Safari (where it works)
-      const result = await signInWithPopup(auth, gp);
-
-      // Get the Google ID token from the credential
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const idToken = credential.idToken;
-
-      if (!idToken) throw new Error('No ID token received');
-
-      document.querySelector('.sub').textContent = 'Signed in! Returning to app…';
-
-      // Create the session doc with the idToken (doc is created here,
-      // not in the PWA, because Firestore fails in iOS standalone WKWebView)
-      const sessionRef = doc(db, 'authSessions', sessionId);
+      // Write the session doc so app.html can redeem it
+      const sessionRef = doc(db, 'authSessions', sid);
       await setDoc(sessionRef, {
         idToken:     idToken,
         createdAt:   serverTimestamp(),
@@ -120,31 +185,37 @@
         completedAt: serverTimestamp()
       });
 
-      // Sign out of this Safari context so there's no stale auth state
+      // Sign out of Safari so there's no stale auth
       await auth.signOut();
+      sessionStorage.removeItem('bd_session');
 
-      // Redirect back to the app — app.html will pick up ?session= and
-      // use signInWithCredential to complete the auth in the PWA context
-      window.location.href = 'https://braindeer.org/app.html?session=' + sessionId;
+      // Send user back — app.html picks up ?session= and signs in
+      window.location.href = 'https://braindeer.org/app.html?session=' + sid;
 
     } catch (e) {
-      console.error('Bridge auth error:', e);
-
-      if (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') {
-        showError('Sign-in was cancelled. Tap "Try Again" to retry.');
-      } else if (e.code === 'auth/network-request-failed') {
-        showError('No internet connection. Check your connection and try again.');
-      } else {
-        showError('Sign-in failed. Tap "Try Again" to retry.');
-      }
+      console.error('Firestore write failed:', e);
+      showError('Could not complete sign-in. Please try again.');
     }
-  };
 
-  // Auto-start auth if we have a session
-  if (sessionId) {
-    // Small delay so the user sees the loading state
-    setTimeout(() => startAuth(), 400);
-  }
+  }).catch((e) => {
+    console.error('getRedirectResult error:', e);
+    if (activeSession) {
+      showButton('Tap below to sign in with Google');
+    }
+  });
+
+  // ── Button handler → signInWithRedirect ──────────────────────────────
+  window.doRedirect = function() {
+    if (!activeSession) {
+      showError('Missing session. Go back to BrainDeer and try again.');
+      return;
+    }
+    showLoading('Redirecting to Google…');
+    signInWithRedirect(auth, gp).catch((e) => {
+      console.error('Redirect failed:', e);
+      showError('Could not open Google sign-in. Please try again.');
+    });
+  };
 </script>
 
 </body>
