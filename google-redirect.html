@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#3a2918">
+  <title>BrainDeer — Signing in…</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      background:#3a2918;font-family:'Nunito',sans-serif;color:#f0e2cc;
+      min-height:100dvh;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;padding:24px;text-align:center;
+    }
+    .mascot{font-size:52px;animation:bob 1.2s ease-in-out infinite}
+    .title{font-size:22px;font-weight:900;margin:10px 0 6px}
+    .sub{font-size:14px;font-weight:700;color:#c2a476;margin-bottom:20px}
+    .dots{display:flex;gap:6px;justify-content:center}
+    .dots span{
+      width:8px;height:8px;border-radius:50%;background:#6b4f32;
+      animation:dotPulse 1s ease infinite;
+    }
+    .dots span:nth-child(2){animation-delay:.15s}
+    .dots span:nth-child(3){animation-delay:.3s}
+    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    @keyframes dotPulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+  </style>
+</head>
+<body>
+  <div class="mascot">🦌</div>
+  <div class="title">BrainDeer</div>
+  <div class="sub" id="status">Redirecting to Google…</div>
+  <div class="dots"><span></span><span></span><span></span></div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    var firebaseConfig = {
+      apiKey:            "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
+      authDomain:        "braindeer-backend.firebaseapp.com",
+      projectId:         "braindeer-backend",
+      storageBucket:     "braindeer-backend.firebasestorage.app",
+      messagingSenderId: "331205139765",
+      appId:             "1:331205139765:web:20cfef8194af63fc55c07c"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    var auth = firebase.auth();
+    var db   = firebase.firestore();
+    var provider = new firebase.auth.GoogleAuthProvider();
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  This page runs at the TOP LEVEL (not in an iframe).
+    //
+    //  STEP 1: Check if we're returning from a Google redirect.
+    //          If yes → we have the credential → ensure user doc → go to app
+    //  STEP 2: If no redirect result → kick off signInWithRedirect
+    //
+    //  On iOS standalone PWA (12.2+), the Google auth page opens in an
+    //  in-app browser that shares storage with the PWA. When it redirects
+    //  back to this page, the in-app browser closes and the PWA resumes.
+    // ════════════════════════════════════════════════════════════════════════
+
+    auth.getRedirectResult().then(function(result) {
+      if (result && result.user) {
+        // ── Returning from Google — sign-in succeeded! ──────────────────
+        document.getElementById('status').textContent = 'Signed in! Loading BrainDeer…';
+
+        // Ensure Firestore user doc exists
+        var ref = db.collection('users').doc(result.user.uid);
+        return ref.get().then(function(snap) {
+          if (!snap.exists) {
+            return ref.set({
+              uid:       result.user.uid,
+              email:     result.user.email,
+              username:  result.user.displayName || null,
+              pic:       result.user.photoURL || null,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+              lastSeen:  firebase.firestore.FieldValue.serverTimestamp()
+            });
+          } else {
+            return ref.set(
+              { lastSeen: firebase.firestore.FieldValue.serverTimestamp() },
+              { merge: true }
+            );
+          }
+        }).then(function() {
+          // Go to app — user is now authenticated
+          window.location.replace('app.html');
+        });
+      }
+
+      // ── No redirect result — first visit. Start the redirect. ─────────
+      // Use a small delay to ensure Firebase is fully initialized
+      return auth.signInWithRedirect(provider);
+
+    }).catch(function(e) {
+      console.error('Google redirect error:', e);
+      document.getElementById('status').textContent =
+        'Sign-in failed. Tap to try again.';
+      document.body.style.cursor = 'pointer';
+      document.body.onclick = function() {
+        document.getElementById('status').textContent = 'Redirecting to Google…';
+        auth.signInWithRedirect(provider);
+      };
+    });
+  </script>
+</body>
+</html>
