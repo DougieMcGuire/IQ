@@ -57,7 +57,7 @@
     getAuth, signInWithPopup, GoogleAuthProvider
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import {
-    getFirestore, doc, updateDoc, serverTimestamp
+    getFirestore, doc, setDoc, serverTimestamp
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const cfg = {
@@ -109,10 +109,14 @@
 
       document.querySelector('.sub').textContent = 'Signed in! Returning to app…';
 
-      // Write the idToken to the Firestore session doc
+      // Create the session doc with the idToken (doc is created here,
+      // not in the PWA, because Firestore fails in iOS standalone WKWebView)
       const sessionRef = doc(db, 'authSessions', sessionId);
-      await updateDoc(sessionRef, {
+      await setDoc(sessionRef, {
         idToken:     idToken,
+        createdAt:   serverTimestamp(),
+        expiresAt:   new Date(Date.now() + 5 * 60 * 1000),
+        used:        false,
         completedAt: serverTimestamp()
       });
 
