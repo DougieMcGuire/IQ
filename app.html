@@ -106,15 +106,12 @@
   window.addEventListener('message', function(e) {
     if (!e.data) return;
 
-    // Auth completed inside the auth iframe — switch to improve
     if (e.data.type === 'authSuccess') {
       goTo('improve');
       return;
     }
 
-    // Google redirect requested from auth iframe (iOS/Android standalone PWA)
-    // Navigate the top-level page to google-redirect.html which handles
-    // signInWithRedirect at the top level where it works properly.
+    // Auth iframe requests Google redirect — navigate top-level
     if (e.data.type === 'googleRedirect') {
       window.location.href = 'google-redirect.html';
       return;
@@ -187,7 +184,6 @@
     }
   };
 
-  // Called by improve.html via parent.authCheck() — must exist
   function authCheck() {}
   window.authCheck = authCheck;
 
@@ -246,8 +242,6 @@
     }
   }
 
-  // ── Redeem a Google auth session token (from bridge.html) ──────────────────
-  // Uses signInWithCredential + the stored idToken — no Worker needed.
   function redeemSessionToken(sessionId) {
     return firebase.firestore()
       .collection('authSessions')
@@ -256,18 +250,12 @@
       .then(function(snap) {
         if (!snap.exists) throw new Error('Session not found');
         var data = snap.data();
-
         if (data.used) throw new Error('Session already used');
-
         var exp = data.expiresAt && data.expiresAt.toDate
           ? data.expiresAt.toDate()
           : new Date(data.expiresAt);
         if (new Date() > exp) throw new Error('Session expired');
-
-        // Mark used immediately to prevent replays
         snap.ref.update({ used: true });
-
-        // Sign in with the stored Google idToken — no backend required
         var credential = firebase.auth.GoogleAuthProvider.credential(data.idToken);
         return firebase.auth().signInWithCredential(credential);
       });
@@ -286,25 +274,21 @@
     setScreenBg(looksLoggedIn ? 'improve' : 'auth');
 
     var params    = new URLSearchParams(window.location.search);
-    var tToken    = params.get('t');        // existing install token
-    var sessionId = params.get('session');  // new Google auth session
+    var tToken    = params.get('t');
+    var sessionId = params.get('session');
 
-    // Clean URL immediately regardless of which token type
     if (tToken || sessionId) {
       window.history.replaceState({}, '', window.location.pathname);
     }
 
     if (sessionId) {
-      // Google auth handoff from bridge.html
       redeemSessionToken(sessionId)
         .then(function() { normalAuth(); })
         .catch(function(e) {
           console.warn('Session redeem failed:', e);
           normalAuth();
         });
-
     } else if (tToken) {
-      // Existing install token flow (unchanged)
       fetch(WORKER_URL, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -319,7 +303,6 @@
         normalAuth();
       })
       .catch(function() { normalAuth(); });
-
     } else {
       normalAuth();
     }
