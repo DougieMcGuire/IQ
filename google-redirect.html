@@ -20,53 +20,23 @@
   </style>
 </head>
 <body>
-
 <div class="mascot">🦌</div>
 <div class="title">BrainDeer</div>
 <div class="sub" id="sub">Choose your Google account</div>
 <button class="btn-back" onclick="window.location.replace('app.html')">← Back</button>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-  firebase.initializeApp({
-    apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
-    authDomain:"braindeer-backend.firebaseapp.com",
-    projectId:"braindeer-backend",
-    storageBucket:"braindeer-backend.firebasestorage.app",
-    messagingSenderId:"331205139765",
-    appId:"1:331205139765:web:20cfef8194af63fc55c07c"
-  });
-
+  // GIS callback — store token in sessionStorage then go to app.html
+  // app.html will read it and do signInWithCredential on its own Firebase instance
   window.handleGISCredential = function(response) {
     var idToken = response.credential;
-    if (!idToken) return;
+    if (!idToken) {
+      document.getElementById('sub').textContent = 'No credential received. Tap back and try again.';
+      return;
+    }
     document.getElementById('sub').textContent = 'Signing in…';
-
-    var credential = firebase.auth.GoogleAuthProvider.credential(idToken);
-    firebase.auth().signInWithCredential(credential)
-      .then(function(result) {
-        var ref = firebase.firestore().collection('users').doc(result.user.uid);
-        return ref.get().then(function(snap) {
-          if (!snap.exists) {
-            return ref.set({
-              uid: result.user.uid, email: result.user.email,
-              username: result.user.displayName || null,
-              pic: result.user.photoURL || null,
-              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-              lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-            });
-          }
-          return ref.set({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-        });
-      })
-      .then(function() {
-        window.location.replace('app.html');
-      })
-      .catch(function(err) {
-        document.getElementById('sub').textContent = 'Sign-in failed. Tap back and try again.';
-      });
+    sessionStorage.setItem('bd_gis_token', idToken);
+    window.location.replace('app.html');
   };
 </script>
 <script src="https://accounts.google.com/gsi/client" onload="
@@ -77,6 +47,5 @@
   });
   google.accounts.id.prompt();
 "></script>
-
 </body>
 </html>
