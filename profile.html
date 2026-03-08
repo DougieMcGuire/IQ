@@ -20,75 +20,33 @@
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body { width: 100%; height: 100%; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--cream); }
     body { display: flex; flex-direction: column; }
-    nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      height: calc(64px + env(safe-area-inset-bottom, 0px));
-      background: var(--card); box-shadow: 0 -3px 0 rgba(0,0,0,0.15);
-      display: flex; justify-content: center; align-items: flex-start;
-      padding-top: 6px; gap: 4px; z-index: 100;
-    }
-    .nav-btn {
-      padding: 8px 18px; background: none; border: none;
-      display: flex; flex-direction: column; align-items: center; gap: 2px;
-      color: var(--brown-light); font-family: 'Nunito', sans-serif;
-      font-size: 11px; font-weight: 800; border-radius: 14px;
-      transition: all 0.15s; cursor: pointer; position: relative;
-    }
+    nav { position: fixed; bottom: 0; left: 0; right: 0; height: calc(64px + env(safe-area-inset-bottom, 0px)); background: var(--card); box-shadow: 0 -3px 0 rgba(0,0,0,0.15); display: flex; justify-content: center; align-items: flex-start; padding-top: 6px; gap: 4px; z-index: 100; }
+    .nav-btn { padding: 8px 18px; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--brown-light); font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 800; border-radius: 14px; transition: all 0.15s; cursor: pointer; position: relative; }
     .nav-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
     .nav-btn.active { color: var(--cream); background: var(--brown-mid); box-shadow: 0 3px 0 rgba(0,0,0,0.15); }
-    .nav-badge {
-      position: absolute; top: 5px; right: 12px;
-      width: 9px; height: 9px; border-radius: 50%;
-      background: var(--red); border: 2px solid var(--card);
-      display: none; animation: badgePulse 2s ease infinite;
-    }
+    .nav-badge { position: absolute; top: 5px; right: 12px; width: 9px; height: 9px; border-radius: 50%; background: var(--red); border: 2px solid var(--card); display: none; animation: badgePulse 2s ease infinite; }
     .nav-badge.show { display: block; }
     @keyframes badgePulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.35)} }
-    main {
-      flex: 1; overflow-y: auto;
-      padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(72px + env(safe-area-inset-bottom, 0px));
-    }
+    main { flex: 1; overflow-y: auto; padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(72px + env(safe-area-inset-bottom, 0px)); }
     main::-webkit-scrollbar { display: none; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .header-left { font-size: 14px; font-weight: 800; color: var(--tan); }
-    .signout-btn {
-      background: none; border: none; padding: 8px 14px;
-      font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
-      color: var(--brown-light); cursor: pointer;
-    }
+    .signout-btn { background: none; border: none; padding: 8px 14px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; color: var(--brown-light); cursor: pointer; }
     .signout-btn:active { opacity: 0.6; }
-    .profile-hero {
-      display: flex; flex-direction: column;
-      align-items: center; margin-bottom: 24px; padding: 8px 0 16px;
-    }
+    .profile-hero { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; padding: 8px 0 16px; }
     .avatar-wrap { position: relative; margin-bottom: 14px; }
-    .avatar {
-      width: clamp(80px, 22vw, 100px); height: clamp(80px, 22vw, 100px);
-      border-radius: 50%; background: var(--card);
-      overflow: hidden; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.15);
-      transition: transform 0.1s;
-    }
+    .avatar { width: clamp(80px, 22vw, 100px); height: clamp(80px, 22vw, 100px); border-radius: 50%; background: var(--card); overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.15); transition: transform 0.1s; }
     .avatar:active { transform: scale(0.95); }
     .avatar img { width: 100%; height: 100%; object-fit: cover; display: none; }
     .avatar svg { width: 40px; height: 40px; stroke: var(--brown-light); fill: none; stroke-width: 1.5; }
-    .avatar-edit {
-      position: absolute; bottom: 2px; right: 2px; width: 28px; height: 28px;
-      background: var(--blue); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 3px 0 var(--blue-dark);
-    }
+    .avatar-edit { position: absolute; bottom: 2px; right: 2px; width: 28px; height: 28px; background: var(--blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 3px 0 var(--blue-dark); }
     .avatar-edit svg { width: 12px; height: 12px; stroke: #fff; fill: none; stroke-width: 2.5; }
     #avatar-input { display: none; }
     .iq-num { font-size: clamp(64px, 20vw, 88px); font-weight: 900; line-height: 1; color: var(--cream); text-shadow: 0 4px 0 rgba(0,0,0,0.2); }
     .iq-label { font-size: clamp(14px, 4vw, 18px); font-weight: 900; color: var(--brown-light); letter-spacing: 6px; text-transform: uppercase; margin-bottom: 10px; }
     .pct-badge { background: var(--gold); color: var(--bg); font-size: 14px; font-weight: 900; padding: 5px 16px; border-radius: 12px; box-shadow: 0 3px 0 var(--gold-dark); text-transform: uppercase; }
     .stats-row { display: flex; gap: 8px; width: 100%; margin-bottom: 24px; }
-    .stat-pill {
-      flex: 1; background: var(--card); border-radius: 14px;
-      padding: 12px 8px; display: flex; flex-direction: column;
-      align-items: center; gap: 2px;
-    }
+    .stat-pill { flex: 1; background: var(--card); border-radius: 14px; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
     .stat-pill .sp-icon { margin-bottom: 2px; }
     .stat-pill .sp-icon svg { width: 16px; height: 16px; stroke: var(--tan); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
     .stat-pill .sp-val { font-size: clamp(18px, 5vw, 22px); font-weight: 900; color: var(--cream); line-height: 1.2; }
@@ -102,62 +60,25 @@
     .ability-track { height: 8px; background: var(--brown-mid); border-radius: 4px; overflow: hidden; }
     .ability-fill { height: 100%; border-radius: 4px; transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .ability-val { font-size: 13px; font-weight: 900; color: var(--cream); min-width: 32px; text-align: right; }
-    .share-fab {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%; padding: 14px; margin-bottom: 12px;
-      background: var(--cream); color: var(--bg); border: none; border-radius: 14px;
-      font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 900;
-      cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.15);
-      transition: transform 0.1s; text-transform: uppercase; letter-spacing: 1px;
-    }
+    .share-fab { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; margin-bottom: 12px; background: var(--cream); color: var(--bg); border: none; border-radius: 14px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.15); transition: transform 0.1s; text-transform: uppercase; letter-spacing: 1px; }
     .share-fab:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
     .share-fab svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; }
     .share-fab.uploading { opacity: 0.6; pointer-events: none; }
-    .reset-btn {
-      margin-top: 12px; background: none; border: none;
-      font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700;
-      color: var(--brown-light); cursor: pointer; opacity: 0.3;
-      display: block; width: 100%; text-align: center; padding: 12px;
-    }
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.65);
-      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-      display: none; align-items: flex-end; justify-content: center; z-index: 200;
-    }
+    .reset-btn { margin-top: 12px; background: none; border: none; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; color: var(--brown-light); cursor: pointer; opacity: 0.3; display: block; width: 100%; text-align: center; padding: 12px; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: none; align-items: flex-end; justify-content: center; z-index: 200; }
     .modal-overlay.show { display: flex; }
-    .modal-sheet {
-      background: var(--card); border-radius: 20px 20px 0 0;
-      width: 100%; max-width: 440px;
-      padding: 10px 16px calc(16px + env(safe-area-inset-bottom, 0px));
-      animation: sheetUp 0.28s cubic-bezier(0.32, 0.72, 0, 1);
-    }
+    .modal-sheet { background: var(--card); border-radius: 20px 20px 0 0; width: 100%; max-width: 440px; padding: 10px 16px calc(16px + env(safe-area-inset-bottom, 0px)); animation: sheetUp 0.28s cubic-bezier(0.32, 0.72, 0, 1); }
     @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .sheet-handle { width: 36px; height: 4px; background: var(--brown-mid); border-radius: 2px; margin: 0 auto 16px; }
     .card-preview { background: var(--bg); border-radius: 16px; overflow: hidden; margin-bottom: 16px; }
     .card-preview canvas { width: 100%; display: block; }
     .share-link-bar { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; }
-    .share-link-url {
-      flex: 1; background: var(--bg); border: none; border-radius: 10px;
-      padding: 11px 14px; font-family: 'Nunito', sans-serif;
-      font-size: 13px; font-weight: 700; color: var(--cream);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .share-link-copy {
-      background: var(--cream); color: var(--bg); border: none;
-      border-radius: 10px; padding: 11px 16px;
-      font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 900;
-      cursor: pointer; white-space: nowrap; transition: transform 0.1s;
-    }
+    .share-link-url { flex: 1; background: var(--bg); border: none; border-radius: 10px; padding: 11px 14px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; color: var(--cream); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .share-link-copy { background: var(--cream); color: var(--bg); border: none; border-radius: 10px; padding: 11px 16px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 900; cursor: pointer; white-space: nowrap; transition: transform 0.1s; }
     .share-link-copy:active { transform: scale(0.95); }
     .share-label { font-size: 11px; font-weight: 800; color: var(--tan); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
     .share-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
-    .share-dest {
-      background: var(--bg); border: none; border-radius: 14px;
-      padding: 12px 4px; display: flex; flex-direction: column;
-      align-items: center; gap: 6px; cursor: pointer;
-      font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 800;
-      color: var(--cream); transition: transform 0.1s;
-    }
+    .share-dest { background: var(--bg); border: none; border-radius: 14px; padding: 12px 4px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 800; color: var(--cream); transition: transform 0.1s; }
     .share-dest:active { transform: scale(0.93); }
     .share-dest .sd-icon { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
     .share-dest .sd-icon svg { width: 20px; height: 20px; fill: #fff; }
@@ -168,20 +89,10 @@
     .sd-more .sd-icon { background: var(--brown-mid); }
     .sd-more .sd-icon svg { fill: none; stroke: #fff; stroke-width: 2.5; }
     .save-row { display: flex; gap: 8px; }
-    .save-row button {
-      flex: 1; padding: 13px; border: none; border-radius: 12px;
-      font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800;
-      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
-      transition: transform 0.1s; background: var(--bg); color: var(--cream);
-    }
+    .save-row button { flex: 1; padding: 13px; border: none; border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: transform 0.1s; background: var(--bg); color: var(--cream); }
     .save-row button:active { transform: translateY(2px); }
     .save-row button svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.5; }
-    .toast {
-      position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%) translateY(20px);
-      background: var(--green); color: #fff; padding: 10px 20px; border-radius: 14px;
-      font-size: 14px; font-weight: 800; opacity: 0; transition: all 0.3s;
-      z-index: 300; white-space: nowrap; box-shadow: 0 3px 0 var(--green-dark); pointer-events: none;
-    }
+    .toast { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--green); color: #fff; padding: 10px 20px; border-radius: 14px; font-size: 14px; font-weight: 800; opacity: 0; transition: all 0.3s; z-index: 300; white-space: nowrap; box-shadow: 0 3px 0 var(--green-dark); pointer-events: none; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
@@ -205,25 +116,13 @@
     <div class="pct-badge" id="pct-badge" style="display:none;"></div>
   </div>
   <div class="stats-row">
-    <div class="stat-pill">
-      <div class="sp-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
-      <div class="sp-val" id="answered">0</div><div class="sp-lbl">Done</div>
-    </div>
-    <div class="stat-pill">
-      <div class="sp-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none"/><path d="M12 6v6l4 2"/></svg></div>
-      <div class="sp-val" id="accuracy">0%</div><div class="sp-lbl">Accuracy</div>
-    </div>
-    <div class="stat-pill">
-      <div class="sp-icon"><svg viewBox="0 0 24 24" fill="#ff9600" fill-opacity="0.2" stroke="#ff9600" stroke-width="2.5"><path d="M12 22c-4.97 0-8-3.58-8-7.5 0-3.07 1.74-5.25 3.53-7.28C9.18 5.38 10.34 3.7 10.34 2c0 0 1.77 2.18 2.34 4.18.27.94.5 1.82 1.32 1.82 0-2 1-3 1-3s1 1.5 1 3.5c.5-.5 1.5-1.5 1.5-1.5s1 2.5 1 5c0 3.92-3.03 7.5-8 7.5z"/></svg></div>
-      <div class="sp-val" id="best-streak">0</div><div class="sp-lbl">Best</div>
-    </div>
+    <div class="stat-pill"><div class="sp-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div class="sp-val" id="answered">0</div><div class="sp-lbl">Done</div></div>
+    <div class="stat-pill"><div class="sp-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none"/><path d="M12 6v6l4 2"/></svg></div><div class="sp-val" id="accuracy">0%</div><div class="sp-lbl">Accuracy</div></div>
+    <div class="stat-pill"><div class="sp-icon"><svg viewBox="0 0 24 24" fill="#ff9600" fill-opacity="0.2" stroke="#ff9600" stroke-width="2.5"><path d="M12 22c-4.97 0-8-3.58-8-7.5 0-3.07 1.74-5.25 3.53-7.28C9.18 5.38 10.34 3.7 10.34 2c0 0 1.77 2.18 2.34 4.18.27.94.5 1.82 1.32 1.82 0-2 1-3 1-3s1 1.5 1 3.5c.5-.5 1.5-1.5 1.5-1.5s1 2.5 1 5c0 3.92-3.03 7.5-8 7.5z"/></svg></div><div class="sp-val" id="best-streak">0</div><div class="sp-lbl">Best</div></div>
   </div>
   <div class="section-title">Abilities</div>
   <div class="abilities-list" id="abilities"></div>
-  <button class="share-fab" id="share-btn">
-    <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-    Share Stats
-  </button>
+  <button class="share-fab" id="share-btn"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share Stats</button>
   <button class="reset-btn" id="reset-btn">Reset Progress</button>
 </main>
 <nav>
@@ -242,33 +141,22 @@
     </div>
     <div class="share-label">Share to</div>
     <div class="share-grid">
-      <button class="share-dest sd-x" id="share-x">
-        <div class="sd-icon"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></div>X
-      </button>
-      <button class="share-dest sd-imsg" id="share-imsg">
-        <div class="sd-icon"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="#fff" stroke="none"/></svg></div>iMessage
-      </button>
-      <button class="share-dest sd-snap" id="share-snap">
-        <div class="sd-icon"><svg viewBox="0 0 24 24"><path d="M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.075.045.203.09.401.09.3-.016.659-.12 1.033-.301a.603.603 0 0 1 .274-.074c.12 0 .24.03.345.09.225.12.39.36.385.636.015.24-.075.494-.51.735-.105.06-.345.15-.765.27-.51.14-.76.27-.855.42a.378.378 0 0 0-.03.273c.067.27.3.705.39.885.27.57.54 1.125.54 1.74 0 .03 0 .075-.015.12-.105.69-.615 1.065-1.35 1.29-.225.06-.435.09-.6.12-.135.015-.24.03-.3.045-.06.03-.12.12-.18.27-.045.12-.06.195-.06.27 0 .15.06.285.15.39.135.165.36.255.615.255h.03c.255 0 .525-.03.78-.06.15-.015.315-.03.48-.03.21 0 .42.015.63.06.57.12 1.065.45 1.47.96.45.57.615 1.29.39 2.04-.36 1.17-1.32 2.04-2.31 2.085a1.5 1.5 0 0 1-.21.015c-.255 0-.54-.045-.855-.135a4.844 4.844 0 0 0-1.02-.18c-.12 0-.24.015-.36.03-.54.075-1.14.165-1.8.165-.66 0-1.26-.09-1.8-.165a2.452 2.452 0 0 0-.36-.03c-.36 0-.72.06-1.02.18-.315.09-.6.135-.855.135a1.5 1.5 0 0 1-.21-.015c-.99-.045-1.95-.915-2.31-2.085-.225-.75-.06-1.47.39-2.04.405-.51.9-.84 1.47-.96.21-.045.42-.06.63-.06.165 0 .33.015.48.03.255.03.525.06.78.06h.03c.255 0 .48-.09.615-.255a.576.576 0 0 0 .15-.39c0-.075-.015-.15-.06-.27-.06-.15-.12-.24-.18-.27a2.67 2.67 0 0 0-.3-.045 5.073 5.073 0 0 1-.6-.12c-.735-.225-1.245-.6-1.35-1.29a.799.799 0 0 1-.015-.12c0-.615.27-1.17.54-1.74.09-.18.33-.615.39-.885a.378.378 0 0 0-.03-.273c-.09-.15-.345-.27-.855-.42-.42-.12-.66-.21-.765-.27-.435-.24-.525-.495-.51-.735a.65.65 0 0 1 .385-.636.48.48 0 0 1 .345-.09c.075 0 .18.03.274.074.374.18.733.302 1.033.302.198 0 .326-.046.401-.091a27.772 27.772 0 0 1-.03-.51l-.003-.06c-.105-1.628-.23-3.654.3-4.847C7.86 1.069 11.216.793 12.206.793z"/></svg></div>Snap
-      </button>
-      <button class="share-dest sd-more" id="share-native">
-        <div class="sd-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></div>More
-      </button>
+      <button class="share-dest sd-x" id="share-x"><div class="sd-icon"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></div>X</button>
+      <button class="share-dest sd-imsg" id="share-imsg"><div class="sd-icon"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="#fff" stroke="none"/></svg></div>iMessage</button>
+      <button class="share-dest sd-snap" id="share-snap"><div class="sd-icon"><svg viewBox="0 0 24 24"><path d="M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.075.045.203.09.401.09.3-.016.659-.12 1.033-.301a.603.603 0 0 1 .274-.074c.12 0 .24.03.345.09.225.12.39.36.385.636.015.24-.075.494-.51.735-.105.06-.345.15-.765.27-.51.14-.76.27-.855.42a.378.378 0 0 0-.03.273c.067.27.3.705.39.885.27.57.54 1.125.54 1.74 0 .03 0 .075-.015.12-.105.69-.615 1.065-1.35 1.29-.225.06-.435.09-.6.12-.135.015-.24.03-.3.045-.06.03-.12.12-.18.27-.045.12-.06.195-.06.27 0 .15.06.285.15.39.135.165.36.255.615.255h.03c.255 0 .525-.03.78-.06.15-.015.315-.03.48-.03.21 0 .42.015.63.06.57.12 1.065.45 1.47.96.45.57.615 1.29.39 2.04-.36 1.17-1.32 2.04-2.31 2.085a1.5 1.5 0 0 1-.21.015c-.255 0-.54-.045-.855-.135a4.844 4.844 0 0 0-1.02-.18c-.12 0-.24.015-.36.03-.54.075-1.14.165-1.8.165-.66 0-1.26-.09-1.8-.165a2.452 2.452 0 0 0-.36-.03c-.36 0-.72.06-1.02.18-.315.09-.6.135-.855.135a1.5 1.5 0 0 1-.21-.015c-.99-.045-1.95-.915-2.31-2.085-.225-.75-.06-1.47.39-2.04.405-.51.9-.84 1.47-.96.21-.045.42-.06.63-.06.165 0 .33.015.48.03.255.03.525.06.78.06h.03c.255 0 .48-.09.615-.255a.576.576 0 0 0 .15-.39c0-.075-.015-.15-.06-.27-.06-.15-.12-.24-.18-.27a2.67 2.67 0 0 0-.3-.045 5.073 5.073 0 0 1-.6-.12c-.735-.225-1.245-.6-1.35-1.29a.799.799 0 0 1-.015-.12c0-.615.27-1.17.54-1.74.09-.18.33-.615.39-.885a.378.378 0 0 0-.03-.273c-.09-.15-.345-.27-.855-.42-.42-.12-.66-.21-.765-.27-.435-.24-.525-.495-.51-.735a.65.65 0 0 1 .385-.636.48.48 0 0 1 .345-.09c.075 0 .18.03.274.074.374.18.733.302 1.033.302.198 0 .326-.046.401-.091a27.772 27.772 0 0 1-.03-.51l-.003-.06c-.105-1.628-.23-3.654.3-4.847C7.86 1.069 11.216.793 12.206.793z"/></svg></div>Snap</button>
+      <button class="share-dest sd-more" id="share-native"><div class="sd-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></div>More</button>
     </div>
-    <div class="save-row">
-      <button id="save-img-btn"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save image</button>
-    </div>
+    <div class="save-row"><button id="save-img-btn"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save image</button></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
-
 <script type="module">
   import { IQData, iqToPercentile, formatPercentile } from './data.js';
   import Haptics from './haptics.js';
   if (window.parent !== window) parent.authCheck();
   window.navGo = function(page) { Haptics.light(); parent.goTo(page); };
 
-  const ABILITIES = [
+  var ABILITIES = [
     { key: 'patternRecognition', name: 'Pattern',        color: '#ff9600' },
     { key: 'problemSolving',     name: 'Problem Solving', color: '#ea2b2b' },
     { key: 'mentalAgility',      name: 'Mental Agility',  color: '#58cc02' },
@@ -280,20 +168,19 @@
   ];
 
   function toast(msg) {
-    const t = document.getElementById('toast');
+    var t = document.getElementById('toast');
     t.textContent = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2000);
+    setTimeout(function() { t.classList.remove('show'); }, 2000);
   }
 
-  // ─── LOAD PROFILE ───
   function load() {
-    const d = IQData.load();
-    const uname = d.username || IQData.getCurrentUser()?.displayName || '';
+    var d = IQData.load();
+    var uname = d.username || IQData.getCurrentUser()?.displayName || '';
     document.getElementById('username-display').textContent = uname;
     if (d.iq) {
       document.getElementById('iq-num').textContent = d.iq;
-      const pct = iqToPercentile(d.iq);
-      const badge = document.getElementById('pct-badge');
+      var pct = iqToPercentile(d.iq);
+      var badge = document.getElementById('pct-badge');
       badge.textContent = 'Top ' + formatPercentile(pct);
       badge.style.display = 'inline-block';
     }
@@ -305,35 +192,34 @@
       document.getElementById('avatar-img').style.display = 'block';
       document.getElementById('avatar-icon').style.display = 'none';
     }
-    const list = document.getElementById('abilities');
+    var list = document.getElementById('abilities');
     list.innerHTML = '';
-    ABILITIES.forEach(a => {
-      const pct = IQData.getStatPercent(a.key);
-      const row = document.createElement('div');
+    ABILITIES.forEach(function(a) {
+      var pct = IQData.getStatPercent(a.key);
+      var row = document.createElement('div');
       row.className = 'ability-row';
       row.innerHTML = '<div class="ability-dot" style="background:'+a.color+'"></div><div class="ability-info"><div class="ability-name">'+a.name+'</div><div class="ability-track"><div class="ability-fill" style="background:'+a.color+';width:0%" data-val="'+pct+'"></div></div></div><div class="ability-val">'+pct+'</div>';
       list.appendChild(row);
     });
-    requestAnimationFrame(() => setTimeout(() => {
-      document.querySelectorAll('.ability-fill').forEach(bar => {
+    requestAnimationFrame(function() { setTimeout(function() {
+      document.querySelectorAll('.ability-fill').forEach(function(bar) {
         bar.style.width = Math.max(8, parseInt(bar.dataset.val)) + '%';
       });
-    }, 60));
+    }, 60); });
   }
 
-  // ─── AVATAR ───
   function handleAvatarFile(file) {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        const c = document.createElement('canvas');
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = new Image();
+      img.onload = function() {
+        var c = document.createElement('canvas');
         c.width = c.height = 200;
-        const ctx = c.getContext('2d');
-        const min = Math.min(img.width, img.height);
+        var ctx = c.getContext('2d');
+        var min = Math.min(img.width, img.height);
         ctx.drawImage(img, (img.width - min) / 2, (img.height - min) / 2, min, min, 0, 0, 200, 200);
-        const url = c.toDataURL('image/jpeg', 0.8);
+        var url = c.toDataURL('image/jpeg', 0.8);
         IQData.setProfilePic(url);
         document.getElementById('avatar-img').src = url;
         document.getElementById('avatar-img').style.display = 'block';
@@ -344,70 +230,70 @@
     };
     reader.readAsDataURL(file);
   }
-  document.getElementById('avatar-tap').onclick = () => { Haptics.medium(); document.getElementById('avatar-input').click(); };
-  document.getElementById('avatar-edit-btn').onclick = () => { Haptics.medium(); document.getElementById('avatar-input').click(); };
-  document.getElementById('avatar-input').onchange = e => handleAvatarFile(e.target.files[0]);
-  document.getElementById('signout-btn').onclick = () => { Haptics.warning(); IQData.signOut(); };
-  document.getElementById('reset-btn').onclick = () => { Haptics.warning(); if (confirm('Reset all progress?')) { Haptics.error(); IQData.reset(); location.reload(); } };
+  document.getElementById('avatar-tap').onclick = function() { Haptics.medium(); document.getElementById('avatar-input').click(); };
+  document.getElementById('avatar-edit-btn').onclick = function() { Haptics.medium(); document.getElementById('avatar-input').click(); };
+  document.getElementById('avatar-input').onchange = function(e) { handleAvatarFile(e.target.files[0]); };
+  document.getElementById('signout-btn').onclick = function() { Haptics.warning(); IQData.signOut(); };
+  document.getElementById('reset-btn').onclick = function() { Haptics.warning(); if (confirm('Reset all progress?')) { Haptics.error(); IQData.reset(); location.reload(); } };
 
-  // ═══════════════════════════════════════
-  // SHARE SYSTEM
-  // Card PNG generated client-side, uploaded
-  // to Firebase Storage, URL saved to Firestore.
-  // Worker just reads the URL for og:image.
-  // ═══════════════════════════════════════
+  // ═══════════════════════════════════
+  // SHARE — card PNG stored in Firestore as base64
+  // Worker reads it back and serves as image/png
+  // ═══════════════════════════════════
 
-  const OG_WORKER_BASE = 'https://braindeer.org/share';
-  let shareCanvas = null;
-  let shareUrl = '';
+  var shareCanvas = null;
+  var shareUrl = '';
 
   function getShareUrl() {
-    const user = IQData.getCurrentUser();
-    if (!user) return 'https://braindeer.org';
-    return OG_WORKER_BASE + '/' + user.uid;
+    var user = IQData.getCurrentUser();
+    return user ? 'https://braindeer.org/share/' + user.uid : 'https://braindeer.org';
   }
 
-  // Draw the 1200x630 share card on canvas
+  function rr(ctx, x, y, w, h, r, fill) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+    if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  }
+
   function genShareCard() {
-    const d = IQData.load();
-    const cv = document.createElement('canvas');
+    var d = IQData.load();
+    var cv = document.createElement('canvas');
     cv.width = 1200; cv.height = 630;
-    const ctx = cv.getContext('2d');
+    var ctx = cv.getContext('2d');
 
     ctx.fillStyle = '#2a1c10'; ctx.fillRect(0, 0, 1200, 630);
     rr(ctx, 28, 28, 1144, 574, 28, '#3a2918');
     ctx.fillStyle = '#4a3625'; ctx.fillRect(380, 60, 3, 510);
 
-    const uname = d.username || IQData.getCurrentUser()?.displayName || 'Brain';
+    var uname = d.username || IQData.getCurrentUser()?.displayName || 'Brain';
     ctx.font = '700 20px Nunito, sans-serif'; ctx.fillStyle = '#c2a476'; ctx.textAlign = 'center';
     ctx.fillText(uname, 200, 180);
 
     ctx.font = '900 120px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(d.iq || '--', 200, 290);
+    ctx.textBaseline = 'middle'; ctx.fillText(d.iq || '--', 200, 290);
     ctx.textBaseline = 'alphabetic';
 
     ctx.font = '900 18px Nunito, sans-serif'; ctx.fillStyle = '#6b4f32';
     ctx.fillText('I Q', 200, 345);
 
     if (d.iq) {
-      const pctText = 'TOP ' + formatPercentile(iqToPercentile(d.iq)).toUpperCase();
+      var pctText = 'TOP ' + formatPercentile(iqToPercentile(d.iq)).toUpperCase();
       ctx.font = '900 15px Nunito, sans-serif';
-      const tw = ctx.measureText(pctText).width + 48;
+      var tw = ctx.measureText(pctText).width + 48;
       rr(ctx, 200 - tw / 2, 360, tw, 36, 12, '#ffc800');
-      ctx.fillStyle = '#2a1c10'; ctx.textAlign = 'center';
-      ctx.fillText(pctText, 200, 384);
+      ctx.fillStyle = '#2a1c10'; ctx.textAlign = 'center'; ctx.fillText(pctText, 200, 384);
     }
 
     ctx.font = '800 16px Nunito, sans-serif'; ctx.fillStyle = '#6b4f32';
     ctx.textAlign = 'center'; ctx.fillText('braindeer.org', 200, 560);
 
-    var stats = [
-      { v: String(d.answered || 0), l: 'DONE' },
-      { v: IQData.getAccuracy() + '%', l: 'ACCURACY' },
-      { v: String(d.bestStreak || 0), l: 'STREAK' },
-    ];
-    stats.forEach(function(s, i) {
+    [{v: String(d.answered||0), l:'DONE'}, {v: IQData.getAccuracy()+'%', l:'ACCURACY'}, {v: String(d.bestStreak||0), l:'STREAK'}]
+    .forEach(function(s, i) {
       var px = 420 + i * 136;
       rr(ctx, px, 80, 120, 64, 14, '#4a3625');
       ctx.font = '900 32px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
@@ -416,8 +302,7 @@
       ctx.fillText(s.l, px + 60, 138);
     });
 
-    var barCats = ABILITIES.slice(0, 6);
-    barCats.forEach(function(a, i) {
+    ABILITIES.slice(0, 6).forEach(function(a, i) {
       var y = 190 + i * 42;
       var v = IQData.getStatPercent(a.key);
       var fillW = Math.max(8, Math.round((v / 100) * 380));
@@ -433,29 +318,16 @@
     return cv;
   }
 
-  function rr(ctx, x, y, w, h, r, fill) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
-    if (fill) { ctx.fillStyle = fill; ctx.fill(); }
-  }
-
-  // Upload card PNG to Firebase Storage + write stats to /shares/{uid}
   async function uploadShareCard() {
     var user = IQData.getCurrentUser();
     if (!user || !shareCanvas) return;
     var d = IQData.load();
     try {
-      var blob = await new Promise(function(r) { shareCanvas.toBlob(r, 'image/png'); });
+      // Convert canvas to base64 PNG (strip the data:image/png;base64, prefix)
+      var dataUrl = shareCanvas.toDataURL('image/png');
+      var base64 = dataUrl.split(',')[1];
+
       var fb = parent.firebase;
-      var storageRef = fb.storage().ref();
-      var cardRef = storageRef.child('cards/' + user.uid + '.png');
-      await cardRef.put(blob, { contentType: 'image/png' });
-      var cardUrl = await cardRef.getDownloadURL();
       var db = fb.firestore();
       await db.collection('shares').doc(user.uid).set({
         iq: d.iq || null,
@@ -463,30 +335,27 @@
         answered: d.answered || 0,
         accuracy: parseInt(IQData.getAccuracy()) || 0,
         bestStreak: d.bestStreak || 0,
-        cardUrl: cardUrl,
+        cardBase64: base64,
         updatedAt: fb.firestore.FieldValue.serverTimestamp(),
       });
       toast('Share card ready!');
     } catch (e) {
       console.warn('Share upload error:', e);
+      toast('Share failed — try again');
     }
   }
 
-  // ─── OPEN / CLOSE SHARE SHEET ───
   async function openShare() {
     var fab = document.getElementById('share-btn');
     fab.classList.add('uploading');
-    fab.querySelector('svg').style.display = 'none';
     fab.textContent = 'Generating...';
 
     shareUrl = getShareUrl();
     genShareCard();
-
-    // Upload card first, then open sheet
     await uploadShareCard();
 
     fab.classList.remove('uploading');
-    fab.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share Stats';
+    fab.innerHTML = '<svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share Stats';
 
     document.getElementById('share-url').value = shareUrl;
     var preview = document.getElementById('card-preview');
@@ -495,33 +364,23 @@
     previewCv.width = 600; previewCv.height = 315;
     previewCv.getContext('2d').drawImage(shareCanvas, 0, 0, 600, 315);
     preview.appendChild(previewCv);
-
     document.getElementById('share-modal').classList.add('show');
   }
 
   function closeShare() { Haptics.light(); document.getElementById('share-modal').classList.remove('show'); }
-
   document.getElementById('share-btn').onclick = function() { Haptics.medium(); openShare(); };
   document.getElementById('share-modal').onclick = function(e) { if (e.target.id === 'share-modal') closeShare(); };
 
-  // ─── SHARE ACTIONS ───
   document.getElementById('copy-link').onclick = async function() {
     Haptics.medium();
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      Haptics.success();
-      document.getElementById('copy-link').textContent = 'Copied!';
-      toast('Link copied!');
-      setTimeout(function() { document.getElementById('copy-link').textContent = 'Copy link'; }, 2000);
-    } catch(e) { Haptics.error(); toast('Copy failed'); }
+    try { await navigator.clipboard.writeText(shareUrl); Haptics.success(); document.getElementById('copy-link').textContent = 'Copied!'; toast('Link copied!'); setTimeout(function() { document.getElementById('copy-link').textContent = 'Copy link'; }, 2000); }
+    catch(e) { Haptics.error(); toast('Copy failed'); }
   };
 
   document.getElementById('share-x').onclick = function() {
     Haptics.medium();
     var d = IQData.load();
-    var text = d.iq
-      ? 'My IQ is ' + d.iq + ' on BrainDeer! Top ' + formatPercentile(iqToPercentile(d.iq)) + ' — think you can beat me?'
-      : 'Training my brain on BrainDeer!';
+    var text = d.iq ? 'My IQ is ' + d.iq + ' on BrainDeer! Top ' + formatPercentile(iqToPercentile(d.iq)) + ' — think you can beat me?' : 'Training my brain on BrainDeer!';
     window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(shareUrl), '_blank');
   };
 
@@ -534,28 +393,20 @@
 
   document.getElementById('share-snap').onclick = async function() {
     Haptics.medium();
-    if (navigator.share) {
-      try { await navigator.share({ title: 'My BrainDeer IQ', text: 'Think you can beat me?', url: shareUrl }); Haptics.success(); }
-      catch(e) { if (e.name !== 'AbortError') toast('Share cancelled'); }
-    } else { await navigator.clipboard.writeText(shareUrl); toast('Link copied — paste in Snapchat!'); }
+    if (navigator.share) { try { await navigator.share({ title: 'My BrainDeer IQ', text: 'Think you can beat me?', url: shareUrl }); Haptics.success(); } catch(e) { if (e.name !== 'AbortError') toast('Share cancelled'); } }
+    else { await navigator.clipboard.writeText(shareUrl); toast('Link copied — paste in Snapchat!'); }
   };
 
   document.getElementById('share-native').onclick = async function() {
     Haptics.medium();
-    if (navigator.share) {
-      try { await navigator.share({ title: 'My BrainDeer IQ', text: 'Think you can beat me?', url: shareUrl }); Haptics.success(); }
-      catch(e) { if (e.name !== 'AbortError') toast('Share cancelled'); }
-    } else { await navigator.clipboard.writeText(shareUrl); toast('Link copied!'); }
+    if (navigator.share) { try { await navigator.share({ title: 'My BrainDeer IQ', text: 'Think you can beat me?', url: shareUrl }); Haptics.success(); } catch(e) { if (e.name !== 'AbortError') toast('Share cancelled'); } }
+    else { await navigator.clipboard.writeText(shareUrl); toast('Link copied!'); }
   };
 
   document.getElementById('save-img-btn').onclick = function() {
-    if (!shareCanvas) return;
-    Haptics.success();
-    var a = document.createElement('a');
-    a.download = 'braindeer-stats.png';
-    a.href = shareCanvas.toDataURL('image/png');
-    a.click();
-    toast('Image saved!');
+    if (!shareCanvas) return; Haptics.success();
+    var a = document.createElement('a'); a.download = 'braindeer-stats.png';
+    a.href = shareCanvas.toDataURL('image/png'); a.click(); toast('Image saved!');
   };
 
   load();
