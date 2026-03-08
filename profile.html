@@ -112,6 +112,7 @@
     }
     .share-fab:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
     .share-fab svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+    .share-fab.uploading { opacity: 0.6; pointer-events: none; }
     .reset-btn {
       margin-top: 12px; background: none; border: none;
       font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700;
@@ -260,13 +261,12 @@
   </div>
 </div>
 <div class="toast" id="toast"></div>
+
 <script type="module">
   import { IQData, iqToPercentile, formatPercentile } from './data.js';
   import Haptics from './haptics.js';
   if (window.parent !== window) parent.authCheck();
   window.navGo = function(page) { Haptics.light(); parent.goTo(page); };
-
-  const OG_WORKER_BASE = 'https://braindeer.org/share';
 
   const ABILITIES = [
     { key: 'patternRecognition', name: 'Pattern',        color: '#ff9600' },
@@ -285,6 +285,7 @@
     setTimeout(() => t.classList.remove('show'), 2000);
   }
 
+  // ─── LOAD PROFILE ───
   function load() {
     const d = IQData.load();
     const uname = d.username || IQData.getCurrentUser()?.displayName || '';
@@ -320,6 +321,7 @@
     }, 60));
   }
 
+  // ─── AVATAR ───
   function handleAvatarFile(file) {
     if (!file) return;
     const reader = new FileReader();
@@ -348,6 +350,14 @@
   document.getElementById('signout-btn').onclick = () => { Haptics.warning(); IQData.signOut(); };
   document.getElementById('reset-btn').onclick = () => { Haptics.warning(); if (confirm('Reset all progress?')) { Haptics.error(); IQData.reset(); location.reload(); } };
 
+  // ═══════════════════════════════════════
+  // SHARE SYSTEM
+  // Card PNG generated client-side, uploaded
+  // to Firebase Storage, URL saved to Firestore.
+  // Worker just reads the URL for og:image.
+  // ═══════════════════════════════════════
+
+  const OG_WORKER_BASE = 'https://braindeer.org/share';
   let shareCanvas = null;
   let shareUrl = '';
 
@@ -357,72 +367,70 @@
     return OG_WORKER_BASE + '/' + user.uid;
   }
 
-  async function writeShareData() {
-    const d = IQData.load();
-    const user = IQData.getCurrentUser();
-    if (!user) return;
-    const shareData = {
-      iq: d.iq || null, answered: d.answered || 0,
-      accuracy: IQData.getAccuracy(), bestStreak: d.bestStreak || 0,
-      username: d.username || user.displayName || 'Brain',
-      abilities: {}, updatedAt: Date.now()
-    };
-    ABILITIES.forEach(a => { shareData.abilities[a.key] = IQData.getStatPercent(a.key); });
-    try {
-      const db = firebase.firestore();
-      await db.collection('shares').doc(user.uid).set(shareData, { merge: true });
-    } catch (e) { console.warn('Share write failed:', e); }
-  }
-
-  function genPreviewCard() {
+  // Draw the 1200x630 share card on canvas
+  function genShareCard() {
     const d = IQData.load();
     const cv = document.createElement('canvas');
-    const W = 600, H = 315;
-    cv.width = W * 2; cv.height = H * 2;
+    cv.width = 1200; cv.height = 630;
     const ctx = cv.getContext('2d');
-    ctx.scale(2, 2);
-    ctx.fillStyle = '#2a1c10'; ctx.fillRect(0, 0, W, H);
-    rr(ctx, 16, 16, W - 32, H - 32, 16, '#3a2918');
-    const cx = W / 2;
+
+    ctx.fillStyle = '#2a1c10'; ctx.fillRect(0, 0, 1200, 630);
+    rr(ctx, 28, 28, 1144, 574, 28, '#3a2918');
+    ctx.fillStyle = '#4a3625'; ctx.fillRect(380, 60, 3, 510);
+
     const uname = d.username || IQData.getCurrentUser()?.displayName || 'Brain';
-    ctx.font = '700 13px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a'; ctx.textAlign = 'center';
-    ctx.fillText(uname, cx, 48);
-    ctx.font = '900 56px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
-    ctx.fillText(d.iq || '--', cx, 110);
-    ctx.font = '900 11px Nunito, sans-serif'; ctx.fillStyle = '#6b4f32';
-    ctx.fillText('I Q', cx, 126);
+    ctx.font = '700 20px Nunito, sans-serif'; ctx.fillStyle = '#c2a476'; ctx.textAlign = 'center';
+    ctx.fillText(uname, 200, 180);
+
+    ctx.font = '900 120px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(d.iq || '--', 200, 290);
+    ctx.textBaseline = 'alphabetic';
+
+    ctx.font = '900 18px Nunito, sans-serif'; ctx.fillStyle = '#6b4f32';
+    ctx.fillText('I Q', 200, 345);
+
     if (d.iq) {
       const pctText = 'TOP ' + formatPercentile(iqToPercentile(d.iq)).toUpperCase();
-      ctx.font = '900 10px Nunito, sans-serif';
-      const tw = ctx.measureText(pctText).width + 20;
-      rr(ctx, cx - tw / 2, 133, tw, 20, 6, '#ffc800');
-      ctx.fillStyle = '#2a1c10'; ctx.fillText(pctText, cx, 147);
+      ctx.font = '900 15px Nunito, sans-serif';
+      const tw = ctx.measureText(pctText).width + 48;
+      rr(ctx, 200 - tw / 2, 360, tw, 36, 12, '#ffc800');
+      ctx.fillStyle = '#2a1c10'; ctx.textAlign = 'center';
+      ctx.fillText(pctText, 200, 384);
     }
-    [{ v: String(d.answered), l: 'Done' }, { v: IQData.getAccuracy() + '%', l: 'Accuracy' }, { v: String(d.bestStreak), l: 'Streak' }]
-      .forEach((s, i) => {
-        const sx = 80 + ((W - 160) / 3) * i + (W - 160) / 6;
-        rr(ctx, sx - 40, 162, 80, 38, 8, '#4a3625');
-        ctx.font = '900 15px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
-        ctx.textAlign = 'center'; ctx.fillText(s.v, sx, 181);
-        ctx.font = '800 8px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a';
-        ctx.fillText(s.l, sx, 194);
-      });
-    const barAbilities = ABILITIES.slice(0, 6);
-    const barW = 150, barH = 10, barGap = 24;
-    barAbilities.forEach((a, i) => {
-      const col = i % 3, row = Math.floor(i / 3);
-      const bx = 40 + col * (barW + 20), by = 214 + row * barGap;
-      const v = IQData.getStatPercent(a.key);
-      ctx.font = '800 7px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a'; ctx.textAlign = 'left';
-      ctx.fillText(a.name.toUpperCase(), bx, by - 2);
-      rr(ctx, bx, by, barW, barH, 3, '#4a3625');
-      rr(ctx, bx, by, Math.max(8, (v / 100) * barW), barH, 3, a.color);
+
+    ctx.font = '800 16px Nunito, sans-serif'; ctx.fillStyle = '#6b4f32';
+    ctx.textAlign = 'center'; ctx.fillText('braindeer.org', 200, 560);
+
+    var stats = [
+      { v: String(d.answered || 0), l: 'DONE' },
+      { v: IQData.getAccuracy() + '%', l: 'ACCURACY' },
+      { v: String(d.bestStreak || 0), l: 'STREAK' },
+    ];
+    stats.forEach(function(s, i) {
+      var px = 420 + i * 136;
+      rr(ctx, px, 80, 120, 64, 14, '#4a3625');
+      ctx.font = '900 32px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
+      ctx.textAlign = 'center'; ctx.fillText(s.v, px + 60, 118);
+      ctx.font = '800 12px Nunito, sans-serif'; ctx.fillStyle = '#c2a476';
+      ctx.fillText(s.l, px + 60, 138);
     });
-    ctx.font = '800 11px Nunito, sans-serif'; ctx.fillStyle = '#6b4f32'; ctx.textAlign = 'center';
-    ctx.fillText('braindeer.org', cx, H - 22);
+
+    var barCats = ABILITIES.slice(0, 6);
+    barCats.forEach(function(a, i) {
+      var y = 190 + i * 42;
+      var v = IQData.getStatPercent(a.key);
+      var fillW = Math.max(8, Math.round((v / 100) * 380));
+      ctx.font = '700 13px Nunito, sans-serif'; ctx.fillStyle = '#c2a476';
+      ctx.textAlign = 'right'; ctx.fillText(a.name, 546, y + 4);
+      rr(ctx, 560, y - 8, 380, 18, 6, '#4a3625');
+      rr(ctx, 560, y - 8, fillW, 18, 6, a.color);
+      ctx.font = '800 13px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
+      ctx.textAlign = 'center'; ctx.fillText(String(v), 960, y + 4);
+    });
+
     shareCanvas = cv;
-    const preview = document.getElementById('card-preview');
-    preview.innerHTML = ''; preview.appendChild(cv);
+    return cv;
   }
 
   function rr(ctx, x, y, w, h, r, fill) {
@@ -436,67 +444,114 @@
     if (fill) { ctx.fillStyle = fill; ctx.fill(); }
   }
 
-  async function openShare() {
-    document.getElementById('share-modal').classList.add('show');
-    shareUrl = getShareUrl();
-    document.getElementById('share-url').value = shareUrl;
-    genPreviewCard();
-    writeShareData();
+  // Upload card PNG to Firebase Storage + write stats to /shares/{uid}
+  async function uploadShareCard() {
+    var user = IQData.getCurrentUser();
+    if (!user || !shareCanvas) return;
+    var d = IQData.load();
+    try {
+      var blob = await new Promise(function(r) { shareCanvas.toBlob(r, 'image/png'); });
+      var fb = parent.firebase;
+      var storageRef = fb.storage().ref();
+      var cardRef = storageRef.child('cards/' + user.uid + '.png');
+      await cardRef.put(blob, { contentType: 'image/png' });
+      var cardUrl = await cardRef.getDownloadURL();
+      var db = fb.firestore();
+      await db.collection('shares').doc(user.uid).set({
+        iq: d.iq || null,
+        username: d.username || user.displayName || 'Brain',
+        answered: d.answered || 0,
+        accuracy: parseInt(IQData.getAccuracy()) || 0,
+        bestStreak: d.bestStreak || 0,
+        cardUrl: cardUrl,
+        updatedAt: fb.firestore.FieldValue.serverTimestamp(),
+      });
+      toast('Share card ready!');
+    } catch (e) {
+      console.warn('Share upload error:', e);
+    }
   }
+
+  // ─── OPEN / CLOSE SHARE SHEET ───
+  async function openShare() {
+    var fab = document.getElementById('share-btn');
+    fab.classList.add('uploading');
+    fab.querySelector('svg').style.display = 'none';
+    fab.textContent = 'Generating...';
+
+    shareUrl = getShareUrl();
+    genShareCard();
+
+    // Upload card first, then open sheet
+    await uploadShareCard();
+
+    fab.classList.remove('uploading');
+    fab.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share Stats';
+
+    document.getElementById('share-url').value = shareUrl;
+    var preview = document.getElementById('card-preview');
+    preview.innerHTML = '';
+    var previewCv = document.createElement('canvas');
+    previewCv.width = 600; previewCv.height = 315;
+    previewCv.getContext('2d').drawImage(shareCanvas, 0, 0, 600, 315);
+    preview.appendChild(previewCv);
+
+    document.getElementById('share-modal').classList.add('show');
+  }
+
   function closeShare() { Haptics.light(); document.getElementById('share-modal').classList.remove('show'); }
 
-  document.getElementById('share-btn').onclick = () => { Haptics.medium(); openShare(); };
-  document.getElementById('share-modal').onclick = e => { if (e.target.id === 'share-modal') closeShare(); };
+  document.getElementById('share-btn').onclick = function() { Haptics.medium(); openShare(); };
+  document.getElementById('share-modal').onclick = function(e) { if (e.target.id === 'share-modal') closeShare(); };
 
-  document.getElementById('copy-link').onclick = async () => {
+  // ─── SHARE ACTIONS ───
+  document.getElementById('copy-link').onclick = async function() {
     Haptics.medium();
     try {
       await navigator.clipboard.writeText(shareUrl);
       Haptics.success();
       document.getElementById('copy-link').textContent = 'Copied!';
       toast('Link copied!');
-      setTimeout(() => document.getElementById('copy-link').textContent = 'Copy link', 2000);
-    } catch { Haptics.error(); toast('Copy failed'); }
+      setTimeout(function() { document.getElementById('copy-link').textContent = 'Copy link'; }, 2000);
+    } catch(e) { Haptics.error(); toast('Copy failed'); }
   };
 
-  document.getElementById('share-x').onclick = () => {
+  document.getElementById('share-x').onclick = function() {
     Haptics.medium();
-    const d = IQData.load();
-    const text = d.iq
+    var d = IQData.load();
+    var text = d.iq
       ? 'My IQ is ' + d.iq + ' on BrainDeer! Top ' + formatPercentile(iqToPercentile(d.iq)) + ' — think you can beat me?'
       : 'Training my brain on BrainDeer!';
     window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(shareUrl), '_blank');
   };
 
-  document.getElementById('share-imsg').onclick = () => {
+  document.getElementById('share-imsg').onclick = function() {
     Haptics.medium();
-    const d = IQData.load();
-    const body = d.iq
-      ? 'Check out my BrainDeer IQ: ' + d.iq + '! ' + shareUrl
-      : 'I am training my brain on BrainDeer! ' + shareUrl;
+    var d = IQData.load();
+    var body = d.iq ? 'Check out my BrainDeer IQ: ' + d.iq + '! ' + shareUrl : 'Training on BrainDeer! ' + shareUrl;
     window.location.href = 'sms:&body=' + encodeURIComponent(body);
   };
 
-  document.getElementById('share-snap').onclick = async () => {
+  document.getElementById('share-snap').onclick = async function() {
     Haptics.medium();
     if (navigator.share) {
       try { await navigator.share({ title: 'My BrainDeer IQ', text: 'Think you can beat me?', url: shareUrl }); Haptics.success(); }
-      catch (e) { if (e.name !== 'AbortError') toast('Share cancelled'); }
+      catch(e) { if (e.name !== 'AbortError') toast('Share cancelled'); }
     } else { await navigator.clipboard.writeText(shareUrl); toast('Link copied — paste in Snapchat!'); }
   };
 
-  document.getElementById('share-native').onclick = async () => {
+  document.getElementById('share-native').onclick = async function() {
     Haptics.medium();
     if (navigator.share) {
       try { await navigator.share({ title: 'My BrainDeer IQ', text: 'Think you can beat me?', url: shareUrl }); Haptics.success(); }
-      catch (e) { if (e.name !== 'AbortError') toast('Share cancelled'); }
+      catch(e) { if (e.name !== 'AbortError') toast('Share cancelled'); }
     } else { await navigator.clipboard.writeText(shareUrl); toast('Link copied!'); }
   };
 
-  document.getElementById('save-img-btn').onclick = () => {
+  document.getElementById('save-img-btn').onclick = function() {
     if (!shareCanvas) return;
     Haptics.success();
-    const a = document.createElement('a');
+    var a = document.createElement('a');
     a.download = 'braindeer-stats.png';
     a.href = shareCanvas.toDataURL('image/png');
     a.click();
