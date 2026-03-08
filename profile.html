@@ -255,7 +255,16 @@
     if (fill) { ctx.fillStyle = fill; ctx.fill(); }
   }
 
-  // ── CARD: tighter layout, no dead space ──
+  // Draw a donut/ring chart segment
+  function drawDonut(ctx, cx, cy, outerR, innerR, startAngle, endAngle, color) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, outerR, startAngle, endAngle, false);
+    ctx.arc(cx, cy, innerR, endAngle, startAngle, true);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+  }
+
   function genShareCard() {
     var d = IQData.load();
     var W = 1200, H = 630;
@@ -264,123 +273,130 @@
     var ctx = cv.getContext('2d');
     var uname = d.username || IQData.getCurrentUser()?.displayName || 'Brain';
     var acc = IQData.getAccuracy();
+    var pic = d.pic || null;
 
-    // Background
+    // ── Background ──
     ctx.fillStyle = '#2a1c10'; ctx.fillRect(0, 0, W, H);
     rr(ctx, 20, 20, W - 40, H - 40, 24, '#3a2918');
 
-    // ── LEFT: IQ block ──
-    var lx = 200; // center of left column
+    // ═══ TOP SECTION: centered profile pic + IQ + stats ═══
+    var topCx = W / 2;
+
+    // Profile picture (circle)
+    var picSize = 64;
+    var picY = 62;
+    if (pic) {
+      // We'll draw it after image loads — for now draw placeholder
+      ctx.fillStyle = '#4a3625';
+      ctx.beginPath(); ctx.arc(topCx, picY + picSize/2, picSize/2, 0, Math.PI * 2); ctx.fill();
+    } else {
+      ctx.fillStyle = '#4a3625';
+      ctx.beginPath(); ctx.arc(topCx, picY + picSize/2, picSize/2, 0, Math.PI * 2); ctx.fill();
+      ctx.font = '28px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('🦌', topCx, picY + picSize/2 + 2);
+    }
 
     // Username
-    ctx.font = '700 18px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a'; ctx.textAlign = 'center';
-    ctx.fillText(uname, lx, 80);
+    ctx.font = '700 16px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText(uname, topCx, picY + picSize + 22);
 
-    // Big IQ
-    ctx.font = '900 140px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
-    ctx.textBaseline = 'middle'; ctx.fillText(d.iq || '--', lx, 210);
+    // IQ number — BIG and centered
+    ctx.font = '900 100px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(d.iq || '--', topCx, picY + picSize + 90);
     ctx.textBaseline = 'alphabetic';
 
     // IQ label
-    ctx.font = '900 16px Nunito, sans-serif'; ctx.fillStyle = '#6b4f32';
-    ctx.fillText('I Q', lx, 295);
+    ctx.font = '900 14px Nunito, sans-serif'; ctx.fillStyle = '#6b4f32';
+    ctx.fillText('I Q', topCx, picY + picSize + 130);
 
     // Percentile badge
     if (d.iq) {
       var pctText = 'TOP ' + formatPercentile(iqToPercentile(d.iq)).toUpperCase();
-      ctx.font = '900 14px Nunito, sans-serif';
-      var tw = ctx.measureText(pctText).width + 40;
-      rr(ctx, lx - tw / 2, 310, tw, 32, 10, '#ffc800');
-      ctx.fillStyle = '#2a1c10'; ctx.fillText(pctText, lx, 332);
+      ctx.font = '900 13px Nunito, sans-serif';
+      var tw = ctx.measureText(pctText).width + 36;
+      rr(ctx, topCx - tw / 2, picY + picSize + 140, tw, 28, 8, '#ffc800');
+      ctx.fillStyle = '#2a1c10'; ctx.fillText(pctText, topCx, picY + picSize + 159);
     }
 
-    // Stats under IQ (horizontal)
+    // Stats row (centered under IQ)
+    var statsY = picY + picSize + 185;
     var miniStats = [
-      { v: String(d.answered || 0), l: 'done' },
-      { v: acc + '%', l: 'acc' },
-      { v: String(d.bestStreak || 0), l: 'streak' },
+      { v: String(d.answered || 0), l: 'ANSWERED' },
+      { v: acc + '%', l: 'ACCURACY' },
+      { v: String(d.bestStreak || 0), l: 'BEST STREAK' },
     ];
+    var pillW = 130, pillGap = 12;
+    var totalPillW = miniStats.length * pillW + (miniStats.length - 1) * pillGap;
+    var pillStartX = topCx - totalPillW / 2;
     miniStats.forEach(function(s, i) {
-      var mx = 90 + i * 110;
-      ctx.font = '900 24px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
-      ctx.textAlign = 'center'; ctx.fillText(s.v, mx, 400);
-      ctx.font = '800 11px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a';
-      ctx.fillText(s.l.toUpperCase(), mx, 418);
+      var px = pillStartX + i * (pillW + pillGap);
+      rr(ctx, px, statsY, pillW, 48, 10, '#4a3625');
+      ctx.font = '900 20px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
+      ctx.textAlign = 'center'; ctx.fillText(s.v, px + pillW/2, statsY + 22);
+      ctx.font = '800 9px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a';
+      ctx.fillText(s.l, px + pillW/2, statsY + 39);
+    });
+
+    // ═══ BOTTOM SECTION: donut charts for each ability ═══
+    var cats = ABILITIES.slice(0, 6);
+    var donutY = statsY + 80;
+    var donutR = 38;
+    var donutInner = 24;
+    var donutGap = (W - 120) / cats.length; // evenly space across width
+    var donutStartX = 60 + donutGap / 2;
+
+    cats.forEach(function(a, i) {
+      var cx = donutStartX + i * donutGap;
+      var cy = donutY + donutR;
+      var v = IQData.getStatPercent(a.key);
+      var angle = (v / 100) * Math.PI * 2;
+
+      // Background ring
+      drawDonut(ctx, cx, cy, donutR, donutInner, 0, Math.PI * 2, '#4a3625');
+
+      // Filled ring
+      drawDonut(ctx, cx, cy, donutR, donutInner, -Math.PI / 2, -Math.PI / 2 + angle, a.color);
+
+      // Value in center
+      ctx.font = '900 18px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(String(v), cx, cy);
+      ctx.textBaseline = 'alphabetic';
+
+      // Label below
+      ctx.font = '800 11px Nunito, sans-serif'; ctx.fillStyle = '#c2a476';
+      ctx.textAlign = 'center';
+      ctx.fillText(a.name, cx, cy + donutR + 18);
     });
 
     // Branding
-    ctx.font = '800 14px Nunito, sans-serif'; ctx.fillStyle = '#5a4232';
-    ctx.textAlign = 'center'; ctx.fillText('braindeer.org', lx, 560);
-
-    // ── Divider ──
-    ctx.fillStyle = '#4a3625'; ctx.fillRect(400, 50, 2, H - 100);
-
-    // ── RIGHT: Ability bars (full height, tight) ──
-    var rx = 430;
-    var barW = 500, barH = 22;
-    var cats = ABILITIES.slice(0, 8); // all 8 abilities
-    var totalBars = cats.length;
-    var barSpacing = Math.min(56, (H - 140) / totalBars);
-    var barStartY = 65 + ((H - 140) - barSpacing * totalBars) / 2;
-
-    cats.forEach(function(a, i) {
-      var y = barStartY + i * barSpacing;
-      var v = IQData.getStatPercent(a.key);
-      var fillW = Math.max(10, Math.round((v / 100) * barW));
-
-      // Label
-      ctx.font = '800 13px Nunito, sans-serif'; ctx.fillStyle = '#c2a476';
-      ctx.textAlign = 'left'; ctx.fillText(a.name, rx, y);
-
-      // Bar track
-      rr(ctx, rx, y + 6, barW, barH, 6, '#4a3625');
-
-      // Bar fill
-      rr(ctx, rx, y + 6, fillW, barH, 6, a.color);
-
-      // Value inside bar
-      ctx.font = '900 12px Nunito, sans-serif'; ctx.fillStyle = '#fff';
-      ctx.textAlign = 'left';
-      if (fillW > 30) {
-        ctx.fillText(String(v), rx + 8, y + 22);
-      } else {
-        ctx.textAlign = 'left'; ctx.fillStyle = '#c2a476';
-        ctx.fillText(String(v), rx + fillW + 6, y + 22);
-      }
-    });
+    ctx.font = '800 13px Nunito, sans-serif'; ctx.fillStyle = '#5a4232';
+    ctx.textAlign = 'center';
+    ctx.fillText('braindeer.org', W / 2, H - 36);
 
     shareCanvas = cv;
+
+    // If we have a profile pic, load it and redraw that part
+    if (pic) {
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function() {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(topCx, picY + picSize/2, picSize/2, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(img, topCx - picSize/2, picY, picSize, picSize);
+        ctx.restore();
+      };
+      img.src = pic;
+    }
+
     return cv;
   }
 
-  async function uploadShareCard() {
-    var user = IQData.getCurrentUser();
-    if (!user || !shareCanvas) return;
-    var d = IQData.load();
-    try {
-      var dataUrl = shareCanvas.toDataURL('image/png');
-      var base64 = dataUrl.split(',')[1];
-
-      // Build object in parent context to avoid iframe serialization issue
-      var shareDoc = new parent.Object();
-      shareDoc.iq = d.iq || 0;
-      shareDoc.username = d.username || user.displayName || 'Brain';
-      shareDoc.answered = d.answered || 0;
-      shareDoc.accuracy = parseInt(IQData.getAccuracy()) || 0;
-      shareDoc.bestStreak = d.bestStreak || 0;
-      shareDoc.cardBase64 = base64;
-      shareDoc.updatedAt = new Date().toISOString();
-
-      var fb = parent.firebase;
-      await fb.firestore().collection('shares').doc(user.uid).set(shareDoc);
-      toast('Share card ready!');
-    } catch (e) {
-      console.warn('Share upload error:', e);
-      toast('Share failed — try again');
-    }
-  }
-
-  // ── DETECT PLATFORM FOR SMART SHARE OPTIONS ──
+  // ── SMART SHARE OPTIONS ──
   function getPlatform() {
     var ua = navigator.userAgent || '';
     if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
@@ -394,28 +410,37 @@
     var grid = document.getElementById('share-grid');
     grid.innerHTML = '';
 
-    // Share options in priority order per platform
     var options = [];
 
-    // Native share is always first on mobile (opens OS share sheet with ALL apps)
+    // Native share — first on mobile (opens OS share sheet with ALL apps: iMessage, Snap, IG, etc)
     if (hasNativeShare) {
-      options.push({ id: 'native', label: 'Share', cls: 'sd-native', icon: '<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>' });
+      options.push({ id: 'native', label: 'Share', cls: 'sd-native',
+        icon: '<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>' });
     }
 
-    // Copy link always available
-    options.push({ id: 'copylink', label: 'Copy Link', cls: 'sd-copy', icon: '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' });
+    // Copy link
+    options.push({ id: 'copylink', label: 'Copy Link', cls: 'sd-copy',
+      icon: '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' });
 
-    // X (Twitter) — works everywhere via URL
-    options.push({ id: 'x', label: 'X', cls: 'sd-x', icon: '<svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>' });
+    // X
+    options.push({ id: 'x', label: 'X', cls: 'sd-x',
+      icon: '<svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>' });
 
-    // WhatsApp — works everywhere via URL
-    options.push({ id: 'whatsapp', label: 'WhatsApp', cls: 'sd-wa', icon: '<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.13.556 4.13 1.532 5.87L.06 23.71l5.99-1.572A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.82c-1.97 0-3.87-.53-5.53-1.53l-.39-.24-3.56.93.95-3.48-.26-.41A9.8 9.8 0 0 1 2.18 12c0-5.42 4.4-9.82 9.82-9.82 5.42 0 9.82 4.4 9.82 9.82 0 5.42-4.4 9.82-9.82 9.82z"/></svg>' });
+    // WhatsApp
+    options.push({ id: 'whatsapp', label: 'WhatsApp', cls: 'sd-wa',
+      icon: '<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.13.556 4.13 1.532 5.87L.06 23.71l5.99-1.572A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.82c-1.97 0-3.87-.53-5.53-1.53l-.39-.24-3.56.93.95-3.48-.26-.41A9.8 9.8 0 0 1 2.18 12c0-5.42 4.4-9.82 9.82-9.82 5.42 0 9.82 4.4 9.82 9.82 0 5.42-4.4 9.82-9.82 9.82z"/></svg>' });
 
     // Telegram
-    options.push({ id: 'telegram', label: 'Telegram', cls: 'sd-tg', icon: '<svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>' });
+    options.push({ id: 'telegram', label: 'Telegram', cls: 'sd-tg',
+      icon: '<svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>' });
+
+    // Reddit
+    options.push({ id: 'reddit', label: 'Reddit', cls: 'sd-reddit',
+      icon: '<svg viewBox="0 0 24 24"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>' });
 
     // Save image
-    options.push({ id: 'save', label: 'Save', cls: 'sd-save', icon: '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' });
+    options.push({ id: 'save', label: 'Save', cls: 'sd-save',
+      icon: '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' });
 
     options.forEach(function(opt) {
       var btn = document.createElement('button');
@@ -429,8 +454,8 @@
   function getShareText() {
     var d = IQData.load();
     return d.iq
-      ? 'My IQ is ' + d.iq + ' on BrainDeer! Top ' + formatPercentile(iqToPercentile(d.iq)) + ' — think you can beat me?'
-      : 'Training my brain on BrainDeer!';
+      ? 'My IQ is ' + d.iq + ' on BrainDeer! Top ' + formatPercentile(iqToPercentile(d.iq)) + ' — think you can beat me? 🦌🧠'
+      : 'Training my brain on BrainDeer! 🦌🧠';
   }
 
   function handleShareAction(id) {
@@ -460,6 +485,10 @@
 
       case 'telegram':
         window.open('https://t.me/share/url?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(text), '_blank');
+        break;
+
+      case 'reddit':
+        window.open('https://reddit.com/submit?url=' + encodeURIComponent(shareUrl) + '&title=' + encodeURIComponent(text), '_blank');
         break;
 
       case 'save':
