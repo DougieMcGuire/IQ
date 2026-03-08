@@ -52,62 +52,102 @@
     var auth = firebase.auth();
     var db   = firebase.firestore();
     var provider = new firebase.auth.GoogleAuthProvider();
+    var statusEl = document.getElementById('status');
+
+    var REDIRECT_KEY = 'bd_google_redirect_pending';
+
+    function ensureUser(user) {
+      var ref = db.collection('users').doc(user.uid);
+      return ref.get().then(function(snap) {
+        if (!snap.exists) {
+          return ref.set({
+            uid:       user.uid,
+            email:     user.email,
+            username:  user.displayName || null,
+            pic:       user.photoURL || null,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            lastSeen:  firebase.firestore.FieldValue.serverTimestamp()
+          });
+        } else {
+          return ref.set(
+            { lastSeen: firebase.firestore.FieldValue.serverTimestamp() },
+            { merge: true }
+          );
+        }
+      });
+    }
+
+    function goToApp() {
+      sessionStorage.removeItem(REDIRECT_KEY);
+      window.location.replace('app.html');
+    }
 
     // ════════════════════════════════════════════════════════════════════════
-    //  This page runs at the TOP LEVEL (not in an iframe).
+    //  FLOW:
+    //  1. First visit: no flag in sessionStorage → set flag, signInWithRedirect
+    //  2. Return from Google: flag exists → try getRedirectResult
+    //     a. Got result → ensure user doc → go to app.html
+    //     b. No result but user is signed in (auth state persisted) → go to app
+    //     c. No result, no user → clear flag, show retry
     //
-    //  STEP 1: Check if we're returning from a Google redirect.
-    //          If yes → we have the credential → ensure user doc → go to app
-    //  STEP 2: If no redirect result → kick off signInWithRedirect
-    //
-    //  On iOS standalone PWA (12.2+), the Google auth page opens in an
-    //  in-app browser that shares storage with the PWA. When it redirects
-    //  back to this page, the in-app browser closes and the PWA resumes.
+    //  The flag prevents the infinite loop: if we already redirected once,
+    //  we NEVER redirect again — we either have auth or we failed.
     // ════════════════════════════════════════════════════════════════════════
 
-    auth.getRedirectResult().then(function(result) {
-      if (result && result.user) {
-        // ── Returning from Google — sign-in succeeded! ──────────────────
-        document.getElementById('status').textContent = 'Signed in! Loading BrainDeer…';
+    var alreadyRedirected = sessionStorage.getItem(REDIRECT_KEY) === '1';
 
-        // Ensure Firestore user doc exists
-        var ref = db.collection('users').doc(result.user.uid);
-        return ref.get().then(function(snap) {
-          if (!snap.exists) {
-            return ref.set({
-              uid:       result.user.uid,
-              email:     result.user.email,
-              username:  result.user.displayName || null,
-              pic:       result.user.photoURL || null,
-              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-              lastSeen:  firebase.firestore.FieldValue.serverTimestamp()
-            });
-          } else {
-            return ref.set(
-              { lastSeen: firebase.firestore.FieldValue.serverTimestamp() },
-              { merge: true }
-            );
-          }
-        }).then(function() {
-          // Go to app — user is now authenticated
-          window.location.replace('app.html');
+    if (!alreadyRedirected) {
+      // ── STEP 1: First visit — kick off the redirect ────────────────────
+      sessionStorage.setItem(REDIRECT_KEY, '1');
+      statusEl.textContent = 'Redirecting to Google…';
+      auth.signInWithRedirect(provider);
+
+    } else {
+      // ── STEP 2: Returning from redirect ────────────────────────────────
+      statusEl.textContent = 'Completing sign-in…';
+
+      auth.getRedirectResult().then(function(result) {
+        if (result && result.user) {
+          statusEl.textContent = 'Signed in! Loading BrainDeer…';
+          return ensureUser(result.user).then(goToApp);
+        }
+
+        // getRedirectResult returned null — but the user might still be
+        // signed in (iOS sometimes loses the redirect result but keeps
+        // the auth state). Check onAuthStateChanged as fallback.
+        return new Promise(function(resolve) {
+          var unsub = auth.onAuthStateChanged(function(user) {
+            unsub();
+            if (user) {
+              statusEl.textContent = 'Signed in! Loading BrainDeer…';
+              ensureUser(user).then(goToApp);
+            } else {
+              // Truly failed — clear flag and let user retry
+              sessionStorage.removeItem(REDIRECT_KEY);
+              statusEl.textContent = 'Sign-in failed. Tap to try again.';
+              document.body.style.cursor = 'pointer';
+              document.body.onclick = function() {
+                statusEl.textContent = 'Redirecting to Google…';
+                sessionStorage.setItem(REDIRECT_KEY, '1');
+                auth.signInWithRedirect(provider);
+              };
+            }
+            resolve();
+          });
         });
-      }
 
-      // ── No redirect result — first visit. Start the redirect. ─────────
-      // Use a small delay to ensure Firebase is fully initialized
-      return auth.signInWithRedirect(provider);
-
-    }).catch(function(e) {
-      console.error('Google redirect error:', e);
-      document.getElementById('status').textContent =
-        'Sign-in failed. Tap to try again.';
-      document.body.style.cursor = 'pointer';
-      document.body.onclick = function() {
-        document.getElementById('status').textContent = 'Redirecting to Google…';
-        auth.signInWithRedirect(provider);
-      };
-    });
+      }).catch(function(e) {
+        console.error('getRedirectResult error:', e);
+        sessionStorage.removeItem(REDIRECT_KEY);
+        statusEl.textContent = 'Sign-in failed. Tap to try again.';
+        document.body.style.cursor = 'pointer';
+        document.body.onclick = function() {
+          statusEl.textContent = 'Redirecting to Google…';
+          sessionStorage.setItem(REDIRECT_KEY, '1');
+          auth.signInWithRedirect(provider);
+        };
+      });
+    }
   </script>
 </body>
 </html>
