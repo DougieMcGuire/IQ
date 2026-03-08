@@ -79,43 +79,40 @@
   import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const app = initializeApp({apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend",storageBucket:"braindeer-backend.firebasestorage.app",messagingSenderId:"331205139765",appId:"1:331205139765:web:20cfef8194af63fc55c07c"});
-  const auth=getAuth(app),db=getFirestore(app),gp=new GoogleAuthProvider();
-  const isStandalone=!!(('standalone' in navigator&&navigator.standalone)||window.matchMedia('(display-mode: standalone)').matches);
-  const inIframe=(window.parent&&window.parent!==window);
+  const auth = getAuth(app), db = getFirestore(app), gp = new GoogleAuthProvider();
+  const isStandalone = !!(('standalone' in navigator && navigator.standalone) || window.matchMedia('(display-mode: standalone)').matches);
+  const inIframe = (window.parent && window.parent !== window);
 
-  onAuthStateChanged(auth,u=>{if(u)navigate()});
-  function navigate(){if(inIframe){window.parent.postMessage({type:'authSuccess'},'*')}else{window.location.href='improve.html'}}
-  getRedirectResult(auth).then(r=>{if(r&&r.user)ensure(r.user).then(()=>navigate())}).catch(()=>{});
+  onAuthStateChanged(auth, u => { if (u) navigate(); });
+  function navigate() { if (inIframe) window.parent.postMessage({ type: 'authSuccess' }, '*'); else window.location.href = 'improve.html'; }
+  getRedirectResult(auth).then(r => { if (r && r.user) ensure(r.user).then(() => navigate()); }).catch(() => {});
 
-  let mode='login';
-  window.switchTab=function(m){mode=m;document.getElementById('tab-login').classList.toggle('active',m==='login');document.getElementById('tab-signup').classList.toggle('active',m==='signup');document.getElementById('field-username').style.display=m==='signup'?'block':'none';document.getElementById('submit-label').textContent=m==='login'?'Sign In':'Create Account';document.getElementById('input-password').autocomplete=m==='signup'?'new-password':'current-password';document.getElementById('str-bar').style.display=m==='signup'?'block':'none';clr()};
-  function showErr(msg){const b=document.getElementById('banner');b.textContent=msg;b.className='banner error'}
-  function clr(){document.getElementById('banner').className='banner'}
-  function setLoading(id,on){const b=document.getElementById(id);if(!b)return;b.classList.toggle('loading',on);b.disabled=on}
-  window.checkStrength=function(v){if(mode!=='signup')return;const f=document.getElementById('str-fill');let s=0;if(v.length>=8)s++;if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;f.style.width=['0%','30%','55%','80%','100%'][s];f.style.background=['#6b4f32','#ea2b2b','#ff9600','#ffc800','#58cc02'][s]};
+  let mode = 'login';
+  window.switchTab = function(m) { mode = m; document.getElementById('tab-login').classList.toggle('active', m === 'login'); document.getElementById('tab-signup').classList.toggle('active', m === 'signup'); document.getElementById('field-username').style.display = m === 'signup' ? 'block' : 'none'; document.getElementById('submit-label').textContent = m === 'login' ? 'Sign In' : 'Create Account'; document.getElementById('input-password').autocomplete = m === 'signup' ? 'new-password' : 'current-password'; document.getElementById('str-bar').style.display = m === 'signup' ? 'block' : 'none'; clr(); };
+  function showErr(msg) { const b = document.getElementById('banner'); b.textContent = msg; b.className = 'banner error'; }
+  function clr() { document.getElementById('banner').className = 'banner'; }
+  function setLoading(id, on) { const b = document.getElementById(id); if (!b) return; b.classList.toggle('loading', on); b.disabled = on; }
+  window.checkStrength = function(v) { if (mode !== 'signup') return; const f = document.getElementById('str-fill'); let s = 0; if (v.length >= 8) s++; if (/[A-Z]/.test(v)) s++; if (/[0-9]/.test(v)) s++; if (/[^A-Za-z0-9]/.test(v)) s++; f.style.width = ['0%','30%','55%','80%','100%'][s]; f.style.background = ['#6b4f32','#ea2b2b','#ff9600','#ffc800','#58cc02'][s]; };
+  async function ensure(u, extra = {}) { try { const ref = doc(db, 'users', u.uid), snap = await getDoc(ref); if (!snap.exists()) { await setDoc(ref, { uid: u.uid, email: u.email, username: extra.username || u.displayName || null, pic: u.photoURL || null, createdAt: serverTimestamp(), lastSeen: serverTimestamp() }); } else { setDoc(ref, { lastSeen: serverTimestamp() }, { merge: true }); } } catch (e) { console.warn('ensure():', e); } }
 
-  async function ensure(u,extra={}){try{const ref=doc(db,'users',u.uid),snap=await getDoc(ref);if(!snap.exists()){await setDoc(ref,{uid:u.uid,email:u.email,username:extra.username||u.displayName||null,pic:u.photoURL||null,createdAt:serverTimestamp(),lastSeen:serverTimestamp()})}else{setDoc(ref,{lastSeen:serverTimestamp()},{merge:true})}}catch(e){console.warn('ensure():',e)}}
-
-  // Standalone PWA → go to google-redirect.html (top-level, GIS works there)
-  // Normal browser → signInWithPopup
-  window.signInWithGoogle=async function(){
-    clr();setLoading('btn-google',true);
-    if(isStandalone){
-      if(inIframe){window.parent.postMessage({type:'googleRedirect'},'*')}
-      else{window.location.href='google-redirect.html'}
+  window.signInWithGoogle = async function() {
+    clr(); setLoading('btn-google', true);
+    if (isStandalone) {
+      if (inIframe) window.parent.postMessage({ type: 'googleRedirect' }, '*');
+      else window.location.href = 'google-redirect.html';
       return;
     }
-    try{const result=await signInWithPopup(auth,gp);await ensure(result.user)}
-    catch(e){
-      if(e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request'){setLoading('btn-google',false);return}
-      if(e.code==='auth/popup-blocked'){try{await signInWithRedirect(auth,gp)}catch(_){setLoading('btn-google',false);showErr('Sign-in failed.')}}
-      else{setLoading('btn-google',false);showErr(fe(e.code))}
+    try { const result = await signInWithPopup(auth, gp); await ensure(result.user); }
+    catch (e) {
+      if (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') { setLoading('btn-google', false); return; }
+      if (e.code === 'auth/popup-blocked') { try { await signInWithRedirect(auth, gp); } catch (_) { setLoading('btn-google', false); showErr('Sign-in failed.'); } }
+      else { setLoading('btn-google', false); showErr(fe(e.code)); }
     }
   };
 
-  window.handleSubmit=async function(e){e.preventDefault();clr();const email=document.getElementById('input-email').value.trim(),pw=document.getElementById('input-password').value,un=document.getElementById('input-username').value.trim();if(mode==='signup'&&pw.length<6){showErr('Password needs at least 6 characters.');return}setLoading('btn-submit',true);try{if(mode==='login'){const c=await signInWithEmailAndPassword(auth,email,pw);await ensure(c.user)}else{const c=await createUserWithEmailAndPassword(auth,email,pw);if(un)await updateProfile(c.user,{displayName:un});await ensure(c.user,{username:un})}navigate()}catch(e){setLoading('btn-submit',false);showErr(fe(e.code))}};
+  window.handleSubmit = async function(e) { e.preventDefault(); clr(); const email = document.getElementById('input-email').value.trim(), pw = document.getElementById('input-password').value, un = document.getElementById('input-username').value.trim(); if (mode === 'signup' && pw.length < 6) { showErr('Password needs at least 6 characters.'); return; } setLoading('btn-submit', true); try { if (mode === 'login') { const c = await signInWithEmailAndPassword(auth, email, pw); await ensure(c.user); } else { const c = await createUserWithEmailAndPassword(auth, email, pw); if (un) await updateProfile(c.user, { displayName: un }); await ensure(c.user, { username: un }); } navigate(); } catch (e) { setLoading('btn-submit', false); showErr(fe(e.code)); } };
 
-  function fe(c){return{'auth/user-not-found':'No account with that email.','auth/wrong-password':'Incorrect password.','auth/email-already-in-use':'That email is already registered — try signing in.','auth/invalid-email':'That doesn\'t look like a valid email.','auth/weak-password':'Password too weak — try adding numbers or symbols.','auth/too-many-requests':'Too many attempts. Please wait a moment.','auth/network-request-failed':'No internet connection.','auth/invalid-credential':'Email or password is incorrect.'}[c]||'Something went wrong. Please try again.'}
+  function fe(c) { return { 'auth/user-not-found':'No account with that email.', 'auth/wrong-password':'Incorrect password.', 'auth/email-already-in-use':'That email is already registered — try signing in.', 'auth/invalid-email':'That doesn\'t look like a valid email.', 'auth/weak-password':'Password too weak — try adding numbers or symbols.', 'auth/too-many-requests':'Too many attempts. Please wait a moment.', 'auth/network-request-failed':'No internet connection.', 'auth/invalid-credential':'Email or password is incorrect.' }[c] || 'Something went wrong. Please try again.'; }
 </script>
 </body>
 </html>
