@@ -90,6 +90,7 @@
     .sd-x .sd-icon { background: #000; }
     .sd-wa .sd-icon { background: #25D366; }
     .sd-tg .sd-icon { background: #0088cc; }
+    .sd-reddit .sd-icon { background: #FF4500; }
     .sd-save .sd-icon { background: var(--green); }
     .sd-save .sd-icon svg { fill: none; stroke: #fff; stroke-width: 2.5; }
     .toast { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--green); color: #fff; padding: 10px 20px; border-radius: 14px; font-size: 14px; font-weight: 800; opacity: 0; transition: all 0.3s; z-index: 300; white-space: nowrap; box-shadow: 0 3px 0 var(--green-dark); pointer-events: none; }
@@ -131,8 +132,6 @@
   <button class="nav-btn" onclick="navGo('tasks')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tasks<span class="nav-badge" id="tasks-badge"></span></button>
   <button class="nav-btn active" onclick="navGo('profile')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
 </nav>
-
-<!-- SHARE SHEET -->
 <div class="modal-overlay" id="share-modal">
   <div class="modal-sheet">
     <div class="sheet-handle"></div>
@@ -146,7 +145,6 @@
   </div>
 </div>
 <div class="toast" id="toast"></div>
-
 <script type="module">
   import { IQData, iqToPercentile, formatPercentile } from './data.js';
   import Haptics from './haptics.js';
@@ -255,7 +253,6 @@
     if (fill) { ctx.fillStyle = fill; ctx.fill(); }
   }
 
-  // Draw a donut/ring chart segment
   function drawDonut(ctx, cx, cy, outerR, innerR, startAngle, endAngle, color) {
     ctx.beginPath();
     ctx.arc(cx, cy, outerR, startAngle, endAngle, false);
@@ -275,53 +272,51 @@
     var acc = IQData.getAccuracy();
     var pic = d.pic || null;
 
-    // ── Background ──
+    // Background
     ctx.fillStyle = '#2a1c10'; ctx.fillRect(0, 0, W, H);
     rr(ctx, 20, 20, W - 40, H - 40, 24, '#3a2918');
 
-    // ═══ TOP SECTION: centered profile pic + IQ + stats ═══
     var topCx = W / 2;
-
-    // Profile picture (circle)
     var picSize = 64;
-    var picY = 62;
-    if (pic) {
-      // We'll draw it after image loads — for now draw placeholder
-      ctx.fillStyle = '#4a3625';
-      ctx.beginPath(); ctx.arc(topCx, picY + picSize/2, picSize/2, 0, Math.PI * 2); ctx.fill();
-    } else {
-      ctx.fillStyle = '#4a3625';
-      ctx.beginPath(); ctx.arc(topCx, picY + picSize/2, picSize/2, 0, Math.PI * 2); ctx.fill();
+    var picY = 52;
+
+    // Profile pic placeholder
+    ctx.fillStyle = '#4a3625';
+    ctx.beginPath(); ctx.arc(topCx, picY + picSize / 2, picSize / 2, 0, Math.PI * 2); ctx.fill();
+    if (!pic) {
       ctx.font = '28px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('🦌', topCx, picY + picSize/2 + 2);
+      ctx.fillText('🦌', topCx, picY + picSize / 2 + 2);
     }
 
     // Username
+    ctx.textBaseline = 'alphabetic';
     ctx.font = '700 16px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.textAlign = 'center';
     ctx.fillText(uname, topCx, picY + picSize + 22);
 
-    // IQ number — BIG and centered
+    // IQ
     ctx.font = '900 100px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
     ctx.textBaseline = 'middle';
-    ctx.fillText(d.iq || '--', topCx, picY + picSize + 90);
+    ctx.fillText(d.iq || '--', topCx, picY + picSize + 85);
     ctx.textBaseline = 'alphabetic';
 
     // IQ label
     ctx.font = '900 14px Nunito, sans-serif'; ctx.fillStyle = '#6b4f32';
-    ctx.fillText('I Q', topCx, picY + picSize + 130);
+    ctx.fillText('I Q', topCx, picY + picSize + 125);
 
     // Percentile badge
+    var badgeBottom = picY + picSize + 130;
     if (d.iq) {
       var pctText = 'TOP ' + formatPercentile(iqToPercentile(d.iq)).toUpperCase();
       ctx.font = '900 13px Nunito, sans-serif';
       var tw = ctx.measureText(pctText).width + 36;
-      rr(ctx, topCx - tw / 2, picY + picSize + 140, tw, 28, 8, '#ffc800');
-      ctx.fillStyle = '#2a1c10'; ctx.fillText(pctText, topCx, picY + picSize + 159);
+      rr(ctx, topCx - tw / 2, badgeBottom + 5, tw, 28, 8, '#ffc800');
+      ctx.fillStyle = '#2a1c10'; ctx.fillText(pctText, topCx, badgeBottom + 24);
+      badgeBottom += 40;
     }
 
-    // Stats row (centered under IQ)
-    var statsY = picY + picSize + 185;
+    // Stats row
+    var statsY = badgeBottom + 14;
     var miniStats = [
       { v: String(d.answered || 0), l: 'ANSWERED' },
       { v: acc + '%', l: 'ACCURACY' },
@@ -334,60 +329,58 @@
       var px = pillStartX + i * (pillW + pillGap);
       rr(ctx, px, statsY, pillW, 48, 10, '#4a3625');
       ctx.font = '900 20px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
-      ctx.textAlign = 'center'; ctx.fillText(s.v, px + pillW/2, statsY + 22);
+      ctx.textAlign = 'center'; ctx.fillText(s.v, px + pillW / 2, statsY + 22);
       ctx.font = '800 9px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a';
-      ctx.fillText(s.l, px + pillW/2, statsY + 39);
+      ctx.fillText(s.l, px + pillW / 2, statsY + 39);
     });
 
-    // ═══ BOTTOM SECTION: donut charts for each ability ═══
+    // Donut charts
     var cats = ABILITIES.slice(0, 6);
-    var donutY = statsY + 80;
+    var donutY = statsY + 72;
     var donutR = 38;
     var donutInner = 24;
-    var donutGap = (W - 120) / cats.length; // evenly space across width
+    var donutGap = (W - 120) / cats.length;
     var donutStartX = 60 + donutGap / 2;
 
     cats.forEach(function(a, i) {
-      var cx = donutStartX + i * donutGap;
-      var cy = donutY + donutR;
+      var dcx = donutStartX + i * donutGap;
+      var dcy = donutY + donutR;
       var v = IQData.getStatPercent(a.key);
       var angle = (v / 100) * Math.PI * 2;
 
       // Background ring
-      drawDonut(ctx, cx, cy, donutR, donutInner, 0, Math.PI * 2, '#4a3625');
-
+      drawDonut(ctx, dcx, dcy, donutR, donutInner, 0, Math.PI * 2, '#4a3625');
       // Filled ring
-      drawDonut(ctx, cx, cy, donutR, donutInner, -Math.PI / 2, -Math.PI / 2 + angle, a.color);
+      if (v > 0) drawDonut(ctx, dcx, dcy, donutR, donutInner, -Math.PI / 2, -Math.PI / 2 + angle, a.color);
 
       // Value in center
       ctx.font = '900 18px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(String(v), cx, cy);
+      ctx.fillText(String(v), dcx, dcy);
       ctx.textBaseline = 'alphabetic';
 
       // Label below
       ctx.font = '800 11px Nunito, sans-serif'; ctx.fillStyle = '#c2a476';
-      ctx.textAlign = 'center';
-      ctx.fillText(a.name, cx, cy + donutR + 18);
+      ctx.fillText(a.name, dcx, dcy + donutR + 18);
     });
 
     // Branding
     ctx.font = '800 13px Nunito, sans-serif'; ctx.fillStyle = '#5a4232';
     ctx.textAlign = 'center';
-    ctx.fillText('braindeer.org', W / 2, H - 36);
+    ctx.fillText('braindeer.org', W / 2, H - 32);
 
     shareCanvas = cv;
 
-    // If we have a profile pic, load it and redraw that part
+    // Load profile pic async
     if (pic) {
       var img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = function() {
         ctx.save();
         ctx.beginPath();
-        ctx.arc(topCx, picY + picSize/2, picSize/2, 0, Math.PI * 2);
+        ctx.arc(topCx, picY + picSize / 2, picSize / 2, 0, Math.PI * 2);
         ctx.clip();
-        ctx.drawImage(img, topCx - picSize/2, picY, picSize, picSize);
+        ctx.drawImage(img, topCx - picSize / 2, picY, picSize, picSize);
         ctx.restore();
       };
       img.src = pic;
@@ -396,7 +389,32 @@
     return cv;
   }
 
-  // ── SMART SHARE OPTIONS ──
+  async function uploadShareCard() {
+    var user = IQData.getCurrentUser();
+    if (!user || !shareCanvas) return;
+    var d = IQData.load();
+    try {
+      var dataUrl = shareCanvas.toDataURL('image/png');
+      var base64 = dataUrl.split(',')[1];
+      var shareDoc = new parent.Object();
+      shareDoc.iq = d.iq || 0;
+      shareDoc.username = d.username || user.displayName || 'Brain';
+      shareDoc.answered = d.answered || 0;
+      shareDoc.accuracy = parseInt(IQData.getAccuracy()) || 0;
+      shareDoc.bestStreak = d.bestStreak || 0;
+      shareDoc.cardBase64 = base64;
+      shareDoc.updatedAt = new Date().toISOString();
+      var fb = parent.firebase;
+      await fb.firestore().collection('shares').doc(user.uid).set(shareDoc);
+      toast('Share card ready!');
+    } catch (e) {
+      console.warn('Share upload error:', e);
+      toast('Share failed — try again');
+    }
+  }
+
+  // ── SHARE OPTIONS ──
+
   function getPlatform() {
     var ua = navigator.userAgent || '';
     if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
@@ -405,40 +423,25 @@
   }
 
   function buildShareGrid() {
-    var platform = getPlatform();
     var hasNativeShare = !!navigator.share;
     var grid = document.getElementById('share-grid');
     grid.innerHTML = '';
-
     var options = [];
 
-    // Native share — first on mobile (opens OS share sheet with ALL apps: iMessage, Snap, IG, etc)
     if (hasNativeShare) {
       options.push({ id: 'native', label: 'Share', cls: 'sd-native',
         icon: '<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>' });
     }
-
-    // Copy link
     options.push({ id: 'copylink', label: 'Copy Link', cls: 'sd-copy',
       icon: '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' });
-
-    // X
     options.push({ id: 'x', label: 'X', cls: 'sd-x',
       icon: '<svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>' });
-
-    // WhatsApp
     options.push({ id: 'whatsapp', label: 'WhatsApp', cls: 'sd-wa',
       icon: '<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.13.556 4.13 1.532 5.87L.06 23.71l5.99-1.572A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.82c-1.97 0-3.87-.53-5.53-1.53l-.39-.24-3.56.93.95-3.48-.26-.41A9.8 9.8 0 0 1 2.18 12c0-5.42 4.4-9.82 9.82-9.82 5.42 0 9.82 4.4 9.82 9.82 0 5.42-4.4 9.82-9.82 9.82z"/></svg>' });
-
-    // Telegram
     options.push({ id: 'telegram', label: 'Telegram', cls: 'sd-tg',
       icon: '<svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>' });
-
-    // Reddit
     options.push({ id: 'reddit', label: 'Reddit', cls: 'sd-reddit',
       icon: '<svg viewBox="0 0 24 24"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>' });
-
-    // Save image
     options.push({ id: 'save', label: 'Save', cls: 'sd-save',
       icon: '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' });
 
@@ -461,36 +464,29 @@
   function handleShareAction(id) {
     Haptics.medium();
     var text = getShareText();
-
     switch (id) {
       case 'native':
         navigator.share({ title: 'My BrainDeer IQ', text: text, url: shareUrl })
           .then(function() { Haptics.success(); })
           .catch(function(e) { if (e.name !== 'AbortError') toast('Share cancelled'); });
         break;
-
       case 'copylink':
         navigator.clipboard.writeText(shareUrl)
           .then(function() { Haptics.success(); toast('Link copied!'); })
           .catch(function() { toast('Copy failed'); });
         break;
-
       case 'x':
         window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(shareUrl), '_blank');
         break;
-
       case 'whatsapp':
         window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + shareUrl), '_blank');
         break;
-
       case 'telegram':
         window.open('https://t.me/share/url?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(text), '_blank');
         break;
-
       case 'reddit':
         window.open('https://reddit.com/submit?url=' + encodeURIComponent(shareUrl) + '&title=' + encodeURIComponent(text), '_blank');
         break;
-
       case 'save':
         if (!shareCanvas) return;
         Haptics.success();
@@ -507,14 +503,11 @@
     var fab = document.getElementById('share-btn');
     fab.classList.add('uploading');
     fab.textContent = 'Generating...';
-
     shareUrl = getShareUrl();
     genShareCard();
     await uploadShareCard();
-
     fab.classList.remove('uploading');
     fab.innerHTML = '<svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share Stats';
-
     document.getElementById('share-url').value = shareUrl;
     var preview = document.getElementById('card-preview');
     preview.innerHTML = '';
@@ -522,7 +515,6 @@
     previewCv.width = 600; previewCv.height = 315;
     previewCv.getContext('2d').drawImage(shareCanvas, 0, 0, 600, 315);
     preview.appendChild(previewCv);
-
     buildShareGrid();
     document.getElementById('share-modal').classList.add('show');
   }
