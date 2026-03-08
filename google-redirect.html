@@ -17,54 +17,196 @@
     }
     .mascot{font-size:52px;animation:bob 1.2s ease-in-out infinite}
     .title{font-size:22px;font-weight:900;margin:10px 0 6px}
-    .sub{font-size:14px;font-weight:700;color:#c2a476;margin-bottom:20px}
-    .dots{display:flex;gap:6px;justify-content:center}
+    .sub{font-size:14px;font-weight:700;color:#c2a476;margin-bottom:20px;max-width:300px;line-height:1.5}
+    .dots{display:flex;gap:6px;justify-content:center;margin-bottom:16px}
     .dots span{width:8px;height:8px;border-radius:50%;background:#6b4f32;animation:dotPulse 1s ease infinite}
     .dots span:nth-child(2){animation-delay:.15s}
     .dots span:nth-child(3){animation-delay:.3s}
+    .btn{
+      padding:15px 36px;border:none;border-radius:14px;
+      background:#58cc02;color:#fff;font-size:16px;font-weight:900;
+      font-family:'Nunito',sans-serif;cursor:pointer;
+      box-shadow:0 5px 0 #46a302;transition:transform .1s,box-shadow .1s;
+      display:none;margin-bottom:12px;
+    }
+    .btn:active{transform:translateY(4px);box-shadow:0 1px 0 #46a302}
+    .btn.show{display:inline-flex;align-items:center;gap:10px}
+    .btn svg{width:20px;height:20px;flex-shrink:0}
+    .btn-back{
+      padding:10px 24px;border:2px solid #6b4f32;border-radius:12px;
+      background:transparent;color:#c2a476;font-size:14px;font-weight:700;
+      font-family:'Nunito',sans-serif;cursor:pointer;display:none;
+    }
+    .btn-back.show{display:inline-block}
+    .debug{font-size:11px;color:#6b4f32;margin-top:16px;max-width:320px;word-break:break-all;display:none}
+    .hidden{display:none!important}
     @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
     @keyframes dotPulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
   </style>
 </head>
 <body>
-  <div class="mascot">🦌</div>
-  <div class="title">BrainDeer</div>
-  <div class="sub" id="status">Connecting…</div>
-  <div class="dots"><span></span><span></span><span></span></div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script>
-    firebase.initializeApp({
-      apiKey:            "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
-      authDomain:        "braindeer-backend.firebaseapp.com",
-      projectId:         "braindeer-backend",
-      storageBucket:     "braindeer-backend.firebasestorage.app",
-      messagingSenderId: "331205139765",
-      appId:             "1:331205139765:web:20cfef8194af63fc55c07c"
+<div class="mascot">🦌</div>
+<div class="title">BrainDeer</div>
+<div class="sub" id="sub">Loading…</div>
+<div class="dots" id="dots"><span></span><span></span><span></span></div>
+
+<button class="btn" id="btnGoogle" onclick="startRedirect()">
+  <svg viewBox="0 0 48 48">
+    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+  </svg>
+  Continue with Google
+</button>
+
+<button class="btn-back" id="btnBack" onclick="window.location.replace('app.html')">← Back to BrainDeer</button>
+
+<div class="debug" id="debug"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey:            "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
+    authDomain:        "braindeer-backend.firebaseapp.com",
+    projectId:         "braindeer-backend",
+    storageBucket:     "braindeer-backend.firebasestorage.app",
+    messagingSenderId: "331205139765",
+    appId:             "1:331205139765:web:20cfef8194af63fc55c07c"
+  });
+
+  var auth     = firebase.auth();
+  var db       = firebase.firestore();
+  var provider = new firebase.auth.GoogleAuthProvider();
+
+  var sub      = document.getElementById('sub');
+  var dots     = document.getElementById('dots');
+  var btnG     = document.getElementById('btnGoogle');
+  var btnBack  = document.getElementById('btnBack');
+  var dbgEl    = document.getElementById('debug');
+
+  var KEY = 'bd_goog_redir';
+
+  function log(msg) {
+    console.log('[google-redirect]', msg);
+    dbgEl.style.display = 'block';
+    dbgEl.textContent += msg + '\n';
+  }
+
+  function showButton(msg) {
+    sub.textContent = msg;
+    dots.classList.add('hidden');
+    btnG.classList.add('show');
+    btnBack.classList.add('show');
+  }
+
+  function showLoading(msg) {
+    sub.textContent = msg;
+    dots.classList.remove('hidden');
+    btnG.classList.remove('show');
+  }
+
+  function goApp() {
+    sessionStorage.removeItem(KEY);
+    log('Navigating to app.html');
+    window.location.replace('app.html');
+  }
+
+  function ensureUser(user) {
+    var ref = db.collection('users').doc(user.uid);
+    return ref.get().then(function(snap) {
+      if (!snap.exists) {
+        return ref.set({
+          uid: user.uid, email: user.email,
+          username: user.displayName || null,
+          pic: user.photoURL || null,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          lastSeen:  firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+      return ref.set({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
     });
+  }
 
-    var KEY = 'bd_goog_redir';
+  window.startRedirect = function() {
+    sessionStorage.setItem(KEY, '1');
+    showLoading('Redirecting to Google…');
+    log('Starting signInWithRedirect');
+    auth.signInWithRedirect(provider);
+  };
 
-    // Already redirected once? → we're back from Google.
-    // Don't try getRedirectResult (unreliable on iOS).
-    // Just go to app.html — onAuthStateChanged there will pick up the user
-    // if auth succeeded (Firebase persists auth in IndexedDB which is shared
-    // between the PWA and the in-app browser on iOS 12.2+).
-    if (sessionStorage.getItem(KEY)) {
-      sessionStorage.removeItem(KEY);
-      document.getElementById('status').textContent = 'Loading BrainDeer…';
-      // Small delay to let Firebase auth state settle
-      setTimeout(function() {
-        window.location.replace('app.html');
-      }, 500);
+  // ═══════════════════════════════════════════════════════════════════
+  //  On page load: check if user is already signed in, then check
+  //  redirect result, then show button.
+  // ═══════════════════════════════════════════════════════════════════
+
+  var didRedirect = sessionStorage.getItem(KEY) === '1';
+  log('didRedirect flag: ' + didRedirect);
+  log('standalone: ' + (navigator.standalone || window.matchMedia('(display-mode: standalone)').matches));
+
+  // FIRST: check if there's already a signed-in user
+  // (covers the case where auth persisted from a previous attempt)
+  var currentUser = auth.currentUser;
+  if (currentUser) {
+    log('Already signed in as: ' + currentUser.email);
+    showLoading('Already signed in! Loading…');
+    ensureUser(currentUser).then(goApp).catch(goApp);
+  } else {
+
+    // SECOND: try getRedirectResult (works on non-iOS, sometimes on iOS)
+    if (didRedirect) {
+      showLoading('Completing sign-in…');
+      log('Checking getRedirectResult...');
+
+      auth.getRedirectResult().then(function(result) {
+        log('getRedirectResult: user=' + (result && result.user ? result.user.email : 'null'));
+
+        if (result && result.user) {
+          showLoading('Signed in! Loading BrainDeer…');
+          return ensureUser(result.user).then(goApp);
+        }
+
+        // No redirect result — wait for onAuthStateChanged
+        log('No redirect result, waiting for onAuthStateChanged...');
+        waitForAuth();
+
+      }).catch(function(e) {
+        log('getRedirectResult error: ' + e.code + ' ' + e.message);
+        waitForAuth();
+      });
+
     } else {
-      // First visit — set flag and redirect to Google
-      sessionStorage.setItem(KEY, '1');
-      document.getElementById('status').textContent = 'Redirecting to Google…';
-      var provider = new firebase.auth.GoogleAuthProvider();
-      firebase.auth().signInWithRedirect(provider);
+      // Not returning from redirect — show the button
+      showButton('Tap to sign in with Google');
     }
-  </script>
+  }
+
+  function waitForAuth() {
+    // Give onAuthStateChanged up to 3 seconds to fire with a user
+    var resolved = false;
+    var timeout = setTimeout(function() {
+      if (resolved) return;
+      resolved = true;
+      log('Auth timeout — no user found');
+      sessionStorage.removeItem(KEY);
+      showButton('Sign-in didn\'t complete. Tap to try again.');
+    }, 3000);
+
+    auth.onAuthStateChanged(function(user) {
+      if (resolved) return;
+      log('onAuthStateChanged: ' + (user ? user.email : 'null'));
+      if (user) {
+        resolved = true;
+        clearTimeout(timeout);
+        showLoading('Signed in! Loading BrainDeer…');
+        ensureUser(user).then(goApp).catch(goApp);
+      }
+      // If null, let the timeout handle it
+    });
+  }
+</script>
 </body>
 </html>
