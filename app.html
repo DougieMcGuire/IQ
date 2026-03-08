@@ -112,6 +112,14 @@
       return;
     }
 
+    // Google redirect requested from auth iframe (iOS/Android standalone PWA)
+    // Navigate the top-level page to google-redirect.html which handles
+    // signInWithRedirect at the top level where it works properly.
+    if (e.data.type === 'googleRedirect') {
+      window.location.href = 'google-redirect.html';
+      return;
+    }
+
     if (e.data.type === 'savePushSub') {
       var sub = e.data.sub;
       firebase.auth().onAuthStateChanged(function(user) {
