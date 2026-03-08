@@ -111,6 +111,36 @@
       return;
     }
 
+    // GIS token from auth iframe — sign in at top level
+    if (e.data.type === 'gisToken' && e.data.idToken) {
+      var credential = firebase.auth.GoogleAuthProvider.credential(e.data.idToken);
+      firebase.auth().signInWithCredential(credential)
+        .then(function(result) {
+          // Ensure user doc
+          var ref = firebase.firestore().collection('users').doc(result.user.uid);
+          return ref.get().then(function(snap) {
+            if (!snap.exists) {
+              return ref.set({
+                uid: result.user.uid,
+                email: result.user.email,
+                username: result.user.displayName || null,
+                pic: result.user.photoURL || null,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+              });
+            }
+            return ref.set({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+          });
+        })
+        .then(function() {
+          goTo('improve');
+        })
+        .catch(function(err) {
+          console.error('GIS sign-in failed:', err);
+        });
+      return;
+    }
+
     if (e.data.type === 'savePushSub') {
       var sub = e.data.sub;
       firebase.auth().onAuthStateChanged(function(user) {
