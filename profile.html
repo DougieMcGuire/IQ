@@ -329,15 +329,16 @@
 
       var fb = parent.firebase;
       var db = fb.firestore();
-      await db.collection('shares').doc(user.uid).set({
-        iq: d.iq || null,
-        username: d.username || user.displayName || 'Brain',
-        answered: d.answered || 0,
-        accuracy: parseInt(IQData.getAccuracy()) || 0,
-        bestStreak: d.bestStreak || 0,
-        cardBase64: base64,
-        updatedAt: fb.firestore.FieldValue.serverTimestamp(),
-      });
+      var shareDoc = {
+  iq: Number(d.iq) || 0,
+  username: String(d.username || user.displayName || 'Brain'),
+  answered: Number(d.answered) || 0,
+  accuracy: Number(parseInt(IQData.getAccuracy())) || 0,
+  bestStreak: Number(d.bestStreak) || 0,
+  cardBase64: String(base64),
+  updatedAt: new Date().toISOString(),
+};
+await db.collection('shares').doc(user.uid).set(shareDoc);
       toast('Share card ready!');
     } catch (e) {
       console.warn('Share upload error:', e);
