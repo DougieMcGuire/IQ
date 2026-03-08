@@ -11,43 +11,22 @@
     :root{
       --bg:#3a2918;--card:#4a3625;--card2:#5a4232;
       --cream:#f0e2cc;--tan:#c2a476;--mid:#6b4f32;--light:#8f6b4a;
-      --green:#58cc02;--greend:#46a302;
-      --red:#ea2b2b;--redd:#c42020;
+      --green:#58cc02;--greend:#46a302;--red:#ea2b2b;--redd:#c42020;
     }
     html,body{height:100%}
-    body{
-      background:var(--bg);min-height:100dvh;
-      font-family:'Nunito',sans-serif;color:var(--cream);
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      padding:env(safe-area-inset-top,20px) 20px env(safe-area-inset-bottom,20px);
-      overflow-y:auto;
-    }
+    body{background:var(--bg);min-height:100dvh;font-family:'Nunito',sans-serif;color:var(--cream);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:env(safe-area-inset-top,20px) 20px env(safe-area-inset-bottom,20px);overflow-y:auto}
     .logo{text-align:center;margin-bottom:20px;animation:fadeUp .45s cubic-bezier(.34,1.56,.64,1) both}
     .mascot{font-size:60px;line-height:1;margin-bottom:2px;display:block;filter:drop-shadow(0 4px 0 rgba(0,0,0,.25))}
     .logo-name{font-size:30px;font-weight:900;text-shadow:0 3px 0 rgba(0,0,0,.2)}
     .logo-tag{font-size:13px;font-weight:700;color:var(--tan);margin-top:2px}
-    .card{
-      background:var(--card);border-radius:24px;padding:22px 20px;width:100%;max-width:380px;
-      box-shadow:0 8px 0 rgba(0,0,0,.18);animation:fadeUp .45s .07s cubic-bezier(.34,1.56,.64,1) both;
-      position:relative;overflow:hidden;
-    }
-    .card::before{
-      content:'';position:absolute;top:0;left:0;right:0;height:50%;
-      background:linear-gradient(180deg,rgba(255,255,255,.04)0%,transparent 100%);
-      border-radius:24px 24px 0 0;pointer-events:none;
-    }
+    .card{background:var(--card);border-radius:24px;padding:22px 20px;width:100%;max-width:380px;box-shadow:0 8px 0 rgba(0,0,0,.18);animation:fadeUp .45s .07s cubic-bezier(.34,1.56,.64,1) both;position:relative;overflow:hidden}
+    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,.04)0%,transparent 100%);border-radius:24px 24px 0 0;pointer-events:none}
     .tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--bg);border-radius:14px;padding:4px;margin-bottom:18px}
     .tab{padding:10px;text-align:center;font-size:15px;font-weight:800;color:var(--tan);border-radius:11px;cursor:pointer;transition:all .2s;user-select:none}
     .tab.active{background:var(--mid);color:var(--cream);box-shadow:0 3px 0 rgba(0,0,0,.15)}
     .banner{border-radius:12px;font-size:14px;font-weight:700;margin-bottom:14px;display:none;padding:12px 14px}
     .banner.error{background:var(--red);color:#fff;display:block;box-shadow:0 3px 0 var(--redd)}
-    .btn-google{
-      width:100%;padding:14px 16px;border:none;border-radius:14px;
-      background:var(--card2);color:var(--cream);font-size:15px;font-weight:700;
-      font-family:'Nunito',sans-serif;cursor:pointer;
-      display:flex;align-items:center;justify-content:center;gap:10px;
-      box-shadow:0 4px 0 rgba(0,0,0,.18);transition:transform .1s,box-shadow .1s;margin-bottom:14px;
-    }
+    .btn-google{width:100%;padding:14px 16px;border:none;border-radius:14px;background:var(--card2);color:var(--cream);font-size:15px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 0 rgba(0,0,0,.18);transition:transform .1s,box-shadow .1s;margin-bottom:14px}
     .btn-google:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
     .btn-google:disabled{opacity:.5;pointer-events:none}
     .g-logo{width:19px;height:19px;flex-shrink:0}
@@ -55,30 +34,18 @@
     .divider::before,.divider::after{content:'';flex:1;height:2px;background:var(--mid);border-radius:1px}
     .form-group{margin-bottom:12px}
     label{display:block;font-size:12px;font-weight:800;color:var(--tan);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
-    input{
-      width:100%;padding:13px 15px;border:2px solid transparent;border-radius:13px;
-      background:var(--bg);font-size:16px;font-weight:700;color:var(--cream);
-      font-family:'Nunito',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none;
-    }
+    input{width:100%;padding:13px 15px;border:2px solid transparent;border-radius:13px;background:var(--bg);font-size:16px;font-weight:700;color:var(--cream);font-family:'Nunito',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none}
     input:focus{border-color:var(--light)}
     input::placeholder{color:var(--light);font-weight:600}
     #str-bar{height:4px;border-radius:2px;margin-top:5px;background:var(--mid);overflow:hidden;display:none}
     #str-fill{height:100%;border-radius:2px;width:0%;transition:width .3s,background .3s}
-    .btn-submit{
-      width:100%;padding:15px;border:none;border-radius:14px;background:var(--green);color:#fff;
-      font-size:16px;font-weight:900;font-family:'Nunito',sans-serif;text-transform:uppercase;
-      letter-spacing:.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
-      box-shadow:0 5px 0 var(--greend);transition:transform .1s,box-shadow .1s;margin-top:4px;
-    }
+    .btn-submit{width:100%;padding:15px;border:none;border-radius:14px;background:var(--green);color:#fff;font-size:16px;font-weight:900;font-family:'Nunito',sans-serif;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 5px 0 var(--greend);transition:transform .1s,box-shadow .1s;margin-top:4px}
     .btn-submit:active{transform:translateY(4px);box-shadow:0 1px 0 var(--greend)}
     .btn-submit:disabled{opacity:.5;pointer-events:none}
     .spinner{width:20px;height:20px;border:3px solid transparent;border-top-color:currentColor;border-radius:50%;animation:spin .6s linear infinite;display:none}
     .loading .spinner{display:block}
     .loading .btn-text{display:none}
-    .footer-links{
-      margin-top:18px;display:flex;align-items:center;justify-content:center;gap:0;
-      animation:fadeUp .45s .14s cubic-bezier(.34,1.56,.64,1) both;
-    }
+    .footer-links{margin-top:18px;display:flex;align-items:center;justify-content:center;gap:0;animation:fadeUp .45s .14s cubic-bezier(.34,1.56,.64,1) both}
     .footer-links a{color:var(--tan);font-size:13px;font-weight:700;text-decoration:none;padding:8px 14px;border-radius:10px;transition:color .2s,background .2s}
     .footer-links a:hover,.footer-links a:active{color:var(--cream);background:rgba(255,255,255,.06)}
     .footer-dot{width:4px;height:4px;border-radius:50%;background:var(--mid);flex-shrink:0}
@@ -98,10 +65,18 @@
     <div class="tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</div>
   </div>
   <div class="banner" id="banner"></div>
-
-  <!-- Google section: custom button for normal browsers, GIS button for standalone PWA -->
-  <div id="google-section"></div>
-
+  <div id="google-section">
+    <button class="btn-google" id="btn-google" onclick="signInWithGoogle()">
+      <svg class="g-logo" viewBox="0 0 48 48">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      <span class="btn-text">Continue with Google</span>
+      <div class="spinner"></div>
+    </button>
+  </div>
   <div class="divider">or</div>
   <form id="auth-form" onsubmit="handleSubmit(event)">
     <div class="form-group" id="field-username" style="display:none">
@@ -131,9 +106,38 @@
   <a href="contact.html">Contact</a>
 </div>
 
-<!-- GIS library — loaded async, only used on standalone PWA -->
+<!-- ═══════════════════════════════════════════════════════════════════
+  REGULAR SCRIPT (not module) — GIS callback MUST be on window
+  before the GIS library tries to call it.
+═══════════════════════════════════════════════════════════════════ -->
+<script>
+  // GIS callback — defined globally in a regular script so GIS can find it
+  var _gisInIframe = (window.parent && window.parent !== window);
+
+  window.handleGISCredential = function(response) {
+    console.log('[auth] handleGISCredential fired');
+    var idToken = response.credential;
+    if (!idToken) {
+      console.error('[auth] No credential in GIS response');
+      return;
+    }
+    console.log('[auth] Got idToken, length=' + idToken.length);
+
+    if (_gisInIframe) {
+      console.log('[auth] Sending gisToken to parent');
+      window.parent.postMessage({ type: 'gisToken', idToken: idToken }, '*');
+    } else {
+      // Fallback: not in iframe, store token and redirect
+      sessionStorage.setItem('bd_gis_token', idToken);
+      window.location.href = 'app.html?gis=1';
+    }
+  };
+</script>
+
+<!-- GIS library -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
+<!-- Firebase + app logic as module -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import {
@@ -160,10 +164,9 @@
   const db = getFirestore(app);
   const gp = new GoogleAuthProvider();
 
-  // ── Environment detection ──────────────────────────────────────────
   const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isStandalone = !!(('standalone' in navigator && navigator.standalone) || window.matchMedia('(display-mode: standalone)').matches);
-  const useGIS = isStandalone; // Use GIS for ALL standalone PWAs (iOS + Android)
+  const useGIS = isStandalone;
   const inIframe = (window.parent && window.parent !== window);
 
   // ── Navigation ─────────────────────────────────────────────────────
@@ -174,67 +177,27 @@
     else { window.location.href = 'improve.html'; }
   }
 
-  // Handle redirect result (for non-standalone fallback)
   getRedirectResult(auth).then(r => {
     if (r && r.user) ensure(r.user).then(() => navigate());
   }).catch(() => {});
 
-  // ── Always show the same custom styled Google button ─────────────
-  document.getElementById('google-section').innerHTML = `
-    <button class="btn-google" id="btn-google" onclick="signInWithGoogle()">
-      <svg class="g-logo" viewBox="0 0 48 48">
-        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-      </svg>
-      <span class="btn-text">Continue with Google</span>
-      <div class="spinner"></div>
-    </button>`;
-
-  // ── Initialize GIS for standalone PWA (One Tap prompt only) ────────
+  // ── Init GIS on standalone ─────────────────────────────────────────
   let gisReady = false;
   if (useGIS) {
-    function tryInit() {
+    (function tryInit() {
       if (typeof google === 'undefined' || !google.accounts) {
         setTimeout(tryInit, 100);
         return;
       }
       google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
-        callback: handleGISCredential,
+        callback: window.handleGISCredential,
         use_fedcm_for_prompt: true
       });
       gisReady = true;
-    }
-    tryInit();
+      console.log('[auth] GIS initialized');
+    })();
   }
-
-  // GIS callback — receives JWT, sends to parent for sign-in
-  async function handleGISCredential(response) {
-    const idToken = response.credential;
-    if (!idToken) { showErr('No credential received.'); return; }
-
-    if (inIframe) {
-      // Send the Google ID token to the parent (app.html) which will
-      // call signInWithCredential on its own Firebase instance.
-      // This ensures auth state is set in the top-level context.
-      window.parent.postMessage({ type: 'gisToken', idToken: idToken }, '*');
-    } else {
-      // Not in iframe — sign in directly
-      try {
-        const credential = GoogleAuthProvider.credential(idToken);
-        const result = await signInWithCredential(auth, credential);
-        await ensure(result.user);
-        window.location.href = 'improve.html';
-      } catch (e) {
-        console.error('GIS signInWithCredential error:', e);
-        showErr('Sign-in failed: ' + (e.message || 'Unknown error'));
-      }
-    }
-  }
-  // Expose globally for GIS callback
-  window.handleGISCredential = handleGISCredential;
 
   // ── Tab switching ──────────────────────────────────────────────────
   let mode = 'login';
@@ -270,35 +233,38 @@
     } catch (e) { console.warn('ensure():', e); }
   }
 
-  // ── Google sign-in ──────────────────────────────────────────────────
+  // ── Google sign-in ─────────────────────────────────────────────────
   window.signInWithGoogle = async function() {
     clr(); setLoading('btn-google', true);
 
-    // Standalone PWA → trigger GIS One Tap prompt (the bottom sheet)
     if (useGIS) {
       if (!gisReady) {
         setLoading('btn-google', false);
         showErr('Google sign-in is loading. Try again in a moment.');
         return;
       }
-      // prompt() shows the One Tap bottom sheet account picker
-      google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+      console.log('[auth] Triggering GIS prompt');
+      google.accounts.id.prompt(function(notification) {
+        console.log('[auth] GIS prompt notification:', notification);
+        if (notification.isNotDisplayed()) {
           setLoading('btn-google', false);
-          // If One Tap can't show (e.g. cooldown), show a message
-          if (notification.isNotDisplayed()) {
-            showErr('Google sign-in is temporarily unavailable. Please use email or try again later.');
-          }
+          var reason = notification.getNotDisplayedReason();
+          console.log('[auth] Not displayed reason:', reason);
+          showErr('Google sign-in unavailable (' + reason + '). Use email instead.');
         }
-        // If dismissed by user, just reset button
+        if (notification.isSkippedMoment()) {
+          setLoading('btn-google', false);
+          console.log('[auth] Skipped reason:', notification.getSkippedReason());
+        }
         if (notification.isDismissedMoment()) {
           setLoading('btn-google', false);
+          console.log('[auth] Dismissed reason:', notification.getDismissedReason());
         }
       });
       return;
     }
 
-    // Normal browsers → signInWithPopup
+    // Normal browsers → popup
     try {
       const result = await signInWithPopup(auth, gp);
       await ensure(result.user);
@@ -314,7 +280,7 @@
     }
   };
 
-  // ── Email/password auth ────────────────────────────────────────────
+  // ── Email/password ─────────────────────────────────────────────────
   window.handleSubmit = async function(e) {
     e.preventDefault(); clr();
     const email = document.getElementById('input-email').value.trim();
