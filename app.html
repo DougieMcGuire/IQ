@@ -45,66 +45,206 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-  firebase.initializeApp({apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend",storageBucket:"braindeer-backend.firebasestorage.app",messagingSenderId:"331205139765",appId:"1:331205139765:web:20cfef8194af63fc55c07c",measurementId:"G-9B6885G0X0"});
-
-  var WORKER_URL='https://braindeer.org/api/redeem-install-token';
-  var BG_COLORS={auth:'#3a2918',improve:'#4a3625',profile:'#4a3625',leaderboard:'#4a3625',tasks:'#3a2918'};
-
-  function setScreenBg(p){var c=BG_COLORS[p]||'#4a3625';document.documentElement.style.setProperty('--bg',c);document.body.style.background=c;var s=document.getElementById('splash');if(s)s.style.background=c}
-
-  window.addEventListener('message',function(e){
-    if(!e.data||!e.data.type)return;
-    if(e.data.type==='authSuccess'){goTo('improve');return}
-    if(e.data.type==='googleRedirect'){window.location.href='google-redirect.html';return}
-    if(e.data.type==='savePushSub'){var sub=e.data.sub;firebase.auth().onAuthStateChanged(function(user){if(!user)return;firebase.firestore().collection('pushSubscriptions').doc(user.uid).set({subscription:sub,uid:user.uid,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){})})}
-    if(e.data.type==='tasksUpdated'){var tc=document.getElementById('screen-tasks');if(tc){var ti=tc.querySelector('iframe');if(ti&&ti.contentWindow)ti.contentWindow.postMessage({type:'tasksUpdated'},'*')}}
-    if(e.data.type==='xpAwarded'){var ic=document.getElementById('screen-improve');if(ic){var ii=ic.querySelector('iframe');if(ii&&ii.contentWindow)ii.contentWindow.postMessage({type:'xpAwarded',xp:e.data.xp},'*')}}
+  firebase.initializeApp({
+    apiKey:            "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
+    authDomain:        "braindeer-backend.firebaseapp.com",
+    projectId:         "braindeer-backend",
+    storageBucket:     "braindeer-backend.firebasestorage.app",
+    messagingSenderId: "331205139765",
+    appId:             "1:331205139765:web:20cfef8194af63fc55c07c",
+    measurementId:     "G-9B6885G0X0"
   });
 
-  var currentScreen=null,screensLoaded={};
-  window.goTo=function(page){
-    document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
-    if((page==='profile'||page==='leaderboard')&&screensLoaded[page]){var old=document.querySelector('#screen-'+page+' iframe');if(old)old.remove();screensLoaded[page]=false}
-    if(!screensLoaded[page]){var c=document.getElementById('screen-'+page);if(!c)return;var f=document.createElement('iframe');f.src=page+'.html';f.allow='web-share';c.appendChild(f);screensLoaded[page]=true}
-    var el=document.getElementById('screen-'+page);if(el){el.classList.add('active');currentScreen=page}
+  var WORKER_URL = 'https://braindeer.org/api/redeem-install-token';
+  var BG_COLORS  = { auth:'#3a2918', improve:'#4a3625', profile:'#4a3625', leaderboard:'#4a3625', tasks:'#3a2918' };
+
+  function setScreenBg(p) {
+    var c = BG_COLORS[p] || '#4a3625';
+    document.documentElement.style.setProperty('--bg', c);
+    document.body.style.background = c;
+    var s = document.getElementById('splash');
+    if (s) s.style.background = c;
+  }
+
+  /* ── Message handler ─────────────────────────────────────────────── */
+  window.addEventListener('message', function(e) {
+    if (!e.data || !e.data.type) return;
+    if (e.data.type === 'authSuccess') { goTo('improve'); return; }
+    if (e.data.type === 'googleRedirect') { window.location.href = 'google-redirect.html'; return; }
+    if (e.data.type === 'savePushSub') {
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (!user) return;
+        firebase.firestore().collection('pushSubscriptions').doc(user.uid).set({
+          subscription: e.data.sub, uid: user.uid,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(function() {});
+      });
+    }
+    if (e.data.type === 'tasksUpdated') {
+      var tc = document.getElementById('screen-tasks');
+      if (tc) { var ti = tc.querySelector('iframe'); if (ti && ti.contentWindow) ti.contentWindow.postMessage({ type: 'tasksUpdated' }, '*'); }
+    }
+    if (e.data.type === 'xpAwarded') {
+      var ic = document.getElementById('screen-improve');
+      if (ic) { var ii = ic.querySelector('iframe'); if (ii && ii.contentWindow) ii.contentWindow.postMessage({ type: 'xpAwarded', xp: e.data.xp }, '*'); }
+    }
+  });
+
+  /* ── Screen management ───────────────────────────────────────────── */
+  var currentScreen = null;
+  var screensLoaded = {};
+
+  window.goTo = function(page) {
+    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+    if ((page === 'profile' || page === 'leaderboard') && screensLoaded[page]) {
+      var old = document.querySelector('#screen-' + page + ' iframe');
+      if (old) old.remove();
+      screensLoaded[page] = false;
+    }
+    if (!screensLoaded[page]) {
+      var c = document.getElementById('screen-' + page);
+      if (!c) return;
+      var f = document.createElement('iframe');
+      f.src = page + '.html';
+      f.allow = 'web-share';
+      c.appendChild(f);
+      screensLoaded[page] = true;
+    }
+    var el = document.getElementById('screen-' + page);
+    if (el) { el.classList.add('active'); currentScreen = page; }
     setScreenBg(page);
-    var sp=document.getElementById('splash');if(sp&&!sp.classList.contains('hide')){sp.classList.add('hide');setTimeout(function(){if(sp.parentNode)sp.remove()},400)}
+    var sp = document.getElementById('splash');
+    if (sp && !sp.classList.contains('hide')) {
+      sp.classList.add('hide');
+      setTimeout(function() { if (sp.parentNode) sp.remove(); }, 400);
+    }
   };
 
-  function authCheck(){}
-  window.authCheck=authCheck;
+  window.authCheck = function() {};
 
-  function generateInstallToken(){var user=firebase.auth().currentUser;if(!user)return Promise.resolve(null);var token=Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2)+Date.now().toString(36);return firebase.firestore().collection('installTokens').doc(token).set({uid:user.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp(),expiresAt:new Date(Date.now()+10*60*1000),used:false}).then(function(){return token}).catch(function(){return null})}
+  /* ── Helpers ─────────────────────────────────────────────────────── */
+  function ensureUser(user) {
+    var ref = firebase.firestore().collection('users').doc(user.uid);
+    return ref.get().then(function(snap) {
+      if (!snap.exists) {
+        return ref.set({
+          uid: user.uid, email: user.email,
+          username: user.displayName || null,
+          pic: user.photoURL || null,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          lastSeen:  firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+      return ref.set({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+    });
+  }
 
-  function showIOSBanner(user){var isStandalone=('standalone' in navigator)&&navigator.standalone;if(isStandalone)return;var isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);if(!isIos)return;if(sessionStorage.getItem('iosBannerDismissed'))return;function renderBanner(html){var b=document.getElementById('iosInstallBanner');b.innerHTML=html;b.style.display='block';var btn=document.getElementById('closeBanner');if(btn)btn.addEventListener('click',function(){b.style.display='none';sessionStorage.setItem('iosBannerDismissed','1')})}if(user){generateInstallToken().then(function(token){var url=token?'https://braindeer.org/app.html?t='+token:'https://braindeer.org/app.html';renderBanner('📲 <a href="'+url+'">Tap here</a>, then <strong>Share ⬆️</strong> → <strong>Add to Home Screen</strong><span class="close-banner" id="closeBanner"> ✕</span>')})}else{renderBanner('📲 Tap <strong>Share ⬆️</strong> → <strong>Add to Home Screen</strong><span class="close-banner" id="closeBanner"> ✕</span>')}}
+  function generateInstallToken() {
+    var user = firebase.auth().currentUser;
+    if (!user) return Promise.resolve(null);
+    var token = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    return firebase.firestore().collection('installTokens').doc(token).set({
+      uid: user.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000), used: false
+    }).then(function() { return token; }).catch(function() { return null; });
+  }
 
-  function redeemSessionToken(sid){return firebase.firestore().collection('authSessions').doc(sid).get().then(function(snap){if(!snap.exists)throw new Error('not found');var d=snap.data();if(d.used)throw new Error('used');var exp=d.expiresAt&&d.expiresAt.toDate?d.expiresAt.toDate():new Date(d.expiresAt);if(new Date()>exp)throw new Error('expired');snap.ref.update({used:true});return firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(d.idToken))})}
+  function showIOSBanner(user) {
+    if (('standalone' in navigator) && navigator.standalone) return;
+    if (!/iphone|ipad|ipod/i.test(navigator.userAgent)) return;
+    if (sessionStorage.getItem('iosBannerDismissed')) return;
+    function renderBanner(html) {
+      var b = document.getElementById('iosInstallBanner');
+      b.innerHTML = html; b.style.display = 'block';
+      var btn = document.getElementById('closeBanner');
+      if (btn) btn.addEventListener('click', function() { b.style.display = 'none'; sessionStorage.setItem('iosBannerDismissed', '1'); });
+    }
+    if (user) {
+      generateInstallToken().then(function(token) {
+        var url = token ? 'https://braindeer.org/app.html?t=' + token : 'https://braindeer.org/app.html';
+        renderBanner('📲 <a href="' + url + '">Tap here</a>, then <strong>Share ⬆️</strong> → <strong>Add to Home Screen</strong><span class="close-banner" id="closeBanner"> ✕</span>');
+      });
+    } else {
+      renderBanner('📲 Tap <strong>Share ⬆️</strong> → <strong>Add to Home Screen</strong><span class="close-banner" id="closeBanner"> ✕</span>');
+    }
+  }
 
-  (function(){
+  function redeemSessionToken(sid) {
+    return firebase.firestore().collection('authSessions').doc(sid).get().then(function(snap) {
+      if (!snap.exists) throw new Error('not found');
+      var d = snap.data();
+      if (d.used) throw new Error('used');
+      var exp = d.expiresAt && d.expiresAt.toDate ? d.expiresAt.toDate() : new Date(d.expiresAt);
+      if (new Date() > exp) throw new Error('expired');
+      snap.ref.update({ used: true });
+      return firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(d.idToken));
+    });
+  }
+
+  /* ── Boot ─────────────────────────────────────────────────────────── */
+  (function() {
     localStorage.removeItem('iq_guest');
-    var loggedIn=false;for(var i=0;i<localStorage.length;i++){if(localStorage.key(i).indexOf('firebase:authUser:')===0){loggedIn=true;break}}
-    setScreenBg(loggedIn?'improve':'auth');
-    var params=new URLSearchParams(window.location.search),t=params.get('t'),sid=params.get('session');
-    if(t||sid)window.history.replaceState({},'',window.location.pathname);
-    if(sid){redeemSessionToken(sid).then(function(){boot()}).catch(function(){boot()})}
-    else if(t){fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:t})}).then(function(r){return r.ok?r.json():null}).then(function(b){if(b&&b.customToken){return firebase.auth().signInWithCustomToken(b.customToken).then(function(){window.location.reload()})}boot()}).catch(function(){boot()})}
-    else{boot()}
 
-    function boot(){
-      // Listen persistently — NOT one-shot.
-      // When user returns from google-redirect.html already signed in,
-      // this will fire and switch to improve.
-      firebase.auth().onAuthStateChanged(function(user){
-        if(user){goTo('improve');showIOSBanner(user)}
-        else{goTo('auth');showIOSBanner(null)}
+    var loggedIn = false;
+    for (var i = 0; i < localStorage.length; i++) {
+      if (localStorage.key(i).indexOf('firebase:authUser:') === 0) { loggedIn = true; break; }
+    }
+    setScreenBg(loggedIn ? 'improve' : 'auth');
+
+    var params = new URLSearchParams(window.location.search);
+    var tToken = params.get('t');
+    var sessionId = params.get('session');
+    if (tToken || sessionId) window.history.replaceState({}, '', window.location.pathname);
+
+    // ── CHECK FOR GIS TOKEN FIRST ──────────────────────────────────
+    // google-redirect.html stores the Google idToken in sessionStorage
+    // so we can sign in HERE, on app.html's own Firebase instance.
+    var gisToken = sessionStorage.getItem('bd_gis_token');
+    if (gisToken) {
+      sessionStorage.removeItem('bd_gis_token');
+      var credential = firebase.auth.GoogleAuthProvider.credential(gisToken);
+      firebase.auth().signInWithCredential(credential)
+        .then(function(result) {
+          return ensureUser(result.user);
+        })
+        .then(function() {
+          goTo('improve');
+        })
+        .catch(function(err) {
+          console.error('GIS sign-in failed:', err);
+          normalBoot();
+        });
+      return; // Don't run normalBoot yet
+    }
+
+    // ── Other token flows ──────────────────────────────────────────
+    if (sessionId) {
+      redeemSessionToken(sessionId).then(function() { normalBoot(); }).catch(function() { normalBoot(); });
+    } else if (tToken) {
+      fetch(WORKER_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: tToken }) })
+        .then(function(r) { return r.ok ? r.json() : null; })
+        .then(function(b) {
+          if (b && b.customToken) return firebase.auth().signInWithCustomToken(b.customToken).then(function() { window.location.reload(); });
+          normalBoot();
+        })
+        .catch(function() { normalBoot(); });
+    } else {
+      normalBoot();
+    }
+
+    function normalBoot() {
+      var unsub = firebase.auth().onAuthStateChanged(function(user) {
+        unsub();
+        goTo(user ? 'improve' : 'auth');
+        showIOSBanner(user);
       });
     }
   })();
 
-  var deferredPrompt=null;
-  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e});
-  window.triggerInstall=function(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(){deferredPrompt=null})}};
-  window.addEventListener('appinstalled',function(){deferredPrompt=null;document.getElementById('iosInstallBanner').style.display='none'});
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e) { e.preventDefault(); deferredPrompt = e; });
+  window.triggerInstall = function() { if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(function() { deferredPrompt = null; }); } };
+  window.addEventListener('appinstalled', function() { deferredPrompt = null; document.getElementById('iosInstallBanner').style.display = 'none'; });
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7417896211953533" crossorigin="anonymous"></script>
 </body>
