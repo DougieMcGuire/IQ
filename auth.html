@@ -212,15 +212,38 @@
 
   // GIS callback — receives JWT, signs in with Firebase
   async function handleGISCredential(response) {
+    // Temporary debug banner
+    function dbg(msg) {
+      const b = document.getElementById('banner');
+      b.textContent = msg;
+      b.className = 'banner error';
+      b.style.background = '#5a4232';
+      b.style.display = 'block';
+    }
+    
+    dbg('Got Google credential, signing in…');
     const idToken = response.credential;
+    if (!idToken) { dbg('ERROR: No credential token'); return; }
+
     const credential = GoogleAuthProvider.credential(idToken);
     try {
+      dbg('Calling signInWithCredential…');
       const result = await signInWithCredential(auth, credential);
+      dbg('Signed in as: ' + result.user.email + ' — navigating…');
       await ensure(result.user);
-      navigate();
+      
+      // Force navigate with a small delay so we can see the message
+      setTimeout(() => {
+        if (inIframe) {
+          dbg('Sending authSuccess to parent…');
+          window.parent.postMessage({ type: 'authSuccess' }, '*');
+        } else {
+          window.location.href = 'improve.html';
+        }
+      }, 300);
     } catch (e) {
+      dbg('ERROR: ' + e.code + ' ' + e.message);
       console.error('GIS signInWithCredential error:', e);
-      showErr('Sign-in failed. Please try again.');
     }
   }
   // Expose globally for GIS callback
