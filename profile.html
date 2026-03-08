@@ -77,21 +77,21 @@
     .share-link-copy { background: var(--cream); color: var(--bg); border: none; border-radius: 10px; padding: 11px 16px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 900; cursor: pointer; white-space: nowrap; transition: transform 0.1s; }
     .share-link-copy:active { transform: scale(0.95); }
     .share-label { font-size: 11px; font-weight: 800; color: var(--tan); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
-    .share-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
-    .share-dest { background: var(--bg); border: none; border-radius: 14px; padding: 12px 4px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 800; color: var(--cream); transition: transform 0.1s; }
+    .share-grid { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 4px; }
+    .share-grid::-webkit-scrollbar { display: none; }
+    .share-dest { flex-shrink: 0; width: 72px; background: var(--bg); border: none; border-radius: 14px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 10px; font-weight: 800; color: var(--cream); transition: transform 0.1s; }
     .share-dest:active { transform: scale(0.93); }
     .share-dest .sd-icon { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
     .share-dest .sd-icon svg { width: 20px; height: 20px; fill: #fff; }
+    .sd-native .sd-icon { background: var(--blue); }
+    .sd-native .sd-icon svg { fill: none; stroke: #fff; stroke-width: 2.5; }
+    .sd-copy .sd-icon { background: var(--brown-mid); }
+    .sd-copy .sd-icon svg { fill: none; stroke: #fff; stroke-width: 2.5; }
     .sd-x .sd-icon { background: #000; }
-    .sd-imsg .sd-icon { background: #34c759; }
-    .sd-snap .sd-icon { background: #FFFC00; }
-    .sd-snap .sd-icon svg { fill: #000; }
-    .sd-more .sd-icon { background: var(--brown-mid); }
-    .sd-more .sd-icon svg { fill: none; stroke: #fff; stroke-width: 2.5; }
-    .save-row { display: flex; gap: 8px; }
-    .save-row button { flex: 1; padding: 13px; border: none; border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: transform 0.1s; background: var(--bg); color: var(--cream); }
-    .save-row button:active { transform: translateY(2px); }
-    .save-row button svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+    .sd-wa .sd-icon { background: #25D366; }
+    .sd-tg .sd-icon { background: #0088cc; }
+    .sd-save .sd-icon { background: var(--green); }
+    .sd-save .sd-icon svg { fill: none; stroke: #fff; stroke-width: 2.5; }
     .toast { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--green); color: #fff; padding: 10px 20px; border-radius: 14px; font-size: 14px; font-weight: 800; opacity: 0; transition: all 0.3s; z-index: 300; white-space: nowrap; box-shadow: 0 3px 0 var(--green-dark); pointer-events: none; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
@@ -131,6 +131,8 @@
   <button class="nav-btn" onclick="navGo('tasks')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tasks<span class="nav-badge" id="tasks-badge"></span></button>
   <button class="nav-btn active" onclick="navGo('profile')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
 </nav>
+
+<!-- SHARE SHEET -->
 <div class="modal-overlay" id="share-modal">
   <div class="modal-sheet">
     <div class="sheet-handle"></div>
@@ -140,16 +142,11 @@
       <button class="share-link-copy" id="copy-link">Copy link</button>
     </div>
     <div class="share-label">Share to</div>
-    <div class="share-grid">
-      <button class="share-dest sd-x" id="share-x"><div class="sd-icon"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></div>X</button>
-      <button class="share-dest sd-imsg" id="share-imsg"><div class="sd-icon"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="#fff" stroke="none"/></svg></div>iMessage</button>
-      <button class="share-dest sd-snap" id="share-snap"><div class="sd-icon"><svg viewBox="0 0 24 24"><path d="M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.075.045.203.09.401.09.3-.016.659-.12 1.033-.301a.603.603 0 0 1 .274-.074c.12 0 .24.03.345.09.225.12.39.36.385.636.015.24-.075.494-.51.735-.105.06-.345.15-.765.27-.51.14-.76.27-.855.42a.378.378 0 0 0-.03.273c.067.27.3.705.39.885.27.57.54 1.125.54 1.74 0 .03 0 .075-.015.12-.105.69-.615 1.065-1.35 1.29-.225.06-.435.09-.6.12-.135.015-.24.03-.3.045-.06.03-.12.12-.18.27-.045.12-.06.195-.06.27 0 .15.06.285.15.39.135.165.36.255.615.255h.03c.255 0 .525-.03.78-.06.15-.015.315-.03.48-.03.21 0 .42.015.63.06.57.12 1.065.45 1.47.96.45.57.615 1.29.39 2.04-.36 1.17-1.32 2.04-2.31 2.085a1.5 1.5 0 0 1-.21.015c-.255 0-.54-.045-.855-.135a4.844 4.844 0 0 0-1.02-.18c-.12 0-.24.015-.36.03-.54.075-1.14.165-1.8.165-.66 0-1.26-.09-1.8-.165a2.452 2.452 0 0 0-.36-.03c-.36 0-.72.06-1.02.18-.315.09-.6.135-.855.135a1.5 1.5 0 0 1-.21-.015c-.99-.045-1.95-.915-2.31-2.085-.225-.75-.06-1.47.39-2.04.405-.51.9-.84 1.47-.96.21-.045.42-.06.63-.06.165 0 .33.015.48.03.255.03.525.06.78.06h.03c.255 0 .48-.09.615-.255a.576.576 0 0 0 .15-.39c0-.075-.015-.15-.06-.27-.06-.15-.12-.24-.18-.27a2.67 2.67 0 0 0-.3-.045 5.073 5.073 0 0 1-.6-.12c-.735-.225-1.245-.6-1.35-1.29a.799.799 0 0 1-.015-.12c0-.615.27-1.17.54-1.74.09-.18.33-.615.39-.885a.378.378 0 0 0-.03-.273c-.09-.15-.345-.27-.855-.42-.42-.12-.66-.21-.765-.27-.435-.24-.525-.495-.51-.735a.65.65 0 0 1 .385-.636.48.48 0 0 1 .345-.09c.075 0 .18.03.274.074.374.18.733.302 1.033.302.198 0 .326-.046.401-.091a27.772 27.772 0 0 1-.03-.51l-.003-.06c-.105-1.628-.23-3.654.3-4.847C7.86 1.069 11.216.793 12.206.793z"/></svg></div>Snap</button>
-      <button class="share-dest sd-more" id="share-native"><div class="sd-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></div>More</button>
-    </div>
-    <div class="save-row"><button id="save-img-btn"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save image</button></div>
+    <div class="share-grid" id="share-grid"></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
+
 <script type="module">
   import { IQData, iqToPercentile, formatPercentile } from './data.js';
   import Haptics from './haptics.js';
@@ -179,9 +176,8 @@
     document.getElementById('username-display').textContent = uname;
     if (d.iq) {
       document.getElementById('iq-num').textContent = d.iq;
-      var pct = iqToPercentile(d.iq);
       var badge = document.getElementById('pct-badge');
-      badge.textContent = 'Top ' + formatPercentile(pct);
+      badge.textContent = 'Top ' + formatPercentile(iqToPercentile(d.iq));
       badge.style.display = 'inline-block';
     }
     document.getElementById('answered').textContent = d.answered;
@@ -237,8 +233,7 @@
   document.getElementById('reset-btn').onclick = function() { Haptics.warning(); if (confirm('Reset all progress?')) { Haptics.error(); IQData.reset(); location.reload(); } };
 
   // ═══════════════════════════════════
-  // SHARE — card PNG stored in Firestore as base64
-  // Worker reads it back and serves as image/png
+  // SHARE SYSTEM
   // ═══════════════════════════════════
 
   var shareCanvas = null;
@@ -260,65 +255,105 @@
     if (fill) { ctx.fillStyle = fill; ctx.fill(); }
   }
 
+  // ── CARD: tighter layout, no dead space ──
   function genShareCard() {
     var d = IQData.load();
+    var W = 1200, H = 630;
     var cv = document.createElement('canvas');
-    cv.width = 1200; cv.height = 630;
+    cv.width = W; cv.height = H;
     var ctx = cv.getContext('2d');
-
-    ctx.fillStyle = '#2a1c10'; ctx.fillRect(0, 0, 1200, 630);
-    rr(ctx, 28, 28, 1144, 574, 28, '#3a2918');
-    ctx.fillStyle = '#4a3625'; ctx.fillRect(380, 60, 3, 510);
-
     var uname = d.username || IQData.getCurrentUser()?.displayName || 'Brain';
-    ctx.font = '700 20px Nunito, sans-serif'; ctx.fillStyle = '#c2a476'; ctx.textAlign = 'center';
-    ctx.fillText(uname, 200, 180);
+    var acc = IQData.getAccuracy();
 
-    ctx.font = '900 120px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
-    ctx.textBaseline = 'middle'; ctx.fillText(d.iq || '--', 200, 290);
+    // Background
+    ctx.fillStyle = '#2a1c10'; ctx.fillRect(0, 0, W, H);
+    rr(ctx, 20, 20, W - 40, H - 40, 24, '#3a2918');
+
+    // ── LEFT: IQ block ──
+    var lx = 200; // center of left column
+
+    // Username
+    ctx.font = '700 18px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a'; ctx.textAlign = 'center';
+    ctx.fillText(uname, lx, 80);
+
+    // Big IQ
+    ctx.font = '900 140px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
+    ctx.textBaseline = 'middle'; ctx.fillText(d.iq || '--', lx, 210);
     ctx.textBaseline = 'alphabetic';
 
-    ctx.font = '900 18px Nunito, sans-serif'; ctx.fillStyle = '#6b4f32';
-    ctx.fillText('I Q', 200, 345);
+    // IQ label
+    ctx.font = '900 16px Nunito, sans-serif'; ctx.fillStyle = '#6b4f32';
+    ctx.fillText('I Q', lx, 295);
 
+    // Percentile badge
     if (d.iq) {
       var pctText = 'TOP ' + formatPercentile(iqToPercentile(d.iq)).toUpperCase();
-      ctx.font = '900 15px Nunito, sans-serif';
-      var tw = ctx.measureText(pctText).width + 48;
-      rr(ctx, 200 - tw / 2, 360, tw, 36, 12, '#ffc800');
-      ctx.fillStyle = '#2a1c10'; ctx.textAlign = 'center'; ctx.fillText(pctText, 200, 384);
+      ctx.font = '900 14px Nunito, sans-serif';
+      var tw = ctx.measureText(pctText).width + 40;
+      rr(ctx, lx - tw / 2, 310, tw, 32, 10, '#ffc800');
+      ctx.fillStyle = '#2a1c10'; ctx.fillText(pctText, lx, 332);
     }
 
-    ctx.font = '800 16px Nunito, sans-serif'; ctx.fillStyle = '#6b4f32';
-    ctx.textAlign = 'center'; ctx.fillText('braindeer.org', 200, 560);
-
-    [{v: String(d.answered||0), l:'DONE'}, {v: IQData.getAccuracy()+'%', l:'ACCURACY'}, {v: String(d.bestStreak||0), l:'STREAK'}]
-    .forEach(function(s, i) {
-      var px = 420 + i * 136;
-      rr(ctx, px, 80, 120, 64, 14, '#4a3625');
-      ctx.font = '900 32px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
-      ctx.textAlign = 'center'; ctx.fillText(s.v, px + 60, 118);
-      ctx.font = '800 12px Nunito, sans-serif'; ctx.fillStyle = '#c2a476';
-      ctx.fillText(s.l, px + 60, 138);
+    // Stats under IQ (horizontal)
+    var miniStats = [
+      { v: String(d.answered || 0), l: 'done' },
+      { v: acc + '%', l: 'acc' },
+      { v: String(d.bestStreak || 0), l: 'streak' },
+    ];
+    miniStats.forEach(function(s, i) {
+      var mx = 90 + i * 110;
+      ctx.font = '900 24px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
+      ctx.textAlign = 'center'; ctx.fillText(s.v, mx, 400);
+      ctx.font = '800 11px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a';
+      ctx.fillText(s.l.toUpperCase(), mx, 418);
     });
 
-    ABILITIES.slice(0, 6).forEach(function(a, i) {
-      var y = 190 + i * 42;
+    // Branding
+    ctx.font = '800 14px Nunito, sans-serif'; ctx.fillStyle = '#5a4232';
+    ctx.textAlign = 'center'; ctx.fillText('braindeer.org', lx, 560);
+
+    // ── Divider ──
+    ctx.fillStyle = '#4a3625'; ctx.fillRect(400, 50, 2, H - 100);
+
+    // ── RIGHT: Ability bars (full height, tight) ──
+    var rx = 430;
+    var barW = 500, barH = 22;
+    var cats = ABILITIES.slice(0, 8); // all 8 abilities
+    var totalBars = cats.length;
+    var barSpacing = Math.min(56, (H - 140) / totalBars);
+    var barStartY = 65 + ((H - 140) - barSpacing * totalBars) / 2;
+
+    cats.forEach(function(a, i) {
+      var y = barStartY + i * barSpacing;
       var v = IQData.getStatPercent(a.key);
-      var fillW = Math.max(8, Math.round((v / 100) * 380));
-      ctx.font = '700 13px Nunito, sans-serif'; ctx.fillStyle = '#c2a476';
-      ctx.textAlign = 'right'; ctx.fillText(a.name, 546, y + 4);
-      rr(ctx, 560, y - 8, 380, 18, 6, '#4a3625');
-      rr(ctx, 560, y - 8, fillW, 18, 6, a.color);
-      ctx.font = '800 13px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
-      ctx.textAlign = 'center'; ctx.fillText(String(v), 960, y + 4);
+      var fillW = Math.max(10, Math.round((v / 100) * barW));
+
+      // Label
+      ctx.font = '800 13px Nunito, sans-serif'; ctx.fillStyle = '#c2a476';
+      ctx.textAlign = 'left'; ctx.fillText(a.name, rx, y);
+
+      // Bar track
+      rr(ctx, rx, y + 6, barW, barH, 6, '#4a3625');
+
+      // Bar fill
+      rr(ctx, rx, y + 6, fillW, barH, 6, a.color);
+
+      // Value inside bar
+      ctx.font = '900 12px Nunito, sans-serif'; ctx.fillStyle = '#fff';
+      ctx.textAlign = 'left';
+      if (fillW > 30) {
+        ctx.fillText(String(v), rx + 8, y + 22);
+      } else {
+        ctx.textAlign = 'left'; ctx.fillStyle = '#c2a476';
+        ctx.fillText(String(v), rx + fillW + 6, y + 22);
+      }
     });
 
     shareCanvas = cv;
     return cv;
   }
 
-async function uploadShareCard() {
+  async function uploadShareCard() {
     var user = IQData.getCurrentUser();
     if (!user || !shareCanvas) return;
     var d = IQData.load();
@@ -326,7 +361,7 @@ async function uploadShareCard() {
       var dataUrl = shareCanvas.toDataURL('image/png');
       var base64 = dataUrl.split(',')[1];
 
-      // Create the object in the PARENT's context so Firestore accepts it
+      // Build object in parent context to avoid iframe serialization issue
       var shareDoc = new parent.Object();
       shareDoc.iq = d.iq || 0;
       shareDoc.username = d.username || user.displayName || 'Brain';
@@ -337,12 +372,105 @@ async function uploadShareCard() {
       shareDoc.updatedAt = new Date().toISOString();
 
       var fb = parent.firebase;
-      var db = fb.firestore();
-      await db.collection('shares').doc(user.uid).set(shareDoc);
+      await fb.firestore().collection('shares').doc(user.uid).set(shareDoc);
       toast('Share card ready!');
     } catch (e) {
       console.warn('Share upload error:', e);
       toast('Share failed — try again');
+    }
+  }
+
+  // ── DETECT PLATFORM FOR SMART SHARE OPTIONS ──
+  function getPlatform() {
+    var ua = navigator.userAgent || '';
+    if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
+    if (/android/i.test(ua)) return 'android';
+    return 'desktop';
+  }
+
+  function buildShareGrid() {
+    var platform = getPlatform();
+    var hasNativeShare = !!navigator.share;
+    var grid = document.getElementById('share-grid');
+    grid.innerHTML = '';
+
+    // Share options in priority order per platform
+    var options = [];
+
+    // Native share is always first on mobile (opens OS share sheet with ALL apps)
+    if (hasNativeShare) {
+      options.push({ id: 'native', label: 'Share', cls: 'sd-native', icon: '<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>' });
+    }
+
+    // Copy link always available
+    options.push({ id: 'copylink', label: 'Copy Link', cls: 'sd-copy', icon: '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' });
+
+    // X (Twitter) — works everywhere via URL
+    options.push({ id: 'x', label: 'X', cls: 'sd-x', icon: '<svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>' });
+
+    // WhatsApp — works everywhere via URL
+    options.push({ id: 'whatsapp', label: 'WhatsApp', cls: 'sd-wa', icon: '<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.13.556 4.13 1.532 5.87L.06 23.71l5.99-1.572A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.82c-1.97 0-3.87-.53-5.53-1.53l-.39-.24-3.56.93.95-3.48-.26-.41A9.8 9.8 0 0 1 2.18 12c0-5.42 4.4-9.82 9.82-9.82 5.42 0 9.82 4.4 9.82 9.82 0 5.42-4.4 9.82-9.82 9.82z"/></svg>' });
+
+    // Telegram
+    options.push({ id: 'telegram', label: 'Telegram', cls: 'sd-tg', icon: '<svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>' });
+
+    // Save image
+    options.push({ id: 'save', label: 'Save', cls: 'sd-save', icon: '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' });
+
+    options.forEach(function(opt) {
+      var btn = document.createElement('button');
+      btn.className = 'share-dest ' + opt.cls;
+      btn.innerHTML = '<div class="sd-icon">' + opt.icon + '</div>' + opt.label;
+      btn.onclick = function() { handleShareAction(opt.id); };
+      grid.appendChild(btn);
+    });
+  }
+
+  function getShareText() {
+    var d = IQData.load();
+    return d.iq
+      ? 'My IQ is ' + d.iq + ' on BrainDeer! Top ' + formatPercentile(iqToPercentile(d.iq)) + ' — think you can beat me?'
+      : 'Training my brain on BrainDeer!';
+  }
+
+  function handleShareAction(id) {
+    Haptics.medium();
+    var text = getShareText();
+
+    switch (id) {
+      case 'native':
+        navigator.share({ title: 'My BrainDeer IQ', text: text, url: shareUrl })
+          .then(function() { Haptics.success(); })
+          .catch(function(e) { if (e.name !== 'AbortError') toast('Share cancelled'); });
+        break;
+
+      case 'copylink':
+        navigator.clipboard.writeText(shareUrl)
+          .then(function() { Haptics.success(); toast('Link copied!'); })
+          .catch(function() { toast('Copy failed'); });
+        break;
+
+      case 'x':
+        window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(shareUrl), '_blank');
+        break;
+
+      case 'whatsapp':
+        window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + shareUrl), '_blank');
+        break;
+
+      case 'telegram':
+        window.open('https://t.me/share/url?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(text), '_blank');
+        break;
+
+      case 'save':
+        if (!shareCanvas) return;
+        Haptics.success();
+        var a = document.createElement('a');
+        a.download = 'braindeer-stats.png';
+        a.href = shareCanvas.toDataURL('image/png');
+        a.click();
+        toast('Image saved!');
+        break;
     }
   }
 
@@ -365,50 +493,15 @@ async function uploadShareCard() {
     previewCv.width = 600; previewCv.height = 315;
     previewCv.getContext('2d').drawImage(shareCanvas, 0, 0, 600, 315);
     preview.appendChild(previewCv);
+
+    buildShareGrid();
     document.getElementById('share-modal').classList.add('show');
   }
 
   function closeShare() { Haptics.light(); document.getElementById('share-modal').classList.remove('show'); }
   document.getElementById('share-btn').onclick = function() { Haptics.medium(); openShare(); };
   document.getElementById('share-modal').onclick = function(e) { if (e.target.id === 'share-modal') closeShare(); };
-
-  document.getElementById('copy-link').onclick = async function() {
-    Haptics.medium();
-    try { await navigator.clipboard.writeText(shareUrl); Haptics.success(); document.getElementById('copy-link').textContent = 'Copied!'; toast('Link copied!'); setTimeout(function() { document.getElementById('copy-link').textContent = 'Copy link'; }, 2000); }
-    catch(e) { Haptics.error(); toast('Copy failed'); }
-  };
-
-  document.getElementById('share-x').onclick = function() {
-    Haptics.medium();
-    var d = IQData.load();
-    var text = d.iq ? 'My IQ is ' + d.iq + ' on BrainDeer! Top ' + formatPercentile(iqToPercentile(d.iq)) + ' — think you can beat me?' : 'Training my brain on BrainDeer!';
-    window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(shareUrl), '_blank');
-  };
-
-  document.getElementById('share-imsg').onclick = function() {
-    Haptics.medium();
-    var d = IQData.load();
-    var body = d.iq ? 'Check out my BrainDeer IQ: ' + d.iq + '! ' + shareUrl : 'Training on BrainDeer! ' + shareUrl;
-    window.location.href = 'sms:&body=' + encodeURIComponent(body);
-  };
-
-  document.getElementById('share-snap').onclick = async function() {
-    Haptics.medium();
-    if (navigator.share) { try { await navigator.share({ title: 'My BrainDeer IQ', text: 'Think you can beat me?', url: shareUrl }); Haptics.success(); } catch(e) { if (e.name !== 'AbortError') toast('Share cancelled'); } }
-    else { await navigator.clipboard.writeText(shareUrl); toast('Link copied — paste in Snapchat!'); }
-  };
-
-  document.getElementById('share-native').onclick = async function() {
-    Haptics.medium();
-    if (navigator.share) { try { await navigator.share({ title: 'My BrainDeer IQ', text: 'Think you can beat me?', url: shareUrl }); Haptics.success(); } catch(e) { if (e.name !== 'AbortError') toast('Share cancelled'); } }
-    else { await navigator.clipboard.writeText(shareUrl); toast('Link copied!'); }
-  };
-
-  document.getElementById('save-img-btn').onclick = function() {
-    if (!shareCanvas) return; Haptics.success();
-    var a = document.createElement('a'); a.download = 'braindeer-stats.png';
-    a.href = shareCanvas.toDataURL('image/png'); a.click(); toast('Image saved!');
-  };
+  document.getElementById('copy-link').onclick = function() { handleShareAction('copylink'); };
 
   load();
 </script>
