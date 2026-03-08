@@ -51,7 +51,6 @@
 
     .banner{border-radius:12px;font-size:14px;font-weight:700;margin-bottom:14px;display:none;padding:12px 14px}
     .banner.error{background:var(--red);color:#fff;display:block;box-shadow:0 3px 0 var(--redd)}
-    .banner.info{background:var(--card2);color:var(--cream);display:block;box-shadow:0 3px 0 rgba(0,0,0,.15)}
 
     .btn-google{
       width:100%;padding:14px 16px;border:none;border-radius:14px;
@@ -100,29 +99,18 @@
     .loading .spinner{display:block}
     .loading .btn-text{display:none}
 
-    /* ── Footer links ── */
     .footer-links{
       margin-top:18px;
       display:flex;align-items:center;justify-content:center;gap:0;
       animation:fadeUp .45s .14s cubic-bezier(.34,1.56,.64,1) both;
     }
     .footer-links a{
-      color:var(--tan);
-      font-size:13px;font-weight:700;
-      text-decoration:none;
-      padding:8px 14px;
-      border-radius:10px;
+      color:var(--tan);font-size:13px;font-weight:700;
+      text-decoration:none;padding:8px 14px;border-radius:10px;
       transition:color .2s, background .2s;
     }
-    .footer-links a:hover,
-    .footer-links a:active{
-      color:var(--cream);
-      background:rgba(255,255,255,.06);
-    }
-    .footer-dot{
-      width:4px;height:4px;border-radius:50%;
-      background:var(--mid);flex-shrink:0;
-    }
+    .footer-links a:hover,.footer-links a:active{color:var(--cream);background:rgba(255,255,255,.06)}
+    .footer-dot{width:4px;height:4px;border-radius:50%;background:var(--mid);flex-shrink:0}
 
     @keyframes fadeUp{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
     @keyframes spin{to{transform:rotate(360deg)}}
@@ -184,7 +172,6 @@
     signInWithPopup, signInWithRedirect, getRedirectResult,
     GoogleAuthProvider,
     createUserWithEmailAndPassword, signInWithEmailAndPassword,
-    signInWithCredential,
     updateProfile
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import {
@@ -205,19 +192,12 @@
   const db   = getFirestore(app);
   const gp   = new GoogleAuthProvider();
 
-  // ── Environment detection ──────────────────────────────────────────────────
   const isIos        = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const isStandalone = !!(
-    ('standalone' in navigator && navigator.standalone) ||
-    window.matchMedia('(display-mode: standalone)').matches
-  );
-  const isIosStandalone = isIos && isStandalone;
+  const isStandalone = !!(('standalone' in navigator && navigator.standalone) || window.matchMedia('(display-mode: standalone)').matches);
+  const isIosStandalone     = isIos && isStandalone;
   const isAndroidStandalone = !isIos && isStandalone;
-
-  // Are we inside an iframe (loaded by app.html)?
   const inIframe = (window.parent && window.parent !== window);
 
-  // ── Google button ──────────────────────────────────────────────────────────
   document.getElementById('google-section').innerHTML = `
     <button class="btn-google" id="btn-google" onclick="signInWithGoogle()">
       <svg class="g-logo" viewBox="0 0 48 48">
@@ -231,10 +211,7 @@
     </button>
   `;
 
-  // ── Navigation helper ──────────────────────────────────────────────────────
-  onAuthStateChanged(auth, u => {
-    if (u) navigate();
-  });
+  onAuthStateChanged(auth, u => { if (u) navigate(); });
 
   function navigate() {
     if (inIframe) {
@@ -244,20 +221,11 @@
     }
   }
 
-  // ── Handle redirect results ────────────────────────────────────────────────
-  // This fires when returning from signInWithRedirect (Android PWA, iOS PWA,
-  // or desktop fallback). On iOS standalone, the in-app browser shares storage
-  // with the PWA, so the redirect result is available here.
+  // Handle redirect result for non-iOS environments
   getRedirectResult(auth).then(result => {
-    if (result && result.user) {
-      ensure(result.user).then(() => navigate());
-    }
-  }).catch(e => {
-    console.warn('getRedirectResult error:', e);
-    // If redirect failed, just show the login form — user can retry
-  });
+    if (result && result.user) ensure(result.user).then(() => navigate());
+  }).catch(() => {});
 
-  // ── Tab switching ──────────────────────────────────────────────────────────
   let mode = 'login';
   window.switchTab = function(m) {
     mode = m;
@@ -286,19 +254,16 @@
     f.style.background = ['#6b4f32','#ea2b2b','#ff9600','#ffc800','#58cc02'][s];
   };
 
-  // ── Firestore user record ─────────────────────────────────────────────────
   async function ensure(u, extra = {}) {
     try {
       const ref  = doc(db, 'users', u.uid);
       const snap = await getDoc(ref);
       if (!snap.exists()) {
         await setDoc(ref, {
-          uid:       u.uid,
-          email:     u.email,
-          username:  extra.username || u.displayName || null,
-          pic:       u.photoURL || null,
-          createdAt: serverTimestamp(),
-          lastSeen:  serverTimestamp()
+          uid: u.uid, email: u.email,
+          username: extra.username || u.displayName || null,
+          pic: u.photoURL || null,
+          createdAt: serverTimestamp(), lastSeen: serverTimestamp()
         });
       } else {
         setDoc(ref, { lastSeen: serverTimestamp() }, { merge: true });
@@ -306,59 +271,21 @@
     } catch (e) { console.warn('ensure():', e); }
   }
 
-  // ══════════════════════════════════════════════════════════════════════════
-  //  GOOGLE SIGN-IN — strategy per environment:
-  //
-  //  1. Desktop browsers           → signInWithPopup (best UX)
-  //  2. Mobile browsers (non-PWA)  → signInWithPopup, fallback to redirect
-  //  3. Android standalone PWA     → signInWithRedirect
-  //  4. iOS standalone PWA         → signInWithRedirect via parent frame
-  //     (iOS 12.2+ opens external URLs in an in-app browser that shares
-  //      storage with the PWA. When the redirect returns to our origin,
-  //      the in-app browser closes and the PWA resumes with auth state.)
-  // ══════════════════════════════════════════════════════════════════════════
-
   window.signInWithGoogle = async function() {
     clr();
     setLoading('btn-google', true);
 
-    // ── iOS Standalone PWA ───────────────────────────────────────────────
-    // signInWithPopup is completely broken in iOS standalone.
-    // signInWithRedirect works IF we navigate from the top-level frame
-    // (not from inside an iframe). iOS 12.2+ will open the Google auth
-    // page in an in-app browser that shares storage, and when it redirects
-    // back to our origin the PWA resumes.
-    //
-    // We tell the parent (app.html) to navigate to google-redirect.html
-    // which is a minimal page that immediately calls signInWithRedirect.
-    // This ensures the redirect happens at the top level.
-    if (isIosStandalone) {
+    // iOS or Android standalone → tell parent to navigate to google-redirect.html
+    if (isIosStandalone || isAndroidStandalone) {
       if (inIframe) {
-        // Tell parent to navigate to the redirect page
         window.parent.postMessage({ type: 'googleRedirect' }, '*');
       } else {
-        // We ARE the top level — do redirect directly
-        signInWithRedirect(auth, gp);
+        window.location.href = 'google-redirect.html';
       }
       return;
     }
 
-    // ── Android Standalone PWA ───────────────────────────────────────────
-    if (isAndroidStandalone) {
-      try {
-        if (inIframe) {
-          window.parent.postMessage({ type: 'googleRedirect' }, '*');
-        } else {
-          await signInWithRedirect(auth, gp);
-        }
-      } catch (e) {
-        setLoading('btn-google', false);
-        showErr('Sign-in failed. Please try again.');
-      }
-      return;
-    }
-
-    // ── Normal browsers (desktop + mobile) ───────────────────────────────
+    // Normal browsers → popup first, redirect fallback
     try {
       const result = await signInWithPopup(auth, gp);
       await ensure(result.user);
@@ -368,14 +295,10 @@
         return;
       }
       if (e.code === 'auth/popup-blocked' || e.code === 'auth/internal-error' || e.code === 'auth/network-request-failed') {
-        // Popup blocked — try redirect as fallback
         try {
-          if (inIframe) {
-            window.parent.postMessage({ type: 'googleRedirect' }, '*');
-          } else {
-            await signInWithRedirect(auth, gp);
-          }
-        } catch (e2) {
+          if (inIframe) { window.parent.postMessage({ type: 'googleRedirect' }, '*'); }
+          else { await signInWithRedirect(auth, gp); }
+        } catch (_) {
           setLoading('btn-google', false);
           showErr('Sign-in failed. Please try again.');
         }
@@ -386,22 +309,13 @@
     }
   };
 
-  // ── Email/password auth ────────────────────────────────────────────────────
   window.handleSubmit = async function(e) {
-    e.preventDefault();
-    clr();
-
+    e.preventDefault(); clr();
     const email = document.getElementById('input-email').value.trim();
     const pw    = document.getElementById('input-password').value;
     const un    = document.getElementById('input-username').value.trim();
-
-    if (mode === 'signup' && pw.length < 6) {
-      showErr('Password needs at least 6 characters.');
-      return;
-    }
-
+    if (mode === 'signup' && pw.length < 6) { showErr('Password needs at least 6 characters.'); return; }
     setLoading('btn-submit', true);
-
     try {
       if (mode === 'login') {
         const c = await signInWithEmailAndPassword(auth, email, pw);
@@ -412,10 +326,7 @@
         await ensure(c.user, { username: un });
       }
       navigate();
-    } catch (e) {
-      setLoading('btn-submit', false);
-      showErr(fe(e.code));
-    }
+    } catch (e) { setLoading('btn-submit', false); showErr(fe(e.code)); }
   };
 
   function fe(c) {
@@ -431,6 +342,5 @@
     }[c] || 'Something went wrong. Please try again.';
   }
 </script>
-
 </body>
 </html>
