@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#3a2918">
-  <title>BrainDeer — Signing in…</title>
+  <title>BrainDeer</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
@@ -19,10 +19,7 @@
     .title{font-size:22px;font-weight:900;margin:10px 0 6px}
     .sub{font-size:14px;font-weight:700;color:#c2a476;margin-bottom:20px}
     .dots{display:flex;gap:6px;justify-content:center}
-    .dots span{
-      width:8px;height:8px;border-radius:50%;background:#6b4f32;
-      animation:dotPulse 1s ease infinite;
-    }
+    .dots span{width:8px;height:8px;border-radius:50%;background:#6b4f32;animation:dotPulse 1s ease infinite}
     .dots span:nth-child(2){animation-delay:.15s}
     .dots span:nth-child(3){animation-delay:.3s}
     @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -32,121 +29,41 @@
 <body>
   <div class="mascot">🦌</div>
   <div class="title">BrainDeer</div>
-  <div class="sub" id="status">Redirecting to Google…</div>
+  <div class="sub" id="status">Connecting…</div>
   <div class="dots"><span></span><span></span><span></span></div>
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
-    var firebaseConfig = {
+    firebase.initializeApp({
       apiKey:            "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
       authDomain:        "braindeer-backend.firebaseapp.com",
       projectId:         "braindeer-backend",
       storageBucket:     "braindeer-backend.firebasestorage.app",
       messagingSenderId: "331205139765",
       appId:             "1:331205139765:web:20cfef8194af63fc55c07c"
-    };
-    firebase.initializeApp(firebaseConfig);
+    });
 
-    var auth = firebase.auth();
-    var db   = firebase.firestore();
-    var provider = new firebase.auth.GoogleAuthProvider();
-    var statusEl = document.getElementById('status');
+    var KEY = 'bd_goog_redir';
 
-    var REDIRECT_KEY = 'bd_google_redirect_pending';
-
-    function ensureUser(user) {
-      var ref = db.collection('users').doc(user.uid);
-      return ref.get().then(function(snap) {
-        if (!snap.exists) {
-          return ref.set({
-            uid:       user.uid,
-            email:     user.email,
-            username:  user.displayName || null,
-            pic:       user.photoURL || null,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            lastSeen:  firebase.firestore.FieldValue.serverTimestamp()
-          });
-        } else {
-          return ref.set(
-            { lastSeen: firebase.firestore.FieldValue.serverTimestamp() },
-            { merge: true }
-          );
-        }
-      });
-    }
-
-    function goToApp() {
-      sessionStorage.removeItem(REDIRECT_KEY);
-      window.location.replace('app.html');
-    }
-
-    // ════════════════════════════════════════════════════════════════════════
-    //  FLOW:
-    //  1. First visit: no flag in sessionStorage → set flag, signInWithRedirect
-    //  2. Return from Google: flag exists → try getRedirectResult
-    //     a. Got result → ensure user doc → go to app.html
-    //     b. No result but user is signed in (auth state persisted) → go to app
-    //     c. No result, no user → clear flag, show retry
-    //
-    //  The flag prevents the infinite loop: if we already redirected once,
-    //  we NEVER redirect again — we either have auth or we failed.
-    // ════════════════════════════════════════════════════════════════════════
-
-    var alreadyRedirected = sessionStorage.getItem(REDIRECT_KEY) === '1';
-
-    if (!alreadyRedirected) {
-      // ── STEP 1: First visit — kick off the redirect ────────────────────
-      sessionStorage.setItem(REDIRECT_KEY, '1');
-      statusEl.textContent = 'Redirecting to Google…';
-      auth.signInWithRedirect(provider);
-
+    // Already redirected once? → we're back from Google.
+    // Don't try getRedirectResult (unreliable on iOS).
+    // Just go to app.html — onAuthStateChanged there will pick up the user
+    // if auth succeeded (Firebase persists auth in IndexedDB which is shared
+    // between the PWA and the in-app browser on iOS 12.2+).
+    if (sessionStorage.getItem(KEY)) {
+      sessionStorage.removeItem(KEY);
+      document.getElementById('status').textContent = 'Loading BrainDeer…';
+      // Small delay to let Firebase auth state settle
+      setTimeout(function() {
+        window.location.replace('app.html');
+      }, 500);
     } else {
-      // ── STEP 2: Returning from redirect ────────────────────────────────
-      statusEl.textContent = 'Completing sign-in…';
-
-      auth.getRedirectResult().then(function(result) {
-        if (result && result.user) {
-          statusEl.textContent = 'Signed in! Loading BrainDeer…';
-          return ensureUser(result.user).then(goToApp);
-        }
-
-        // getRedirectResult returned null — but the user might still be
-        // signed in (iOS sometimes loses the redirect result but keeps
-        // the auth state). Check onAuthStateChanged as fallback.
-        return new Promise(function(resolve) {
-          var unsub = auth.onAuthStateChanged(function(user) {
-            unsub();
-            if (user) {
-              statusEl.textContent = 'Signed in! Loading BrainDeer…';
-              ensureUser(user).then(goToApp);
-            } else {
-              // Truly failed — clear flag and let user retry
-              sessionStorage.removeItem(REDIRECT_KEY);
-              statusEl.textContent = 'Sign-in failed. Tap to try again.';
-              document.body.style.cursor = 'pointer';
-              document.body.onclick = function() {
-                statusEl.textContent = 'Redirecting to Google…';
-                sessionStorage.setItem(REDIRECT_KEY, '1');
-                auth.signInWithRedirect(provider);
-              };
-            }
-            resolve();
-          });
-        });
-
-      }).catch(function(e) {
-        console.error('getRedirectResult error:', e);
-        sessionStorage.removeItem(REDIRECT_KEY);
-        statusEl.textContent = 'Sign-in failed. Tap to try again.';
-        document.body.style.cursor = 'pointer';
-        document.body.onclick = function() {
-          statusEl.textContent = 'Redirecting to Google…';
-          sessionStorage.setItem(REDIRECT_KEY, '1');
-          auth.signInWithRedirect(provider);
-        };
-      });
+      // First visit — set flag and redirect to Google
+      sessionStorage.setItem(KEY, '1');
+      document.getElementById('status').textContent = 'Redirecting to Google…';
+      var provider = new firebase.auth.GoogleAuthProvider();
+      firebase.auth().signInWithRedirect(provider);
     }
   </script>
 </body>
