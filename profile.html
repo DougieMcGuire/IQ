@@ -318,27 +318,27 @@
     return cv;
   }
 
-  async function uploadShareCard() {
+async function uploadShareCard() {
     var user = IQData.getCurrentUser();
     if (!user || !shareCanvas) return;
     var d = IQData.load();
     try {
-      // Convert canvas to base64 PNG (strip the data:image/png;base64, prefix)
       var dataUrl = shareCanvas.toDataURL('image/png');
       var base64 = dataUrl.split(',')[1];
 
+      // Create the object in the PARENT's context so Firestore accepts it
+      var shareDoc = new parent.Object();
+      shareDoc.iq = d.iq || 0;
+      shareDoc.username = d.username || user.displayName || 'Brain';
+      shareDoc.answered = d.answered || 0;
+      shareDoc.accuracy = parseInt(IQData.getAccuracy()) || 0;
+      shareDoc.bestStreak = d.bestStreak || 0;
+      shareDoc.cardBase64 = base64;
+      shareDoc.updatedAt = new Date().toISOString();
+
       var fb = parent.firebase;
       var db = fb.firestore();
-      var shareDoc = {
-  iq: Number(d.iq) || 0,
-  username: String(d.username || user.displayName || 'Brain'),
-  answered: Number(d.answered) || 0,
-  accuracy: Number(parseInt(IQData.getAccuracy())) || 0,
-  bestStreak: Number(d.bestStreak) || 0,
-  cardBase64: String(base64),
-  updatedAt: new Date().toISOString(),
-};
-await db.collection('shares').doc(user.uid).set(shareDoc);
+      await db.collection('shares').doc(user.uid).set(shareDoc);
       toast('Share card ready!');
     } catch (e) {
       console.warn('Share upload error:', e);
