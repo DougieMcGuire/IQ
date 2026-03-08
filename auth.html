@@ -65,8 +65,6 @@
     .btn-google:disabled{opacity:.5;pointer-events:none}
     .g-logo{width:19px;height:19px;flex-shrink:0}
 
-    /* Subtle hint shown under the Google button in iOS standalone */
-
     .divider{display:flex;align-items:center;gap:10px;margin:0 0 14px;color:var(--light);font-size:13px;font-weight:700}
     .divider::before,.divider::after{content:'';flex:1;height:2px;background:var(--mid);border-radius:1px}
 
@@ -101,12 +99,28 @@
     .loading .spinner{display:block}
     .loading .btn-text{display:none}
 
-    .hint{
-      margin-top:16px;text-align:center;
-      font-size:12px;font-weight:600;color:var(--light);line-height:1.6;
-      background:var(--card);padding:11px 20px;border-radius:14px;
-      box-shadow:0 3px 0 rgba(0,0,0,.1);
+    /* ── Footer links ── */
+    .footer-links{
+      margin-top:18px;
+      display:flex;align-items:center;justify-content:center;gap:0;
       animation:fadeUp .45s .14s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    .footer-links a{
+      color:var(--tan);
+      font-size:13px;font-weight:700;
+      text-decoration:none;
+      padding:8px 14px;
+      border-radius:10px;
+      transition:color .2s, background .2s;
+    }
+    .footer-links a:hover,
+    .footer-links a:active{
+      color:var(--cream);
+      background:rgba(255,255,255,.06);
+    }
+    .footer-dot{
+      width:4px;height:4px;border-radius:50%;
+      background:var(--mid);flex-shrink:0;
     }
 
     @keyframes fadeUp{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
@@ -154,9 +168,11 @@
   </form>
 </div>
 
-<div class="hint">
-  <a href="about.html">About</a> •
-  <a href="privacy.html">Privacy</a> •
+<div class="footer-links">
+  <a href="about.html">About</a>
+  <div class="footer-dot"></div>
+  <a href="privacy.html">Privacy</a>
+  <div class="footer-dot"></div>
   <a href="contact.html">Contact</a>
 </div>
 
@@ -164,8 +180,10 @@
   import { initializeApp }       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import {
     getAuth, onAuthStateChanged,
-    signInWithPopup, GoogleAuthProvider,
+    signInWithPopup, signInWithRedirect, getRedirectResult,
+    GoogleAuthProvider,
     createUserWithEmailAndPassword, signInWithEmailAndPassword,
+    signInWithCredential,
     updateProfile
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import {
@@ -186,7 +204,16 @@
   const db   = getFirestore(app);
   const gp   = new GoogleAuthProvider();
 
-  // Google button — shown everywhere
+  // ── Environment detection ──────────────────────────────────────────────────
+  const isIos        = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = !!(
+    ('standalone' in navigator && navigator.standalone) ||
+    window.matchMedia('(display-mode: standalone)').matches
+  );
+  const isIosStandalone = isIos && isStandalone;
+  const isAndroidStandalone = !isIos && isStandalone;
+
+  // ── Google button ──────────────────────────────────────────────────────────
   document.getElementById('google-section').innerHTML = `
     <button class="btn-google" id="btn-google" onclick="signInWithGoogle()">
       <svg class="g-logo" viewBox="0 0 48 48">
@@ -200,20 +227,27 @@
     </button>
   `;
 
-  // Use postMessage to parent — more reliable than calling goTo() directly across iframe boundary
+  // ── Navigation helper ──────────────────────────────────────────────────────
   onAuthStateChanged(auth, u => {
     if (u) navigate();
   });
 
   function navigate() {
     if (window.parent && window.parent !== window) {
-      // postMessage is more reliable than direct goTo() call across iframe boundary
       window.parent.postMessage({ type: 'authSuccess' }, '*');
     } else {
       window.location.href = 'improve.html';
     }
   }
 
+  // ── Check redirect result (for Android standalone + desktop redirect fallback)
+  getRedirectResult(auth).then(result => {
+    if (result && result.user) {
+      ensure(result.user).then(() => navigate());
+    }
+  }).catch(() => {});
+
+  // ── Tab switching ──────────────────────────────────────────────────────────
   let mode = 'login';
   window.switchTab = function(m) {
     mode = m;
@@ -242,6 +276,7 @@
     f.style.background = ['#6b4f32','#ea2b2b','#ff9600','#ffc800','#58cc02'][s];
   };
 
+  // ── Firestore user record ─────────────────────────────────────────────────
   async function ensure(u, extra = {}) {
     try {
       const ref  = doc(db, 'users', u.uid);
@@ -261,21 +296,104 @@
     } catch (e) { console.warn('ensure():', e); }
   }
 
+  // ══════════════════════════════════════════════════════════════════════════
+  //  GOOGLE SIGN-IN — works on EVERY scenario:
+  //
+  //  1. Desktop browsers         → signInWithPopup (best UX)
+  //  2. Mobile browsers (non-PWA)→ signInWithPopup, fallback to redirect
+  //  3. Android standalone PWA   → signInWithRedirect (works natively)
+  //  4. iOS standalone PWA       → bridge.html flow (popup/redirect both
+  //                                 broken in iOS standalone WebKit)
+  // ══════════════════════════════════════════════════════════════════════════
+
   window.signInWithGoogle = async function() {
     clr();
     setLoading('btn-google', true);
+
+    // ── iOS Standalone: use bridge flow ──────────────────────────────────
+    // Google OAuth is fundamentally broken in iOS standalone mode.
+    // Neither signInWithPopup nor signInWithRedirect work because iOS
+    // standalone uses a sandboxed WKWebView that doesn't share cookies
+    // or allow proper OAuth redirects back to the PWA context.
+    //
+    // Solution: Open bridge.html in Safari (escaping the standalone context),
+    // do the Google auth there, store the idToken in Firestore, and pass
+    // a session ID back via URL parameter. app.html picks it up on reload.
+    if (isIosStandalone) {
+      try {
+        // Generate a unique session ID
+        const sessionId = crypto.randomUUID
+          ? crypto.randomUUID()
+          : (Math.random().toString(36).slice(2) + Date.now().toString(36));
+
+        // Store pending session so bridge.html knows what to write back to
+        const sessionRef = doc(db, 'authSessions', sessionId);
+        await setDoc(sessionRef, {
+          createdAt: serverTimestamp(),
+          expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+          used: false,
+          idToken: null
+        });
+
+        // Open bridge in Safari — this escapes the standalone WKWebView
+        // The bridge does Google auth, writes the idToken back, and redirects
+        // back to app.html?session=<id>
+        window.location.href = 'https://braindeer.org/bridge.html?session=' + sessionId;
+      } catch (e) {
+        console.error('iOS bridge setup failed:', e);
+        setLoading('btn-google', false);
+        showErr('Could not start Google sign-in. Please use email instead.');
+      }
+      return;
+    }
+
+    // ── Android Standalone PWA: use redirect ─────────────────────────────
+    // signInWithPopup can be flaky on Android PWA; redirect is reliable.
+    if (isAndroidStandalone) {
+      try {
+        await signInWithRedirect(auth, gp);
+        // Page will redirect — no further code runs here
+      } catch (e) {
+        setLoading('btn-google', false);
+        showErr('Sign-in failed. Please try again.');
+      }
+      return;
+    }
+
+    // ── Normal browsers (desktop + mobile Safari/Chrome): popup first ────
     try {
       const result = await signInWithPopup(auth, gp);
       await ensure(result.user);
-      // Don't call navigate() here — onAuthStateChanged will fire and handle it
+      // onAuthStateChanged will fire and call navigate()
     } catch (e) {
-      setLoading('btn-google', false);
-      if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
+      // If popup was blocked or failed, fall back to redirect
+      if (
+        e.code === 'auth/popup-blocked' ||
+        e.code === 'auth/popup-closed-by-user' ||
+        e.code === 'auth/cancelled-popup-request' ||
+        e.code === 'auth/internal-error' ||
+        e.code === 'auth/network-request-failed'
+      ) {
+        // For popup-closed, user intentionally closed — don't auto-redirect
+        if (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') {
+          setLoading('btn-google', false);
+          return;
+        }
+        // Popup was blocked or failed — try redirect as fallback
+        try {
+          await signInWithRedirect(auth, gp);
+        } catch (e2) {
+          setLoading('btn-google', false);
+          showErr('Sign-in failed. Please try again.');
+        }
+      } else {
+        setLoading('btn-google', false);
         showErr(fe(e.code));
       }
     }
   };
 
+  // ── Email/password auth ────────────────────────────────────────────────────
   window.handleSubmit = async function(e) {
     e.preventDefault();
     clr();
