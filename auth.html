@@ -51,6 +51,7 @@
 
     .banner{border-radius:12px;font-size:14px;font-weight:700;margin-bottom:14px;display:none;padding:12px 14px}
     .banner.error{background:var(--red);color:#fff;display:block;box-shadow:0 3px 0 var(--redd)}
+    .banner.info{background:var(--card2);color:var(--cream);display:block;box-shadow:0 3px 0 rgba(0,0,0,.15)}
 
     .btn-google{
       width:100%;padding:14px 16px;border:none;border-radius:14px;
@@ -213,6 +214,9 @@
   const isIosStandalone = isIos && isStandalone;
   const isAndroidStandalone = !isIos && isStandalone;
 
+  // Are we inside an iframe (loaded by app.html)?
+  const inIframe = (window.parent && window.parent !== window);
+
   // ── Google button ──────────────────────────────────────────────────────────
   document.getElementById('google-section').innerHTML = `
     <button class="btn-google" id="btn-google" onclick="signInWithGoogle()">
@@ -233,19 +237,25 @@
   });
 
   function navigate() {
-    if (window.parent && window.parent !== window) {
+    if (inIframe) {
       window.parent.postMessage({ type: 'authSuccess' }, '*');
     } else {
       window.location.href = 'improve.html';
     }
   }
 
-  // ── Check redirect result (for Android standalone + desktop redirect fallback)
+  // ── Handle redirect results ────────────────────────────────────────────────
+  // This fires when returning from signInWithRedirect (Android PWA, iOS PWA,
+  // or desktop fallback). On iOS standalone, the in-app browser shares storage
+  // with the PWA, so the redirect result is available here.
   getRedirectResult(auth).then(result => {
     if (result && result.user) {
       ensure(result.user).then(() => navigate());
     }
-  }).catch(() => {});
+  }).catch(e => {
+    console.warn('getRedirectResult error:', e);
+    // If redirect failed, just show the login form — user can retry
+  });
 
   // ── Tab switching ──────────────────────────────────────────────────────────
   let mode = 'login';
@@ -297,47 +307,50 @@
   }
 
   // ══════════════════════════════════════════════════════════════════════════
-  //  GOOGLE SIGN-IN — works on EVERY scenario:
+  //  GOOGLE SIGN-IN — strategy per environment:
   //
-  //  1. Desktop browsers         → signInWithPopup (best UX)
-  //  2. Mobile browsers (non-PWA)→ signInWithPopup, fallback to redirect
-  //  3. Android standalone PWA   → signInWithRedirect (works natively)
-  //  4. iOS standalone PWA       → bridge.html flow (popup/redirect both
-  //                                 broken in iOS standalone WebKit)
+  //  1. Desktop browsers           → signInWithPopup (best UX)
+  //  2. Mobile browsers (non-PWA)  → signInWithPopup, fallback to redirect
+  //  3. Android standalone PWA     → signInWithRedirect
+  //  4. iOS standalone PWA         → signInWithRedirect via parent frame
+  //     (iOS 12.2+ opens external URLs in an in-app browser that shares
+  //      storage with the PWA. When the redirect returns to our origin,
+  //      the in-app browser closes and the PWA resumes with auth state.)
   // ══════════════════════════════════════════════════════════════════════════
 
   window.signInWithGoogle = async function() {
     clr();
     setLoading('btn-google', true);
 
-    // ── iOS Standalone: use bridge flow ──────────────────────────────────
-    // Google OAuth is fundamentally broken in iOS standalone mode.
-    // Neither signInWithPopup nor signInWithRedirect work because iOS
-    // standalone uses a sandboxed WKWebView that doesn't share cookies
-    // or allow proper OAuth redirects back to the PWA context.
+    // ── iOS Standalone PWA ───────────────────────────────────────────────
+    // signInWithPopup is completely broken in iOS standalone.
+    // signInWithRedirect works IF we navigate from the top-level frame
+    // (not from inside an iframe). iOS 12.2+ will open the Google auth
+    // page in an in-app browser that shares storage, and when it redirects
+    // back to our origin the PWA resumes.
     //
-    // Solution: Open bridge.html in Safari (escaping the standalone context),
-    // do the Google auth there, store the idToken in Firestore, and pass
-    // a session ID back via URL parameter. app.html picks it up on reload.
+    // We tell the parent (app.html) to navigate to google-redirect.html
+    // which is a minimal page that immediately calls signInWithRedirect.
+    // This ensures the redirect happens at the top level.
     if (isIosStandalone) {
-      // Generate session ID and redirect immediately — no Firestore write
-      // needed here. bridge.html creates the doc from real Safari where
-      // Firebase works reliably. This avoids the sandboxed WKWebView
-      // Firestore issues that cause the "Could not start" error.
-      const sessionId = crypto.randomUUID
-        ? crypto.randomUUID()
-        : (Math.random().toString(36).slice(2) + Date.now().toString(36));
-
-      window.location.href = 'https://braindeer.org/bridge.html?session=' + sessionId;
+      if (inIframe) {
+        // Tell parent to navigate to the redirect page
+        window.parent.postMessage({ type: 'googleRedirect' }, '*');
+      } else {
+        // We ARE the top level — do redirect directly
+        signInWithRedirect(auth, gp);
+      }
       return;
     }
 
-    // ── Android Standalone PWA: use redirect ─────────────────────────────
-    // signInWithPopup can be flaky on Android PWA; redirect is reliable.
+    // ── Android Standalone PWA ───────────────────────────────────────────
     if (isAndroidStandalone) {
       try {
-        await signInWithRedirect(auth, gp);
-        // Page will redirect — no further code runs here
+        if (inIframe) {
+          window.parent.postMessage({ type: 'googleRedirect' }, '*');
+        } else {
+          await signInWithRedirect(auth, gp);
+        }
       } catch (e) {
         setLoading('btn-google', false);
         showErr('Sign-in failed. Please try again.');
@@ -345,28 +358,23 @@
       return;
     }
 
-    // ── Normal browsers (desktop + mobile Safari/Chrome): popup first ────
+    // ── Normal browsers (desktop + mobile) ───────────────────────────────
     try {
       const result = await signInWithPopup(auth, gp);
       await ensure(result.user);
-      // onAuthStateChanged will fire and call navigate()
     } catch (e) {
-      // If popup was blocked or failed, fall back to redirect
-      if (
-        e.code === 'auth/popup-blocked' ||
-        e.code === 'auth/popup-closed-by-user' ||
-        e.code === 'auth/cancelled-popup-request' ||
-        e.code === 'auth/internal-error' ||
-        e.code === 'auth/network-request-failed'
-      ) {
-        // For popup-closed, user intentionally closed — don't auto-redirect
-        if (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') {
-          setLoading('btn-google', false);
-          return;
-        }
-        // Popup was blocked or failed — try redirect as fallback
+      if (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') {
+        setLoading('btn-google', false);
+        return;
+      }
+      if (e.code === 'auth/popup-blocked' || e.code === 'auth/internal-error' || e.code === 'auth/network-request-failed') {
+        // Popup blocked — try redirect as fallback
         try {
-          await signInWithRedirect(auth, gp);
+          if (inIframe) {
+            window.parent.postMessage({ type: 'googleRedirect' }, '*');
+          } else {
+            await signInWithRedirect(auth, gp);
+          }
         } catch (e2) {
           setLoading('btn-google', false);
           showErr('Sign-in failed. Please try again.');
