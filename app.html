@@ -115,7 +115,8 @@
 
   window.addEventListener('message', function(e) {
     if (!e.data) return;
-    dbg('postMessage received: ' + JSON.stringify(e.data).slice(0, 100));
+    // Only log our own messages, not internal Firebase/GIS chatter
+    if (e.data.type) dbg('msg: ' + e.data.type + (e.data.idToken ? ' token=' + e.data.idToken.length + 'chars' : ''));
 
     if (e.data.type === 'authSuccess') {
       dbg('authSuccess → goTo(improve)');
