@@ -52,6 +52,8 @@
       display: inline-block; margin-left: 12px; font-size: 16px;
       cursor: pointer; opacity: 0.4; vertical-align: middle;
     }
+    #dbg{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.85);color:#58cc02;font-size:11px;font-family:monospace;padding:8px 12px;max-height:40vh;overflow-y:auto;z-index:99999;display:none;word-break:break-all;line-height:1.6}
+    #dbg.show{display:block}
   </style>
 </head>
 <body>
@@ -69,6 +71,7 @@
 <div class="screen" id="screen-tasks"></div>
 
 <div id="iosInstallBanner" role="alert"></div>
+<div id="dbg" class="show"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -85,6 +88,13 @@
     measurementId:     "G-9B6885G0X0"
   };
   firebase.initializeApp(firebaseConfig);
+
+  function dbg(msg) {
+    var el = document.getElementById('dbg');
+    if (el) { el.classList.add('show'); el.textContent += new Date().toLocaleTimeString() + ' ' + msg + '\n'; el.scrollTop = el.scrollHeight; }
+    console.log('[app]', msg);
+  }
+  dbg('app.html loaded');
 
   var WORKER_URL = 'https://braindeer.org/api/redeem-install-token';
   var BG_COLORS  = {
@@ -105,21 +115,27 @@
 
   window.addEventListener('message', function(e) {
     if (!e.data) return;
+    dbg('postMessage received: ' + JSON.stringify(e.data).slice(0, 100));
 
     if (e.data.type === 'authSuccess') {
+      dbg('authSuccess → goTo(improve)');
       goTo('improve');
       return;
     }
 
     // GIS token from auth iframe — sign in at top level
     if (e.data.type === 'gisToken' && e.data.idToken) {
+      dbg('gisToken received, length=' + e.data.idToken.length);
       var credential = firebase.auth.GoogleAuthProvider.credential(e.data.idToken);
+      dbg('credential created, calling signInWithCredential...');
       firebase.auth().signInWithCredential(credential)
         .then(function(result) {
+          dbg('signInWithCredential SUCCESS: ' + result.user.email);
           // Ensure user doc
           var ref = firebase.firestore().collection('users').doc(result.user.uid);
           return ref.get().then(function(snap) {
             if (!snap.exists) {
+              dbg('Creating new user doc');
               return ref.set({
                 uid: result.user.uid,
                 email: result.user.email,
@@ -129,13 +145,16 @@
                 lastSeen: firebase.firestore.FieldValue.serverTimestamp()
               });
             }
+            dbg('Updating lastSeen');
             return ref.set({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
           });
         })
         .then(function() {
+          dbg('User doc done → goTo(improve)');
           goTo('improve');
         })
         .catch(function(err) {
+          dbg('ERROR: ' + err.code + ' ' + err.message);
           console.error('GIS sign-in failed:', err);
         });
       return;
@@ -178,6 +197,7 @@
   var screensLoaded = {};
 
   window.goTo = function goTo(page) {
+    dbg('goTo(' + page + ')');
     document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
 
     if ((page === 'profile' || page === 'leaderboard') && screensLoaded[page]) {
@@ -331,7 +351,9 @@
     }
 
     function normalAuth() {
+      dbg('normalAuth() called');
       var unsubscribe = firebase.auth().onAuthStateChanged(function(user) {
+        dbg('onAuthStateChanged: ' + (user ? user.email : 'null'));
         unsubscribe();
         goTo(user ? 'improve' : 'auth');
         showIOSBanner(user);
