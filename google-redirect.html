@@ -10,161 +10,73 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{
-      background:#3a2918;font-family:'Nunito',sans-serif;color:#f0e2cc;
-      min-height:100dvh;display:flex;flex-direction:column;
-      align-items:center;justify-content:center;padding:24px;text-align:center;
-    }
+    body{background:#3a2918;font-family:'Nunito',sans-serif;color:#f0e2cc;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
     .mascot{font-size:52px;animation:bob 1.2s ease-in-out infinite}
     .title{font-size:22px;font-weight:900;margin:10px 0 6px}
     .sub{font-size:14px;font-weight:700;color:#c2a476;margin-bottom:20px;max-width:300px;line-height:1.5}
-    .dots{display:flex;gap:6px;justify-content:center;margin-bottom:16px}
-    .dots span{width:8px;height:8px;border-radius:50%;background:#6b4f32;animation:dotPulse 1s ease infinite}
-    .dots span:nth-child(2){animation-delay:.15s}
-    .dots span:nth-child(3){animation-delay:.3s}
-    #g_id_onload, #gsi-btn{display:flex;justify-content:center;margin-bottom:16px}
-    .btn-back{
-      padding:10px 24px;border:2px solid #6b4f32;border-radius:12px;
-      background:transparent;color:#c2a476;font-size:14px;font-weight:700;
-      font-family:'Nunito',sans-serif;cursor:pointer;margin-top:8px;
-    }
+    .btn-back{padding:10px 24px;border:2px solid #6b4f32;border-radius:12px;background:transparent;color:#c2a476;font-size:14px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:12px}
     .btn-back:active{opacity:.7}
-    .err{
-      background:#ea2b2b;color:#fff;padding:12px 18px;
-      border-radius:12px;font-size:14px;font-weight:700;
-      max-width:340px;display:none;margin-top:12px;
-      box-shadow:0 3px 0 #c42020;
-    }
-    .err.show{display:block}
-    .hidden{display:none!important}
     @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-    @keyframes dotPulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
   </style>
 </head>
 <body>
 
 <div class="mascot">🦌</div>
 <div class="title">BrainDeer</div>
-<div class="sub" id="sub">Tap the button below to sign in</div>
-<div class="dots hidden" id="dots"><span></span><span></span><span></span></div>
-
-<!-- Google Identity Services renders its button here -->
-<div id="gsi-btn"></div>
-
-<div class="err" id="err"></div>
-
-<button class="btn-back" onclick="window.location.replace('app.html')">← Back to BrainDeer</button>
+<div class="sub" id="sub">Choose your Google account</div>
+<button class="btn-back" onclick="window.location.replace('app.html')">← Back</button>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
   firebase.initializeApp({
-    apiKey:            "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
-    authDomain:        "braindeer-backend.firebaseapp.com",
-    projectId:         "braindeer-backend",
-    storageBucket:     "braindeer-backend.firebasestorage.app",
-    messagingSenderId: "331205139765",
-    appId:             "1:331205139765:web:20cfef8194af63fc55c07c"
+    apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
+    authDomain:"braindeer-backend.firebaseapp.com",
+    projectId:"braindeer-backend",
+    storageBucket:"braindeer-backend.firebasestorage.app",
+    messagingSenderId:"331205139765",
+    appId:"1:331205139765:web:20cfef8194af63fc55c07c"
   });
 
-  var auth = firebase.auth();
-  var db   = firebase.firestore();
-
-  // ═══════════════════════════════════════════════════════════════════
-  //  ⚠️  PASTE YOUR WEB CLIENT ID BELOW  ⚠️
-  //
-  //  Find it at: Firebase Console → Authentication → Sign-in method
-  //  → Google → Web SDK configuration → Web client ID
-  //
-  //  It looks like: 331205139765-XXXXXXXX.apps.googleusercontent.com
-  // ═══════════════════════════════════════════════════════════════════
-  var GOOGLE_CLIENT_ID = '331205139765-3gapl6adar49lag63483id304v04mdd4.apps.googleusercontent.com';
-
-  var sub    = document.getElementById('sub');
-  var dots   = document.getElementById('dots');
-  var errEl  = document.getElementById('err');
-
-  function showErr(msg) {
-    errEl.textContent = msg;
-    errEl.classList.add('show');
-  }
-
-  function ensureUser(user) {
-    var ref = db.collection('users').doc(user.uid);
-    return ref.get().then(function(snap) {
-      if (!snap.exists) {
-        return ref.set({
-          uid: user.uid, email: user.email,
-          username: user.displayName || null,
-          pic: user.photoURL || null,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          lastSeen:  firebase.firestore.FieldValue.serverTimestamp()
-        });
-      }
-      return ref.set({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-    });
-  }
-
-  // ── Google Identity Services callback ──────────────────────────────
-  // This is called when the user completes the Google sign-in.
-  // It receives a JWT credential (id_token) that we pass to Firebase.
-  // NO popup, NO redirect, NO leaving the app. Works everywhere.
-  window.handleGoogleCredential = function(response) {
-    sub.textContent = 'Signing in…';
-    dots.classList.remove('hidden');
-    document.getElementById('gsi-btn').style.display = 'none';
-
+  window.handleGISCredential = function(response) {
     var idToken = response.credential;
-    var credential = firebase.auth.GoogleAuthProvider.credential(idToken);
+    if (!idToken) return;
+    document.getElementById('sub').textContent = 'Signing in…';
 
-    auth.signInWithCredential(credential)
+    var credential = firebase.auth.GoogleAuthProvider.credential(idToken);
+    firebase.auth().signInWithCredential(credential)
       .then(function(result) {
-        sub.textContent = 'Signed in! Loading BrainDeer…';
-        return ensureUser(result.user);
+        var ref = firebase.firestore().collection('users').doc(result.user.uid);
+        return ref.get().then(function(snap) {
+          if (!snap.exists) {
+            return ref.set({
+              uid: result.user.uid, email: result.user.email,
+              username: result.user.displayName || null,
+              pic: result.user.photoURL || null,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+              lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          }
+          return ref.set({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+        });
       })
       .then(function() {
         window.location.replace('app.html');
       })
-      .catch(function(e) {
-        console.error('signInWithCredential error:', e);
-        dots.classList.add('hidden');
-        document.getElementById('gsi-btn').style.display = 'flex';
-        showErr('Sign-in failed: ' + (e.message || 'Unknown error'));
+      .catch(function(err) {
+        document.getElementById('sub').textContent = 'Sign-in failed. Tap back and try again.';
       });
   };
 </script>
-
-<!-- Google Identity Services library — renders sign-in button inline -->
-<script src="https://accounts.google.com/gsi/client" async defer
-  onload="initGSI()"></script>
-
-<script>
-  function initGSI() {
-    google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: handleGoogleCredential,
-      // Use FedCM where available (Chrome 117+), falls back to iframe
-      use_fedcm_for_prompt: true
-    });
-
-    // Render a big Google sign-in button
-    google.accounts.id.renderButton(
-      document.getElementById('gsi-btn'),
-      {
-        type: 'standard',
-        theme: 'filled_black',
-        size: 'large',
-        text: 'continue_with',
-        shape: 'pill',
-        width: 300
-      }
-    );
-
-    // Also try One Tap prompt (auto-selects if only one account)
-    google.accounts.id.prompt();
-  }
-</script>
+<script src="https://accounts.google.com/gsi/client" onload="
+  google.accounts.id.initialize({
+    client_id: '331205139765-3gapl6adar49lag63483id304v04mdd4.apps.googleusercontent.com',
+    callback: handleGISCredential,
+    use_fedcm_for_prompt: true
+  });
+  google.accounts.id.prompt();
+"></script>
 
 </body>
 </html>
