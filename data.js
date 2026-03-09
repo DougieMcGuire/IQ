@@ -54,6 +54,98 @@ async function redirectIfLoggedIn() {
 }
 
 // ═══════════════════════════════════════════════════
+// IRT ENGINE — 3-Parameter Logistic Model
+//
+// P(correct | θ) = c + (1-c) / (1 + exp(-a*(θ - b)))
+//   θ (theta) = latent ability  [IQ = 100 + θ*15]
+//   a = discrimination  (higher = better item)
+//   b = difficulty      (-2=very easy … +2.5=very hard)
+//   c = guessing floor  (1/n_options, typically 0.25)
+//
+// Ability estimation: Newton-Raphson Maximum Likelihood
+// Item selection:     Maximum Fisher Information
+// ═══════════════════════════════════════════════════
+const IRT = {
+  iqToTheta: iq  => (iq - 100) / 15,
+  thetaToIQ: t   => Math.round(Math.max(55, Math.min(160, 100 + t * 15))),
+
+  // 3PL probability
+  p3pl(theta, a, b, c) {
+    return c + (1 - c) / (1 + Math.exp(-a * (theta - b)));
+  },
+
+  // First derivative of log-likelihood
+  dL(theta, responses) {
+    let d = 0;
+    for (const r of responses) {
+      const { a, b, c, correct } = r;
+      const P = this.p3pl(theta, a, b, c);
+      const W = (P - c) / ((1 - c) * P + 1e-9);
+      d += a * W * ((correct ? 1 : 0) - P);
+    }
+    return d;
+  },
+
+  // Second derivative (for Newton-Raphson step)
+  d2L(theta, responses) {
+    let d2 = 0;
+    for (const r of responses) {
+      const { a, b, c } = r;
+      const P  = this.p3pl(theta, a, b, c);
+      const Q  = 1 - P;
+      const W  = (P - c) / ((1 - c) * P + 1e-9);
+      d2 -= a * a * W * W * P * Q;
+    }
+    return d2;
+  },
+
+  // Fisher Information at theta for one item
+  info(theta, a, b, c) {
+    const P = this.p3pl(theta, a, b, c);
+    const Q = 1 - P;
+    const W = (P - c) / ((1 - c) * P + 1e-9);
+    return a * a * W * W * P * Q;
+  },
+
+  // MLE via Newton-Raphson — returns { theta, se }
+  estimate(responses, initTheta = 0) {
+    if (responses.length === 0) return { theta: 0, se: 2.0 };
+    const allCorrect = responses.every(r => r.correct);
+    const allWrong   = responses.every(r => !r.correct);
+    let theta = allCorrect ? 1.5 : allWrong ? -1.5 : initTheta;
+
+    for (let iter = 0; iter < 40; iter++) {
+      const d1   = this.dL(theta, responses);
+      const d2   = this.d2L(theta, responses);
+      if (Math.abs(d2) < 1e-9) break;
+      const step = d1 / d2;
+      theta -= step;
+      theta  = Math.max(-3.5, Math.min(3.5, theta));
+      if (Math.abs(step) < 1e-7) break;
+    }
+
+    const I  = responses.reduce((s, r) => s + this.info(theta, r.a, r.b, r.c), 0);
+    const se = I > 0 ? 1 / Math.sqrt(I) : 2.0;
+    return { theta, se };
+  },
+
+  // Select item with highest Fisher Information at current theta
+  selectItem(theta, answeredIds, items) {
+    let best = null, bestInfo = -Infinity;
+    for (const item of items) {
+      if (answeredIds.has(item.id)) continue;
+      const info = this.info(theta, item.irt.a, item.irt.b, item.irt.c);
+      if (info > bestInfo) { bestInfo = info; best = item; }
+    }
+    if (!best) {
+      const pool = items.filter(i => !answeredIds.has(i.id));
+      return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
+    }
+    return best;
+  }
+};
+
+// ═══════════════════════════════════════════════════
 // DAILY TASKS — task pool
 // ═══════════════════════════════════════════════════
 const TASK_POOL = [
@@ -243,11 +335,7 @@ const DailyTasks = {
 // ═══════════════════════════════════════════════════
 // LEADERBOARD SNAPSHOT HELPER
 // ═══════════════════════════════════════════════════
-// Writes only the current user's entry into leaderboard/snapshot.
-// Called after stats change — debounced so rapid answers don't spam writes.
-// Cost: 1 read + 1 write, at most once per SNAPSHOT_DEBOUNCE_MS window.
-
-const SNAPSHOT_DEBOUNCE_MS = 30_000; // at most 1 snapshot write per 30s per session
+const SNAPSHOT_DEBOUNCE_MS = 30_000;
 let _snapshotTimer = null;
 let _snapshotDirty = false;
 
@@ -272,14 +360,13 @@ async function _flushSnapshotEntry() {
 
   try {
     const ref      = doc(db, 'leaderboard', 'snapshot');
-    const snap     = await getDoc(ref);                                    // 1 read
+    const snap     = await getDoc(ref);
     let users      = snap.exists() ? (snap.data().users || []) : [];
-    users          = users.filter(u => u.uid !== currentUser.uid);        // remove stale entry
-    if (!myEntry.hidden) users.push(myEntry);                             // add updated entry
+    users          = users.filter(u => u.uid !== currentUser.uid);
+    if (!myEntry.hidden) users.push(myEntry);
     users.sort((a, b) => (b.iq || 0) - (a.iq || 0));
     if (users.length > 500) users = users.slice(0, 500);
-    await setDoc(ref, { users, updatedAt: Date.now() });                   // 1 write
-    // Bust leaderboard session cache so next view is fresh
+    await setDoc(ref, { users, updatedAt: Date.now() });
     try { sessionStorage.removeItem('bd_lb_snapshot'); } catch {}
   } catch (e) {
     console.warn('[data.js] snapshot flush failed:', e.message);
@@ -287,11 +374,9 @@ async function _flushSnapshotEntry() {
 }
 
 function _scheduleSnapshotFlush() {
-  // If a timer is already pending, just mark dirty — it'll flush when it fires
   if (_snapshotTimer) { _snapshotDirty = true; return; }
   _snapshotTimer = setTimeout(async () => {
     await _flushSnapshotEntry();
-    // If more writes came in while we were flushing, schedule one more
     if (_snapshotDirty) {
       _snapshotDirty = false;
       _scheduleSnapshotFlush();
@@ -306,36 +391,44 @@ const SYNC_EVERY = 10;
 let _pendingAnswers = 0;
 
 const IQData = {
-  KEY: 'iq_profile_v6',
+  KEY: 'iq_profile_v7',  // bumped — IRT replaces Elo
 
   defaults() {
     return {
-      version:      6,
-      uid:          null,
-      username:     null,
-      pic:          null,
-      age:          null,
-      iq:           null,
-      xp:           0,
-      level:        1,
-      answered:     0,
-      correct:      0,
-      streak:       0,
-      bestStreak:   0,
-      avgMs:        0,
-      fastAnswers:  0,
-      totalSessions:0,
-      sessionStart: null,
-      calibrated:   false,
+      version:       7,
+      uid:           null,
+      username:      null,
+      pic:           null,
+      age:           null,
+      iq:            null,
+      xp:            0,
+      level:         1,
+      answered:      0,
+      correct:       0,
+      streak:        0,
+      bestStreak:    0,
+      avgMs:         0,
+      fastAnswers:   0,
+      totalSessions: 0,
+      sessionStart:  null,
+      calibrated:    false,
+      // IRT state — persisted so MLE can resume across sessions
+      irt: {
+        theta:     0,      // current ability estimate
+        se:        2.0,    // standard error (shrinks as you answer more)
+        responses: [],     // [{a, b, c, correct}] — last 200 kept for MLE
+        answeredIds: [],   // item ids already seen
+      },
+      // Per-category tracking (kept for profile stats / radar chart)
       ratings: {
-        patternRecognition: { r: 1000, n: 0, wins: 0, history: [] },
-        problemSolving:     { r: 1000, n: 0, wins: 0, history: [] },
-        mentalAgility:      { r: 1000, n: 0, wins: 0, history: [] },
-        workingMemory:      { r: 1000, n: 0, wins: 0, history: [] },
-        verbalReasoning:    { r: 1000, n: 0, wins: 0, history: [] },
-        logicalReasoning:   { r: 1000, n: 0, wins: 0, history: [] },
-        spatialAwareness:   { r: 1000, n: 0, wins: 0, history: [] },
-        numericalReasoning: { r: 1000, n: 0, wins: 0, history: [] },
+        patternRecognition: { n: 0, wins: 0 },
+        problemSolving:     { n: 0, wins: 0 },
+        mentalAgility:      { n: 0, wins: 0 },
+        workingMemory:      { n: 0, wins: 0 },
+        verbalReasoning:    { n: 0, wins: 0 },
+        logicalReasoning:   { n: 0, wins: 0 },
+        spatialAwareness:   { n: 0, wins: 0 },
+        numericalReasoning: { n: 0, wins: 0 },
       }
     };
   },
@@ -344,8 +437,13 @@ const IQData = {
     try {
       const raw = localStorage.getItem(this.KEY);
       if (!raw) return this.defaults();
-      const d = JSON.parse(raw);
+      const d   = JSON.parse(raw);
       const def = this.defaults();
+      // Back-fill any missing keys
+      if (!d.irt) d.irt = def.irt;
+      if (!d.irt.responses)   d.irt.responses   = [];
+      if (!d.irt.answeredIds) d.irt.answeredIds  = [];
+      if (d.irt.se === undefined) d.irt.se = 2.0;
       for (const k of Object.keys(def.ratings)) {
         if (!d.ratings[k]) d.ratings[k] = def.ratings[k];
       }
@@ -356,8 +454,8 @@ const IQData = {
 
   save(d) { localStorage.setItem(this.KEY, JSON.stringify(d)); },
 
-  isGuest()       { return localStorage.getItem('iq_guest') === '1'; },
-  getCurrentUser(){ return currentUser; },
+  isGuest()        { return localStorage.getItem('iq_guest') === '1'; },
+  getCurrentUser() { return currentUser; },
 
   signOut() {
     signOut(auth).then(() => {
@@ -371,22 +469,25 @@ const IQData = {
   needsCalibration() { const d = this.load(); return !d.calibrated && d.answered < 5; },
 
   markCalibrated(iq) {
-    const d = this.load(); d.calibrated = true; d.iq = iq;
+    const d = this.load();
+    d.calibrated  = true;
+    d.iq          = iq;
+    d.irt.theta   = IRT.iqToTheta(iq);
     this.save(d);
     this._pushToCloud(d);
-    _scheduleSnapshotFlush(); // ← snapshot hook: calibration sets up initial entry
+    _scheduleSnapshotFlush();
   },
 
   setAge(age)        { const d = this.load(); d.age = age;       this.save(d); this._pushToCloud(d); },
   setProfilePic(url) {
     const d = this.load(); d.pic = url; this.save(d);
     this._pushToCloud(d);
-    _scheduleSnapshotFlush(); // ← snapshot hook: pic change should show on leaderboard
+    _scheduleSnapshotFlush();
   },
-  setUsername(name)  {
+  setUsername(name) {
     const d = this.load(); d.username = name; this.save(d);
     this._pushToCloud(d);
-    _scheduleSnapshotFlush(); // ← snapshot hook: username change should show on leaderboard
+    _scheduleSnapshotFlush();
   },
 
   async _syncFromCloud() {
@@ -413,20 +514,32 @@ const IQData = {
   },
 
   _merge(local, cloud) {
-    const m = { ...this.defaults(), ...local };
+    const m   = { ...this.defaults(), ...local };
+    const hi  = (a, b) => Math.max(a || 0, b || 0);
+    m.answered     = hi(local.answered,     cloud.answered);
+    m.correct      = hi(local.correct,      cloud.correct);
+    m.bestStreak   = hi(local.bestStreak,   cloud.bestStreak);
+    m.xp           = hi(local.xp,           cloud.xp);
+    m.level        = Math.max(local.level || 1, cloud.level || 1);
+    m.fastAnswers  = hi(local.fastAnswers,  cloud.fastAnswers);
+    m.totalSessions= hi(local.totalSessions,cloud.totalSessions);
+    m.age          = cloud.age || local.age;
+    m.calibrated   = local.calibrated || cloud.calibrated || false;
+
+    // IRT: prefer whichever has more responses (more data = better estimate)
+    const localN  = local.irt?.responses?.length  || 0;
+    const cloudN  = cloud.irt?.responses?.length  || 0;
+    if (cloudN > localN) {
+      m.irt = cloud.irt;
+    }
+
+    // Per-category: prefer higher n
     for (const k of Object.keys(m.ratings)) {
       const lc = local.ratings?.[k], cc = cloud.ratings?.[k];
-      if (cc && cc.n > (lc?.n || 0)) m.ratings[k] = cc;
+      if (cc && (cc.n || 0) > (lc?.n || 0)) m.ratings[k] = cc;
     }
-    const hi = (a, b) => Math.max(a || 0, b || 0);
-    m.answered = hi(local.answered, cloud.answered); m.correct = hi(local.correct, cloud.correct);
-    m.bestStreak = hi(local.bestStreak, cloud.bestStreak); m.xp = hi(local.xp, cloud.xp);
-    m.level = Math.max(local.level || 1, cloud.level || 1);
-    m.fastAnswers = hi(local.fastAnswers, cloud.fastAnswers);
-    m.totalSessions = hi(local.totalSessions, cloud.totalSessions);
+
     if (cloud.iq && cloud.answered >= local.answered) m.iq = cloud.iq;
-    m.age = cloud.age || local.age;
-    m.calibrated = local.calibrated || cloud.calibrated || false;
     return m;
   },
 
@@ -434,10 +547,8 @@ const IQData = {
     if (!currentUser) return;
     try {
       const d = dataOverride ? { ...dataOverride } : { ...this.load() };
-      for (const k of Object.keys(d.ratings)) {
-        d.ratings[k] = { ...d.ratings[k] };
-        d.ratings[k].history = (d.ratings[k].history || []).slice(-20);
-      }
+      // Trim IRT responses to last 200 before saving
+      if (d.irt?.responses) d.irt.responses = d.irt.responses.slice(-200);
       delete d.sessionStart;
       d.lastSeen = serverTimestamp();
       await setDoc(doc(db, 'users', currentUser.uid), d, { merge: true });
@@ -450,98 +561,138 @@ const IQData = {
     if (_pendingAnswers >= SYNC_EVERY) { _pendingAnswers = 0; await this._pushToCloud(); }
   },
 
-  getDifficulty(cat) {
+  // ── IRT helpers exposed for the feed ──
+  getTheta() { return this.load().irt.theta; },
+  getSE()    { return this.load().irt.se; },
+  getAnsweredIds() { return new Set(this.load().irt.answeredIds); },
+
+  // Select next best question from an item bank
+  selectItem(itemBank) {
+    const d = this.load();
+    return IRT.selectItem(d.irt.theta, new Set(d.irt.answeredIds), itemBank);
+  },
+
+  // Category stat % for profile radar
+  getStatPercent(cat) {
     const d = this.load(), c = d.ratings[cat];
-    if (!c || c.n < 3) return 0.8;
-    return 0.5 + ((c.r - 600) / 800) * 1.5;
+    if (!c || c.n === 0) return 50;
+    const acc = c.n > 0 ? (c.wins / c.n) : 0.5;
+    // Scale accuracy to 0-100 with some stretch
+    return Math.round(Math.max(5, Math.min(95, acc * 100)));
+  },
+
+  getDifficulty(cat) {
+    // Keep for compatibility with Q.generate — derive from IRT theta
+    const d = this.load();
+    return 0.5 + ((d.irt.theta + 2) / 4) * 1.5;
   },
 
   getWeakestCategory() {
     const d = this.load(); let min = Infinity, weak = null;
-    for (const [k, v] of Object.entries(d.ratings)) { if (v.n < min) { min = v.n; weak = k; } }
+    for (const [k, v] of Object.entries(d.ratings)) {
+      if ((v.n || 0) < min) { min = v.n; weak = k; }
+    }
     return weak;
   },
 
   getRecentAccuracy(cat) {
+    // Kept for compatibility
     const d = this.load(), c = d.ratings[cat];
-    if (!c || !c.history.length) return 0.5;
-    const r = c.history.slice(-10);
-    return r.filter(x => x).length / r.length;
+    if (!c || !c.n) return 0.5;
+    return c.wins / c.n;
   },
 
-  recordAnswer(cat, correct, diff, ms) {
-    const d = this.load(), c = d.ratings[cat];
-    if (!c) return d;
+  // ── Core answer recording — now IRT-powered ──
+  recordAnswer(cat, correct, irtParams, ms) {
+    // irtParams = { a, b, c, id }  OR  diff (number, legacy fallback)
+    const d = this.load();
+    const isLegacy = typeof irtParams === 'number';
 
-    const expected = 1 / (1 + Math.pow(10, (diff * 400 - (c.r - 1000)) / 400));
-    const K = Math.max(16, 48 - c.n * 0.5);
-    c.r = Math.round(c.r + K * ((correct ? 1 : 0) - expected));
-    c.r = Math.max(400, Math.min(1600, c.r));
-    c.n++; if (correct) c.wins++;
-    c.history.push(correct ? 1 : 0);
-    if (c.history.length > 50) c.history = c.history.slice(-50);
+    // --- IRT update ---
+    let a = 1.2, b = 0, cGuess = 0.25;
+    if (!isLegacy) {
+      a      = irtParams.a      ?? 1.2;
+      b      = irtParams.b      ?? 0;
+      cGuess = irtParams.c      ?? 0.25;
+    } else {
+      // Legacy: map difficulty float to b parameter
+      b = (irtParams - 1.0) * 2;
+    }
 
+    d.irt.responses.push({ a, b, c: cGuess, correct });
+    if (d.irt.responses.length > 200) d.irt.responses = d.irt.responses.slice(-200);
+
+    if (!isLegacy && irtParams.id) {
+      if (!d.irt.answeredIds.includes(irtParams.id)) d.irt.answeredIds.push(irtParams.id);
+      if (d.irt.answeredIds.length > 500) d.irt.answeredIds = d.irt.answeredIds.slice(-500);
+    }
+
+    const est    = IRT.estimate(d.irt.responses, d.irt.theta);
+    d.irt.theta  = est.theta;
+    d.irt.se     = est.se;
+
+    // --- Per-category stats ---
+    const cat_r = d.ratings[cat] || { n: 0, wins: 0 };
+    cat_r.n++;
+    if (correct) cat_r.wins++;
+    d.ratings[cat] = cat_r;
+
+    // --- Global counters ---
     d.answered++;
     if (correct) { d.correct++; d.streak++; if (d.streak > d.bestStreak) d.bestStreak = d.streak; }
-    else { d.streak = 0; }
+    else         { d.streak = 0; }
 
     d.avgMs = d.answered === 1 ? ms : Math.round(d.avgMs * 0.95 + ms * 0.05);
     if (correct && ms < 3500) d.fastAnswers++;
 
+    // --- XP ---
     let xp = correct ? 10 : 3;
     if (correct && ms < 3000) xp += 7; else if (correct && ms < 5000) xp += 3;
     if (correct && d.streak >= 3) xp += Math.min(Math.floor(d.streak * 1.5), 20);
-    if (correct && diff >= 1.5) xp += 5;
+    if (correct && b >= 1.5) xp += 5;  // bonus for hard IRT items
     d.xp += xp;
 
     const oldLvl = d.level;
     d.level = Math.floor(d.xp / 150) + 1;
-    d.iq    = this.calcIQ(d);
+
+    // --- IQ from IRT theta ---
+    if (d.answered >= 5) d.iq = IRT.thetaToIQ(d.irt.theta);
+
     this.save(d);
     this._maybeSync();
-
-    // ← Snapshot hook: schedule a debounced leaderboard update after stats change.
-    // Debounced to 30s so answering 100 questions = 1 snapshot write, not 100.
     _scheduleSnapshotFlush();
 
-    return { ...d, xpGain: xp, leveledUp: d.level > oldLvl };
+    return {
+      ...d,
+      xpGain:   xp,
+      leveledUp: d.level > oldLvl,
+      iqDelta:  d.iq ? (d.iq - IRT.thetaToIQ(d.irt.theta - (est.theta - d.irt.theta))) : 0,
+      thetaSE:  est.se,
+    };
+  },
+
+  // IQ confidence interval (95%) in IQ points
+  getIQConfidenceInterval() {
+    const d   = this.load();
+    const se  = d.irt.se * 15;  // convert theta SE → IQ SE
+    const iq  = d.iq || 100;
+    return {
+      iq,
+      low:  Math.max(55,  Math.round(iq - 1.96 * se)),
+      high: Math.min(160, Math.round(iq + 1.96 * se)),
+      se:   Math.round(se),
+    };
   },
 
   calcIQ(d) {
-    const w = {
-      patternRecognition: 0.15, problemSolving: 0.14, mentalAgility: 0.13,
-      workingMemory: 0.14, verbalReasoning: 0.13, logicalReasoning: 0.13,
-      spatialAwareness: 0.09, numericalReasoning: 0.09,
-    };
-    let sum = 0, wt = 0, games = 0;
-    for (const [k, v] of Object.entries(w)) {
-      const r = d.ratings[k];
-      if (r && r.n > 0) {
-        const conf = Math.min(1, r.n / 10);
-        sum += r.r * v * conf; wt += v * conf; games += r.n;
-      }
-    }
-    if (wt === 0 || games < 5) return d.iq || null;
-    const avg = sum / wt;
-    let iq = 100 + ((avg - 1000) / 100) * 15;
-    iq = 100 + (iq - 100) * Math.min(1, games / 50);
-    return Math.round(Math.max(55, Math.min(160, iq)));
+    // Direct from IRT theta — much more accurate than weighted Elo average
+    if (!d.irt || d.answered < 5) return d.iq || null;
+    return IRT.thetaToIQ(d.irt.theta);
   },
 
   getAccuracy() {
     const d = this.load();
     return d.answered === 0 ? 0 : Math.round((d.correct / d.answered) * 100);
-  },
-
-  getStatPercent(cat) {
-    const d = this.load(), c = d.ratings[cat];
-    if (!c || c.n === 0) return 50;
-    return Math.round(Math.max(0, Math.min(100, ((c.r - 400) / 1200) * 100)));
-  },
-
-  getCategoryRating(cat) {
-    const d = this.load(), c = d.ratings[cat];
-    return c ? c.r : 1000;
   },
 
   startSession() {
@@ -554,11 +705,10 @@ const IQData = {
   endSession() {
     _pendingAnswers = 0;
     this._pushToCloud();
-    // Flush any pending snapshot immediately on session end (tab close / nav away)
     if (_snapshotTimer) {
       clearTimeout(_snapshotTimer);
       _snapshotTimer = null;
-      _flushSnapshotEntry(); // fire-and-forget on unload
+      _flushSnapshotEntry();
     }
   },
 
@@ -570,7 +720,6 @@ const IQData = {
 
 window.addEventListener('beforeunload', () => {
   if (currentUser && _pendingAnswers > 0) IQData._pushToCloud();
-  // Also flush snapshot if dirty
   if (_snapshotTimer) { clearTimeout(_snapshotTimer); _flushSnapshotEntry(); }
 });
 
@@ -604,7 +753,7 @@ function getEncouragement(streak, correct) {
 }
 
 export {
-  IQData, auth, db,
+  IQData, IRT, auth, db,
   authReady, requireAuth, redirectIfLoggedIn,
   iqToPercentile, formatPercentile, getEncouragement
 };
