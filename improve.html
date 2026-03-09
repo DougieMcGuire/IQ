@@ -38,12 +38,38 @@
     .pill-icon svg { width:100%; height:100%; }
     .stat-pill .val { font-size:16px; font-weight:800; color:var(--cream); }
     .stat-pill .lbl { font-size:11px; font-weight:700; color:var(--tan); }
+    /* IQ bump animation */
+    .stat-pill .val.bump { animation: iqBump 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes iqBump { 0%,100%{transform:scale(1)} 50%{transform:scale(1.22)} }
 
     .xp-wrap { display:flex; align-items:center; gap:8px; }
     .xp-bar-outer { flex:1; height:10px; background:var(--brown-mid); border-radius:5px; overflow:hidden; }
     .xp-bar-inner { height:100%; background:var(--gold); border-radius:5px; transition:width 0.4s ease; position:relative; }
     .xp-bar-inner::after { content:''; position:absolute; top:0;left:0;right:0;height:40%; background:rgba(255,255,255,0.25); border-radius:5px 5px 0 0; }
     .xp-label { font-size:12px; font-weight:800; color:var(--tan); white-space:nowrap; }
+
+    /* ── Confidence band ── */
+    .conf-row {
+      display: flex; align-items: center; gap: 8px; margin-top: 4px;
+    }
+    .conf-label { font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--tan); white-space: nowrap; }
+    .conf-bar-outer {
+      flex: 1; height: 10px; background: var(--brown-mid); border-radius: 5px;
+      position: relative; overflow: visible;
+    }
+    .conf-bar-range {
+      position: absolute; height: 100%; border-radius: 5px;
+      background: linear-gradient(90deg, var(--blue), var(--purple));
+      transition: left 0.5s ease, width 0.5s ease;
+      box-shadow: 0 0 8px rgba(28,176,246,0.35);
+    }
+    .conf-bar-needle {
+      position: absolute; top: -3px; width: 4px; height: 16px;
+      background: var(--gold); border-radius: 2px; transform: translateX(-50%);
+      transition: left 0.5s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 0 6px var(--gold);
+    }
+    .conf-text { font-size: 10px; font-weight: 700; color: var(--tan); white-space: nowrap; }
 
     /* ── Nav ── */
     nav {
@@ -76,7 +102,7 @@
     /* ── Feed ── */
     main {
       flex: 1;
-      padding-top: 78px;
+      padding-top: calc(env(safe-area-inset-top, 0px) + 96px);
       padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
       overflow-y: auto;
       scroll-snap-type: y mandatory;
@@ -85,7 +111,7 @@
     main::-webkit-scrollbar { display: none; }
 
     .slide {
-      height: calc(100dvh - 78px - 64px - env(safe-area-inset-bottom, 0px));
+      height: calc(100dvh - 96px - 64px - env(safe-area-inset-bottom, 0px));
       min-height: 0;
       scroll-snap-align: start;
       scroll-snap-stop: always;
@@ -94,14 +120,10 @@
       padding: 12px 16px;
     }
 
-    /* Pruned spacer — same height, zero render cost */
     .slide-spacer {
-      height: calc(100dvh - 78px - 64px - env(safe-area-inset-bottom, 0px));
-      min-height: 0;
-      flex-shrink: 0;
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
-      contain: strict;
+      height: calc(100dvh - 96px - 64px - env(safe-area-inset-bottom, 0px));
+      min-height: 0; flex-shrink: 0;
+      scroll-snap-align: start; scroll-snap-stop: always; contain: strict;
     }
 
     /* ── Card ── */
@@ -115,6 +137,15 @@
       position: relative; overflow: hidden;
     }
     .qcard::before { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:linear-gradient(180deg,rgba(255,255,255,0.04)0%,transparent 100%); border-radius:20px 20px 0 0; pointer-events:none; }
+
+    /* Difficulty dots */
+    .diff-row { width:100%; display:flex; align-items:center; gap:6px; }
+    .diff-lbl { font-size:10px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--tan); white-space:nowrap; }
+    .diff-dots { display:flex; gap:3px; }
+    .diff-dot { width:7px; height:7px; border-radius:50%; background:var(--brown-mid); transition:background 0.3s; }
+    .diff-dot.lit { background:var(--gold); box-shadow:0 0 4px var(--gold); }
+    .diff-dot.lit.hard { background:var(--red); box-shadow:0 0 4px var(--red); }
+    .diff-spacer { flex:1; }
 
     .category { font-size:11px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:var(--cream); background:var(--brown-mid); padding:4px 14px; border-radius:10px; box-shadow:0 2px 0 rgba(0,0,0,0.12); }
     .question { font-size:clamp(14px,3.8vw,17px); font-weight:800; text-align:center; line-height:1.4; padding:0 4px; color:var(--cream); }
@@ -148,32 +179,35 @@
     @keyframes pop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
     @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
 
-    .feedback { font-size:16px; font-weight:900; min-height:22px; opacity:0; transition:opacity 0.3s; text-transform:uppercase; letter-spacing:0.5px; }
+    /* Feedback row */
+    .feedback-row { display:flex; align-items:center; gap:8px; min-height:22px; }
+    .feedback { font-size:16px; font-weight:900; opacity:0; transition:opacity 0.3s; text-transform:uppercase; letter-spacing:0.5px; }
     .feedback.show { opacity:1; }
     .feedback.correct { color:var(--green); }
     .feedback.wrong { color:var(--red); }
+
+    /* IQ delta badge */
+    .iq-delta { font-size:12px; font-weight:900; opacity:0; transition:opacity 0.3s; padding:2px 8px; border-radius:8px; }
+    .iq-delta.show { opacity:1; }
+    .iq-delta.up { background:rgba(88,204,2,0.18); color:var(--green); }
+    .iq-delta.dn { background:rgba(234,43,43,0.18); color:var(--red); }
 
     .explain { background:var(--bg); border-radius:12px; padding:8px 12px; font-size:12px; font-weight:600; color:var(--tan); line-height:1.5; text-align:center; display:none; width:100%; }
     .explain.show { display:block; animation:slideUp 0.3s ease; }
     @keyframes slideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
     .scroll-hint { margin-top:8px; font-size:13px; font-weight:800; color:var(--brown-light); opacity:0; display:flex; flex-direction:column; align-items:center; gap:2px; transition:opacity 0.3s; }
-    @keyframes slideEnter { 0%{opacity:0;transform:translateY(28px) scale(0.96)} 100%{opacity:1;transform:translateY(0) scale(1)} }
-    .slide.entering .qcard { animation:slideEnter 0.35s cubic-bezier(0.22,1,0.36,1) both; }
     .scroll-hint.show { opacity:0.5; }
     .scroll-hint svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2.5; animation:bounce 1.5s infinite; }
     @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
 
+    @keyframes slideEnter { 0%{opacity:0;transform:translateY(28px) scale(0.96)} 100%{opacity:1;transform:translateY(0) scale(1)} }
+    .slide.entering .qcard { animation:slideEnter 0.35s cubic-bezier(0.22,1,0.36,1) both; }
+
     /* ══ WORDLE ══ */
     .wordle-grid { display:flex; flex-direction:column; gap:5px; margin:2px 0; }
     .wordle-row { display:flex; gap:5px; }
-    .wordle-tile {
-      width:clamp(42px,11.5vw,52px); height:clamp(42px,11.5vw,52px);
-      border-radius:10px; background:var(--bg); border:2.5px solid var(--brown-mid);
-      display:flex; align-items:center; justify-content:center;
-      font-size:clamp(18px,5vw,22px); font-weight:900; color:var(--cream);
-      transition:border-color 0.08s;
-    }
+    .wordle-tile { width:clamp(42px,11.5vw,52px); height:clamp(42px,11.5vw,52px); border-radius:10px; background:var(--bg); border:2.5px solid var(--brown-mid); display:flex; align-items:center; justify-content:center; font-size:clamp(18px,5vw,22px); font-weight:900; color:var(--cream); transition:border-color 0.08s; }
     .wordle-tile.has-letter  { border-color:var(--tan); animation:wtPop 0.08s ease; }
     .wordle-tile.reveal-correct { background:var(--green); border-color:var(--green); color:#fff; box-shadow:0 3px 0 var(--green-dark); }
     .wordle-tile.reveal-present { background:var(--gold); border-color:var(--gold); color:#2a1800; box-shadow:0 3px 0 var(--gold-dark); }
@@ -186,15 +220,7 @@
     .wordle-msg.success { color:var(--green); }
     .wordle-kb { display:flex; flex-direction:column; gap:6px; width:100%; max-width:340px; }
     .wordle-kb-row { display:flex; gap:5px; justify-content:center; }
-    .wk {
-      height:44px; flex:1; min-width:0; max-width:36px;
-      border:none; border-radius:8px; background:var(--brown-mid); color:var(--cream);
-      font-family:'Nunito',sans-serif; font-size:13px; font-weight:900; cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-      box-shadow:0 3px 0 rgba(0,0,0,0.22);
-      transition:background 0.25s, color 0.25s, box-shadow 0.25s;
-      position:relative; overflow:hidden; user-select:none;
-    }
+    .wk { height:44px; flex:1; min-width:0; max-width:36px; border:none; border-radius:8px; background:var(--brown-mid); color:var(--cream); font-family:'Nunito',sans-serif; font-size:13px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 0 rgba(0,0,0,0.22); transition:background 0.25s, color 0.25s, box-shadow 0.25s; position:relative; overflow:hidden; user-select:none; }
     .wk::before { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:linear-gradient(180deg,rgba(255,255,255,0.09)0%,transparent 100%); pointer-events:none; }
     .wk:active    { transform:translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,0.22); }
     .wk.wide      { max-width:52px; font-size:11px; }
@@ -204,13 +230,7 @@
 
     /* ══ TIC TAC TOE ══ */
     .ttt-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; width:clamp(180px,50vw,240px); margin:4px 0; }
-    .ttt-cell {
-      aspect-ratio:1; border:none; border-radius:12px; background:var(--bg); cursor:pointer;
-      font-family:'Nunito',sans-serif; font-size:clamp(28px,8vw,38px); font-weight:900; color:var(--cream);
-      display:flex; align-items:center; justify-content:center;
-      box-shadow:0 3px 0 rgba(0,0,0,0.15); transition:background 0.15s,transform 0.1s;
-      position:relative; overflow:hidden;
-    }
+    .ttt-cell { aspect-ratio:1; border:none; border-radius:12px; background:var(--bg); cursor:pointer; font-family:'Nunito',sans-serif; font-size:clamp(28px,8vw,38px); font-weight:900; color:var(--cream); display:flex; align-items:center; justify-content:center; box-shadow:0 3px 0 rgba(0,0,0,0.15); transition:background 0.15s,transform 0.1s; position:relative; overflow:hidden; }
     .ttt-cell::before { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:linear-gradient(180deg,rgba(255,255,255,0.05)0%,transparent 100%); pointer-events:none; border-radius:12px 12px 0 0; }
     .ttt-cell:active { transform:translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,0.15); }
     .ttt-cell.ttt-x { color:var(--blue); }
@@ -225,12 +245,7 @@
     .mem-grid { display:grid; gap:6px; margin:4px 0; justify-content:center; }
     .mem-cols-3 { grid-template-columns:repeat(3,1fr); width:clamp(160px,45vw,210px); }
     .mem-cols-4 { grid-template-columns:repeat(4,1fr); width:clamp(210px,55vw,280px); }
-    .mem-card {
-      aspect-ratio:1; border:none; border-radius:10px; background:var(--brown-mid); cursor:pointer;
-      font-size:clamp(20px,5.5vw,28px); display:flex; align-items:center; justify-content:center;
-      box-shadow:0 3px 0 rgba(0,0,0,0.15); transition:transform 0.3s,background 0.3s;
-      position:relative; user-select:none;
-    }
+    .mem-card { aspect-ratio:1; border:none; border-radius:10px; background:var(--brown-mid); cursor:pointer; font-size:clamp(20px,5.5vw,28px); display:flex; align-items:center; justify-content:center; box-shadow:0 3px 0 rgba(0,0,0,0.15); transition:transform 0.3s,background 0.3s; position:relative; user-select:none; }
     .mem-front, .mem-back { position:absolute; backface-visibility:hidden; }
     .mem-front { color:var(--tan); font-weight:900; font-size:18px; }
     .mem-back { opacity:0; transition:opacity 0.2s; }
@@ -252,14 +267,7 @@
 
     /* ══ REACTION TIME ══ */
     .react-zone { display:flex; justify-content:center; margin:8px 0; }
-    .react-circle {
-      width:clamp(120px,32vw,160px); height:clamp(120px,32vw,160px);
-      border-radius:50%; background:var(--red);
-      display:flex; align-items:center; justify-content:center;
-      font-size:18px; font-weight:900; color:#fff;
-      cursor:pointer; user-select:none;
-      box-shadow:0 6px 0 rgba(0,0,0,0.2); transition:background 0.15s,transform 0.1s;
-    }
+    .react-circle { width:clamp(120px,32vw,160px); height:clamp(120px,32vw,160px); border-radius:50%; background:var(--red); display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:900; color:#fff; cursor:pointer; user-select:none; box-shadow:0 6px 0 rgba(0,0,0,0.2); transition:background 0.15s,transform 0.1s; }
     .react-circle:active { transform:translateY(3px); box-shadow:0 3px 0 rgba(0,0,0,0.2); }
     .react-circle.react-go { background:var(--green); animation:pop 0.3s ease; }
     .react-circle.react-fail { background:var(--red); }
@@ -332,6 +340,24 @@
     .confetti i.fall { animation:confettiFall 1.2s ease-out forwards; }
     @keyframes confettiFall { 0%{opacity:1;transform:translateY(0) rotate(0)} 100%{opacity:0;transform:translateY(100vh) rotate(720deg)} }
 
+    /* ── IQ Unlock Overlay ── */
+    .iq-unlock {
+      position: fixed; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: rgba(30,18,8,0.92); z-index: 350;
+      opacity: 0; pointer-events: none; transition: opacity 0.4s; padding: 24px;
+    }
+    .iq-unlock.show { opacity: 1; pointer-events: all; }
+    .unlock-mascot { font-size: 48px; margin-bottom: 6px; }
+    .unlock-label { font-size: 11px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--tan); margin-bottom: 4px; }
+    .unlock-iq { font-size: 88px; font-weight: 900; color: var(--gold); text-shadow: 0 6px 0 var(--gold-dark), 0 0 50px rgba(255,200,0,0.4); line-height: 1; animation: iqReveal 0.6s cubic-bezier(0.34,1.56,0.64,1) both; }
+    @keyframes iqReveal { 0%{transform:scale(0.4);opacity:0} 100%{transform:scale(1);opacity:1} }
+    .unlock-ci { font-size: 13px; font-weight: 700; color: var(--blue); margin-top: 4px; }
+    .unlock-arc { width: 220px; height: 110px; margin: 8px 0; }
+    .unlock-sub { font-size: 14px; font-weight: 700; color: var(--tan); margin-bottom: 20px; line-height: 1.5; text-align: center; max-width: 300px; }
+    .unlock-btn { background: var(--green); color: #fff; border: none; border-radius: 16px; padding: 14px 40px; font-family: 'Nunito', sans-serif; font-size: 17px; font-weight: 900; cursor: pointer; box-shadow: 0 5px 0 var(--green-dark); text-transform: uppercase; }
+    .unlock-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--green-dark); }
+
     /* ── Modals ── */
     .modal { position:fixed; inset:0; background:rgba(58,41,24,0.92); display:none; align-items:center; justify-content:center; z-index:300; padding:20px; }
     .modal.show { display:flex; }
@@ -389,8 +415,20 @@
       <span class="val" id="streak-val">0</span>
       <span class="lbl">streak</span>
     </div>
+    <div class="stat-pill">
+      <span class="val" id="xp-val">0</span>
+      <span class="lbl">XP</span>
+    </div>
   </div>
-  <div class="xp-wrap">
+  <div class="conf-row">
+    <span class="conf-label">IQ Range</span>
+    <div class="conf-bar-outer" id="conf-bar">
+      <div class="conf-bar-range" id="conf-range" style="left:20%;width:60%;"></div>
+      <div class="conf-bar-needle" id="conf-needle" style="left:50%;"></div>
+    </div>
+    <span class="conf-text" id="conf-text">Estimating…</span>
+  </div>
+  <div class="xp-wrap" style="margin-top:4px;">
     <span class="xp-label" id="level-label">Lvl 1</span>
     <div class="xp-bar-outer"><div class="xp-bar-inner" id="xp-bar" style="width:0%"></div></div>
     <span class="xp-label" id="xp-label">0/150</span>
@@ -427,6 +465,17 @@
 
 <div class="flash" id="flash"></div>
 <div class="confetti" id="confetti"></div>
+
+<!-- IQ Unlock Overlay (shown after 5 questions) -->
+<div class="iq-unlock" id="iq-unlock">
+  <div class="unlock-mascot">🧠</div>
+  <div class="unlock-label">First IQ Estimate</div>
+  <div class="unlock-iq" id="unlock-iq-val">100</div>
+  <div class="unlock-ci" id="unlock-ci">±20 pts (95% CI)</div>
+  <canvas class="unlock-arc" id="unlock-arc" width="440" height="220"></canvas>
+  <div class="unlock-sub" id="unlock-sub">Keep training to narrow your estimate!</div>
+  <button class="unlock-btn" id="unlock-continue">Keep Training →</button>
+</div>
 
 <div id="push-prompt">
   <div class="pp-title">🦌 Daily brain reminders?</div>
@@ -492,7 +541,7 @@
 <script src="games/mathRush.js"></script>
 
 <script type="module">
-  import { IQData, getEncouragement } from './data.js';
+  import { IQData, IRT, getEncouragement, iqToPercentile } from './data.js';
   import Haptics from './haptics.js';
 
   if (window.parent !== window) parent.authCheck();
@@ -516,11 +565,16 @@
   const xpBar       = document.getElementById('xp-bar');
   const levelLabel  = document.getElementById('level-label');
   const xpLabel     = document.getElementById('xp-label');
+  const xpVal       = document.getElementById('xp-val');
   const tasksBadge  = document.getElementById('tasks-badge');
+  const confRange   = document.getElementById('conf-range');
+  const confNeedle  = document.getElementById('conf-needle');
+  const confText    = document.getElementById('conf-text');
 
-  // ── Session stats ──
+  const UNLOCK_AT   = 5;  // questions before first IQ reveal
   const SESSION_KEY = 'bd_session_today';
 
+  // ── Task plumbing (unchanged from original) ──
   let _tasksUid = null;
   let _tasksDb  = null;
 
@@ -541,9 +595,7 @@
     return `${n.getFullYear()}-${n.getMonth() + 1}-${n.getDate()}`;
   }
 
-  function updateTasksBadge() {
-    tasksBadge.classList.add('show');
-  }
+  function updateTasksBadge() { tasksBadge.classList.add('show'); }
 
   const TASK_POOL = [
     { id: 'streak_5',       type: 'streak',   target: 5,   label: 'Get a streak of 5',          icon: '🔥', xp: 30  },
@@ -606,10 +658,7 @@
       await ref.set(fresh);
       _taskStateCache = fresh;
       return fresh;
-    } catch (e) {
-      console.warn('[tasks] loadTaskState failed', e);
-      return null;
-    }
+    } catch (e) { console.warn('[tasks] loadTaskState failed', e); return null; }
   }
 
   function saveTaskState(state) {
@@ -716,38 +765,92 @@
       d.level = Math.floor(d.xp / 150) + 1;
       IQData.save(d);
       IQData._maybeSync && IQData._maybeSync();
-      updateUI({ xp: d.xp, level: d.level, xpGain: xp, leveledUp: false, streak: d.streak, iq: d.iq });
+      updateUI({ xp: d.xp, level: d.level, xpGain: xp, leveledUp: false, streak: d.streak, iq: d.iq, irt: d.irt });
     } catch (e) { console.warn('[improve] xpAwarded handler failed', e); }
   });
 
-  // ─────────────────────────────────────────────────────────────────
-  // PERFORMANCE-OPTIMISED FEED ENGINE
-  //
-  // Key changes vs original:
-  //  1. QUEUE_TARGET reduced to 8 (generate just-in-time, not upfront)
-  //  2. fillQueue is chunked via requestIdleCallback so it never
-  //     blocks the main thread / scroll animation
-  //  3. Scroll handler is throttled with rAF (max once per frame)
-  //  4. Pruned slides are REPLACED with lightweight spacer divs —
-  //     this actually frees memory instead of just hiding nodes
-  //  5. No setInterval polling — replaced by IntersectionObserver only
-  //  6. Slide count cap: only keep MAX_DOM_SLIDES real nodes live at once
-  // ─────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────
+  // CONFIDENCE BAND UPDATE
+  // ─────────────────────────────────────────────────────────
+  function iqToBarPct(iq) {
+    return Math.max(2, Math.min(98, ((iq - 55) / 105) * 100));
+  }
 
-  const QUEUE_TARGET   = 8;   // small buffer — fill lazily
-  const KEEP_BEHIND    = 3;   // real slides to keep behind viewport
-  const KEEP_AHEAD     = 6;   // real slides to keep ahead of viewport
-  const MAX_DOM_SLIDES = KEEP_BEHIND + KEEP_AHEAD + 1; // ~10 real nodes max
+  function updateConfidenceBand(d) {
+    if (!d) d = IQData.load();
+    const ci  = IQData.getIQConfidenceInterval();
+    const pL  = iqToBarPct(ci.low);
+    const pH  = iqToBarPct(ci.high);
+    const pM  = iqToBarPct(ci.iq || 100);
 
-  let slides       = 0;        // total slides ever created (grows forever)
-  let firstSlide   = 0;        // lowest slide index still in DOM as real slide
+    confRange.style.left  = pL + '%';
+    confRange.style.width = (pH - pL) + '%';
+    confNeedle.style.left = pM + '%';
+
+    if ((d.answered || 0) < UNLOCK_AT) {
+      confText.textContent = `${d.answered || 0}/${UNLOCK_AT} to unlock`;
+    } else {
+      confText.textContent = `±${ci.se}`;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // IQ UNLOCK OVERLAY
+  // ─────────────────────────────────────────────────────────
+  function showIQUnlock() {
+    const ci  = IQData.getIQConfidenceInterval();
+    const pct = iqToPercentile(ci.iq);
+
+    document.getElementById('unlock-iq-val').textContent = ci.iq;
+    document.getElementById('unlock-ci').textContent = `±${ci.se} pts (95% confidence interval)`;
+    document.getElementById('unlock-sub').textContent =
+      `You score better than ~${pct}% of people. Every question narrows your estimate — the band above gets tighter as you train.`;
+
+    // Draw arc
+    const canvas = document.getElementById('unlock-arc');
+    const ctx    = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    const cx = W/2, cy = H - 8, r = H - 18;
+    ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, 0);
+    ctx.strokeStyle = '#6b4f32'; ctx.lineWidth = 16; ctx.lineCap = 'round'; ctx.stroke();
+    const t = Math.max(0, Math.min(1, (ci.iq - 55) / 105));
+    const angle = Math.PI + t * Math.PI;
+    const grad = ctx.createLinearGradient(0, cy, W, cy);
+    grad.addColorStop(0, '#ea2b2b'); grad.addColorStop(0.5, '#ffc800'); grad.addColorStop(1, '#1cb0f6');
+    ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, angle);
+    ctx.strokeStyle = grad; ctx.lineWidth = 16; ctx.lineCap = 'round'; ctx.stroke();
+    const nx = cx + r * Math.cos(angle), ny = cy + r * Math.sin(angle);
+    ctx.beginPath(); ctx.arc(nx, ny, 9, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffc800'; ctx.fill();
+    ctx.font = 'bold 14px Nunito, sans-serif'; ctx.fillStyle = '#c2a476';
+    ctx.textAlign = 'left'; ctx.fillText('55', 8, H - 4);
+    ctx.textAlign = 'right'; ctx.fillText('160', W - 8, H - 4);
+
+    spawnConfetti(30);
+    document.getElementById('iq-unlock').classList.add('show');
+  }
+
+  document.getElementById('unlock-continue').addEventListener('click', () => {
+    Haptics.medium();
+    document.getElementById('iq-unlock').classList.remove('show');
+  });
+
+  // ─────────────────────────────────────────────────────────
+  // FEED ENGINE (same optimised engine as original)
+  // ─────────────────────────────────────────────────────────
+  const QUEUE_TARGET = 8;
+  const KEEP_BEHIND  = 3;
+  const KEEP_AHEAD   = 6;
+
+  let slides       = 0;
+  let firstSlide   = 0;
   let answerStart  = 0;
 
   const questionQueue = [];
   let _filling        = false;
   let _fillScheduled  = false;
 
-  // Chunk-fill via rIC so it never janks scroll
   function scheduleFill() {
     if (_fillScheduled) return;
     _fillScheduled = true;
@@ -758,25 +861,18 @@
       try {
         let safety = 0;
         while (questionQueue.length < QUEUE_TARGET) {
-          if (++safety > QUEUE_TARGET * 4) { console.warn('[BrainDeer] fillQueue safety'); break; }
-          // Use deadline if available so we don't overrun the idle window
+          if (++safety > QUEUE_TARGET * 4) break;
           if (deadline && deadline.timeRemaining && deadline.timeRemaining() < 2 && questionQueue.length >= 3) break;
           try {
             const weakCat = IQData.getWeakestCategory();
             const diff    = weakCat ? IQData.getDifficulty(weakCat) : 1.0;
             const q       = Q.generate(diff);
             if (q) questionQueue.push(q);
-          } catch (e) {
-            console.warn('[BrainDeer] Q.generate error:', e);
-          }
+          } catch (e) { console.warn('[BrainDeer] Q.generate error:', e); }
         }
-      } finally {
-        _filling = false;
-      }
-      // If still below target, schedule another fill
+      } finally { _filling = false; }
       if (questionQueue.length < QUEUE_TARGET) scheduleFill();
     };
-
     if (typeof requestIdleCallback === 'function') {
       requestIdleCallback(doFill, { timeout: 300 });
     } else {
@@ -786,27 +882,18 @@
 
   function nextQuestion() {
     if (questionQueue.length === 0) {
-      // Synchronous fallback — generate one right now so scroll never stalls
-      try {
-        const q = Q.generate(1.0);
-        scheduleFill(); // replenish async
-        return q;
-      } catch(e) { return null; }
+      try { const q = Q.generate(1.0); scheduleFill(); return q; } catch(e) { return null; }
     }
     const q = questionQueue.shift();
     if (questionQueue.length < Math.ceil(QUEUE_TARGET / 2)) scheduleFill();
     return q;
   }
 
-  // ── rAF-throttled scroll handler ──
   let _rafPending = false;
   function onFeedScroll() {
     if (_rafPending) return;
     _rafPending = true;
-    requestAnimationFrame(() => {
-      _rafPending = false;
-      handleScroll();
-    });
+    requestAnimationFrame(() => { _rafPending = false; handleScroll(); });
   }
 
   let _lastAnimatedSlide = -1;
@@ -814,26 +901,17 @@
     const slideH = feed.clientHeight;
     if (!slideH) return;
     const currentSlide = Math.floor((feed.scrollTop + slideH * 0.5) / slideH);
-    // Add slides ahead
     const targetSlides = currentSlide + KEEP_AHEAD + 1;
     while (slides < targetSlides) addSlide();
-    // Prune old slides
     pruneSlides(currentSlide);
-    // Replenish queue if low
     if (questionQueue.length < Math.ceil(QUEUE_TARGET / 2)) scheduleFill();
-    // Fire enter animation when landing on a new slide
     if (currentSlide !== _lastAnimatedSlide) {
       _lastAnimatedSlide = currentSlide;
       const el = feed.querySelector(`.slide[data-slide-idx="${currentSlide}"]`);
-      if (el) {
-        el.classList.remove('entering');
-        void el.offsetWidth; // force reflow so animation restarts
-        el.classList.add('entering');
-      }
+      if (el) { el.classList.remove('entering'); void el.offsetWidth; el.classList.add('entering'); }
     }
   }
 
-  // ── IntersectionObserver sentinel (bottom of feed) ──
   let _sentinel = null;
   function attachSentinel() {
     if (_sentinel) _sentinel.remove();
@@ -850,21 +928,27 @@
     obs.observe(_sentinel);
   }
 
-  // ── Real DOM pruning — replace with spacer divs ──
   function pruneSlides(currentSlide) {
     const cutoff = currentSlide - KEEP_BEHIND;
     if (cutoff <= firstSlide) return;
-
     for (let idx = firstSlide; idx < cutoff; idx++) {
       const el = feed.querySelector(`.slide[data-slide-idx="${idx}"]`);
       if (!el) continue;
-      // Replace real slide with a cheap spacer of identical height
       const spacer = document.createElement('div');
       spacer.className = 'slide-spacer';
       spacer.dataset.slideIdx = idx;
       feed.replaceChild(spacer, el);
     }
     firstSlide = cutoff;
+  }
+
+  function diffDots(b) {
+    const level  = Math.round(((b + 2) / 4.5) * 4) + 1;
+    const capped = Math.max(1, Math.min(5, level));
+    const hard   = b > 1.2;
+    return `<div class="diff-dots">${[1,2,3,4,5].map(i =>
+      `<div class="diff-dot${i <= capped ? ' lit' + (hard ? ' hard' : '') : ''}"></div>`
+    ).join('')}</div>`;
   }
 
   function addSlide() {
@@ -874,7 +958,7 @@
     div.dataset.slideIdx = idx;
 
     let q = null;
-    try { q = nextQuestion(); } catch(e) { console.warn('[BrainDeer] nextQuestion threw:', e); }
+    try { q = nextQuestion(); } catch(e) {}
 
     if (!q) {
       div.innerHTML = renderFallback(idx);
@@ -886,12 +970,8 @@
       const customRenderer = Q._renderers && Q._renderers[q.type];
       if (customRenderer) {
         div.innerHTML = customRenderer.render(q, idx);
-        // Insert before sentinel if it exists, otherwise just append
-        if (_sentinel && _sentinel.parentNode === feed) {
-          feed.insertBefore(div, _sentinel);
-        } else {
-          feed.appendChild(div);
-        }
+        if (_sentinel && _sentinel.parentNode === feed) feed.insertBefore(div, _sentinel);
+        else feed.appendChild(div);
         try {
           customRenderer.attach(div, q, idx, {
             feed, flashEl, confettiEl, IQData, getEncouragement,
@@ -901,37 +981,23 @@
             notifyGamePlayed: window.notifyGamePlayed,
             onAnswer: window.onAnswerForTasks,
           });
-        } catch (e) {
-          console.warn('[BrainDeer] attach failed for type:', q.type, e);
-        }
+        } catch (e) { console.warn('[BrainDeer] attach failed for type:', q.type, e); }
       } else {
         div.innerHTML = renderDefault(q, idx);
-        if (_sentinel && _sentinel.parentNode === feed) {
-          feed.insertBefore(div, _sentinel);
-        } else {
-          feed.appendChild(div);
-        }
+        if (_sentinel && _sentinel.parentNode === feed) feed.insertBefore(div, _sentinel);
+        else feed.appendChild(div);
       }
     } catch (e) {
-      console.warn('[BrainDeer] render failed for type:', q && q.type, e);
       div.innerHTML = renderFallback(idx);
-      if (_sentinel && _sentinel.parentNode === feed) {
-        feed.insertBefore(div, _sentinel);
-      } else {
-        feed.appendChild(div);
-      }
+      if (_sentinel && _sentinel.parentNode === feed) feed.insertBefore(div, _sentinel);
+      else feed.appendChild(div);
     }
 
     answerStart = Date.now();
   }
 
   function renderFallback(idx) {
-    return `
-      <div class="qcard">
-        <div class="category">Brain Training</div>
-        <div class="question">Keep scrolling — more challenges ahead! 🦌</div>
-        <div class="branding">braindeer.org</div>
-      </div>`;
+    return `<div class="qcard"><div class="category">Brain Training</div><div class="question">Keep scrolling — more challenges ahead! 🦌</div><div class="branding">braindeer.org</div></div>`;
   }
 
   function renderDefault(q, idx) {
@@ -950,17 +1016,33 @@
         `<div class="matrix-cell${c === '?' ? ' blank' : ''}">${c}</div>`
       ).join('')}</div>`;
     }
+
+    // IRT params: use q.irt if present, else derive from q.difficulty
+    const irtA = q.irt?.a ?? 1.2;
+    const irtB = q.irt?.b ?? ((q.difficulty || 1.0) - 1.0) * 2;
+    const irtC = q.irt?.c ?? 0.25;
+    const irtId = q.irt?.id ?? q.id ?? '';
+
     const wide = q.options.some(o => String(o).length > 20);
     return `
       <div class="qcard">
-        <div class="category">${q.categoryLabel}</div>
+        <div class="diff-row">
+          <span class="diff-lbl">Difficulty</span>
+          ${diffDots(irtB)}
+          <div class="diff-spacer"></div>
+          <div class="category">${q.categoryLabel}</div>
+        </div>
         <div class="question">${q.question}</div>
         ${visual}
-        <div class="options${wide ? ' wide' : ''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">
+        <div class="options${wide ? ' wide' : ''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}"
+             data-irt-a="${irtA}" data-irt-b="${irtB}" data-irt-c="${irtC}" data-irt-id="${esc(irtId)}">
           ${q.options.map(o => `<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}
         </div>
-        <div class="feedback" id="fb-${idx}"></div>
-        <div class="explain"  id="exp-${idx}">${q.explanation}</div>
+        <div class="feedback-row">
+          <div class="feedback" id="fb-${idx}"></div>
+          <div class="iq-delta" id="delta-${idx}"></div>
+        </div>
+        <div class="explain" id="exp-${idx}">${q.explanation}</div>
         <div class="branding">braindeer.org</div>
       </div>
       <div class="scroll-hint" id="hint-${idx}">
@@ -982,13 +1064,22 @@
     const isCorrect = btn.dataset.v === correct;
     const ms        = Date.now() - answerStart;
 
+    // IRT params from data attributes
+    const irtParams = {
+      a:  parseFloat(opts.dataset.irtA),
+      b:  parseFloat(opts.dataset.irtB),
+      c:  parseFloat(opts.dataset.irtC),
+      id: opts.dataset.irtId || '',
+    };
+
     opts.querySelectorAll('.opt').forEach(o => {
       if      (o.dataset.v === correct) o.classList.add(isCorrect ? 'correct' : 'show-correct');
       else if (o === btn)               o.classList.add('wrong');
       else                              o.classList.add('dim');
     });
 
-    const result = IQData.recordAnswer(opts.dataset.cat, isCorrect, parseFloat(opts.dataset.diff), ms);
+    const prevIQ = IQData.load().iq;
+    const result = IQData.recordAnswer(opts.dataset.cat, isCorrect, irtParams, ms);
 
     if (isCorrect) {
       if (result.streak > 0 && result.streak % 5 === 0) Haptics.streak();
@@ -1002,6 +1093,16 @@
     fb.textContent = getEncouragement(result.streak, isCorrect);
     fb.className   = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
 
+    // IQ delta badge
+    if (result.answered >= UNLOCK_AT && result.iq) {
+      const delta = result.iq - (prevIQ || result.iq);
+      const dEl   = document.getElementById(`delta-${idx}`);
+      if (dEl && Math.abs(delta) >= 1) {
+        dEl.textContent = (delta > 0 ? '+' : '') + delta + ' IQ';
+        dEl.className   = `iq-delta show ${delta > 0 ? 'up' : 'dn'}`;
+      }
+    }
+
     if (isCorrect) { flashEl.className = 'flash green show'; spawnConfetti(8); }
     else           { flashEl.className = 'flash red show'; }
     setTimeout(() => flashEl.className = 'flash', 350);
@@ -1013,6 +1114,11 @@
         spawnConfetti(25);
         setTimeout(() => streakPopup.classList.remove('show'), 1800);
       }, 300);
+    }
+
+    // IQ unlock reveal
+    if (result.answered === UNLOCK_AT) {
+      setTimeout(() => showIQUnlock(), 600);
     }
 
     const session = updateSessionStats(isCorrect, ms);
@@ -1037,16 +1143,16 @@
   });
 
   const CAL_QUESTIONS = [
-    { q:'What comes next? 2, 6, 18, 54, ?', a:'162', w:['108','126','148'], cat:'patternRecognition', d:1.2 },
-    { q:'If all Bloops are Razzies, and all Razzies are Lazzies, are all Bloops Lazzies?', a:'Yes', w:['No','Maybe','Not enough info'], cat:'logicalReasoning', d:1.1 },
-    { q:'Hot is to Cold as Up is to _____', a:'Down', w:['High','Sky','Top'], cat:'verbalReasoning', d:0.6 },
-    { q:'(7 × 8) − 13 = ?', a:'43', w:['42','45','49'], cat:'mentalAgility', d:1.0 },
-    { q:"Which doesn't belong? Cello, Flute, Violin, Harp", a:'Flute', w:['Cello','Violin','Harp'], cat:'logicalReasoning', d:1.0 },
+    { q:'What comes next? 2, 6, 18, 54, ?', a:'162', w:['108','126','148'], cat:'patternRecognition', irt:{a:1.5,b:1.2,c:0.25} },
+    { q:'If all Bloops are Razzies, and all Razzies are Lazzies, are all Bloops Lazzies?', a:'Yes', w:['No','Maybe','Not enough info'], cat:'logicalReasoning', irt:{a:1.8,b:0.5,c:0.25} },
+    { q:'Hot is to Cold as Up is to _____', a:'Down', w:['High','Sky','Top'], cat:'verbalReasoning', irt:{a:1.0,b:-2.0,c:0.25} },
+    { q:'(7 × 8) − 13 = ?', a:'43', w:['42','45','49'], cat:'mentalAgility', irt:{a:1.5,b:-0.4,c:0.25} },
+    { q:"Which doesn't belong? Cello, Flute, Violin, Harp", a:'Flute', w:['Cello','Violin','Harp'], cat:'logicalReasoning', irt:{a:1.1,b:-1.4,c:0.25} },
   ];
-  let calIdx = 0, calCorrect = 0;
+  let calIdx = 0, calResponses = [];
 
   function startCalibration() {
-    calIdx = 0; calCorrect = 0;
+    calIdx = 0; calResponses = [];
     document.getElementById('calibration').classList.add('show');
     document.getElementById('cal-quiz').style.display = 'block';
     document.getElementById('cal-result').style.display = 'none';
@@ -1076,15 +1182,17 @@
     if (par.dataset.done) return;
     par.dataset.done = '1';
     const ok = btn.dataset.v === btn.dataset.ans;
-    if (ok) { calCorrect++; Haptics.success(); } else { Haptics.error(); }
+    if (ok) Haptics.success(); else Haptics.error();
     par.querySelectorAll('.cal-opt').forEach(o => {
       if (o.dataset.v === btn.dataset.ans) o.classList.add('correct');
       else if (o === btn) o.classList.add('wrong');
       else o.classList.add('dim');
     });
+    const cq = CAL_QUESTIONS[calIdx];
+    calResponses.push({ a: cq.irt.a, b: cq.irt.b, c: cq.irt.c, correct: ok });
+    IQData.recordAnswer(cq.cat, ok, cq.irt, 5000);
     const dot = document.getElementById('cal-dot-' + calIdx);
     dot.classList.remove('active'); dot.classList.add(ok ? 'done' : 'wrong-dot');
-    IQData.recordAnswer(CAL_QUESTIONS[calIdx].cat, ok, CAL_QUESTIONS[calIdx].d, 5000);
     setTimeout(() => {
       calIdx++;
       if (calIdx >= CAL_QUESTIONS.length) showCalResult();
@@ -1092,8 +1200,11 @@
     }, 800);
   });
   function showCalResult() {
-    const iq = Math.max(75, Math.min(130, 85 + Math.round(calCorrect / CAL_QUESTIONS.length * 30)));
+    // Use IRT estimate from calibration responses
+    const est = IRT.estimate(calResponses, 0);
+    const iq  = IRT.thetaToIQ(est.theta);
     IQData.markCalibrated(iq);
+    document.getElementById('cal-iq').textContent = iq;
     document.getElementById('cal-quiz').style.display = 'none';
     document.getElementById('cal-result').style.display = 'block';
     Haptics.levelUp();
@@ -1108,6 +1219,7 @@
   function init() {
     const d = IQData.load();
     updateUI(d);
+    updateConfidenceBand(d);
     updateTasksBadge();
     if      (IQData.needsOnboarding())  { onboard.classList.add('show'); }
     else if (IQData.needsCalibration()) { Q.setAge(d.age); startCalibration(); }
@@ -1119,50 +1231,32 @@
     Q.setAge(d.age || 25);
     IQData.startSession();
     updateUI(d);
-
-    // Seed queue with just a few questions upfront — rest fills lazily
     scheduleFill();
-
-    // Render initial batch (small — just enough to fill screen + 1 ahead)
     for (let i = 0; i < 3; i++) addSlide();
 
     feed.addEventListener('scroll',    onFeedScroll, { passive: true });
     feed.addEventListener('touchmove', onFeedScroll, { passive: true });
 
-    // ── TikTok-style wheel: one slide per scroll tick ──
-    let _wheelLocked   = false;
-    let _wheelCooldown = null;
+    let _wheelLocked = false, _wheelCooldown = null;
     feed.addEventListener('wheel', (e) => {
       e.preventDefault();
-
       if (_wheelLocked) return;
       _wheelLocked = true;
-
       const slideH       = feed.clientHeight;
       const currentSlide = Math.round(feed.scrollTop / slideH);
       const dir          = e.deltaY > 0 ? 1 : -1;
       const targetSlide  = Math.max(0, currentSlide + dir);
-
       feed.scrollTo({ top: targetSlide * slideH, behavior: 'smooth' });
-
-      // Fire enter animation on the destination slide after scroll settles
       clearTimeout(_wheelCooldown);
       _wheelCooldown = setTimeout(() => {
         _wheelLocked = false;
         const el = feed.querySelector(`.slide[data-slide-idx="${targetSlide}"]`);
-        if (el) {
-          el.classList.remove('entering');
-          void el.offsetWidth;
-          el.classList.add('entering');
-          _lastAnimatedSlide = targetSlide;
-        }
+        if (el) { el.classList.remove('entering'); void el.offsetWidth; el.classList.add('entering'); _lastAnimatedSlide = targetSlide; }
       }, 380);
     }, { passive: false });
 
     attachSentinel();
     setTimeout(maybeShowPushPrompt, 3000);
-
-    // Kick off first real fill now that feed is visible
     scheduleFill();
   }
 
@@ -1184,13 +1278,28 @@
   }
 
   function updateUI(d) {
-    iqVal.textContent = d.iq || '--';
+    const iq = d.iq || (d.answered >= UNLOCK_AT ? IQData.calcIQ(d) : null);
+
+    // IQ value with bump animation
+    const oldIQ = iqVal.textContent;
+    const newIQ = iq || '--';
+    if (String(newIQ) !== String(oldIQ)) {
+      iqVal.textContent = newIQ;
+      iqVal.classList.remove('bump');
+      void iqVal.offsetWidth;
+      iqVal.classList.add('bump');
+    }
+
     if (d.streak > 0) { streakPill.style.display = 'flex'; streakVal.textContent = d.streak; }
     else              { streakPill.style.display = 'none'; }
-    const xpInLevel  = d.xp % 150;
+
+    const xpInLevel        = d.xp % 150;
     xpBar.style.width      = (xpInLevel / 150 * 100) + '%';
     levelLabel.textContent = 'Lvl ' + d.level;
     xpLabel.textContent    = xpInLevel + '/150';
+    xpVal.textContent      = d.xp || 0;
+
+    updateConfidenceBand(d);
   }
 
   // ── Push ──
@@ -1225,9 +1334,7 @@
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
       });
       window.parent.postMessage({ type: 'savePushSub', sub: sub.toJSON() }, '*');
-    } catch (err) {
-      console.error('BrainDeer: push setup failed', err);
-    }
+    } catch (err) { console.error('BrainDeer: push setup failed', err); }
   }
   function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
