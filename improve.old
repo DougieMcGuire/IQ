@@ -51,17 +51,27 @@
       height: calc(64px + env(safe-area-inset-bottom, 0px));
       background: var(--card); box-shadow: 0 -3px 0 rgba(0,0,0,0.15);
       display: flex; justify-content: center; align-items: flex-start;
-      padding-top: 6px; gap: 6px; z-index: 100;
+      padding-top: 6px; gap: 4px; z-index: 100;
     }
     .nav-btn {
-      padding: 8px 28px; background: none; border: none;
+      padding: 8px 18px; background: none; border: none;
       display: flex; flex-direction: column; align-items: center; gap: 2px;
       color: var(--brown-light); font-family: 'Nunito', sans-serif;
-      font-size: 12px; font-weight: 800; border-radius: 14px;
-      transition: all 0.15s; cursor: pointer;
+      font-size: 11px; font-weight: 800; border-radius: 14px;
+      transition: all 0.15s; cursor: pointer; position: relative;
     }
     .nav-btn svg { width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
     .nav-btn.active { color:var(--cream); background:var(--brown-mid); box-shadow:0 3px 0 rgba(0,0,0,0.15); }
+
+    /* Tasks badge */
+    .nav-badge {
+      position: absolute; top: 5px; right: 12px;
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--red); border: 2px solid var(--card);
+      display: none; animation: badgePulse 2s ease infinite;
+    }
+    .nav-badge.show { display: block; }
+    @keyframes badgePulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.35)} }
 
     /* ── Feed ── */
     main {
@@ -82,6 +92,16 @@
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       padding: 12px 16px;
+    }
+
+    /* Pruned spacer — same height, zero render cost */
+    .slide-spacer {
+      height: calc(100dvh - 78px - 64px - env(safe-area-inset-bottom, 0px));
+      min-height: 0;
+      flex-shrink: 0;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      contain: strict;
     }
 
     /* ── Card ── */
@@ -138,251 +158,160 @@
     @keyframes slideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
     .scroll-hint { margin-top:8px; font-size:13px; font-weight:800; color:var(--brown-light); opacity:0; display:flex; flex-direction:column; align-items:center; gap:2px; transition:opacity 0.3s; }
+    @keyframes slideEnter { 0%{opacity:0;transform:translateY(28px) scale(0.96)} 100%{opacity:1;transform:translateY(0) scale(1)} }
+    .slide.entering .qcard { animation:slideEnter 0.35s cubic-bezier(0.22,1,0.36,1) both; }
     .scroll-hint.show { opacity:0.5; }
     .scroll-hint svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2.5; animation:bounce 1.5s infinite; }
     @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
 
-    /* ══════════════════════════════════════
-       WORDLE STYLES
-    ══════════════════════════════════════ */
-    .wordle-grid { display: flex; flex-direction: column; gap: 5px; margin: 2px 0; }
-    .wordle-row { display: flex; gap: 5px; }
+    /* ══ WORDLE ══ */
+    .wordle-grid { display:flex; flex-direction:column; gap:5px; margin:2px 0; }
+    .wordle-row { display:flex; gap:5px; }
     .wordle-tile {
-      width: clamp(42px, 11.5vw, 52px); height: clamp(42px, 11.5vw, 52px);
-      border-radius: 10px; background: var(--bg); border: 2.5px solid var(--brown-mid);
-      display: flex; align-items: center; justify-content: center;
-      font-size: clamp(18px, 5vw, 22px); font-weight: 900; color: var(--cream);
-      transition: border-color 0.08s; perspective: 250px;
+      width:clamp(42px,11.5vw,52px); height:clamp(42px,11.5vw,52px);
+      border-radius:10px; background:var(--bg); border:2.5px solid var(--brown-mid);
+      display:flex; align-items:center; justify-content:center;
+      font-size:clamp(18px,5vw,22px); font-weight:900; color:var(--cream);
+      transition:border-color 0.08s;
     }
-    .wordle-tile.has-letter  { border-color: var(--tan); animation: wtPop 0.08s ease; }
-    .wordle-tile.reveal-correct { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 0 3px 0 var(--green-dark); }
-    .wordle-tile.reveal-present { background: var(--gold); border-color: var(--gold); color: #2a1800; box-shadow: 0 3px 0 var(--gold-dark); }
-    .wordle-tile.reveal-absent  { background: var(--brown-mid); border-color: var(--brown-mid); color: var(--tan); }
-    .wordle-tile.shake { animation: wtShake 0.4s ease; }
+    .wordle-tile.has-letter  { border-color:var(--tan); animation:wtPop 0.08s ease; }
+    .wordle-tile.reveal-correct { background:var(--green); border-color:var(--green); color:#fff; box-shadow:0 3px 0 var(--green-dark); }
+    .wordle-tile.reveal-present { background:var(--gold); border-color:var(--gold); color:#2a1800; box-shadow:0 3px 0 var(--gold-dark); }
+    .wordle-tile.reveal-absent  { background:var(--brown-mid); border-color:var(--brown-mid); color:var(--tan); }
+    .wordle-tile.shake { animation:wtShake 0.4s ease; }
     @keyframes wtPop   { 0%{transform:scale(1)} 40%{transform:scale(1.14)} 100%{transform:scale(1)} }
     @keyframes wtShake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-7px)} 40%,80%{transform:translateX(7px)} }
-    @keyframes wtFlipIn  { 0%{transform:rotateX(0)} 100%{transform:rotateX(-90deg)} }
-    @keyframes wtFlipOut { 0%{transform:rotateX(90deg)} 100%{transform:rotateX(0)} }
-
-    .wordle-msg { font-size: 13px; font-weight: 800; color: var(--tan); min-height: 18px; text-align: center; transition: color 0.2s; }
-    .wordle-msg.error   { color: var(--red); animation: wtShake 0.3s ease; }
-    .wordle-msg.success { color: var(--green); }
-
-    .wordle-kb { display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 340px; }
-    .wordle-kb-row { display: flex; gap: 5px; justify-content: center; }
+    .wordle-msg { font-size:13px; font-weight:800; color:var(--tan); min-height:18px; text-align:center; transition:color 0.2s; }
+    .wordle-msg.error   { color:var(--red); animation:wtShake 0.3s ease; }
+    .wordle-msg.success { color:var(--green); }
+    .wordle-kb { display:flex; flex-direction:column; gap:6px; width:100%; max-width:340px; }
+    .wordle-kb-row { display:flex; gap:5px; justify-content:center; }
     .wk {
-      height: 44px; flex: 1; min-width: 0; max-width: 36px;
-      border: none; border-radius: 8px; background: var(--brown-mid); color: var(--cream);
-      font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 900; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.22);
-      transition: background 0.25s, color 0.25s, box-shadow 0.25s;
-      position: relative; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent;
+      height:44px; flex:1; min-width:0; max-width:36px;
+      border:none; border-radius:8px; background:var(--brown-mid); color:var(--cream);
+      font-family:'Nunito',sans-serif; font-size:13px; font-weight:900; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 3px 0 rgba(0,0,0,0.22);
+      transition:background 0.25s, color 0.25s, box-shadow 0.25s;
+      position:relative; overflow:hidden; user-select:none;
     }
     .wk::before { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:linear-gradient(180deg,rgba(255,255,255,0.09)0%,transparent 100%); pointer-events:none; }
-    .wk:active    { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.22); }
-    .wk.wide      { max-width: 52px; font-size: 11px; }
-    .wk.st-correct { background: var(--green); color: #fff; box-shadow: 0 3px 0 var(--green-dark); }
-    .wk.st-present { background: var(--gold); color: #2a1800; box-shadow: 0 3px 0 var(--gold-dark); }
-    .wk.st-absent  { background: #2c1d0e; color: #6b4f32; box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
+    .wk:active    { transform:translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,0.22); }
+    .wk.wide      { max-width:52px; font-size:11px; }
+    .wk.st-correct { background:var(--green); color:#fff; box-shadow:0 3px 0 var(--green-dark); }
+    .wk.st-present { background:var(--gold); color:#2a1800; box-shadow:0 3px 0 var(--gold-dark); }
+    .wk.st-absent  { background:#2c1d0e; color:#6b4f32; box-shadow:0 2px 0 rgba(0,0,0,0.15); }
 
-    /* ══════════════════════════════════════
-       TIC TAC TOE STYLES
-    ══════════════════════════════════════ */
-    .ttt-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 6px; width: clamp(180px, 50vw, 240px);
-      margin: 4px 0;
-    }
+    /* ══ TIC TAC TOE ══ */
+    .ttt-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; width:clamp(180px,50vw,240px); margin:4px 0; }
     .ttt-cell {
-      aspect-ratio: 1; border: none; border-radius: 12px;
-      background: var(--bg); cursor: pointer;
-      font-family: 'Nunito', sans-serif; font-size: clamp(28px, 8vw, 38px);
-      font-weight: 900; color: var(--cream);
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.15);
-      transition: background 0.15s, transform 0.1s;
-      position: relative; overflow: hidden;
+      aspect-ratio:1; border:none; border-radius:12px; background:var(--bg); cursor:pointer;
+      font-family:'Nunito',sans-serif; font-size:clamp(28px,8vw,38px); font-weight:900; color:var(--cream);
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 3px 0 rgba(0,0,0,0.15); transition:background 0.15s,transform 0.1s;
+      position:relative; overflow:hidden;
     }
     .ttt-cell::before { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:linear-gradient(180deg,rgba(255,255,255,0.05)0%,transparent 100%); pointer-events:none; border-radius:12px 12px 0 0; }
-    .ttt-cell:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
-    .ttt-cell.ttt-x { color: var(--blue); }
-    .ttt-cell.ttt-o { color: var(--red); }
-    .ttt-cell.ttt-win { background: var(--green); color: #fff; box-shadow: 0 3px 0 var(--green-dark); animation: pop 0.4s ease; }
-    .ttt-status {
-      font-size: 14px; font-weight: 800; color: var(--tan);
-      min-height: 20px; text-align: center;
-      transition: color 0.2s;
-    }
+    .ttt-cell:active { transform:translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,0.15); }
+    .ttt-cell.ttt-x { color:var(--blue); }
+    .ttt-cell.ttt-o { color:var(--red); }
+    .ttt-cell.ttt-win { background:var(--green); color:#fff; box-shadow:0 3px 0 var(--green-dark); animation:pop 0.4s ease; }
+    .ttt-status { font-size:14px; font-weight:800; color:var(--tan); min-height:20px; text-align:center; transition:color 0.2s; }
 
-    /* ══════════════════════════════════════
-       BRANDING
-    ══════════════════════════════════════ */
-    .branding {
-      text-align: center; font-size: 13px; font-weight: 900;
-      color: var(--tan); letter-spacing: 1.5px; text-transform: uppercase;
-      margin-top: 12px; opacity: 0.9;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-    }
+    /* ══ BRANDING ══ */
+    .branding { text-align:center; font-size:13px; font-weight:900; color:var(--tan); letter-spacing:1.5px; text-transform:uppercase; margin-top:12px; opacity:0.9; text-shadow:0 1px 2px rgba(0,0,0,0.4); }
 
-    /* ══════════════════════════════════════
-       MEMORY MATCH STYLES
-    ══════════════════════════════════════ */
-    .mem-grid { display: grid; gap: 6px; margin: 4px 0; justify-content: center; }
-    .mem-cols-3 { grid-template-columns: repeat(3, 1fr); width: clamp(160px, 45vw, 210px); }
-    .mem-cols-4 { grid-template-columns: repeat(4, 1fr); width: clamp(210px, 55vw, 280px); }
+    /* ══ MEMORY MATCH ══ */
+    .mem-grid { display:grid; gap:6px; margin:4px 0; justify-content:center; }
+    .mem-cols-3 { grid-template-columns:repeat(3,1fr); width:clamp(160px,45vw,210px); }
+    .mem-cols-4 { grid-template-columns:repeat(4,1fr); width:clamp(210px,55vw,280px); }
     .mem-card {
-      aspect-ratio: 1; border: none; border-radius: 10px;
-      background: var(--brown-mid); cursor: pointer;
-      font-size: clamp(20px, 5.5vw, 28px);
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.15);
-      transition: transform 0.3s, background 0.3s;
-      position: relative; user-select: none;
+      aspect-ratio:1; border:none; border-radius:10px; background:var(--brown-mid); cursor:pointer;
+      font-size:clamp(20px,5.5vw,28px); display:flex; align-items:center; justify-content:center;
+      box-shadow:0 3px 0 rgba(0,0,0,0.15); transition:transform 0.3s,background 0.3s;
+      position:relative; user-select:none;
     }
-    .mem-front, .mem-back { position: absolute; backface-visibility: hidden; }
-    .mem-front { color: var(--tan); font-weight: 900; font-size: 18px; }
-    .mem-back { opacity: 0; transition: opacity 0.2s; }
-    .mem-card.mem-flip .mem-front { opacity: 0; }
-    .mem-card.mem-flip .mem-back { opacity: 1; }
-    .mem-card.mem-flip { background: var(--bg); transform: scale(1.05); }
-    .mem-card.mem-matched { background: var(--green); box-shadow: 0 3px 0 var(--green-dark); animation: pop 0.4s ease; }
-    .mem-card.mem-matched .mem-back { opacity: 1; }
-    .mem-card.mem-matched .mem-front { opacity: 0; }
-    .mem-status { font-size: 13px; font-weight: 800; color: var(--tan); min-height: 18px; text-align: center; }
+    .mem-front, .mem-back { position:absolute; backface-visibility:hidden; }
+    .mem-front { color:var(--tan); font-weight:900; font-size:18px; }
+    .mem-back { opacity:0; transition:opacity 0.2s; }
+    .mem-card.mem-flip .mem-front { opacity:0; }
+    .mem-card.mem-flip .mem-back { opacity:1; }
+    .mem-card.mem-flip { background:var(--bg); transform:scale(1.05); }
+    .mem-card.mem-matched { background:var(--green); box-shadow:0 3px 0 var(--green-dark); animation:pop 0.4s ease; }
+    .mem-card.mem-matched .mem-back { opacity:1; }
+    .mem-card.mem-matched .mem-front { opacity:0; }
+    .mem-status { font-size:13px; font-weight:800; color:var(--tan); min-height:18px; text-align:center; }
 
-    /* ══════════════════════════════════════
-       SIMON SAYS STYLES
-    ══════════════════════════════════════ */
-    .simon-grid {
-      display: grid; grid-template-columns: repeat(2, 1fr);
-      gap: 8px; width: clamp(160px, 42vw, 200px); margin: 6px 0;
-    }
-    .simon-pad {
-      aspect-ratio: 1; border: none; border-radius: 16px;
-      cursor: pointer; opacity: 0.45;
-      box-shadow: 0 4px 0 rgba(0,0,0,0.2);
-      transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
-      user-select: none; -webkit-tap-highlight-color: transparent;
-    }
-    .simon-pad:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
-    .simon-pad.simon-lit { opacity: 1; box-shadow: 0 0 20px rgba(255,255,255,0.3); transform: scale(1.06); }
-    .simon-status { font-size: 14px; font-weight: 800; color: var(--tan); min-height: 20px; text-align: center; }
-    .simon-level { font-size: 12px; font-weight: 700; color: var(--brown-mid); text-align: center; }
+    /* ══ SIMON SAYS ══ */
+    .simon-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; width:clamp(160px,42vw,200px); margin:6px 0; }
+    .simon-pad { aspect-ratio:1; border:none; border-radius:16px; cursor:pointer; opacity:0.45; box-shadow:0 4px 0 rgba(0,0,0,0.2); transition:opacity 0.15s,transform 0.1s,box-shadow 0.15s; user-select:none; }
+    .simon-pad:active { transform:translateY(2px); box-shadow:0 2px 0 rgba(0,0,0,0.2); }
+    .simon-pad.simon-lit { opacity:1; box-shadow:0 0 20px rgba(255,255,255,0.3); transform:scale(1.06); }
+    .simon-status { font-size:14px; font-weight:800; color:var(--tan); min-height:20px; text-align:center; }
+    .simon-level  { font-size:12px; font-weight:700; color:var(--brown-mid); text-align:center; }
 
-    /* ══════════════════════════════════════
-       REACTION TIME STYLES
-    ══════════════════════════════════════ */
-    .react-zone { display: flex; justify-content: center; margin: 8px 0; }
+    /* ══ REACTION TIME ══ */
+    .react-zone { display:flex; justify-content:center; margin:8px 0; }
     .react-circle {
-      width: clamp(120px, 32vw, 160px); height: clamp(120px, 32vw, 160px);
-      border-radius: 50%; background: var(--red);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; font-weight: 900; color: #fff;
-      cursor: pointer; user-select: none;
-      box-shadow: 0 6px 0 rgba(0,0,0,0.2);
-      transition: background 0.15s, transform 0.1s;
-      -webkit-tap-highlight-color: transparent;
+      width:clamp(120px,32vw,160px); height:clamp(120px,32vw,160px);
+      border-radius:50%; background:var(--red);
+      display:flex; align-items:center; justify-content:center;
+      font-size:18px; font-weight:900; color:#fff;
+      cursor:pointer; user-select:none;
+      box-shadow:0 6px 0 rgba(0,0,0,0.2); transition:background 0.15s,transform 0.1s;
     }
-    .react-circle:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0,0,0,0.2); }
-    .react-circle.react-go { background: var(--green); animation: pop 0.3s ease; }
-    .react-circle.react-fail { background: var(--red); }
-    .react-circle.react-success { background: var(--green); font-size: 28px; }
-    .react-circle.react-slow { background: var(--gold); color: #2a1800; font-size: 28px; }
-    .react-result { font-size: 14px; font-weight: 800; text-align: center; min-height: 20px; margin-top: 4px; }
+    .react-circle:active { transform:translateY(3px); box-shadow:0 3px 0 rgba(0,0,0,0.2); }
+    .react-circle.react-go { background:var(--green); animation:pop 0.3s ease; }
+    .react-circle.react-fail { background:var(--red); }
+    .react-circle.react-success { background:var(--green); font-size:28px; }
+    .react-circle.react-slow { background:var(--gold); color:#2a1800; font-size:28px; }
+    .react-result { font-size:14px; font-weight:800; text-align:center; min-height:20px; margin-top:4px; }
 
-    /* ══════════════════════════════════════
-       WORD SCRAMBLE STYLES
-    ══════════════════════════════════════ */
-    .ws-hint { font-size: 12px; font-weight: 700; color: var(--gold); text-align: center; margin-bottom: 4px; }
-    .ws-answer, .ws-source { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; margin: 6px 0; }
-    .ws-tile {
-      width: clamp(36px, 9vw, 44px); height: clamp(36px, 9vw, 44px);
-      border-radius: 8px; display: flex; align-items: center; justify-content: center;
-      font-size: clamp(16px, 4.5vw, 20px); font-weight: 900; font-family: 'Nunito', sans-serif;
-      user-select: none;
-    }
-    .ws-src {
-      background: var(--brown-mid); color: var(--cream); border: none; cursor: pointer;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.2); transition: transform 0.1s, opacity 0.2s;
-    }
-    .ws-src:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.2); }
-    .ws-src.ws-used { opacity: 0.25; pointer-events: none; }
-    .ws-slot { background: var(--bg); color: var(--cream); border: 2.5px dashed var(--brown-mid); }
-    .ws-slot.ws-filled { border-style: solid; border-color: var(--tan); cursor: pointer; }
-    .ws-slot.ws-correct { border-color: var(--green); background: var(--green); color: #fff; animation: pop 0.3s ease; }
-    .ws-status { font-size: 13px; font-weight: 800; text-align: center; min-height: 18px; }
-    .ws-shake { animation: wtShake 0.4s ease; }
+    /* ══ WORD SCRAMBLE ══ */
+    .ws-hint { font-size:12px; font-weight:700; color:var(--gold); text-align:center; margin-bottom:4px; }
+    .ws-answer, .ws-source { display:flex; gap:5px; justify-content:center; flex-wrap:wrap; margin:6px 0; }
+    .ws-tile { width:clamp(36px,9vw,44px); height:clamp(36px,9vw,44px); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:clamp(16px,4.5vw,20px); font-weight:900; font-family:'Nunito',sans-serif; user-select:none; }
+    .ws-src { background:var(--brown-mid); color:var(--cream); border:none; cursor:pointer; box-shadow:0 3px 0 rgba(0,0,0,0.2); transition:transform 0.1s,opacity 0.2s; }
+    .ws-src:active { transform:translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,0.2); }
+    .ws-src.ws-used { opacity:0.25; pointer-events:none; }
+    .ws-slot { background:var(--bg); color:var(--cream); border:2.5px dashed var(--brown-mid); }
+    .ws-slot.ws-filled { border-style:solid; border-color:var(--tan); cursor:pointer; }
+    .ws-slot.ws-correct { border-color:var(--green); background:var(--green); color:#fff; animation:pop 0.3s ease; }
+    .ws-status { font-size:13px; font-weight:800; text-align:center; min-height:18px; }
+    .ws-shake { animation:wtShake 0.4s ease; }
 
-    /* ══════════════════════════════════════
-       SLIDE PUZZLE STYLES
-    ══════════════════════════════════════ */
-    .slide-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 4px; width: clamp(150px, 40vw, 195px); margin: 4px 0;
-    }
-    .slide-cell {
-      aspect-ratio: 1; border: none; border-radius: 10px;
-      background: var(--brown-mid); color: var(--cream);
-      font-family: 'Nunito', sans-serif; font-size: clamp(22px, 6vw, 30px); font-weight: 900;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.15);
-      transition: transform 0.12s, background 0.15s;
-    }
-    .slide-cell:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
-    .slide-empty { background: transparent; box-shadow: none; cursor: default; }
-    .slide-cell.slide-win { background: var(--green); color: #fff; box-shadow: 0 3px 0 var(--green-dark); animation: pop 0.4s ease; }
-    .slide-moves { font-size: 13px; font-weight: 800; color: var(--tan); text-align: center; min-height: 18px; }
+    /* ══ SLIDE PUZZLE ══ */
+    .slide-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; width:clamp(150px,40vw,195px); margin:4px 0; }
+    .slide-cell { aspect-ratio:1; border:none; border-radius:10px; background:var(--brown-mid); color:var(--cream); font-family:'Nunito',sans-serif; font-size:clamp(22px,6vw,30px); font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 0 rgba(0,0,0,0.15); transition:transform 0.12s,background 0.15s; }
+    .slide-cell:active { transform:translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,0.15); }
+    .slide-empty { background:transparent; box-shadow:none; cursor:default; }
+    .slide-cell.slide-win { background:var(--green); color:#fff; box-shadow:0 3px 0 var(--green-dark); animation:pop 0.4s ease; }
+    .slide-moves { font-size:13px; font-weight:800; color:var(--tan); text-align:center; min-height:18px; }
 
-    /* ══════════════════════════════════════
-       COLOR SORT STYLES
-    ══════════════════════════════════════ */
-    .csort-pool { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin: 6px 0; }
-    .csort-tile {
-      width: clamp(42px, 11vw, 52px); height: clamp(42px, 11vw, 52px);
-      border-radius: 10px; border: none; cursor: pointer;
-      font-size: 10px; font-weight: 800; color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.2);
-      transition: transform 0.1s, opacity 0.2s;
-      font-family: 'Nunito', sans-serif;
-    }
-    .csort-tile:active { transform: translateY(2px); }
-    .csort-tile.csort-used { opacity: 0.2; pointer-events: none; }
-    .csort-placed { display: flex; gap: 4px; justify-content: center; margin: 4px 0; min-height: 36px; }
-    .csort-placed-tile {
-      width: clamp(30px, 8vw, 38px); height: clamp(30px, 8vw, 38px);
-      border-radius: 8px; animation: pop 0.25s ease;
-    }
-    .csort-status { font-size: 13px; font-weight: 800; text-align: center; min-height: 18px; color: var(--tan); }
+    /* ══ COLOR SORT ══ */
+    .csort-pool { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin:6px 0; }
+    .csort-tile { width:clamp(42px,11vw,52px); height:clamp(42px,11vw,52px); border-radius:10px; border:none; cursor:pointer; font-size:10px; font-weight:800; color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 0 rgba(0,0,0,0.2); transition:transform 0.1s,opacity 0.2s; font-family:'Nunito',sans-serif; }
+    .csort-tile:active { transform:translateY(2px); }
+    .csort-tile.csort-used { opacity:0.2; pointer-events:none; }
+    .csort-placed { display:flex; gap:4px; justify-content:center; margin:4px 0; min-height:36px; }
+    .csort-placed-tile { width:clamp(30px,8vw,38px); height:clamp(30px,8vw,38px); border-radius:8px; animation:pop 0.25s ease; }
+    .csort-status { font-size:13px; font-weight:800; text-align:center; min-height:18px; color:var(--tan); }
 
-    /* ══════════════════════════════════════
-       MATH RUSH STYLES
-    ══════════════════════════════════════ */
-    .mr-eq {
-      font-size: clamp(22px, 6vw, 30px); font-weight: 900;
-      color: var(--cream); text-align: center; min-height: 40px;
-      padding: 8px; border-radius: 12px; transition: background 0.2s, color 0.2s;
-    }
-    .mr-eq.mr-correct { background: var(--green); color: #fff; }
-    .mr-eq.mr-wrong { background: var(--red); color: #fff; }
-    .mr-timer { font-size: 16px; font-weight: 800; text-align: center; color: var(--cream); min-height: 22px; }
-    .mr-btns { display: flex; gap: 10px; justify-content: center; margin: 8px 0; }
-    .mr-btn {
-      flex: 1; max-width: 140px; height: 48px;
-      border: none; border-radius: 12px; cursor: pointer;
-      font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 900;
-      box-shadow: 0 4px 0 rgba(0,0,0,0.2); transition: transform 0.1s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .mr-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
-    .mr-true { background: var(--green); color: #fff; }
-    .mr-false { background: var(--red); color: #fff; }
-    .mr-score { font-size: 14px; font-weight: 800; color: var(--tan); text-align: center; }
-    .mr-progress { display: flex; gap: 6px; justify-content: center; margin: 4px 0; }
-    .mr-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--brown-mid); }
-    .mr-dot-active { background: var(--gold); }
-    .mr-dot-done { background: var(--green); }
+    /* ══ MATH RUSH ══ */
+    .mr-eq { font-size:clamp(22px,6vw,30px); font-weight:900; color:var(--cream); text-align:center; min-height:40px; padding:8px; border-radius:12px; transition:background 0.2s,color 0.2s; }
+    .mr-eq.mr-correct { background:var(--green); color:#fff; }
+    .mr-eq.mr-wrong { background:var(--red); color:#fff; }
+    .mr-timer { font-size:16px; font-weight:800; text-align:center; color:var(--cream); min-height:22px; }
+    .mr-btns { display:flex; gap:10px; justify-content:center; margin:8px 0; }
+    .mr-btn { flex:1; max-width:140px; height:48px; border:none; border-radius:12px; cursor:pointer; font-family:'Nunito',sans-serif; font-size:16px; font-weight:900; box-shadow:0 4px 0 rgba(0,0,0,0.2); transition:transform 0.1s; }
+    .mr-btn:active { transform:translateY(2px); box-shadow:0 2px 0 rgba(0,0,0,0.2); }
+    .mr-true { background:var(--green); color:#fff; }
+    .mr-false { background:var(--red); color:#fff; }
+    .mr-score { font-size:14px; font-weight:800; color:var(--tan); text-align:center; }
+    .mr-progress { display:flex; gap:6px; justify-content:center; margin:4px 0; }
+    .mr-dot { width:10px; height:10px; border-radius:50%; background:var(--brown-mid); }
+    .mr-dot-active { background:var(--gold); }
+    .mr-dot-done { background:var(--green); }
 
     /* ── Overlays ── */
     .streak-popup { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(58,41,24,0.85); z-index:200; opacity:0; pointer-events:none; transition:opacity 0.3s; }
@@ -406,11 +335,7 @@
     /* ── Modals ── */
     .modal { position:fixed; inset:0; background:rgba(58,41,24,0.92); display:none; align-items:center; justify-content:center; z-index:300; padding:20px; }
     .modal.show { display:flex; }
-    .modal-box {
-      background:var(--card); border-radius:22px; padding:28px 22px;
-      width:100%; max-width:360px; text-align:center;
-      box-shadow:0 8px 0 rgba(0,0,0,0.15); position:relative; overflow:hidden;
-    }
+    .modal-box { background:var(--card); border-radius:22px; padding:28px 22px; width:100%; max-width:360px; text-align:center; box-shadow:0 8px 0 rgba(0,0,0,0.15); position:relative; overflow:hidden; }
     .modal-box::before { content:''; position:absolute; top:0;left:0;right:0;height:50%; background:linear-gradient(180deg,rgba(255,255,255,0.04)0%,transparent 100%); pointer-events:none; }
     .modal-mascot { font-size:48px; margin-bottom:8px; }
     .modal-title { font-size:22px; font-weight:900; margin-bottom:6px; color:var(--cream); }
@@ -418,15 +343,10 @@
     .age-num { font-size:48px; font-weight:900; margin:10px 0; color:var(--gold); text-shadow:0 3px 0 var(--gold-dark); }
     .age-slider { width:100%; height:12px; -webkit-appearance:none; background:var(--brown-mid); border-radius:6px; margin-bottom:22px; }
     .age-slider::-webkit-slider-thumb { -webkit-appearance:none; width:32px; height:32px; background:var(--gold); border-radius:50%; cursor:pointer; box-shadow:0 3px 0 var(--gold-dark); }
-    .btn-go {
-      background:var(--green); color:#fff; border:none; border-radius:16px;
-      padding:14px 40px; font-family:'Nunito',sans-serif; font-size:18px;
-      font-weight:900; cursor:pointer; text-transform:uppercase;
-      box-shadow:0 5px 0 var(--green-dark); transition:transform 0.1s;
-    }
+    .btn-go { background:var(--green); color:#fff; border:none; border-radius:16px; padding:14px 40px; font-family:'Nunito',sans-serif; font-size:18px; font-weight:900; cursor:pointer; text-transform:uppercase; box-shadow:0 5px 0 var(--green-dark); transition:transform 0.1s; }
     .btn-go:active { transform:translateY(4px); box-shadow:0 1px 0 var(--green-dark); }
 
-    /* ── Calibration Modal ── */
+    /* ── Calibration ── */
     #calibration .cal-progress { display:flex; gap:6px; margin-bottom:16px; justify-content:center; }
     #calibration .cal-dot { width:12px; height:12px; border-radius:50%; background:var(--brown-mid); transition:background 0.3s; }
     #calibration .cal-dot.done { background:var(--green); }
@@ -434,49 +354,25 @@
     #calibration .cal-dot.wrong-dot { background:var(--red); }
     #calibration .cal-question { font-size:16px; font-weight:800; color:var(--cream); margin-bottom:14px; line-height:1.4; min-height:48px; }
     #calibration .cal-opts { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    #calibration .cal-opt {
-      background:var(--card-glow); border:none; border-radius:14px;
-      padding:12px 10px; font-family:'Nunito',sans-serif; font-size:14px;
-      font-weight:800; color:var(--cream); cursor:pointer; text-align:center;
-      box-shadow:0 4px 0 rgba(0,0,0,0.15); transition:transform 0.1s;
-      position:relative; overflow:hidden;
-    }
+    #calibration .cal-opt { background:var(--card-glow); border:none; border-radius:14px; padding:12px 10px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; color:var(--cream); cursor:pointer; text-align:center; box-shadow:0 4px 0 rgba(0,0,0,0.15); transition:transform 0.1s; position:relative; overflow:hidden; }
     #calibration .cal-opt::before { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:linear-gradient(180deg,rgba(255,255,255,0.06)0%,transparent 100%); pointer-events:none; }
     #calibration .cal-opt:active { transform:translateY(3px); }
     #calibration .cal-opt.correct { background:var(--green); color:#fff; box-shadow:0 4px 0 var(--green-dark); }
     #calibration .cal-opt.wrong { background:var(--red); color:#fff; box-shadow:0 4px 0 var(--red-dark); }
     #calibration .cal-opt.dim { opacity:0.25; pointer-events:none; }
-
     #cal-result { display:none; }
     #cal-result .result-iq { font-size:64px; font-weight:900; color:var(--gold); text-shadow:0 4px 0 var(--gold-dark); margin:8px 0; }
     #cal-result .result-label { font-size:14px; font-weight:900; color:var(--brown-light); letter-spacing:4px; margin-bottom:12px; }
     #cal-result .result-text { font-size:14px; color:var(--tan); font-weight:600; margin-bottom:18px; line-height:1.5; }
 
     /* ── Push Prompt ── */
-    #push-prompt {
-      position: fixed; bottom: calc(80px + env(safe-area-inset-bottom, 0px));
-      left: 50%; transform: translateX(-50%);
-      background: var(--card); border-radius: 18px; padding: 16px 18px;
-      width: calc(100% - 32px); max-width: 360px;
-      box-shadow: 0 6px 0 rgba(0,0,0,0.2);
-      z-index: 250; display: none;
-      animation: slideUp 0.3s ease;
-    }
-    #push-prompt.show { display: block; }
-    #push-prompt .pp-title { font-size: 15px; font-weight: 900; color: var(--cream); margin-bottom: 4px; }
-    #push-prompt .pp-text { font-size: 12px; font-weight: 600; color: var(--tan); margin-bottom: 12px; line-height: 1.4; }
-    #push-prompt .pp-btns { display: flex; gap: 8px; }
-    #push-prompt .pp-yes {
-      flex: 1; background: var(--green); color: #fff; border: none;
-      border-radius: 12px; padding: 10px; font-family: 'Nunito', sans-serif;
-      font-size: 14px; font-weight: 900; cursor: pointer;
-      box-shadow: 0 3px 0 var(--green-dark);
-    }
-    #push-prompt .pp-no {
-      background: var(--brown-mid); color: var(--tan); border: none;
-      border-radius: 12px; padding: 10px 16px; font-family: 'Nunito', sans-serif;
-      font-size: 14px; font-weight: 900; cursor: pointer;
-    }
+    #push-prompt { position:fixed; bottom:calc(80px + env(safe-area-inset-bottom,0px)); left:50%; transform:translateX(-50%); background:var(--card); border-radius:18px; padding:16px 18px; width:calc(100% - 32px); max-width:360px; box-shadow:0 6px 0 rgba(0,0,0,0.2); z-index:250; display:none; animation:slideUp 0.3s ease; }
+    #push-prompt.show { display:block; }
+    #push-prompt .pp-title { font-size:15px; font-weight:900; color:var(--cream); margin-bottom:4px; }
+    #push-prompt .pp-text { font-size:12px; font-weight:600; color:var(--tan); margin-bottom:12px; line-height:1.4; }
+    #push-prompt .pp-btns { display:flex; gap:8px; }
+    #push-prompt .pp-yes { flex:1; background:var(--green); color:#fff; border:none; border-radius:12px; padding:10px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:900; cursor:pointer; box-shadow:0 3px 0 var(--green-dark); }
+    #push-prompt .pp-no { background:var(--brown-mid); color:var(--tan); border:none; border-radius:12px; padding:10px 16px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:900; cursor:pointer; }
   </style>
 </head>
 <body>
@@ -504,11 +400,20 @@
 <main id="feed"></main>
 
 <nav>
-  <button class="nav-btn active" onclick="parent.goTo('improve')">
+  <button class="nav-btn" onclick="navGo('leaderboard')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+    Ranks
+  </button>
+  <button class="nav-btn active" onclick="navGo('improve')">
     <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
     Train
   </button>
-  <button class="nav-btn" onclick="parent.goTo('profile')">
+  <button class="nav-btn" onclick="navGo('tasks')">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    Tasks
+    <span class="nav-badge" id="tasks-badge"></span>
+  </button>
+  <button class="nav-btn" onclick="navGo('profile')">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     Profile
   </button>
@@ -523,7 +428,6 @@
 <div class="flash" id="flash"></div>
 <div class="confetti" id="confetti"></div>
 
-<!-- Push Notification Prompt -->
 <div id="push-prompt">
   <div class="pp-title">🦌 Daily brain reminders?</div>
   <div class="pp-text">Get a nudge each day to keep your streak alive. We'll only ping you once a day.</div>
@@ -567,19 +471,7 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     SCRIPT LOADING ORDER:
-     1. questions.js  — core Q registry + shared utils
-     2. games/*.js    — each self-registers via Q.register()
-     3. module script — app logic (data.js import, feed, UI)
-
-     TO ADD A NEW QUESTION TYPE:
-     Just create games/myType.js and add a <script> tag here.
-     No changes to questions.js or this file's module script needed.
-═══════════════════════════════════════════════════ -->
 <script src="questions.js"></script>
-
-<!-- Game type plugins — add new ones here -->
 <script src="games/wordle.js"></script>
 <script src="games/ticTacToe.js"></script>
 <script src="games/numSeq.js"></script>
@@ -601,179 +493,446 @@
 
 <script type="module">
   import { IQData, getEncouragement } from './data.js';
+  import Haptics from './haptics.js';
 
   if (window.parent !== window) parent.authCheck();
 
-  const feed      = document.getElementById('feed');
-  const iqVal     = document.getElementById('iq-val');
-  const streakVal = document.getElementById('streak-val');
-  const streakPill   = document.getElementById('streak-pill');
-  const streakPopup  = document.getElementById('streak-popup');
-  const streakNum    = document.getElementById('streak-num');
-  const onboard      = document.getElementById('onboard');
-  const ageSlider    = document.getElementById('age-slider');
-  const ageDisplay   = document.getElementById('age-display');
-  const flashEl      = document.getElementById('flash');
-  const confettiEl   = document.getElementById('confetti');
-  const xpBar        = document.getElementById('xp-bar');
-  const levelLabel   = document.getElementById('level-label');
-  const xpLabel      = document.getElementById('xp-label');
+  window.navGo = function(page) {
+    Haptics.light();
+    parent.goTo(page);
+  };
 
-  let slides = 0, answerStart = 0;
-  const questionQueue = [];
-  const QUEUE_TARGET  = 25;
+  const feed        = document.getElementById('feed');
+  const iqVal       = document.getElementById('iq-val');
+  const streakVal   = document.getElementById('streak-val');
+  const streakPill  = document.getElementById('streak-pill');
+  const streakPopup = document.getElementById('streak-popup');
+  const streakNum   = document.getElementById('streak-num');
+  const onboard     = document.getElementById('onboard');
+  const ageSlider   = document.getElementById('age-slider');
+  const ageDisplay  = document.getElementById('age-display');
+  const flashEl     = document.getElementById('flash');
+  const confettiEl  = document.getElementById('confetti');
+  const xpBar       = document.getElementById('xp-bar');
+  const levelLabel  = document.getElementById('level-label');
+  const xpLabel     = document.getElementById('xp-label');
+  const tasksBadge  = document.getElementById('tasks-badge');
 
-  // ── Queue ──
-  function fillQueue() {
-    while (questionQueue.length < QUEUE_TARGET) {
-      const weakCat = IQData.getWeakestCategory();
-      const diff = weakCat ? IQData.getDifficulty(weakCat) : 1.0;
-      questionQueue.push(Q.generate(diff));
+  // ── Session stats ──
+  const SESSION_KEY = 'bd_session_today';
+
+  let _tasksUid = null;
+  let _tasksDb  = null;
+
+  function getFirebase() {
+    try {
+      if (_tasksDb && _tasksUid) return true;
+      const fb = window.firebase || (window.parent !== window && window.parent.firebase);
+      if (!fb) return false;
+      _tasksDb  = fb.firestore();
+      const u   = fb.auth().currentUser;
+      if (u) _tasksUid = u.uid;
+      return !!(_tasksDb && _tasksUid);
+    } catch { return false; }
+  }
+
+  function getTodayKey() {
+    const n = new Date();
+    return `${n.getFullYear()}-${n.getMonth() + 1}-${n.getDate()}`;
+  }
+
+  function updateTasksBadge() {
+    tasksBadge.classList.add('show');
+  }
+
+  const TASK_POOL = [
+    { id: 'streak_5',       type: 'streak',   target: 5,   label: 'Get a streak of 5',          icon: '🔥', xp: 30  },
+    { id: 'streak_10',      type: 'streak',   target: 10,  label: 'Get a streak of 10',         icon: '🔥', xp: 60  },
+    { id: 'streak_15',      type: 'streak',   target: 15,  label: 'Get a streak of 15',         icon: '🔥', xp: 100 },
+    { id: 'correct_10',     type: 'correct',  target: 10,  label: 'Get 10 correct',              icon: '✅', xp: 25  },
+    { id: 'correct_25',     type: 'correct',  target: 25,  label: 'Get 25 correct',              icon: '✅', xp: 50  },
+    { id: 'correct_50',     type: 'correct',  target: 50,  label: 'Get 50 correct',              icon: '✅', xp: 90  },
+    { id: 'answer_20',      type: 'answered', target: 20,  label: 'Answer 20 questions',         icon: '🧠', xp: 20  },
+    { id: 'answer_50',      type: 'answered', target: 50,  label: 'Answer 50 questions',         icon: '🧠', xp: 45  },
+    { id: 'answer_100',     type: 'answered', target: 100, label: 'Answer 100 questions',        icon: '🧠', xp: 80  },
+    { id: 'accuracy_70',    type: 'accuracy', target: 70,  label: 'Hit 70% accuracy today',      icon: '🎯', xp: 35  },
+    { id: 'accuracy_80',    type: 'accuracy', target: 80,  label: 'Hit 80% accuracy today',      icon: '🎯', xp: 55  },
+    { id: 'play_wordle',    type: 'game', game: 'wordle',       target: 3, label: 'Play 3 Wordle rounds',      icon: '🟩', xp: 40 },
+    { id: 'play_math',      type: 'game', game: 'mathRush',     target: 3, label: 'Play 3 Math Rush rounds',   icon: '➕', xp: 40 },
+    { id: 'play_memory',    type: 'game', game: 'memory',       target: 2, label: 'Play 2 Memory games',       icon: '🃏', xp: 35 },
+    { id: 'play_reaction',  type: 'game', game: 'reaction',     target: 3, label: 'Play 3 Reaction tests',     icon: '⚡', xp: 30 },
+    { id: 'play_ttt',       type: 'game', game: 'ticTacToe',    target: 2, label: 'Play 2 Tic Tac Toe games',  icon: '⭕', xp: 30 },
+    { id: 'play_simon',     type: 'game', game: 'simon',        target: 2, label: 'Play 2 Simon Says rounds',  icon: '🔴', xp: 35 },
+    { id: 'play_scramble',  type: 'game', game: 'wordScramble', target: 3, label: 'Unscramble 3 words',        icon: '🔤', xp: 30 },
+    { id: 'fast_5',         type: 'fast',     target: 5,   label: 'Answer 5 in under 3.5s',      icon: '⚡', xp: 45  },
+    { id: 'fast_10',        type: 'fast',     target: 10,  label: 'Answer 10 in under 3.5s',     icon: '⚡', xp: 70  },
+  ];
+
+  function seededRandom(seed) {
+    let s = seed;
+    return () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+  }
+  function getDailyTaskDefs() {
+    const dateKey = getTodayKey();
+    const seed    = dateKey.split('-').reduce((a, n) => a * 31 + parseInt(n), 0);
+    const rng     = seededRandom(seed);
+    return [...TASK_POOL].sort(() => rng() - 0.5).slice(0, 3);
+  }
+
+  let _taskStateCache = null;
+
+  function getTasksRef() {
+    if (!_tasksDb || !_tasksUid) return null;
+    return _tasksDb.collection('users').doc(_tasksUid).collection('dailyTasks').doc(getTodayKey());
+  }
+
+  async function loadTaskState() {
+    if (!getFirebase()) return null;
+    try {
+      const ref  = getTasksRef();
+      if (!ref) return null;
+      const snap = await ref.get();
+      if (snap.exists) {
+        _taskStateCache = snap.data();
+        return _taskStateCache;
+      }
+      const fresh = {
+        date:        getTodayKey(),
+        tasks:       getDailyTaskDefs().map(def => ({ ...def, progress: 0, done: false, claimed: false })),
+        allDone:     false,
+        allClaimed:  false,
+        dailyStreak: 0,
+      };
+      await ref.set(fresh);
+      _taskStateCache = fresh;
+      return fresh;
+    } catch (e) {
+      console.warn('[tasks] loadTaskState failed', e);
+      return null;
     }
   }
+
+  function saveTaskState(state) {
+    _taskStateCache = state;
+    const ref = getTasksRef();
+    if (!ref) return;
+    ref.set(state).catch(e => console.warn('[tasks] saveTaskState failed', e));
+  }
+
+  function notifyTasksPage() {
+    try { if (window.parent !== window) window.parent.postMessage({ type: 'tasksUpdated' }, '*'); } catch {}
+  }
+
+  function getSessionStats() {
+    try {
+      const raw   = localStorage.getItem(SESSION_KEY);
+      const s     = raw ? JSON.parse(raw) : null;
+      const today = getTodayKey();
+      if (!s || s.date !== today) {
+        const fresh = { date: today, answered: 0, correct: 0, fast: 0 };
+        localStorage.setItem(SESSION_KEY, JSON.stringify(fresh));
+        return fresh;
+      }
+      return s;
+    } catch { return { date: getTodayKey(), answered: 0, correct: 0, fast: 0 }; }
+  }
+
+  function updateSessionStats(correct, ms) {
+    const s = getSessionStats();
+    s.answered++;
+    if (correct) s.correct++;
+    if (correct && ms < 3500) s.fast++;
+    localStorage.setItem(SESSION_KEY, JSON.stringify(s));
+    return s;
+  }
+
+  async function updateTaskProgress(streak, correct, ms, session) {
+    if (!getFirebase()) return;
+    try {
+      let state = _taskStateCache || await loadTaskState();
+      if (!state || state.date !== getTodayKey()) return;
+      state.tasks.forEach(task => {
+        if (task.done) return;
+        switch (task.type) {
+          case 'streak':   task.progress = Math.max(task.progress, streak); break;
+          case 'correct':  task.progress = session.correct; break;
+          case 'answered': task.progress = session.answered; break;
+          case 'accuracy':
+            task.progress = session.answered > 0
+              ? Math.round((session.correct / session.answered) * 100) : 0; break;
+          case 'fast':     task.progress = session.fast; break;
+        }
+        if (task.progress >= task.target) task.done = true;
+      });
+      if (!state.allDone && state.tasks.every(t => t.done)) state.allDone = true;
+      saveTaskState(state);
+      notifyTasksPage();
+    } catch (e) { console.warn('[improve] updateTaskProgress failed', e); }
+  }
+
+  window.notifyGamePlayed = async function(gameType) {
+    if (!getFirebase()) return;
+    try {
+      let state = _taskStateCache || await loadTaskState();
+      if (!state || state.date !== getTodayKey()) return;
+      state.tasks.forEach(task => {
+        if (task.type !== 'game' || task.game !== gameType || task.done) return;
+        task.progress = Math.min(task.progress + 1, task.target);
+        if (task.progress >= task.target) task.done = true;
+      });
+      if (!state.allDone && state.tasks.every(t => t.done)) state.allDone = true;
+      saveTaskState(state);
+      updateTasksBadge();
+      notifyTasksPage();
+    } catch (e) { console.warn('[improve] notifyGamePlayed failed', e); }
+  };
+
+  window.onAnswerForTasks = function(correct, ms) {
+    const result  = IQData.load();
+    const session = updateSessionStats(correct, ms);
+    updateTaskProgress(result.streak, correct, ms, session);
+    updateTasksBadge();
+  };
+
+  (function initTaskTracking() {
+    const fb = window.firebase || (window.parent !== window && window.parent.firebase);
+    if (!fb) return;
+    fb.auth().onAuthStateChanged(async u => {
+      if (!u) return;
+      _tasksUid = u.uid;
+      _tasksDb  = fb.firestore();
+      await loadTaskState();
+      updateTasksBadge();
+    });
+  })();
+
+  window.addEventListener('message', function(e) {
+    if (!e.data || e.data.type !== 'xpAwarded') return;
+    const xp = e.data.xp;
+    if (!xp) return;
+    try {
+      const d = IQData.load();
+      d.xp += xp;
+      d.level = Math.floor(d.xp / 150) + 1;
+      IQData.save(d);
+      IQData._maybeSync && IQData._maybeSync();
+      updateUI({ xp: d.xp, level: d.level, xpGain: xp, leveledUp: false, streak: d.streak, iq: d.iq });
+    } catch (e) { console.warn('[improve] xpAwarded handler failed', e); }
+  });
+
+  // ─────────────────────────────────────────────────────────────────
+  // PERFORMANCE-OPTIMISED FEED ENGINE
+  //
+  // Key changes vs original:
+  //  1. QUEUE_TARGET reduced to 8 (generate just-in-time, not upfront)
+  //  2. fillQueue is chunked via requestIdleCallback so it never
+  //     blocks the main thread / scroll animation
+  //  3. Scroll handler is throttled with rAF (max once per frame)
+  //  4. Pruned slides are REPLACED with lightweight spacer divs —
+  //     this actually frees memory instead of just hiding nodes
+  //  5. No setInterval polling — replaced by IntersectionObserver only
+  //  6. Slide count cap: only keep MAX_DOM_SLIDES real nodes live at once
+  // ─────────────────────────────────────────────────────────────────
+
+  const QUEUE_TARGET   = 8;   // small buffer — fill lazily
+  const KEEP_BEHIND    = 3;   // real slides to keep behind viewport
+  const KEEP_AHEAD     = 6;   // real slides to keep ahead of viewport
+  const MAX_DOM_SLIDES = KEEP_BEHIND + KEEP_AHEAD + 1; // ~10 real nodes max
+
+  let slides       = 0;        // total slides ever created (grows forever)
+  let firstSlide   = 0;        // lowest slide index still in DOM as real slide
+  let answerStart  = 0;
+
+  const questionQueue = [];
+  let _filling        = false;
+  let _fillScheduled  = false;
+
+  // Chunk-fill via rIC so it never janks scroll
+  function scheduleFill() {
+    if (_fillScheduled) return;
+    _fillScheduled = true;
+    const doFill = (deadline) => {
+      _fillScheduled = false;
+      if (_filling) return;
+      _filling = true;
+      try {
+        let safety = 0;
+        while (questionQueue.length < QUEUE_TARGET) {
+          if (++safety > QUEUE_TARGET * 4) { console.warn('[BrainDeer] fillQueue safety'); break; }
+          // Use deadline if available so we don't overrun the idle window
+          if (deadline && deadline.timeRemaining && deadline.timeRemaining() < 2 && questionQueue.length >= 3) break;
+          try {
+            const weakCat = IQData.getWeakestCategory();
+            const diff    = weakCat ? IQData.getDifficulty(weakCat) : 1.0;
+            const q       = Q.generate(diff);
+            if (q) questionQueue.push(q);
+          } catch (e) {
+            console.warn('[BrainDeer] Q.generate error:', e);
+          }
+        }
+      } finally {
+        _filling = false;
+      }
+      // If still below target, schedule another fill
+      if (questionQueue.length < QUEUE_TARGET) scheduleFill();
+    };
+
+    if (typeof requestIdleCallback === 'function') {
+      requestIdleCallback(doFill, { timeout: 300 });
+    } else {
+      setTimeout(() => doFill(null), 16);
+    }
+  }
+
   function nextQuestion() {
-    if (!questionQueue.length) fillQueue();
+    if (questionQueue.length === 0) {
+      // Synchronous fallback — generate one right now so scroll never stalls
+      try {
+        const q = Q.generate(1.0);
+        scheduleFill(); // replenish async
+        return q;
+      } catch(e) { return null; }
+    }
     const q = questionQueue.shift();
-    if (questionQueue.length < QUEUE_TARGET / 2) requestAnimationFrame(fillQueue);
+    if (questionQueue.length < Math.ceil(QUEUE_TARGET / 2)) scheduleFill();
     return q;
   }
 
-  // ── Onboarding ──
-  ageSlider.oninput = () => ageDisplay.textContent = ageSlider.value;
-  document.getElementById('start-btn').addEventListener('click', () => {
-    IQData.setAge(parseInt(ageSlider.value));
-    Q.setAge(parseInt(ageSlider.value));
-    onboard.classList.remove('show');
-    IQData.needsCalibration() ? startCalibration() : startFeed();
-  });
-
-  // ── IQ Calibration Test ──
-  const CAL_QUESTIONS = [
-    { q:'What comes next? 2, 6, 18, 54, ?', a:'162', w:['108','126','148'], cat:'patternRecognition', d:1.2 },
-    { q:'If all Bloops are Razzies, and all Razzies are Lazzies, are all Bloops Lazzies?', a:'Yes', w:['No','Maybe','Not enough info'], cat:'logicalReasoning', d:1.1 },
-    { q:'Hot is to Cold as Up is to _____', a:'Down', w:['High','Sky','Top'], cat:'verbalReasoning', d:0.6 },
-    { q:'(7 × 8) − 13 = ?', a:'43', w:['42','45','49'], cat:'mentalAgility', d:1.0 },
-    { q:"Which doesn't belong? Cello, Flute, Violin, Harp", a:'Flute', w:['Cello','Violin','Harp'], cat:'logicalReasoning', d:1.0 },
-  ];
-  let calIdx = 0, calCorrect = 0;
-
-  function startCalibration() {
-    calIdx = 0; calCorrect = 0;
-    document.getElementById('calibration').classList.add('show');
-    document.getElementById('cal-quiz').style.display = 'block';
-    document.getElementById('cal-result').style.display = 'none';
-    renderCalDots();
-    renderCalQuestion();
+  // ── rAF-throttled scroll handler ──
+  let _rafPending = false;
+  function onFeedScroll() {
+    if (_rafPending) return;
+    _rafPending = true;
+    requestAnimationFrame(() => {
+      _rafPending = false;
+      handleScroll();
+    });
   }
-  function renderCalDots() {
-    const dots = document.getElementById('cal-dots');
-    dots.innerHTML = '';
-    for (let i = 0; i < CAL_QUESTIONS.length; i++) {
-      const d = document.createElement('div');
-      d.className = 'cal-dot' + (i === calIdx ? ' active' : '') + (i < calIdx ? ' done' : '');
-      d.id = 'cal-dot-' + i;
-      dots.appendChild(d);
+
+  let _lastAnimatedSlide = -1;
+  function handleScroll() {
+    const slideH = feed.clientHeight;
+    if (!slideH) return;
+    const currentSlide = Math.floor((feed.scrollTop + slideH * 0.5) / slideH);
+    // Add slides ahead
+    const targetSlides = currentSlide + KEEP_AHEAD + 1;
+    while (slides < targetSlides) addSlide();
+    // Prune old slides
+    pruneSlides(currentSlide);
+    // Replenish queue if low
+    if (questionQueue.length < Math.ceil(QUEUE_TARGET / 2)) scheduleFill();
+    // Fire enter animation when landing on a new slide
+    if (currentSlide !== _lastAnimatedSlide) {
+      _lastAnimatedSlide = currentSlide;
+      const el = feed.querySelector(`.slide[data-slide-idx="${currentSlide}"]`);
+      if (el) {
+        el.classList.remove('entering');
+        void el.offsetWidth; // force reflow so animation restarts
+        el.classList.add('entering');
+      }
     }
   }
-  function renderCalQuestion() {
-    const cq = CAL_QUESTIONS[calIdx];
-    document.getElementById('cal-q').textContent = cq.q;
-    const optsEl = document.getElementById('cal-opts');
-    optsEl.innerHTML = shuffle([cq.a, ...cq.w]).map(o =>
-      `<button class="cal-opt" data-v="${esc(o)}" data-ans="${esc(cq.a)}">${o}</button>`
-    ).join('');
-  }
-  document.getElementById('cal-opts').addEventListener('click', e => {
-    if (!e.target.classList.contains('cal-opt')) return;
-    const btn = e.target;
-    const par = btn.parentElement;
-    if (par.dataset.done) return;
-    par.dataset.done = '1';
-    const ok = btn.dataset.v === btn.dataset.ans;
-    if (ok) calCorrect++;
-    par.querySelectorAll('.cal-opt').forEach(o => {
-      if (o.dataset.v === btn.dataset.ans) o.classList.add('correct');
-      else if (o === btn) o.classList.add('wrong');
-      else o.classList.add('dim');
-    });
-    const dot = document.getElementById('cal-dot-' + calIdx);
-    dot.classList.remove('active');
-    dot.classList.add(ok ? 'done' : 'wrong-dot');
-    IQData.recordAnswer(CAL_QUESTIONS[calIdx].cat, ok, CAL_QUESTIONS[calIdx].d, 5000);
-    setTimeout(() => {
-      calIdx++;
-      if (calIdx >= CAL_QUESTIONS.length) { showCalResult(); }
-      else { par.dataset.done = ''; renderCalDots(); renderCalQuestion(); }
-    }, 800);
-  });
-  function showCalResult() {
-    const iq = Math.max(75, Math.min(130, 85 + Math.round(calCorrect / CAL_QUESTIONS.length * 30)));
-    IQData.markCalibrated(iq);
-    document.getElementById('cal-quiz').style.display = 'none';
-    document.getElementById('cal-result').style.display = 'block';
-    document.getElementById('cal-iq').textContent = iq;
-  }
-  document.getElementById('cal-done-btn').addEventListener('click', () => {
-    document.getElementById('calibration').classList.remove('show');
-    startFeed();
-  });
 
-  // ── Boot ──
-  function init() {
-    const d = IQData.load();
-    updateUI(d);
-    if      (IQData.needsOnboarding())   { onboard.classList.add('show'); }
-    else if (IQData.needsCalibration())  { Q.setAge(d.age); startCalibration(); }
-    else                                 { startFeed(); }
+  // ── IntersectionObserver sentinel (bottom of feed) ──
+  let _sentinel = null;
+  function attachSentinel() {
+    if (_sentinel) _sentinel.remove();
+    _sentinel = document.createElement('div');
+    _sentinel.style.cssText = 'height:1px;width:100%;flex-shrink:0;';
+    feed.appendChild(_sentinel);
+    const obs = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        obs.disconnect();
+        for (let i = 0; i < KEEP_AHEAD; i++) addSlide();
+        attachSentinel();
+      }
+    }, { root: feed, threshold: 0 });
+    obs.observe(_sentinel);
   }
 
-  function startFeed() {
-    const d = IQData.load();
-    Q.setAge(d.age || 25);
-    IQData.startSession();
-    updateUI(d);
-    fillQueue();
-    for (let i = 0; i < 8; i++) addSlide();
-    feed.addEventListener('scroll',    checkMore, { passive: true });
-    feed.addEventListener('touchmove', checkMore, { passive: true });
-    setInterval(checkMore, 200);
-    setTimeout(maybeShowPushPrompt, 3000);
-  }
+  // ── Real DOM pruning — replace with spacer divs ──
+  function pruneSlides(currentSlide) {
+    const cutoff = currentSlide - KEEP_BEHIND;
+    if (cutoff <= firstSlide) return;
 
-  function checkMore() {
-    const h = feed.clientHeight;
-    if (!h) return;
-    const idx = Math.round(feed.scrollTop / h);
-    while (slides < idx + 8) addSlide();
+    for (let idx = firstSlide; idx < cutoff; idx++) {
+      const el = feed.querySelector(`.slide[data-slide-idx="${idx}"]`);
+      if (!el) continue;
+      // Replace real slide with a cheap spacer of identical height
+      const spacer = document.createElement('div');
+      spacer.className = 'slide-spacer';
+      spacer.dataset.slideIdx = idx;
+      feed.replaceChild(spacer, el);
+    }
+    firstSlide = cutoff;
   }
 
   function addSlide() {
-    const q   = nextQuestion();
     const idx = slides++;
     const div = document.createElement('div');
     div.className = 'slide';
+    div.dataset.slideIdx = idx;
 
-    // Check if this type has a custom renderer registered
-    const customRenderer = Q._renderers && Q._renderers[q.type];
-    if (customRenderer) {
-      div.innerHTML = customRenderer.render(q, idx);
-    } else {
-      div.innerHTML = renderDefault(q, idx);
+    let q = null;
+    try { q = nextQuestion(); } catch(e) { console.warn('[BrainDeer] nextQuestion threw:', e); }
+
+    if (!q) {
+      div.innerHTML = renderFallback(idx);
+      feed.appendChild(div);
+      return;
     }
 
-    feed.appendChild(div);
-
-    // If the type has a post-attach hook, call it
-    if (customRenderer && customRenderer.attach) {
-      customRenderer.attach(div, q, idx, { feed, flashEl, confettiEl, IQData, getEncouragement, updateUI, checkMore, spawnConfetti, answerStartRef: { get: () => answerStart, set: v => { answerStart = v; } } });
+    try {
+      const customRenderer = Q._renderers && Q._renderers[q.type];
+      if (customRenderer) {
+        div.innerHTML = customRenderer.render(q, idx);
+        // Insert before sentinel if it exists, otherwise just append
+        if (_sentinel && _sentinel.parentNode === feed) {
+          feed.insertBefore(div, _sentinel);
+        } else {
+          feed.appendChild(div);
+        }
+        try {
+          customRenderer.attach(div, q, idx, {
+            feed, flashEl, confettiEl, IQData, getEncouragement,
+            updateUI, checkMore: handleScroll, spawnConfetti,
+            answerStartRef: { get: () => answerStart, set: v => { answerStart = v; } },
+            Haptics,
+            notifyGamePlayed: window.notifyGamePlayed,
+            onAnswer: window.onAnswerForTasks,
+          });
+        } catch (e) {
+          console.warn('[BrainDeer] attach failed for type:', q.type, e);
+        }
+      } else {
+        div.innerHTML = renderDefault(q, idx);
+        if (_sentinel && _sentinel.parentNode === feed) {
+          feed.insertBefore(div, _sentinel);
+        } else {
+          feed.appendChild(div);
+        }
+      }
+    } catch (e) {
+      console.warn('[BrainDeer] render failed for type:', q && q.type, e);
+      div.innerHTML = renderFallback(idx);
+      if (_sentinel && _sentinel.parentNode === feed) {
+        feed.insertBefore(div, _sentinel);
+      } else {
+        feed.appendChild(div);
+      }
     }
 
     answerStart = Date.now();
   }
 
-  // ══════════════════════════════════════════════════
-  //  DEFAULT CARD RENDERER (sequence, matrix, text)
-  // ══════════════════════════════════════════════════
+  function renderFallback(idx) {
+    return `
+      <div class="qcard">
+        <div class="category">Brain Training</div>
+        <div class="question">Keep scrolling — more challenges ahead! 🦌</div>
+        <div class="branding">braindeer.org</div>
+      </div>`;
+  }
 
   function renderDefault(q, idx) {
     let visual = '';
@@ -810,7 +969,7 @@
       </div>`;
   }
 
-  // ── Answer handling (default multiple-choice cards) ──
+  // ── Answer handler ──
   document.addEventListener('click', e => {
     if (!e.target.classList.contains('opt')) return;
     const btn  = e.target;
@@ -831,6 +990,14 @@
 
     const result = IQData.recordAnswer(opts.dataset.cat, isCorrect, parseFloat(opts.dataset.diff), ms);
 
+    if (isCorrect) {
+      if (result.streak > 0 && result.streak % 5 === 0) Haptics.streak();
+      else Haptics.success();
+    } else {
+      Haptics.error();
+    }
+    if (result.leveledUp) setTimeout(() => Haptics.levelUp(), 300);
+
     const fb = document.getElementById(`fb-${idx}`);
     fb.textContent = getEncouragement(result.streak, isCorrect);
     fb.className   = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
@@ -848,26 +1015,172 @@
       }, 300);
     }
 
+    const session = updateSessionStats(isCorrect, ms);
+    updateTaskProgress(result.streak, isCorrect, ms, session);
+    updateTasksBadge();
+
     updateUI(result);
-    checkMore();
+    handleScroll();
     setTimeout(() => document.getElementById(`exp-${idx}`)?.classList.add('show'),  250);
     setTimeout(() => document.getElementById(`hint-${idx}`)?.classList.add('show'), 500);
     answerStart = Date.now();
   });
 
-  // ── Utils ──
+  // ── Onboarding / calibration ──
+  ageSlider.oninput = () => { ageDisplay.textContent = ageSlider.value; Haptics.light(); };
+  document.getElementById('start-btn').addEventListener('click', () => {
+    Haptics.medium();
+    IQData.setAge(parseInt(ageSlider.value));
+    Q.setAge(parseInt(ageSlider.value));
+    onboard.classList.remove('show');
+    IQData.needsCalibration() ? startCalibration() : startFeed();
+  });
+
+  const CAL_QUESTIONS = [
+    { q:'What comes next? 2, 6, 18, 54, ?', a:'162', w:['108','126','148'], cat:'patternRecognition', d:1.2 },
+    { q:'If all Bloops are Razzies, and all Razzies are Lazzies, are all Bloops Lazzies?', a:'Yes', w:['No','Maybe','Not enough info'], cat:'logicalReasoning', d:1.1 },
+    { q:'Hot is to Cold as Up is to _____', a:'Down', w:['High','Sky','Top'], cat:'verbalReasoning', d:0.6 },
+    { q:'(7 × 8) − 13 = ?', a:'43', w:['42','45','49'], cat:'mentalAgility', d:1.0 },
+    { q:"Which doesn't belong? Cello, Flute, Violin, Harp", a:'Flute', w:['Cello','Violin','Harp'], cat:'logicalReasoning', d:1.0 },
+  ];
+  let calIdx = 0, calCorrect = 0;
+
+  function startCalibration() {
+    calIdx = 0; calCorrect = 0;
+    document.getElementById('calibration').classList.add('show');
+    document.getElementById('cal-quiz').style.display = 'block';
+    document.getElementById('cal-result').style.display = 'none';
+    renderCalDots(); renderCalQuestion();
+  }
+  function renderCalDots() {
+    const dots = document.getElementById('cal-dots');
+    dots.innerHTML = '';
+    for (let i = 0; i < CAL_QUESTIONS.length; i++) {
+      const d = document.createElement('div');
+      d.className = 'cal-dot' + (i === calIdx ? ' active' : '') + (i < calIdx ? ' done' : '');
+      d.id = 'cal-dot-' + i;
+      dots.appendChild(d);
+    }
+  }
+  function renderCalQuestion() {
+    const cq = CAL_QUESTIONS[calIdx];
+    document.getElementById('cal-q').textContent = cq.q;
+    const optsEl = document.getElementById('cal-opts');
+    optsEl.innerHTML = shuffle([cq.a, ...cq.w]).map(o =>
+      `<button class="cal-opt" data-v="${esc(o)}" data-ans="${esc(cq.a)}">${o}</button>`
+    ).join('');
+  }
+  document.getElementById('cal-opts').addEventListener('click', e => {
+    if (!e.target.classList.contains('cal-opt')) return;
+    const btn = e.target, par = btn.parentElement;
+    if (par.dataset.done) return;
+    par.dataset.done = '1';
+    const ok = btn.dataset.v === btn.dataset.ans;
+    if (ok) { calCorrect++; Haptics.success(); } else { Haptics.error(); }
+    par.querySelectorAll('.cal-opt').forEach(o => {
+      if (o.dataset.v === btn.dataset.ans) o.classList.add('correct');
+      else if (o === btn) o.classList.add('wrong');
+      else o.classList.add('dim');
+    });
+    const dot = document.getElementById('cal-dot-' + calIdx);
+    dot.classList.remove('active'); dot.classList.add(ok ? 'done' : 'wrong-dot');
+    IQData.recordAnswer(CAL_QUESTIONS[calIdx].cat, ok, CAL_QUESTIONS[calIdx].d, 5000);
+    setTimeout(() => {
+      calIdx++;
+      if (calIdx >= CAL_QUESTIONS.length) showCalResult();
+      else { par.dataset.done = ''; renderCalDots(); renderCalQuestion(); }
+    }, 800);
+  });
+  function showCalResult() {
+    const iq = Math.max(75, Math.min(130, 85 + Math.round(calCorrect / CAL_QUESTIONS.length * 30)));
+    IQData.markCalibrated(iq);
+    document.getElementById('cal-quiz').style.display = 'none';
+    document.getElementById('cal-result').style.display = 'block';
+    Haptics.levelUp();
+  }
+  document.getElementById('cal-done-btn').addEventListener('click', () => {
+    Haptics.medium();
+    document.getElementById('calibration').classList.remove('show');
+    startFeed();
+  });
+
+  // ── Init ──
+  function init() {
+    const d = IQData.load();
+    updateUI(d);
+    updateTasksBadge();
+    if      (IQData.needsOnboarding())  { onboard.classList.add('show'); }
+    else if (IQData.needsCalibration()) { Q.setAge(d.age); startCalibration(); }
+    else                                { startFeed(); }
+  }
+
+  function startFeed() {
+    const d = IQData.load();
+    Q.setAge(d.age || 25);
+    IQData.startSession();
+    updateUI(d);
+
+    // Seed queue with just a few questions upfront — rest fills lazily
+    scheduleFill();
+
+    // Render initial batch (small — just enough to fill screen + 1 ahead)
+    for (let i = 0; i < 3; i++) addSlide();
+
+    feed.addEventListener('scroll',    onFeedScroll, { passive: true });
+    feed.addEventListener('touchmove', onFeedScroll, { passive: true });
+
+    // ── TikTok-style wheel: one slide per scroll tick ──
+    let _wheelLocked   = false;
+    let _wheelCooldown = null;
+    feed.addEventListener('wheel', (e) => {
+      e.preventDefault();
+
+      if (_wheelLocked) return;
+      _wheelLocked = true;
+
+      const slideH       = feed.clientHeight;
+      const currentSlide = Math.round(feed.scrollTop / slideH);
+      const dir          = e.deltaY > 0 ? 1 : -1;
+      const targetSlide  = Math.max(0, currentSlide + dir);
+
+      feed.scrollTo({ top: targetSlide * slideH, behavior: 'smooth' });
+
+      // Fire enter animation on the destination slide after scroll settles
+      clearTimeout(_wheelCooldown);
+      _wheelCooldown = setTimeout(() => {
+        _wheelLocked = false;
+        const el = feed.querySelector(`.slide[data-slide-idx="${targetSlide}"]`);
+        if (el) {
+          el.classList.remove('entering');
+          void el.offsetWidth;
+          el.classList.add('entering');
+          _lastAnimatedSlide = targetSlide;
+        }
+      }, 380);
+    }, { passive: false });
+
+    attachSentinel();
+    setTimeout(maybeShowPushPrompt, 3000);
+
+    // Kick off first real fill now that feed is visible
+    scheduleFill();
+  }
+
+  // ── Confetti ──
   function spawnConfetti(n) {
     const colors = ['#58cc02','#ffc800','#ea2b2b','#1cb0f6','#ce82ff','#ff9600'];
+    const frag = document.createDocumentFragment();
     for (let i = 0; i < n; i++) {
       const p = document.createElement('i');
-      p.style.left            = Math.random() * 100 + '%';
-      p.style.top             = '-10px';
-      p.style.background      = colors[Math.floor(Math.random() * colors.length)];
-      p.style.animationDelay  = Math.random() * 0.2 + 's';
-      confettiEl.appendChild(p);
+      p.style.left           = Math.random() * 100 + '%';
+      p.style.top            = '-10px';
+      p.style.background     = colors[Math.floor(Math.random() * colors.length)];
+      p.style.animationDelay = Math.random() * 0.2 + 's';
+      frag.appendChild(p);
       setTimeout(() => p.classList.add('fall'), 10);
       setTimeout(() => p.remove(), 1400);
     }
+    confettiEl.appendChild(frag);
   }
 
   function updateUI(d) {
@@ -875,12 +1188,12 @@
     if (d.streak > 0) { streakPill.style.display = 'flex'; streakVal.textContent = d.streak; }
     else              { streakPill.style.display = 'none'; }
     const xpInLevel  = d.xp % 150;
-    xpBar.style.width    = (xpInLevel / 150 * 100) + '%';
+    xpBar.style.width      = (xpInLevel / 150 * 100) + '%';
     levelLabel.textContent = 'Lvl ' + d.level;
     xpLabel.textContent    = xpInLevel + '/150';
   }
 
-  // ── Push Notifications ──
+  // ── Push ──
   const VAPID_PUBLIC_KEY = 'BCeif8Bk8ozGVFukIl2zE7UWB1YXN5eBPF0nHgNc0ELsEyNmZ0VE3xo15UCuqjgNg9dARdIKThXKakZL9ci8ZXI';
 
   function maybeShowPushPrompt() {
@@ -891,10 +1204,12 @@
     document.getElementById('push-prompt').classList.add('show');
   }
   document.getElementById('pp-yes').addEventListener('click', async () => {
+    Haptics.success();
     document.getElementById('push-prompt').classList.remove('show');
     await subscribePush();
   });
   document.getElementById('pp-no').addEventListener('click', () => {
+    Haptics.light();
     document.getElementById('push-prompt').classList.remove('show');
     localStorage.setItem('push_dismissed', '1');
   });
@@ -909,9 +1224,7 @@
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
       });
-      const subPlain = sub.toJSON();
-      window.parent.postMessage({ type: 'savePushSub', sub: subPlain }, '*');
-      console.log('BrainDeer: push sub sent to parent ✓');
+      window.parent.postMessage({ type: 'savePushSub', sub: sub.toJSON() }, '*');
     } catch (err) {
       console.error('BrainDeer: push setup failed', err);
     }
