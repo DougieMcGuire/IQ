@@ -722,32 +722,21 @@
 
   // ─────────────────────────────────────────────────────────────────
   // PERFORMANCE-OPTIMISED FEED ENGINE
-  //
-  // Key changes vs original:
-  //  1. QUEUE_TARGET reduced to 8 (generate just-in-time, not upfront)
-  //  2. fillQueue is chunked via requestIdleCallback so it never
-  //     blocks the main thread / scroll animation
-  //  3. Scroll handler is throttled with rAF (max once per frame)
-  //  4. Pruned slides are REPLACED with lightweight spacer divs —
-  //     this actually frees memory instead of just hiding nodes
-  //  5. No setInterval polling — replaced by IntersectionObserver only
-  //  6. Slide count cap: only keep MAX_DOM_SLIDES real nodes live at once
   // ─────────────────────────────────────────────────────────────────
 
-  const QUEUE_TARGET   = 8;   // small buffer — fill lazily
-  const KEEP_BEHIND    = 3;   // real slides to keep behind viewport
-  const KEEP_AHEAD     = 6;   // real slides to keep ahead of viewport
-  const MAX_DOM_SLIDES = KEEP_BEHIND + KEEP_AHEAD + 1; // ~10 real nodes max
+  const QUEUE_TARGET   = 8;
+  const KEEP_BEHIND    = 3;
+  const KEEP_AHEAD     = 6;
+  const MAX_DOM_SLIDES = KEEP_BEHIND + KEEP_AHEAD + 1;
 
-  let slides       = 0;        // total slides ever created (grows forever)
-  let firstSlide   = 0;        // lowest slide index still in DOM as real slide
+  let slides       = 0;
+  let firstSlide   = 0;
   let answerStart  = 0;
 
   const questionQueue = [];
   let _filling        = false;
   let _fillScheduled  = false;
 
-  // Chunk-fill via rIC so it never janks scroll
   function scheduleFill() {
     if (_fillScheduled) return;
     _fillScheduled = true;
@@ -759,7 +748,6 @@
         let safety = 0;
         while (questionQueue.length < QUEUE_TARGET) {
           if (++safety > QUEUE_TARGET * 4) { console.warn('[BrainDeer] fillQueue safety'); break; }
-          // Use deadline if available so we don't overrun the idle window
           if (deadline && deadline.timeRemaining && deadline.timeRemaining() < 2 && questionQueue.length >= 3) break;
           try {
             const weakCat = IQData.getWeakestCategory();
@@ -773,7 +761,6 @@
       } finally {
         _filling = false;
       }
-      // If still below target, schedule another fill
       if (questionQueue.length < QUEUE_TARGET) scheduleFill();
     };
 
@@ -786,10 +773,9 @@
 
   function nextQuestion() {
     if (questionQueue.length === 0) {
-      // Synchronous fallback — generate one right now so scroll never stalls
       try {
         const q = Q.generate(1.0);
-        scheduleFill(); // replenish async
+        scheduleFill();
         return q;
       } catch(e) { return null; }
     }
@@ -798,7 +784,6 @@
     return q;
   }
 
-  // ── rAF-throttled scroll handler ──
   let _rafPending = false;
   function onFeedScroll() {
     if (_rafPending) return;
@@ -814,26 +799,21 @@
     const slideH = feed.clientHeight;
     if (!slideH) return;
     const currentSlide = Math.floor((feed.scrollTop + slideH * 0.5) / slideH);
-    // Add slides ahead
     const targetSlides = currentSlide + KEEP_AHEAD + 1;
     while (slides < targetSlides) addSlide();
-    // Prune old slides
     pruneSlides(currentSlide);
-    // Replenish queue if low
     if (questionQueue.length < Math.ceil(QUEUE_TARGET / 2)) scheduleFill();
-    // Fire enter animation when landing on a new slide
     if (currentSlide !== _lastAnimatedSlide) {
       _lastAnimatedSlide = currentSlide;
       const el = feed.querySelector(`.slide[data-slide-idx="${currentSlide}"]`);
       if (el) {
         el.classList.remove('entering');
-        void el.offsetWidth; // force reflow so animation restarts
+        void el.offsetWidth;
         el.classList.add('entering');
       }
     }
   }
 
-  // ── IntersectionObserver sentinel (bottom of feed) ──
   let _sentinel = null;
   function attachSentinel() {
     if (_sentinel) _sentinel.remove();
@@ -850,7 +830,6 @@
     obs.observe(_sentinel);
   }
 
-  // ── Real DOM pruning — replace with spacer divs ──
   function pruneSlides(currentSlide) {
     const cutoff = currentSlide - KEEP_BEHIND;
     if (cutoff <= firstSlide) return;
@@ -858,7 +837,6 @@
     for (let idx = firstSlide; idx < cutoff; idx++) {
       const el = feed.querySelector(`.slide[data-slide-idx="${idx}"]`);
       if (!el) continue;
-      // Replace real slide with a cheap spacer of identical height
       const spacer = document.createElement('div');
       spacer.className = 'slide-spacer';
       spacer.dataset.slideIdx = idx;
@@ -886,7 +864,6 @@
       const customRenderer = Q._renderers && Q._renderers[q.type];
       if (customRenderer) {
         div.innerHTML = customRenderer.render(q, idx);
-        // Insert before sentinel if it exists, otherwise just append
         if (_sentinel && _sentinel.parentNode === feed) {
           feed.insertBefore(div, _sentinel);
         } else {
@@ -1036,12 +1013,17 @@
     IQData.needsCalibration() ? startCalibration() : startFeed();
   });
 
+  // ── Calibration questions ──
+  // Each question has an assigned difficulty (used as the Elo opponent)
+  // and a category, so the calibration answers feed directly into the
+  // real Elo system via recordAnswer(). The final displayed IQ is then
+  // derived from the actual Elo ratings — not a separate formula.
   const CAL_QUESTIONS = [
-    { q:'What comes next? 2, 6, 18, 54, ?', a:'162', w:['108','126','148'], cat:'patternRecognition', d:1.2 },
-    { q:'If all Bloops are Razzies, and all Razzies are Lazzies, are all Bloops Lazzies?', a:'Yes', w:['No','Maybe','Not enough info'], cat:'logicalReasoning', d:1.1 },
-    { q:'Hot is to Cold as Up is to _____', a:'Down', w:['High','Sky','Top'], cat:'verbalReasoning', d:0.6 },
-    { q:'(7 × 8) − 13 = ?', a:'43', w:['42','45','49'], cat:'mentalAgility', d:1.0 },
-    { q:"Which doesn't belong? Cello, Flute, Violin, Harp", a:'Flute', w:['Cello','Violin','Harp'], cat:'logicalReasoning', d:1.0 },
+    { q:'Hot is to Cold as Up is to _____',                                        a:'Down',  w:['High','Sky','Top'],              cat:'verbalReasoning',    d:0.5  },
+    { q:'(7 × 8) − 13 = ?',                                                       a:'43',    w:['42','45','49'],                  cat:'mentalAgility',      d:0.8  },
+    { q:"Which doesn't belong? Cello, Flute, Violin, Harp",                        a:'Flute', w:['Cello','Violin','Harp'],         cat:'logicalReasoning',   d:1.0  },
+    { q:'What comes next? 2, 6, 18, 54, ?',                                        a:'162',   w:['108','126','148'],               cat:'patternRecognition', d:1.2  },
+    { q:'If all Bloops are Razzies, and all Razzies are Lazzies, are all Bloops Lazzies?', a:'Yes', w:['No','Maybe','Not enough info'], cat:'logicalReasoning', d:1.4  },
   ];
   let calIdx = 0, calCorrect = 0;
 
@@ -1084,6 +1066,7 @@
     });
     const dot = document.getElementById('cal-dot-' + calIdx);
     dot.classList.remove('active'); dot.classList.add(ok ? 'done' : 'wrong-dot');
+    // Feed calibration answer into the real Elo system
     IQData.recordAnswer(CAL_QUESTIONS[calIdx].cat, ok, CAL_QUESTIONS[calIdx].d, 5000);
     setTimeout(() => {
       calIdx++;
@@ -1091,9 +1074,15 @@
       else { par.dataset.done = ''; renderCalDots(); renderCalQuestion(); }
     }, 800);
   });
+
   function showCalResult() {
-    const iq = Math.max(75, Math.min(130, 85 + Math.round(calCorrect / CAL_QUESTIONS.length * 30)));
+    // Derive IQ from the actual Elo ratings that were just updated
+    // by the calibration answers — no separate formula needed.
+    const d  = IQData.load();
+    const iq = IQData.calcIQ(d) || 100;
     IQData.markCalibrated(iq);
+
+    document.getElementById('cal-iq').textContent = iq;
     document.getElementById('cal-quiz').style.display = 'none';
     document.getElementById('cal-result').style.display = 'block';
     Haptics.levelUp();
@@ -1120,16 +1109,13 @@
     IQData.startSession();
     updateUI(d);
 
-    // Seed queue with just a few questions upfront — rest fills lazily
     scheduleFill();
 
-    // Render initial batch (small — just enough to fill screen + 1 ahead)
     for (let i = 0; i < 3; i++) addSlide();
 
     feed.addEventListener('scroll',    onFeedScroll, { passive: true });
     feed.addEventListener('touchmove', onFeedScroll, { passive: true });
 
-    // ── TikTok-style wheel: one slide per scroll tick ──
     let _wheelLocked   = false;
     let _wheelCooldown = null;
     feed.addEventListener('wheel', (e) => {
@@ -1145,7 +1131,6 @@
 
       feed.scrollTo({ top: targetSlide * slideH, behavior: 'smooth' });
 
-      // Fire enter animation on the destination slide after scroll settles
       clearTimeout(_wheelCooldown);
       _wheelCooldown = setTimeout(() => {
         _wheelLocked = false;
@@ -1162,7 +1147,6 @@
     attachSentinel();
     setTimeout(maybeShowPushPrompt, 3000);
 
-    // Kick off first real fill now that feed is visible
     scheduleFill();
   }
 
