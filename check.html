@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Total Questions Answered</title>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
+  authDomain: "braindeer-backend.firebaseapp.com",
+  projectId: "braindeer-backend",
+  storageBucket: "braindeer-backend.firebasestorage.app",
+  messagingSenderId: "331205139765",
+  appId: "1:331205139765:web:20cfef8194af63fc55c07c",
+  measurementId: "G-9B6885G0X0"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+async function loadTotal() {
+
+  const ref = doc(db, "leaderboard", "snapshot");
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    document.getElementById("count").innerText = "No data";
+    return;
+  }
+
+  const data = snap.data();
+  const users = data.users || [];
+
+  let totalAnswered = 0;
+
+  users.forEach(user => {
+    totalAnswered += user.answered || 0;
+  });
+
+  document.getElementById("count").innerText =
+    totalAnswered.toLocaleString();
+}
+
+loadTotal();
+</script>
+
+<style>
+body{
+  font-family: Arial;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  background:#111;
+  color:white;
+}
+
+#count{
+  font-size:64px;
+  font-weight:bold;
+}
+</style>
+
+</head>
+
+<body>
+
+<div>
+<div style="text-align:center;font-size:20px;">Total Questions Answered</div>
+<div id="count">Loading...</div>
+</div>
+
+</body>
+</html>
