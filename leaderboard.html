@@ -3,628 +3,139 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Leaderboard — BrainDeer</title>
+  <title>Leaderboard — Cebear</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #3a2918; --card: #4a3625; --card-glow: #5a4232;
-      --brown-mid: #6b4f32; --brown-light: #8f6b4a;
-      --tan: #c2a476; --cream: #f0e2cc;
-      --green: #58cc02; --green-dark: #46a302;
-      --red: #ea2b2b; --red-dark: #c42020;
-      --gold: #ffc800; --gold-dark: #d9aa00;
-      --blue: #1cb0f6;
-      --purple: #ce82ff; --orange: #ff9600;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { width: 100%; height: 100%; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--cream); overflow: hidden; }
-    body { display: flex; flex-direction: column; }
+    :root{--bg:#162b5e;--navy:#162b5e;--navy-mid:#1e3872;--card:#fff;--text:#162b5e;--text-dim:#5a6a90;--text-light:#8a96b8;--pill:#EEF0F7;--green:#2DC653;--green-dark:#22a344;--red:#FF3B5C;--gold:#FFB800;--gold-dark:#d99e00;--blue:#3B82F6;--purple:#7C5CFC;--orange:#FF8C00}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{width:100%;height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+    body{display:flex;flex-direction:column}
+    main{flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top,0px)+12px) 14px 20px}
+    main::-webkit-scrollbar{display:none}
 
-    nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      height: calc(64px + env(safe-area-inset-bottom, 0px));
-      background: var(--card); box-shadow: 0 -3px 0 rgba(0,0,0,0.15);
-      display: flex; justify-content: center; align-items: flex-start;
-      padding-top: 6px; gap: 4px; z-index: 100;
-    }
-    .nav-btn {
-      padding: 8px 18px; background: none; border: none;
-      display: flex; flex-direction: column; align-items: center; gap: 2px;
-      color: var(--brown-light); font-family: 'Nunito', sans-serif;
-      font-size: 11px; font-weight: 800; border-radius: 14px;
-      transition: all 0.15s; cursor: pointer; position: relative;
-    }
-    .nav-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-    .nav-btn.active { color: var(--cream); background: var(--brown-mid); box-shadow: 0 3px 0 rgba(0,0,0,0.15); }
-    .nav-badge { position: absolute; top: 5px; right: 12px; width: 9px; height: 9px; border-radius: 50%; background: var(--red); border: 2px solid var(--card); display: none; animation: badgePulse 2s ease infinite; }
-    .nav-badge.show { display: block; }
-    @keyframes badgePulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.35)} }
+    .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
+    .page-title{font-size:20px;font-weight:900;color:#fff;flex-shrink:0}
+    .header-right{display:flex;align-items:center;gap:7px}
+    .refresh-btn{background:rgba(255,255,255,.1);border:none;border-radius:10px;padding:8px 12px;color:rgba(255,255,255,.6);cursor:pointer;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;display:flex;align-items:center;gap:5px;transition:transform .1s;flex-shrink:0}
+    .refresh-btn:active{transform:translateY(2px)}
+    .refresh-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;transition:transform .6s}
+    .refresh-btn.spinning svg{transform:rotate(360deg)}
+    .cache-pill{background:rgba(255,255,255,.1);border-radius:8px;padding:4px 10px;font-size:10px;font-weight:800;color:rgba(255,255,255,.4);flex-shrink:0}
+    .cache-pill.fresh{color:var(--green)}
+    .privacy-btn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border:none;border-radius:10px;padding:8px 12px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:rgba(255,255,255,.5);transition:all .15s;flex-shrink:0}
+    .privacy-btn:active{transform:translateY(2px)}
+    .privacy-btn.hidden-mode{background:rgba(255,59,92,.15);color:var(--red)}
+    .privacy-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;flex-shrink:0}
+    .hidden-notice{background:var(--card);border-radius:14px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;border-left:4px solid var(--red)}
+    .hidden-notice .hn-icon{width:32px;height:32px;background:rgba(255,59,92,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .hidden-notice .hn-icon svg{width:16px;height:16px;stroke:var(--red);fill:none;stroke-width:2}
+    .hidden-notice .hn-text{font-size:12px;font-weight:700;color:var(--text-dim);line-height:1.4}
+    .hidden-notice .hn-text strong{color:var(--red)}
 
-    main {
-      flex: 1; overflow-y: auto;
-      padding: calc(env(safe-area-inset-top, 0px) + 12px) 14px calc(72px + env(safe-area-inset-bottom, 0px));
-    }
-    main::-webkit-scrollbar { display: none; }
+    .filter-row{display:flex;gap:6px;margin-bottom:14px}
+    .filter-tab{flex:1;background:var(--card);border:none;border-radius:12px;padding:9px 4px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:var(--text-dim);cursor:pointer;text-align:center;transition:all .15s;box-shadow:0 2px 4px rgba(0,0,0,.06)}
+    .filter-tab[data-sort="iq"].active{background:var(--purple);color:#fff;box-shadow:0 4px 12px rgba(124,92,252,.3)}
+    .filter-tab[data-sort="bestStreak"].active{background:var(--gold);color:var(--navy);box-shadow:0 4px 12px rgba(255,184,0,.3)}
+    .filter-tab[data-sort="level"].active{background:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(59,130,246,.3)}
 
-    /* ── Header ── */
-    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-top: 4px; gap: 8px; }
-    .page-title { font-size: 20px; font-weight: 900; color: var(--cream); flex-shrink: 0; }
-    .header-right { display: flex; align-items: center; gap: 7px; }
+    .your-rank-bar{background:var(--card);border-radius:16px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid var(--gold)}
+    .yrb-left{font-size:12px;font-weight:800;color:var(--text-dim)}
+    .yrb-rank{font-size:24px;font-weight:900;color:var(--gold)}
 
-    .refresh-btn {
-      background: var(--card); border: none; border-radius: 12px;
-      padding: 8px 12px; color: var(--tan); cursor: pointer;
-      font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 800;
-      display: flex; align-items: center; gap: 5px;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.12); transition: transform 0.1s; flex-shrink: 0;
-    }
-    .refresh-btn:active { transform: translateY(2px); }
-    .refresh-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; transition: transform 0.6s ease; }
-    .refresh-btn.spinning svg { transform: rotate(360deg); }
+    .podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin-bottom:18px}
+    .podium-spot{flex:1;max-width:115px;display:flex;flex-direction:column;align-items:center}
+    .podium-spot.rank-1{order:2}.podium-spot.rank-2{order:1}.podium-spot.rank-3{order:3}
+    .podium-avatar{width:48px;height:48px;border-radius:50%;background:var(--pill);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:20px;position:relative;margin-bottom:6px;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+    .podium-spot.rank-1 .podium-avatar{width:58px;height:58px;font-size:24px}
+    .podium-avatar img{width:100%;height:100%;object-fit:cover;display:none}
+    .podium-avatar.has-pic img{display:block}.podium-avatar.has-pic .avatar-emoji{display:none}
+    .podium-crown{position:absolute;top:-16px;left:50%;transform:translateX(-50%)}
+    .podium-crown svg{width:20px;height:20px}
+    .podium-name{font-size:11px;font-weight:900;color:#fff;text-align:center;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px}
+    .podium-val{font-size:14px;font-weight:900;margin-bottom:5px;text-align:center}
+    .podium-val.col-iq{color:var(--purple)}.podium-val.col-bestStreak{color:var(--gold)}.podium-val.col-level{color:var(--blue)}
+    .podium-block{width:100%;border-radius:12px 12px 0 0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff}
+    .podium-spot.rank-1 .podium-block{height:68px}.podium-spot.rank-2 .podium-block{height:50px}.podium-spot.rank-3 .podium-block{height:36px}
+    .podium-block.col-iq{background:var(--purple)}.podium-block.col-bestStreak{background:var(--gold)}.podium-block.col-level{background:var(--blue)}
+    .podium-spot.rank-1 .podium-avatar{border-color:var(--gold)}
 
-    /* Cache age pill */
-    .cache-pill {
-      background: var(--card); border-radius: 10px; padding: 5px 10px;
-      font-size: 10px; font-weight: 800; color: var(--brown-light);
-      flex-shrink: 0;
-    }
-    .cache-pill.fresh { color: var(--green); }
-
-    .privacy-btn {
-      display: flex; align-items: center; gap: 5px;
-      background: var(--card); border: none; border-radius: 12px;
-      padding: 8px 12px; cursor: pointer;
-      font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 800;
-      color: var(--tan); box-shadow: 0 3px 0 rgba(0,0,0,0.12);
-      transition: all 0.15s; flex-shrink: 0; position: relative; overflow: hidden;
-    }
-    .privacy-btn::before { content:''; position:absolute; top:0;left:0;right:0;height:50%; background:linear-gradient(180deg,rgba(255,255,255,0.05)0%,transparent 100%); pointer-events:none; }
-    .privacy-btn:active { transform: translateY(2px); }
-    .privacy-btn.hidden-mode { background: rgba(234,43,43,0.15); color: var(--red); box-shadow: 0 3px 0 rgba(234,43,43,0.2); }
-    .privacy-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2.5; flex-shrink: 0; }
-
-    .hidden-notice {
-      background: rgba(234,43,43,0.1); border-radius: 14px; padding: 10px 14px;
-      margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
-      border: 1.5px solid rgba(234,43,43,0.2);
-    }
-    .hidden-notice .hn-icon { font-size: 18px; flex-shrink: 0; }
-    .hidden-notice .hn-text { font-size: 12px; font-weight: 700; color: var(--tan); line-height: 1.4; }
-    .hidden-notice .hn-text strong { color: var(--red); }
-
-    .filter-row { display: flex; gap: 6px; margin-bottom: 14px; }
-    .filter-tab {
-      flex: 1; background: var(--card); border: none; border-radius: 20px;
-      padding: 8px 4px; font-family: 'Nunito', sans-serif;
-      font-size: 12px; font-weight: 800; color: var(--tan);
-      cursor: pointer; text-align: center;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.12); transition: all 0.15s;
-      position: relative; overflow: hidden;
-    }
-    .filter-tab::before { content:''; position:absolute; top:0;left:0;right:0;height:50%; background:linear-gradient(180deg,rgba(255,255,255,0.05)0%,transparent 100%); pointer-events:none; }
-    .filter-tab[data-sort="iq"].active         { background: var(--purple); color: #fff; box-shadow: 0 3px 0 #9b5dcc; }
-    .filter-tab[data-sort="bestStreak"].active  { background: var(--gold);   color: #2a1800; box-shadow: 0 3px 0 var(--gold-dark); }
-    .filter-tab[data-sort="level"].active       { background: var(--blue);   color: #fff; box-shadow: 0 3px 0 #1080b8; }
-
-    .your-rank-bar {
-      background: var(--card); border-radius: 16px; padding: 12px 16px;
-      margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.12); border: 2px solid rgba(255,200,0,0.15);
-      position: relative; overflow: hidden;
-    }
-    .your-rank-bar::before { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:linear-gradient(180deg,rgba(255,255,255,0.04)0%,transparent 100%); pointer-events:none; }
-    .yrb-left { font-size: 13px; font-weight: 800; color: var(--tan); }
-    .yrb-rank { font-size: 24px; font-weight: 900; color: var(--gold); }
-
-    .podium { display: flex; align-items: flex-end; justify-content: center; gap: 8px; margin-bottom: 18px; }
-    .podium-spot { flex: 1; max-width: 115px; display: flex; flex-direction: column; align-items: center; }
-    .podium-spot.rank-1 { order: 2; }
-    .podium-spot.rank-2 { order: 1; }
-    .podium-spot.rank-3 { order: 3; }
-    .podium-avatar {
-      width: 52px; height: 52px; border-radius: 50%; background: var(--brown-mid);
-      overflow: hidden; display: flex; align-items: center; justify-content: center;
-      font-size: 22px; position: relative; margin-bottom: 6px;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.2);
-    }
-    .podium-spot.rank-1 .podium-avatar { width: 62px; height: 62px; font-size: 28px; }
-    .podium-avatar img { width: 100%; height: 100%; object-fit: cover; display: none; }
-    .podium-avatar.has-pic img { display: block; }
-    .podium-avatar.has-pic .avatar-emoji { display: none; }
-    .podium-crown { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 16px; }
-    .podium-name { font-size: 11px; font-weight: 900; color: var(--cream); text-align: center; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 3px; }
-    .podium-val { font-size: 14px; font-weight: 900; margin-bottom: 5px; text-align: center; }
-    .podium-val.col-iq         { color: var(--purple); }
-    .podium-val.col-bestStreak { color: var(--gold); }
-    .podium-val.col-level      { color: var(--blue); }
-    .podium-block {
-      width: 100%; border-radius: 12px 12px 0 0;
-      display: flex; align-items: center; justify-content: center; font-size: 18px;
-      position: relative; overflow: hidden;
-    }
-    .podium-block::before { content:''; position:absolute; top:0;left:0;right:0;height:40%; background:linear-gradient(180deg,rgba(255,255,255,0.14)0%,transparent 100%); pointer-events:none; }
-    .podium-spot.rank-1 .podium-block { height: 68px; }
-    .podium-spot.rank-2 .podium-block { height: 50px; }
-    .podium-spot.rank-3 .podium-block { height: 36px; }
-    .podium-block.col-iq         { background: var(--purple); }
-    .podium-block.col-bestStreak { background: var(--gold); }
-    .podium-block.col-level      { background: var(--blue); }
-    .podium-spot.rank-1 .podium-avatar.col-iq         { border: 3px solid var(--purple); }
-    .podium-spot.rank-1 .podium-avatar.col-bestStreak { border: 3px solid var(--gold); }
-    .podium-spot.rank-1 .podium-avatar.col-level      { border: 3px solid var(--blue); }
-
-    .section-label { font-size: 11px; font-weight: 900; color: var(--tan); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; padding-left: 2px; }
-    .lb-list { display: flex; flex-direction: column; gap: 7px; }
-    .lb-row {
-      background: var(--card); border-radius: 16px;
-      padding: 11px 14px; display: flex; align-items: center; gap: 12px;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.12); position: relative; overflow: hidden;
-    }
-    .lb-row::before { content:''; position:absolute; top:0;left:0;right:0;height:45%; background:linear-gradient(180deg,rgba(255,255,255,0.04)0%,transparent 100%); pointer-events:none; border-radius:16px 16px 0 0; }
-    .lb-row.me { background: var(--card-glow); box-shadow: 0 3px 0 rgba(0,0,0,0.12), inset 0 0 0 2px rgba(255,200,0,0.2); }
-    .lb-rank { font-size: 14px; font-weight: 900; color: var(--brown-light); min-width: 24px; text-align: center; }
-    .lb-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--brown-mid); overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-    .lb-avatar img { width: 100%; height: 100%; object-fit: cover; display: none; }
-    .lb-avatar.has-pic img { display: block; }
-    .lb-avatar.has-pic .avatar-emoji { display: none; }
-    .lb-info { flex: 1; min-width: 0; }
-    .lb-name { font-size: 14px; font-weight: 800; color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .lb-sub { font-size: 11px; font-weight: 700; color: var(--tan); margin-top: 2px; }
-    .lb-sub span { margin-right: 8px; }
-    .lb-val { font-size: 18px; font-weight: 900; text-align: right; flex-shrink: 0; }
-    .lb-val-label { font-size: 10px; font-weight: 800; color: var(--tan); text-align: right; }
-    .you-badge { background: var(--gold); color: #2a1800; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 6px; letter-spacing: 0.5px; margin-left: 5px; }
-
-    .skeleton { background: var(--card); border-radius: 16px; height: 62px; box-shadow: 0 3px 0 rgba(0,0,0,0.12); position: relative; overflow: hidden; }
-    .skeleton::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent); animation:shimmer 1.4s infinite; }
-    @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
-    .lb-empty { text-align: center; padding: 32px 20px; color: var(--tan); font-size: 14px; font-weight: 700; line-height: 1.6; }
-    .lb-empty .emoji { font-size: 40px; display: block; margin-bottom: 10px; }
-
-    .toast { position:fixed; bottom:84px; left:50%; transform:translateX(-50%); background:var(--green); color:#fff; padding:10px 20px; border-radius:14px; font-size:14px; font-weight:800; opacity:0; transition:opacity 0.3s; z-index:300; white-space:nowrap; box-shadow:0 3px 0 var(--green-dark); pointer-events:none; }
-    .toast.show { opacity: 1; }
+    .section-label{font-size:11px;font-weight:900;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;padding-left:2px}
+    .lb-list{display:flex;flex-direction:column;gap:7px}
+    .lb-row{background:var(--card);border-radius:16px;padding:11px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 4px rgba(0,0,0,.06)}
+    .lb-row.me{box-shadow:0 2px 4px rgba(0,0,0,.06),inset 0 0 0 2px rgba(255,184,0,.3)}
+    .lb-rank{font-size:14px;font-weight:900;color:var(--text-light);min-width:24px;text-align:center}
+    .lb-avatar{width:38px;height:38px;border-radius:50%;background:var(--pill);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+    .lb-avatar img{width:100%;height:100%;object-fit:cover;display:none}.lb-avatar.has-pic img{display:block}.lb-avatar.has-pic .avatar-emoji{display:none}
+    .lb-info{flex:1;min-width:0}
+    .lb-name{font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .lb-sub{font-size:11px;font-weight:700;color:var(--text-dim);margin-top:2px}
+    .lb-sub span{margin-right:8px}
+    .lb-val{font-size:18px;font-weight:900;text-align:right;flex-shrink:0}
+    .lb-val-label{font-size:10px;font-weight:800;color:var(--text-dim);text-align:right}
+    .you-badge{background:var(--gold);color:var(--navy);font-size:9px;font-weight:900;padding:2px 6px;border-radius:6px;letter-spacing:.5px;margin-left:5px}
+    .skeleton{background:var(--card);border-radius:16px;height:62px;box-shadow:0 2px 4px rgba(0,0,0,.06);position:relative;overflow:hidden}
+    .skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(0,0,0,.03),transparent);animation:shimmer 1.4s infinite}
+    @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+    .lb-empty{text-align:center;padding:32px 20px;color:rgba(255,255,255,.4);font-size:14px;font-weight:700;line-height:1.6}
+    .toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 20px;border-radius:14px;font-size:14px;font-weight:800;opacity:0;transition:opacity .3s;z-index:300;white-space:nowrap;pointer-events:none}
+    .toast.show{opacity:1}
   </style>
 </head>
 <body>
-
 <main>
   <div class="page-header">
-    <div class="page-title">🏆 Leaderboard</div>
+    <div class="page-title">Leaderboard</div>
     <div class="header-right">
       <span class="cache-pill" id="cache-pill">—</span>
-      <button class="privacy-btn" id="privacy-btn">
-        <svg id="privacy-icon" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-        <span id="privacy-label">Hide me</span>
-      </button>
-      <button class="refresh-btn" id="refresh-btn">
-        <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-        Refresh
-      </button>
+      <button class="privacy-btn" id="privacy-btn"><svg id="privacy-icon" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg><span id="privacy-label">Hide me</span></button>
+      <button class="refresh-btn" id="refresh-btn"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Refresh</button>
     </div>
   </div>
-
-  <div class="hidden-notice" id="hidden-notice" style="display:none;">
-    <div class="hn-icon">👻</div>
-    <div class="hn-text"><strong>You're hidden</strong> — others can't see you on the leaderboard</div>
-  </div>
-
+  <div class="hidden-notice" id="hidden-notice" style="display:none;"><div class="hn-icon"><svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg></div><div class="hn-text"><strong>You're hidden</strong> — others can't see you on the leaderboard</div></div>
   <div class="filter-row" id="filter-row">
-    <button class="filter-tab active" data-sort="iq">🧠 IQ</button>
-    <button class="filter-tab" data-sort="bestStreak">🏅 Best Streak</button>
-    <button class="filter-tab" data-sort="level">⚡ Level</button>
+    <button class="filter-tab active" data-sort="iq">IQ</button>
+    <button class="filter-tab" data-sort="bestStreak">Best Streak</button>
+    <button class="filter-tab" data-sort="level">Level</button>
   </div>
-
-  <div class="your-rank-bar" id="your-rank-bar" style="display:none;">
-    <div>
-      <div class="yrb-left">Your Rank</div>
-      <div class="yrb-rank" id="your-rank-num">#—</div>
-    </div>
-    <div id="your-rank-right" style="font-size:12px;font-weight:700;color:var(--brown-light);text-align:right;"></div>
-  </div>
-
+  <div class="your-rank-bar" id="your-rank-bar" style="display:none;"><div><div class="yrb-left">Your Rank</div><div class="yrb-rank" id="your-rank-num">#—</div></div><div id="your-rank-right" style="font-size:12px;font-weight:700;color:var(--text-light);text-align:right;"></div></div>
   <div class="podium" id="podium"></div>
   <div class="section-label" id="rest-label" style="display:none;">Others</div>
-  <div class="lb-list" id="lb-list">
-    <div class="skeleton"></div>
-    <div class="skeleton"></div>
-    <div class="skeleton"></div>
-    <div class="skeleton"></div>
-    <div class="skeleton"></div>
-  </div>
+  <div class="lb-list" id="lb-list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
 </main>
-
-<nav>
-  <button class="nav-btn active" onclick="parent.goTo('leaderboard')">
-    <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
-    Ranks
-  </button>
-  <button class="nav-btn" onclick="parent.goTo('improve')">
-    <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-    Train
-  </button>
-  <button class="nav-btn" onclick="parent.goTo('tasks')">
-    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-    Tasks
-    <span class="nav-badge" id="tasks-badge"></span>
-  </button>
-  <button class="nav-btn" onclick="parent.goTo('profile')">
-    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    Profile
-  </button>
-</nav>
-
 <div class="toast" id="toast"></div>
 
 <script type="module">
-  import { IQData, db, authReady } from './data.js';
-  import Haptics from './haptics.js';
-  import { doc, getDoc, setDoc, updateDoc }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import{IQData,db,authReady}from'./data.js';import Haptics from'./haptics.js';
+  import{doc,getDoc,setDoc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  if(window.parent!==window)parent.authCheck();
 
-  if (window.parent !== window) parent.authCheck();
-
-  // ─────────────────────────────────────────────────────────────────
-  // SNAPSHOT ARCHITECTURE
-  //
-  // Instead of reading every user doc (200 reads per view), we maintain
-  // a single document:  leaderboard/snapshot
-  // Shape: { updatedAt: timestamp, users: [ {uid, username, iq, level, ...}, ... ] }
-  //
-  // Reading the leaderboard = 1 read always.
-  //
-  // Writing: only happens when the CURRENT USER's stats change meaningfully.
-  // data.js should call window.updateLeaderboardSnapshot() after recordAnswer.
-  // We also update it on page load if the user's entry is stale.
-  //
-  // Client-side cache: store snapshot in sessionStorage so tab switches
-  // within the same session cost 0 reads.
-  // ─────────────────────────────────────────────────────────────────
-
-  const SNAPSHOT_DOC   = 'leaderboard/snapshot';
-  const SESSION_CACHE  = 'bd_lb_snapshot';
-  const CACHE_MAX_AGE  = 5 * 60 * 1000; // 5 min — only re-fetch if older than this on manual refresh
-
-  const SORT_CONFIG = {
-    iq:         { field: 'iq',         label: 'IQ',         color: 'var(--purple)', min: 50, fmt: v => v },
-    bestStreak: { field: 'bestStreak', label: 'Best Streak', color: 'var(--gold)',  min: 1,  fmt: v => v + ' 🏅' },
-    level:      { field: 'level',      label: 'Level',       color: 'var(--blue)',  min: 1,  fmt: v => 'Lvl ' + v },
-  };
-
-  let currentSort = 'iq';
-  let allUsers    = [];
-  let myUid       = null;
-  let isHidden    = false;
-  let snapshotAge = null; // ms since last fetch
-
-  // ── Session cache helpers ──
-  function getCached() {
-    try {
-      const raw = sessionStorage.getItem(SESSION_CACHE);
-      if (!raw) return null;
-      return JSON.parse(raw);
-    } catch { return null; }
-  }
-  function setCached(data) {
-    try { sessionStorage.setItem(SESSION_CACHE, JSON.stringify({ ...data, _cachedAt: Date.now() })); } catch {}
-  }
-
-  // ── Toast ──
-  function toast(msg, color) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.style.background = color || 'var(--green)';
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2200);
-  }
-
-  // ── Cache age pill ──
-  function updateCachePill() {
-    const pill = document.getElementById('cache-pill');
-    if (snapshotAge === null) { pill.textContent = '—'; pill.className = 'cache-pill'; return; }
-    const mins = Math.round(snapshotAge / 60000);
-    if (mins < 1)  { pill.textContent = 'Live'; pill.className = 'cache-pill fresh'; }
-    else           { pill.textContent = mins + 'm ago'; pill.className = 'cache-pill'; }
-  }
-
-  // ── Nav haptics ──
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('touchstart', () => Haptics.light(), { passive: true });
-  });
-
-  // ── Filter tabs ──
-  document.getElementById('filter-row').addEventListener('click', e => {
-    const tab = e.target.closest('.filter-tab');
-    if (!tab) return;
-    Haptics.medium();
-    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    currentSort = tab.dataset.sort;
-    render();
-  });
-
-  // ── Refresh — only fetch if cache is stale ──
-  document.getElementById('refresh-btn').addEventListener('click', () => {
-    Haptics.medium();
-    const cached = getCached();
-    const age    = cached ? Date.now() - cached._cachedAt : Infinity;
-    if (age < CACHE_MAX_AGE) {
-      toast('Already up to date ✓', 'var(--brown-mid)');
-      return;
-    }
-    fetchSnapshot(true);
-  });
-
-  // ── Privacy ──
-  function loadPrivacySetting() {
-    const d = IQData.load();
-    isHidden = !!d.hideFromLeaderboard;
-    updatePrivacyUI();
-  }
-
-  async function togglePrivacy() {
-    isHidden = !isHidden;
-    Haptics.toggle ? Haptics.toggle() : Haptics.medium();
-    const d = IQData.load();
-    d.hideFromLeaderboard = isHidden;
-    IQData.save(d);
-    if (myUid) {
-      try { await updateDoc(doc(db, 'users', myUid), { hideFromLeaderboard: isHidden }); }
-      catch (e) { console.warn('Privacy update failed', e); }
-    }
-    updatePrivacyUI();
-    toast(isHidden ? '👻 Hidden from leaderboard' : '👀 You\'re visible again', isHidden ? 'var(--red)' : 'var(--green)');
-    // Update snapshot to remove/add current user
-    await pushMyEntryToSnapshot();
-    render();
-  }
-
-  function updatePrivacyUI() {
-    const btn    = document.getElementById('privacy-btn');
-    const icon   = document.getElementById('privacy-icon');
-    const label  = document.getElementById('privacy-label');
-    const notice = document.getElementById('hidden-notice');
-    const rankBar = document.getElementById('your-rank-bar');
-    if (isHidden) {
-      icon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
-      label.textContent = 'Show me';
-      btn.classList.add('hidden-mode');
-      notice.style.display = 'flex';
-      rankBar.style.display = 'none';
-    } else {
-      icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`;
-      label.textContent = 'Hide me';
-      btn.classList.remove('hidden-mode');
-      notice.style.display = 'none';
-    }
-  }
-
-  document.getElementById('privacy-btn').addEventListener('click', togglePrivacy);
-
-  // ── Push MY entry into the snapshot ──
-  // This is the only write that happens — upserts your entry in the snapshot doc.
-  // Called on login + after answer (via data.js) + privacy toggle.
-  // Cost: 1 write. The snapshot doc stores an array of users, we merge your entry.
-  async function pushMyEntryToSnapshot() {
-    if (!myUid) return;
-    const d = IQData.load();
-    if (!d.calibrated || (d.answered || 0) < 5) return; // don't pollute leaderboard with incomplete profiles
-
-    const myEntry = {
-      uid:        myUid,
-      username:   d.username   || 'Anonymous',
-      iq:         d.iq         || 0,
-      level:      d.level      || 1,
-      bestStreak: d.bestStreak || 0,
-      answered:   d.answered   || 0,
-      correct:    d.correct    || 0,
-      pic:        d.pic        || '',
-      hidden:     !!d.hideFromLeaderboard,
-      updatedAt:  Date.now(),
-    };
-
-    try {
-      const ref  = doc(db, 'leaderboard', 'snapshot');
-      const snap = await getDoc(ref);           // 1 read
-      let users  = [];
-      if (snap.exists()) {
-        users = (snap.data().users || []).filter(u => u.uid !== myUid); // remove old entry
-      }
-      if (!myEntry.hidden) users.push(myEntry); // only add if visible
-      // Keep top 500 by IQ to prevent unbounded growth
-      users.sort((a, b) => (b.iq || 0) - (a.iq || 0));
-      if (users.length > 500) users = users.slice(0, 500);
-      await setDoc(ref, { users, updatedAt: Date.now() }); // 1 write
-      // Bust session cache so next render picks up fresh data
-      sessionStorage.removeItem(SESSION_CACHE);
-    } catch (e) {
-      console.warn('[leaderboard] pushMyEntry failed', e);
-    }
-  }
-
-  // Expose so data.js / improve.html can call after recording an answer
-  window.updateLeaderboardSnapshot = pushMyEntryToSnapshot;
-
-  // ── One-time migration: build snapshot from all existing users/{uid} docs ──
-  // Only runs when leaderboard/snapshot doesn't exist yet.
-  async function migrateSnapshotFromUsers() {
-    try {
-      const { collection, getDocs, query, limit } =
-        await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-
-      // Grab ALL users with no filters — let the map below handle filtering
-      // This avoids index issues and catches users regardless of calibrated flag
-      const snap = await getDocs(query(collection(db, 'users'), limit(500)));
-
-      console.log('[leaderboard] migration found ' + snap.docs.length + ' total user docs');
-
-      const users = snap.docs
-        .map(d => ({ uid: d.id, ...d.data() }))
-        .filter(u => !u.hideFromLeaderboard && (u.iq || 0) > 0)  // just needs an IQ score
-        .map(u => ({
-          uid:        u.uid        || u.id || '',
-          username:   u.username   || 'Anonymous',
-          iq:         u.iq         || 0,
-          level:      u.level      || 1,
-          bestStreak: u.bestStreak || 0,
-          answered:   u.answered   || 0,
-          correct:    u.correct    || 0,
-          pic:        u.pic        || '',
-          hidden:     false,
-          updatedAt:  Date.now(),
-        }))
-        .filter(u => u.uid); // drop any docs without a uid
-
-      users.sort((a, b) => (b.iq || 0) - (a.iq || 0));
-      const ref = doc(db, 'leaderboard', 'snapshot');
-      await setDoc(ref, { users, updatedAt: Date.now(), migrated: true });
-      console.log('[leaderboard] migrated ' + users.length + ' users into snapshot');
-      return users;
-    } catch (e) {
-      console.warn('[leaderboard] migration failed:', e.message);
-      return [];
-    }
-  }
-
-  // ── Fetch the snapshot (1 read normally, N reads only on very first load) ──
-  async function fetchSnapshot(forced = false) {
-    const btn = document.getElementById('refresh-btn');
-    btn.classList.add('spinning');
-
-    try {
-      // Check session cache first (0 reads)
-      if (!forced) {
-        const cached = getCached();
-        if (cached && cached.users) {
-          allUsers    = cached.users;
-          snapshotAge = Date.now() - cached._cachedAt;
-          updateCachePill();
-          render();
-          btn.classList.remove('spinning');
-          return;
-        }
-      }
-
-      // 1 Firestore read
-      const ref  = doc(db, 'leaderboard', 'snapshot');
-      const snap = await getDoc(ref);
-
-      if (snap.exists()) {
-        const data = snap.data();
-        allUsers = (data.users || []).filter(u => !u.hidden && (u.iq || 0) >= 50 && (u.answered || 0) >= 5);
-        setCached({ users: allUsers });
-        snapshotAge = 0;
-      } else {
-        // Snapshot doesn't exist — run one-time migration from users collection
-        console.log('[leaderboard] snapshot missing, running one-time migration...');
-        const migrated = await migrateSnapshotFromUsers();
-        allUsers = migrated.filter(u => (u.iq || 0) >= 50 && (u.answered || 0) >= 5);
-        setCached({ users: allUsers });
-        snapshotAge = 0;
-      }
-    } catch (e) {
-      console.error('[leaderboard] fetchSnapshot failed:', e.message);
-      Haptics.error && Haptics.error();
-      toast('Could not load — check connection', 'var(--red)');
-      const cached = getCached();
-      if (cached && cached.users) allUsers = cached.users;
-    }
-
-    updateCachePill();
-    btn.classList.remove('spinning');
-    render();
-  }
-
-  // ── Render (pure client-side sort from cached array — 0 reads) ──
-  function getSorted() {
-    const cfg = SORT_CONFIG[currentSort];
-    return [...allUsers]
-      .filter(u => u[cfg.field] != null && Number(u[cfg.field]) >= cfg.min)
-      .sort((a, b) => (b[cfg.field] || 0) - (a[cfg.field] || 0));
-  }
-
-  function render() {
-    const sorted = getSorted();
-    const cfg    = SORT_CONFIG[currentSort];
-    const myIdx  = myUid && !isHidden ? sorted.findIndex(u => u.uid === myUid) : -1;
-    renderYourRank(sorted, myIdx, cfg);
-    renderPodium(sorted.slice(0, 3), cfg);
-    renderList(sorted.slice(3), myIdx, cfg);
-    document.getElementById('rest-label').style.display = sorted.length > 3 ? 'block' : 'none';
-  }
-
-  function renderYourRank(sorted, myIdx, cfg) {
-    const bar = document.getElementById('your-rank-bar');
-    if (!myUid || myIdx === -1 || isHidden) { bar.style.display = 'none'; return; }
-    bar.style.display = 'flex';
-    const me = sorted[myIdx];
-    document.getElementById('your-rank-num').textContent = '#' + (myIdx + 1);
-    document.getElementById('your-rank-right').innerHTML =
-      `<div style="font-size:20px;font-weight:900;color:${cfg.color}">${cfg.fmt(me[cfg.field])}</div><div>${cfg.label}</div>`;
-  }
-
-  function renderPodium(top3, cfg) {
-    const podium = document.getElementById('podium');
-    if (!top3.length) { podium.innerHTML = ''; return; }
-    podium.innerHTML = [1,2,3].map(rank => {
-      const u = top3[rank - 1];
-      if (!u) return `<div class="podium-spot rank-${rank}"></div>`;
-      const isMe = u.uid === myUid;
-      return `
-        <div class="podium-spot rank-${rank}">
-          <div class="podium-avatar${u.pic ? ' has-pic' : ''} col-${currentSort}">
-            ${rank === 1 ? `<div class="podium-crown">👑</div>` : ''}
-            <img src="${u.pic || ''}" alt=""><span class="avatar-emoji">${avatarEmoji(u)}</span>
-          </div>
-          <div class="podium-name">${esc(u.username || 'Anonymous')}${isMe ? ' 🫵' : ''}</div>
-          <div class="podium-val col-${currentSort}">${cfg.fmt(u[cfg.field])}</div>
-          <div class="podium-block col-${currentSort}">${['👑','🥈','🥉'][rank-1]}</div>
-        </div>`;
-    }).join('');
-  }
-
-  function renderList(rest, myIdx, cfg) {
-    const list = document.getElementById('lb-list');
-    if (!rest.length) {
-      list.innerHTML = `<div class="lb-empty"><span class="emoji">🧠</span>Not enough players yet — keep training!</div>`;
-      return;
-    }
-    list.innerHTML = rest.map((u, i) => {
-      const rank = i + 4;
-      const isMe = u.uid === myUid;
-      const acc  = u.answered > 0 ? Math.round((u.correct / u.answered) * 100) : 0;
-      return `
-        <div class="lb-row${isMe ? ' me' : ''}">
-          <div class="lb-rank">${rank}</div>
-          <div class="lb-avatar${u.pic ? ' has-pic' : ''}">
-            <img src="${u.pic || ''}" alt=""><span class="avatar-emoji">${avatarEmoji(u)}</span>
-          </div>
-          <div class="lb-info">
-            <div class="lb-name">${esc(u.username || 'Anonymous')}${isMe ? `<span class="you-badge">YOU</span>` : ''}</div>
-            <div class="lb-sub"><span>🧠 ${u.iq || '--'}</span><span>🎯 ${acc}%</span><span>⚡ Lvl ${u.level || 1}</span></div>
-          </div>
-          <div>
-            <div class="lb-val" style="color:${cfg.color}">${cfg.fmt(u[cfg.field])}</div>
-            <div class="lb-val-label">${cfg.label}</div>
-          </div>
-        </div>`;
-    }).join('');
-  }
-
-  const EMOJIS = ['🦊','🐻','🦁','🐯','🦝','🐺','🦄','🐸','🐧','🦋','🦀','🐙'];
-  function avatarEmoji(u) { return EMOJIS[(u.uid || 'x').charCodeAt(0) % EMOJIS.length]; }
-  function esc(s) { return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-  async function init() {
-    await authReady;
-    myUid = IQData.getCurrentUser()?.uid || null;
-    loadPrivacySetting();
-    // Push our entry into snapshot (1 read + 1 write, only on first open or if stale)
-    await pushMyEntryToSnapshot();
-    // Fetch snapshot — uses session cache if available (0 reads on tab switch)
-    await fetchSnapshot();
-  }
-
+  const SNAPSHOT_DOC='leaderboard/snapshot',SESSION_CACHE='bd_lb_snapshot',CACHE_MAX_AGE=5*60*1000;
+  const SORT_CONFIG={iq:{field:'iq',label:'IQ',color:'var(--purple)',min:50,fmt:v=>v},bestStreak:{field:'bestStreak',label:'Best Streak',color:'var(--gold)',min:1,fmt:v=>v},level:{field:'level',label:'Level',color:'var(--blue)',min:1,fmt:v=>'Lvl '+v}};
+  let currentSort='iq',allUsers=[],myUid=null,isHidden=false,snapshotAge=null;
+  function getCached(){try{const raw=sessionStorage.getItem(SESSION_CACHE);return raw?JSON.parse(raw):null}catch{return null}}
+  function setCached(data){try{sessionStorage.setItem(SESSION_CACHE,JSON.stringify({...data,_cachedAt:Date.now()}))}catch{}}
+  function toast(msg,color){const t=document.getElementById('toast');t.textContent=msg;t.style.background=color||'var(--green)';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+  function updateCachePill(){const pill=document.getElementById('cache-pill');if(snapshotAge===null){pill.textContent='—';pill.className='cache-pill';return}const mins=Math.round(snapshotAge/60000);if(mins<1){pill.textContent='Live';pill.className='cache-pill fresh'}else{pill.textContent=mins+'m ago';pill.className='cache-pill'}}
+  document.getElementById('filter-row').addEventListener('click',e=>{const tab=e.target.closest('.filter-tab');if(!tab)return;Haptics.medium();document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');currentSort=tab.dataset.sort;render()});
+  document.getElementById('refresh-btn').addEventListener('click',()=>{Haptics.medium();const cached=getCached();const age=cached?Date.now()-cached._cachedAt:Infinity;if(age<CACHE_MAX_AGE){toast('Already up to date','rgba(255,255,255,.15)');return}fetchSnapshot(true)});
+  function loadPrivacySetting(){const d=IQData.load();isHidden=!!d.hideFromLeaderboard;updatePrivacyUI()}
+  async function togglePrivacy(){isHidden=!isHidden;Haptics.medium();const d=IQData.load();d.hideFromLeaderboard=isHidden;IQData.save(d);if(myUid){try{await updateDoc(doc(db,'users',myUid),{hideFromLeaderboard:isHidden})}catch{}}updatePrivacyUI();toast(isHidden?'Hidden from leaderboard':'You\'re visible again',isHidden?'var(--red)':'var(--green)');await pushMyEntryToSnapshot();render()}
+  function updatePrivacyUI(){const btn=document.getElementById('privacy-btn'),icon=document.getElementById('privacy-icon'),label=document.getElementById('privacy-label'),notice=document.getElementById('hidden-notice'),rankBar=document.getElementById('your-rank-bar');if(isHidden){icon.innerHTML='<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';label.textContent='Show me';btn.classList.add('hidden-mode');notice.style.display='flex';rankBar.style.display='none'}else{icon.innerHTML='<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';label.textContent='Hide me';btn.classList.remove('hidden-mode');notice.style.display='none'}}
+  document.getElementById('privacy-btn').addEventListener('click',togglePrivacy);
+  async function pushMyEntryToSnapshot(){if(!myUid)return;const d=IQData.load();if(!d.calibrated||(d.answered||0)<5)return;const myEntry={uid:myUid,username:d.username||'Anonymous',iq:d.iq||0,level:d.level||1,bestStreak:d.bestStreak||0,answered:d.answered||0,correct:d.correct||0,pic:d.pic||'',hidden:!!d.hideFromLeaderboard,updatedAt:Date.now()};try{const ref=doc(db,'leaderboard','snapshot');const snap=await getDoc(ref);let users=[];if(snap.exists())users=(snap.data().users||[]).filter(u=>u.uid!==myUid);if(!myEntry.hidden)users.push(myEntry);users.sort((a,b)=>(b.iq||0)-(a.iq||0));if(users.length>500)users=users.slice(0,500);await setDoc(ref,{users,updatedAt:Date.now()});sessionStorage.removeItem(SESSION_CACHE)}catch{}}
+  window.updateLeaderboardSnapshot=pushMyEntryToSnapshot;
+  async function migrateSnapshotFromUsers(){try{const{collection,getDocs,query,limit}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");const snap=await getDocs(query(collection(db,'users'),limit(500)));const users=snap.docs.map(d=>({uid:d.id,...d.data()})).filter(u=>!u.hideFromLeaderboard&&(u.iq||0)>0).map(u=>({uid:u.uid||'',username:u.username||'Anonymous',iq:u.iq||0,level:u.level||1,bestStreak:u.bestStreak||0,answered:u.answered||0,correct:u.correct||0,pic:u.pic||'',hidden:false,updatedAt:Date.now()})).filter(u=>u.uid);users.sort((a,b)=>(b.iq||0)-(a.iq||0));await setDoc(doc(db,'leaderboard','snapshot'),{users,updatedAt:Date.now(),migrated:true});return users}catch{return[]}}
+  async function fetchSnapshot(forced=false){const btn=document.getElementById('refresh-btn');btn.classList.add('spinning');try{if(!forced){const cached=getCached();if(cached&&cached.users){allUsers=cached.users;snapshotAge=Date.now()-cached._cachedAt;updateCachePill();render();btn.classList.remove('spinning');return}}const ref=doc(db,'leaderboard','snapshot');const snap=await getDoc(ref);if(snap.exists()){const data=snap.data();allUsers=(data.users||[]).filter(u=>!u.hidden&&(u.iq||0)>=50&&(u.answered||0)>=5);setCached({users:allUsers});snapshotAge=0}else{const migrated=await migrateSnapshotFromUsers();allUsers=migrated.filter(u=>(u.iq||0)>=50&&(u.answered||0)>=5);setCached({users:allUsers});snapshotAge=0}}catch{toast('Could not load','var(--red)');const cached=getCached();if(cached&&cached.users)allUsers=cached.users}updateCachePill();btn.classList.remove('spinning');render()}
+  function getSorted(){const cfg=SORT_CONFIG[currentSort];return[...allUsers].filter(u=>u[cfg.field]!=null&&Number(u[cfg.field])>=cfg.min).sort((a,b)=>(b[cfg.field]||0)-(a[cfg.field]||0))}
+  function render(){const sorted=getSorted(),cfg=SORT_CONFIG[currentSort];const myIdx=myUid&&!isHidden?sorted.findIndex(u=>u.uid===myUid):-1;renderYourRank(sorted,myIdx,cfg);renderPodium(sorted.slice(0,3),cfg);renderList(sorted.slice(3),myIdx,cfg);document.getElementById('rest-label').style.display=sorted.length>3?'block':'none'}
+  function renderYourRank(sorted,myIdx,cfg){const bar=document.getElementById('your-rank-bar');if(!myUid||myIdx===-1||isHidden){bar.style.display='none';return}bar.style.display='flex';const me=sorted[myIdx];document.getElementById('your-rank-num').textContent='#'+(myIdx+1);document.getElementById('your-rank-right').innerHTML='<div style="font-size:20px;font-weight:900;color:'+cfg.color+'">'+cfg.fmt(me[cfg.field])+'</div><div>'+cfg.label+'</div>'}
+  function renderPodium(top3,cfg){const podium=document.getElementById('podium');if(!top3.length){podium.innerHTML='';return}podium.innerHTML=[1,2,3].map(rank=>{const u=top3[rank-1];if(!u)return'<div class="podium-spot rank-'+rank+'"></div>';const isMe=u.uid===myUid;return'<div class="podium-spot rank-'+rank+'"><div class="podium-avatar'+(u.pic?' has-pic':'')+'">'+(rank===1?'<div class="podium-crown"><svg viewBox="0 0 24 24" fill="#FFB800"><path d="M2 20h20L19 9l-5 4-2-7-2 7-5-4z"/></svg></div>':'')+'<img src="'+(u.pic||'')+'" alt=""><span class="avatar-emoji">'+avatarEmoji(u)+'</span></div><div class="podium-name">'+esc(u.username||'Anonymous')+(isMe?' (you)':'')+'</div><div class="podium-val col-'+currentSort+'">'+cfg.fmt(u[cfg.field])+'</div><div class="podium-block col-'+currentSort+'">'+rank+'</div></div>'}).join('')}
+  function renderList(rest,myIdx,cfg){const list=document.getElementById('lb-list');if(!rest.length){list.innerHTML='<div class="lb-empty">Not enough players yet — keep training!</div>';return}list.innerHTML=rest.map((u,i)=>{const rank=i+4,isMe=u.uid===myUid,acc=u.answered>0?Math.round((u.correct/u.answered)*100):0;return'<div class="lb-row'+(isMe?' me':'')+'"><div class="lb-rank">'+rank+'</div><div class="lb-avatar'+(u.pic?' has-pic':'')+'"><img src="'+(u.pic||'')+'" alt=""><span class="avatar-emoji">'+avatarEmoji(u)+'</span></div><div class="lb-info"><div class="lb-name">'+esc(u.username||'Anonymous')+(isMe?'<span class="you-badge">YOU</span>':'')+'</div><div class="lb-sub"><span>IQ '+( u.iq||'--')+'</span><span>'+acc+'%</span><span>Lvl '+(u.level||1)+'</span></div></div><div><div class="lb-val" style="color:'+cfg.color+'">'+cfg.fmt(u[cfg.field])+'</div><div class="lb-val-label">'+cfg.label+'</div></div></div>'}).join('')}
+  const EMOJIS=['CB','CB','CB','CB','CB','CB','CB','CB','CB','CB','CB','CB'];
+  function avatarEmoji(u){return EMOJIS[0]}
+  function esc(s){return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+  async function init(){await authReady;myUid=IQData.getCurrentUser()?.uid||null;loadPrivacySetting();await pushMyEntryToSnapshot();await fetchSnapshot()}
   init();
 </script>
 </body>
