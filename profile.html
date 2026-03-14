@@ -46,36 +46,35 @@
     .share-cta.uploading{opacity:.6;pointer-events:none}
     .share-nudge{text-align:center;font-size:11px;font-weight:700;color:var(--dim);margin-bottom:20px}
 
-    /* ══ NAVY BOTTOM — stats + abilities, flows into nav ══ */
+    /* ══ NAVY BOTTOM ══ */
     .navy-section{
       background:var(--navy);
       border-radius:28px 28px 0 0;
-      padding:24px 20px 32px;
-      flex:1;
-      min-height:0;
+      padding:24px 16px 32px;
     }
+    .navy-inner{max-width:420px;margin:0 auto}
 
-    /* ── Stats: horizontal scroll cards ── */
-    .stats-scroll{display:flex;gap:10px;overflow-x:auto;margin:0 -20px;padding:0 20px 12px;-webkit-overflow-scrolling:touch}
-    .stats-scroll::-webkit-scrollbar{display:none}
-    .sg{flex-shrink:0;width:min(140px,38vw);background:rgba(240,234,214,.06);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:6px}
-    .sg-top{display:flex;align-items:center;gap:8px}
-    .sg-ic{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .sg-ic svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+    /* ── Stats: 2×2 grid, cream cards ── */
+    .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+    .sg{background:rgba(240,234,214,.08);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+    .sg-ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .sg-ic svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
     .sg-ic.i1{background:var(--green)}.sg-ic.i2{background:var(--blue)}.sg-ic.i3{background:var(--orange)}.sg-ic.i4{background:var(--purple)}
-    .sg-val{font-size:min(22px,5.5vw);font-weight:900;color:var(--cream);line-height:1}
-    .sg-lbl{font-size:10px;font-weight:800;color:rgba(240,234,214,.35)}
+    .sg-info{display:flex;flex-direction:column}
+    .sg-val{font-size:min(22px,5.5vw);font-weight:900;color:var(--cream);line-height:1.1}
+    .sg-lbl{font-size:10px;font-weight:800;color:rgba(240,234,214,.35);margin-top:1px}
 
-    /* ── Abilities: vertical list with bars ── */
-    .ab-title{font-size:11px;font-weight:900;color:rgba(240,234,214,.3);letter-spacing:2px;text-transform:uppercase;margin:8px 0 10px}
-    .ab-list{display:flex;flex-direction:column;gap:8px}
-    .ab-row{display:flex;align-items:center;gap:10px}
-    .ab-dot{width:4px;height:28px;border-radius:2px;flex-shrink:0}
-    .ab-info{flex:1;min-width:0}
-    .ab-name{font-size:11px;font-weight:800;color:rgba(240,234,214,.5);margin-bottom:4px}
+    /* ── Abilities: contained card with rows ── */
+    .ab-title{font-size:11px;font-weight:900;color:rgba(240,234,214,.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+    .ab-card{background:rgba(240,234,214,.05);border-radius:18px;padding:6px 0;overflow:hidden}
+    .ab-row{display:flex;align-items:center;gap:12px;padding:10px 16px}
+    .ab-row+.ab-row{border-top:1px solid rgba(240,234,214,.04)}
+    .ab-dot{width:4px;height:24px;border-radius:2px;flex-shrink:0}
+    .ab-mid{flex:1;min-width:0}
+    .ab-name{font-size:12px;font-weight:800;color:rgba(240,234,214,.55);margin-bottom:5px}
     .ab-bar{height:6px;background:rgba(240,234,214,.06);border-radius:3px;overflow:hidden}
     .ab-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
-    .ab-val{font-size:15px;font-weight:900;color:var(--cream);min-width:28px;text-align:right}
+    .ab-val{font-size:16px;font-weight:900;color:var(--cream);min-width:30px;text-align:right}
 
     .reset-btn{margin:20px auto 0;background:none;border:none;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;color:rgba(240,234,214,.12);cursor:pointer;display:block;padding:12px;text-align:center}
 
@@ -123,16 +122,18 @@
 
   <!-- ══ NAVY BOTTOM ══ -->
   <div class="navy-section">
-    <div class="stats-scroll">
-      <div class="sg"><div class="sg-top"><div class="sg-ic i1"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg></div></div><div class="sg-val" id="answered">0</div><div class="sg-lbl">Answered</div></div>
-      <div class="sg"><div class="sg-top"><div class="sg-ic i2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div></div><div class="sg-val" id="accuracy">0%</div><div class="sg-lbl">Accuracy</div></div>
-      <div class="sg"><div class="sg-top"><div class="sg-ic i3"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div></div><div class="sg-val" id="best-streak">0</div><div class="sg-lbl">Best Streak</div></div>
-      <div class="sg"><div class="sg-top"><div class="sg-ic i4"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div></div><div class="sg-val" id="level-val">1</div><div class="sg-lbl">Level</div></div>
-    </div>
+    <div class="navy-inner">
+      <div class="stats-grid">
+        <div class="sg"><div class="sg-ic i1"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg></div><div class="sg-info"><div class="sg-val" id="answered">0</div><div class="sg-lbl">Answered</div></div></div>
+        <div class="sg"><div class="sg-ic i2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div class="sg-info"><div class="sg-val" id="accuracy">0%</div><div class="sg-lbl">Accuracy</div></div></div>
+        <div class="sg"><div class="sg-ic i3"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="sg-info"><div class="sg-val" id="best-streak">0</div><div class="sg-lbl">Best Streak</div></div></div>
+        <div class="sg"><div class="sg-ic i4"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div><div class="sg-info"><div class="sg-val" id="level-val">1</div><div class="sg-lbl">Level</div></div></div>
+      </div>
 
-    <div class="ab-title">Abilities</div>
-    <div class="ab-list" id="abilities"></div>
-    <button class="reset-btn" id="reset-btn">Reset Progress</button>
+      <div class="ab-title">Abilities</div>
+      <div class="ab-card" id="abilities"></div>
+      <button class="reset-btn" id="reset-btn">Reset Progress</button>
+    </div>
   </div>
 </div>
 
@@ -151,7 +152,7 @@ document.getElementById('answered').textContent=d.answered||0;document.getElemen
 if(d.pic){document.getElementById('avatar-img').src=d.pic;document.getElementById('avatar-img').style.display='block';document.getElementById('avatar-icon').style.display='none'}
 var list=document.getElementById('abilities');list.innerHTML='';
 AB.forEach(a=>{var pct=IQData.getStatPercent(a.key);var row=document.createElement('div');row.className='ab-row';
-row.innerHTML='<div class="ab-dot" style="background:'+a.color+'"></div><div class="ab-info"><div class="ab-name">'+a.name+'</div><div class="ab-bar"><div class="ab-fill" style="background:'+a.color+';width:0%" data-val="'+pct+'"></div></div></div><div class="ab-val">'+pct+'</div>';
+row.innerHTML='<div class="ab-dot" style="background:'+a.color+'"></div><div class="ab-mid"><div class="ab-name">'+a.name+'</div><div class="ab-bar"><div class="ab-fill" style="background:'+a.color+';width:0%" data-val="'+pct+'"></div></div></div><div class="ab-val">'+pct+'</div>';
 list.appendChild(row)});
 requestAnimationFrame(()=>setTimeout(()=>{document.querySelectorAll('.ab-fill').forEach(b=>{b.style.width=Math.max(6,parseInt(b.dataset.val))+'%'})},80))}
 
