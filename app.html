@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="theme-color" content="#FDFCFC">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#192d63">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="manifest" href="manifest.json">
   <title>Cebear</title>
@@ -13,169 +13,76 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #FDFCFC;
+      --bg: #192d63;
+      --bg-deep: #12224d;
       --navy: #223B7E;
-      --navy-dark: #182a5c;
-      --navy-light: #3a5bb0;
-      --card: #FFFFFF;
-      --card-border: #E8EAF0;
-      --text: #1a1a2e;
-      --text-dim: #7a7f9a;
+      --navy-light: #2e4d99;
+      --card: #1e3470;
+      --white: #FDFCFC;
+      --white-dim: rgba(253,252,252,0.55);
+      --white-faint: rgba(253,252,252,0.1);
       --green: #4CD964;
-      --green-dark: #34b84c;
       --red: #FF3B5C;
-      --red-dark: #d92e4a;
       --gold: #FFBF00;
-      --gold-dark: #d9a200;
-      --blue: #3B82F6;
-      --purple: #8B5CF6;
-      --orange: #FF8C00;
-      --pink: #FF6B9D;
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      width: 100%; height: 100%; overflow: hidden;
-      background: var(--bg); font-family: 'Nunito', sans-serif;
-      touch-action: manipulation;
-    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Nunito',sans-serif;touch-action:manipulation}
 
-    /* ── Splash ── */
-    #splash {
-      position: fixed; inset: 0; z-index: 9999;
-      background: var(--navy);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      transition: opacity 0.3s ease;
-    }
-    #splash.hide { opacity: 0; pointer-events: none; }
-    #splash .mascot {
-      font-size: 64px;
-      animation: bob 1.2s ease-in-out infinite;
-    }
-    #splash .name {
-      font-size: 28px; font-weight: 900;
-      color: #fff; margin-top: 8px;
-      letter-spacing: -0.5px;
-    }
-    #splash .dots {
-      margin-top: 18px; display: flex; gap: 7px;
-    }
-    #splash .dots span {
-      width: 9px; height: 9px; border-radius: 50%;
-      background: rgba(255,255,255,0.3);
-      animation: dotPulse 1s ease infinite;
-    }
-    #splash .dots span:nth-child(2) { animation-delay: 0.15s; }
-    #splash .dots span:nth-child(3) { animation-delay: 0.3s; }
+    #splash{position:fixed;inset:0;z-index:9999;background:var(--bg-deep);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .3s}
+    #splash.hide{opacity:0;pointer-events:none}
+    #splash .mascot{font-size:64px;animation:bob 1.2s ease-in-out infinite}
+    #splash .name{font-size:28px;font-weight:900;color:#fff;margin-top:8px;letter-spacing:-.5px}
+    #splash .dots{margin-top:18px;display:flex;gap:7px}
+    #splash .dots span{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.25);animation:dotPulse 1s ease infinite}
+    #splash .dots span:nth-child(2){animation-delay:.15s}
+    #splash .dots span:nth-child(3){animation-delay:.3s}
+    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+    @keyframes dotPulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
 
-    @keyframes bob {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-    @keyframes dotPulse {
-      0%, 100% { opacity: 0.3; transform: scale(0.8); }
-      50% { opacity: 1; transform: scale(1.2); }
-    }
+    .screen{position:absolute;top:0;left:0;right:0;bottom:0;display:none;overflow:hidden}
+    .screen.active{display:block}
+    .screen iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;touch-action:manipulation}
+    body.has-nav .screen iframe{height:calc(100% - 52px - env(safe-area-inset-bottom,0px))}
 
-    /* ── Screens ── */
-    .screen {
-      position: absolute; top: 0; left: 0; right: 0;
-      bottom: 0;
-      display: none; overflow: hidden;
+    /* ── Tight bottom nav ── */
+    #app-nav{
+      position:fixed;bottom:0;left:0;right:0;
+      height:calc(52px + env(safe-area-inset-bottom,0px));
+      padding-bottom:env(safe-area-inset-bottom,0px);
+      background:var(--bg-deep);
+      border-top:1.5px solid var(--white-faint);
+      display:none;
+      justify-content:space-around;align-items:center;
+      z-index:100;
     }
-    .screen.active { display: block; }
-    .screen iframe {
-      position: absolute; top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-      touch-action: manipulation;
-    }
-    /* When nav is visible, iframe needs bottom padding */
-    body.has-nav .screen iframe {
-      height: calc(100% - 68px - env(safe-area-inset-bottom, 0px));
-    }
+    body.has-nav #app-nav{display:flex}
 
-    /* ── Bottom Nav (in app shell) ── */
-    #app-nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      height: calc(68px + env(safe-area-inset-bottom, 0px));
-      background: #fff;
-      border-top: 2px solid var(--card-border);
-      display: none; /* hidden by default, shown when logged in */
-      justify-content: center; align-items: flex-start;
-      padding-top: 8px; gap: 0;
-      z-index: 100;
+    .nav-btn{
+      padding:4px 0 2px;background:none;border:none;
+      display:flex;flex-direction:column;align-items:center;gap:1px;
+      color:var(--white-dim);font-family:'Nunito',sans-serif;
+      font-size:10px;font-weight:800;cursor:pointer;position:relative;
+      transition:color .15s;-webkit-tap-highlight-color:transparent;
     }
-    body.has-nav #app-nav { display: flex; }
+    .nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+    .nav-btn.active{color:#fff}
 
-    .nav-btn {
-      flex: 1; max-width: 90px;
-      padding: 6px 0 2px;
-      background: none; border: none;
-      display: flex; flex-direction: column;
-      align-items: center; gap: 3px;
-      color: var(--text-dim);
-      font-family: 'Nunito', sans-serif;
-      font-size: 11px; font-weight: 800;
-      cursor: pointer; position: relative;
-      transition: color 0.15s;
-      -webkit-tap-highlight-color: transparent;
+    .nav-badge{
+      position:absolute;top:0;right:calc(50% - 14px);
+      width:7px;height:7px;border-radius:50%;
+      background:var(--red);border:1.5px solid var(--bg-deep);
+      display:none;animation:badgePulse 2s ease infinite;
     }
-    .nav-btn svg {
-      width: 26px; height: 26px;
-      stroke: currentColor; fill: none;
-      stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
-    }
-    .nav-btn.active {
-      color: var(--navy);
-    }
-    .nav-btn.active::before {
-      content: '';
-      position: absolute; top: -8px;
-      left: 50%; transform: translateX(-50%);
-      width: 32px; height: 4px;
-      background: var(--navy);
-      border-radius: 0 0 4px 4px;
-    }
+    .nav-badge.show{display:block}
+    @keyframes badgePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
 
-    .nav-badge {
-      position: absolute; top: 2px; right: calc(50% - 18px);
-      width: 9px; height: 9px; border-radius: 50%;
-      background: var(--red);
-      border: 2px solid #fff;
-      display: none;
-      animation: badgePulse 2s ease infinite;
-    }
-    .nav-badge.show { display: block; }
-    @keyframes badgePulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
-
-    /* ── iOS Install Banner ── */
-    #iosInstallBanner {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-      background: var(--navy); color: #fff;
-      padding: 13px 22px; border-radius: 16px;
-      font-size: 15px; font-weight: 800;
-      display: none; z-index: 10000;
-      max-width: 90%; text-align: center;
-      box-shadow: 0 4px 20px rgba(34,59,126,0.3);
-      line-height: 1.5;
-    }
-    #iosInstallBanner a { color: #fff; text-decoration: underline; }
-    #iosInstallBanner .close-banner {
-      display: inline-block; margin-left: 12px;
-      font-size: 16px; cursor: pointer; opacity: 0.5;
-      vertical-align: middle;
-    }
+    #iosInstallBanner{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;color:var(--navy);padding:13px 22px;border-radius:16px;font-size:15px;font-weight:800;display:none;z-index:10000;max-width:90%;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.3);line-height:1.5}
+    #iosInstallBanner a{color:var(--navy);text-decoration:underline}
+    #iosInstallBanner .close-banner{display:inline-block;margin-left:12px;font-size:16px;cursor:pointer;opacity:.5;vertical-align:middle}
   </style>
 </head>
 <body>
-
-<div id="splash">
-  <div class="mascot">🐻</div>
-  <div class="name">Cebear</div>
-  <div class="dots"><span></span><span></span><span></span></div>
-</div>
+<div id="splash"><div class="mascot">🐻</div><div class="name">Cebear</div><div class="dots"><span></span><span></span><span></span></div></div>
 
 <div class="screen" id="screen-auth"></div>
 <div class="screen" id="screen-improve"></div>
@@ -209,207 +116,64 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-  firebase.initializeApp({
-    apiKey:            "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
-    authDomain:        "braindeer-backend.firebaseapp.com",
-    projectId:         "braindeer-backend",
-    storageBucket:     "braindeer-backend.firebasestorage.app",
-    messagingSenderId: "331205139765",
-    appId:             "1:331205139765:web:20cfef8194af63fc55c07c",
-    measurementId:     "G-9B6885G0X0"
+  firebase.initializeApp({apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend",storageBucket:"braindeer-backend.firebasestorage.app",messagingSenderId:"331205139765",appId:"1:331205139765:web:20cfef8194af63fc55c07c",measurementId:"G-9B6885G0X0"});
+
+  var WORKER_URL='https://cebear.com/api/redeem-install-token';
+
+  function showNav(s){if(s)document.body.classList.add('has-nav');else document.body.classList.remove('has-nav')}
+  function updateNavActive(p){document.querySelectorAll('#app-nav .nav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.page===p)})}
+
+  window.addEventListener('message',function(e){
+    if(!e.data||!e.data.type)return;
+    if(e.data.type==='authSuccess'){goTo('improve');return}
+    if(e.data.type==='googleRedirect'){window.location.href='google-redirect.html';return}
+    if(e.data.type==='savePushSub'){firebase.auth().onAuthStateChanged(function(u){if(!u)return;firebase.firestore().collection('pushSubscriptions').doc(u.uid).set({subscription:e.data.sub,uid:u.uid,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){})})}
+    if(e.data.type==='tasksUpdated'){var tc=document.getElementById('screen-tasks');if(tc){var ti=tc.querySelector('iframe');if(ti&&ti.contentWindow)ti.contentWindow.postMessage({type:'tasksUpdated'},'*')}}
+    if(e.data.type==='xpAwarded'){var ic=document.getElementById('screen-improve');if(ic){var ii=ic.querySelector('iframe');if(ii&&ii.contentWindow)ii.contentWindow.postMessage({type:'xpAwarded',xp:e.data.xp},'*')}}
   });
 
-  var WORKER_URL = 'https://braindeer.org/api/redeem-install-token';
-
-  /* ── Nav management ── */
-  function showNav(show) {
-    if (show) document.body.classList.add('has-nav');
-    else document.body.classList.remove('has-nav');
-  }
-
-  function updateNavActive(page) {
-    document.querySelectorAll('#app-nav .nav-btn').forEach(function(btn) {
-      btn.classList.toggle('active', btn.dataset.page === page);
-    });
-  }
-
-  /* ── Message handler ── */
-  window.addEventListener('message', function(e) {
-    if (!e.data || !e.data.type) return;
-    if (e.data.type === 'authSuccess') { goTo('improve'); return; }
-    if (e.data.type === 'googleRedirect') { window.location.href = 'google-redirect.html'; return; }
-    if (e.data.type === 'savePushSub') {
-      firebase.auth().onAuthStateChanged(function(user) {
-        if (!user) return;
-        firebase.firestore().collection('pushSubscriptions').doc(user.uid).set({
-          subscription: e.data.sub, uid: user.uid,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).catch(function() {});
-      });
-    }
-    if (e.data.type === 'tasksUpdated') {
-      var tc = document.getElementById('screen-tasks');
-      if (tc) { var ti = tc.querySelector('iframe'); if (ti && ti.contentWindow) ti.contentWindow.postMessage({ type: 'tasksUpdated' }, '*'); }
-    }
-    if (e.data.type === 'xpAwarded') {
-      var ic = document.getElementById('screen-improve');
-      if (ic) { var ii = ic.querySelector('iframe'); if (ii && ii.contentWindow) ii.contentWindow.postMessage({ type: 'xpAwarded', xp: e.data.xp }, '*'); }
-    }
-  });
-
-  /* ── Screen management ── */
-  var currentScreen = null;
-  var screensLoaded = {};
-
-  window.goTo = function(page) {
-    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
-
-    // Reload profile and leaderboard each visit for fresh data
-    if ((page === 'profile' || page === 'leaderboard') && screensLoaded[page]) {
-      var old = document.querySelector('#screen-' + page + ' iframe');
-      if (old) old.remove();
-      screensLoaded[page] = false;
-    }
-
-    if (!screensLoaded[page]) {
-      var c = document.getElementById('screen-' + page);
-      if (!c) return;
-      var f = document.createElement('iframe');
-      f.src = page + '.html';
-      f.allow = 'web-share';
-      c.appendChild(f);
-      screensLoaded[page] = true;
-    }
-
-    var el = document.getElementById('screen-' + page);
-    if (el) { el.classList.add('active'); currentScreen = page; }
-
-    // Show/hide nav based on auth state
-    showNav(page !== 'auth');
-    updateNavActive(page);
-
-    // Kill splash
-    var sp = document.getElementById('splash');
-    if (sp && !sp.classList.contains('hide')) {
-      sp.classList.add('hide');
-      setTimeout(function() { if (sp.parentNode) sp.remove(); }, 400);
-    }
+  var currentScreen=null,screensLoaded={};
+  window.goTo=function(page){
+    document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+    if((page==='profile'||page==='leaderboard')&&screensLoaded[page]){var old=document.querySelector('#screen-'+page+' iframe');if(old)old.remove();screensLoaded[page]=false}
+    if(!screensLoaded[page]){var c=document.getElementById('screen-'+page);if(!c)return;var f=document.createElement('iframe');f.src=page+'.html';f.allow='web-share';c.appendChild(f);screensLoaded[page]=true}
+    var el=document.getElementById('screen-'+page);if(el){el.classList.add('active');currentScreen=page}
+    showNav(page!=='auth');updateNavActive(page);
+    var sp=document.getElementById('splash');if(sp&&!sp.classList.contains('hide')){sp.classList.add('hide');setTimeout(function(){if(sp.parentNode)sp.remove()},400)}
   };
+  window.authCheck=function(){};
 
-  window.authCheck = function() {};
+  function ensureUser(u){var r=firebase.firestore().collection('users').doc(u.uid);return r.get().then(function(s){if(!s.exists)return r.set({uid:u.uid,email:u.email,username:u.displayName||null,pic:u.photoURL||null,createdAt:firebase.firestore.FieldValue.serverTimestamp(),lastSeen:firebase.firestore.FieldValue.serverTimestamp()});return r.set({lastSeen:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})})}
+  function generateInstallToken(){var u=firebase.auth().currentUser;if(!u)return Promise.resolve(null);var t=Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2)+Date.now().toString(36);return firebase.firestore().collection('installTokens').doc(t).set({uid:u.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp(),expiresAt:new Date(Date.now()+600000),used:false}).then(function(){return t}).catch(function(){return null})}
 
-  /* ── Helpers ── */
-  function ensureUser(user) {
-    var ref = firebase.firestore().collection('users').doc(user.uid);
-    return ref.get().then(function(snap) {
-      if (!snap.exists) {
-        return ref.set({
-          uid: user.uid, email: user.email,
-          username: user.displayName || null,
-          pic: user.photoURL || null,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          lastSeen:  firebase.firestore.FieldValue.serverTimestamp()
-        });
-      }
-      return ref.set({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-    });
+  function showIOSBanner(user){
+    if(('standalone' in navigator)&&navigator.standalone)return;
+    if(!/iphone|ipad|ipod/i.test(navigator.userAgent))return;
+    if(sessionStorage.getItem('iosBannerDismissed'))return;
+    function rb(h){var b=document.getElementById('iosInstallBanner');b.innerHTML=h;b.style.display='block';var btn=document.getElementById('closeBanner');if(btn)btn.addEventListener('click',function(){b.style.display='none';sessionStorage.setItem('iosBannerDismissed','1')})}
+    if(user){generateInstallToken().then(function(t){var url=t?'https://cebear.com/app.html?t='+t:'https://cebear.com/app.html';rb('📲 <a href="'+url+'">Tap here</a>, then <strong>Share ⬆️</strong> → <strong>Add to Home Screen</strong><span class="close-banner" id="closeBanner"> ✕</span>')})}
+    else{rb('📲 Tap <strong>Share ⬆️</strong> → <strong>Add to Home Screen</strong><span class="close-banner" id="closeBanner"> ✕</span>')}
   }
 
-  function generateInstallToken() {
-    var user = firebase.auth().currentUser;
-    if (!user) return Promise.resolve(null);
-    var token = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + Date.now().toString(36);
-    return firebase.firestore().collection('installTokens').doc(token).set({
-      uid: user.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      expiresAt: new Date(Date.now() + 10 * 60 * 1000), used: false
-    }).then(function() { return token; }).catch(function() { return null; });
-  }
+  function redeemSessionToken(sid){return firebase.firestore().collection('authSessions').doc(sid).get().then(function(s){if(!s.exists)throw new Error('nf');var d=s.data();if(d.used)throw new Error('used');var exp=d.expiresAt&&d.expiresAt.toDate?d.expiresAt.toDate():new Date(d.expiresAt);if(new Date()>exp)throw new Error('exp');s.ref.update({used:true});return firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(d.idToken))})}
 
-  function showIOSBanner(user) {
-    if (('standalone' in navigator) && navigator.standalone) return;
-    if (!/iphone|ipad|ipod/i.test(navigator.userAgent)) return;
-    if (sessionStorage.getItem('iosBannerDismissed')) return;
-    function renderBanner(html) {
-      var b = document.getElementById('iosInstallBanner');
-      b.innerHTML = html; b.style.display = 'block';
-      var btn = document.getElementById('closeBanner');
-      if (btn) btn.addEventListener('click', function() { b.style.display = 'none'; sessionStorage.setItem('iosBannerDismissed', '1'); });
-    }
-    if (user) {
-      generateInstallToken().then(function(token) {
-        var url = token ? 'https://braindeer.org/app.html?t=' + token : 'https://braindeer.org/app.html';
-        renderBanner('📲 <a href="' + url + '">Tap here</a>, then <strong>Share ⬆️</strong> → <strong>Add to Home Screen</strong><span class="close-banner" id="closeBanner"> ✕</span>');
-      });
-    } else {
-      renderBanner('📲 Tap <strong>Share ⬆️</strong> → <strong>Add to Home Screen</strong><span class="close-banner" id="closeBanner"> ✕</span>');
-    }
-  }
-
-  function redeemSessionToken(sid) {
-    return firebase.firestore().collection('authSessions').doc(sid).get().then(function(snap) {
-      if (!snap.exists) throw new Error('not found');
-      var d = snap.data();
-      if (d.used) throw new Error('used');
-      var exp = d.expiresAt && d.expiresAt.toDate ? d.expiresAt.toDate() : new Date(d.expiresAt);
-      if (new Date() > exp) throw new Error('expired');
-      snap.ref.update({ used: true });
-      return firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(d.idToken));
-    });
-  }
-
-  /* ── Boot ── */
-  (function() {
+  (function(){
     localStorage.removeItem('iq_guest');
-
-    var loggedIn = false;
-    for (var i = 0; i < localStorage.length; i++) {
-      if (localStorage.key(i).indexOf('firebase:authUser:') === 0) { loggedIn = true; break; }
-    }
-
-    var params = new URLSearchParams(window.location.search);
-    var tToken = params.get('t');
-    var sessionId = params.get('session');
-    if (tToken || sessionId) window.history.replaceState({}, '', window.location.pathname);
-
-    // GIS token check
-    var gisToken = sessionStorage.getItem('bd_gis_token');
-    if (gisToken) {
-      sessionStorage.removeItem('bd_gis_token');
-      var credential = firebase.auth.GoogleAuthProvider.credential(gisToken);
-      firebase.auth().signInWithCredential(credential)
-        .then(function(result) { return ensureUser(result.user); })
-        .then(function() { goTo('improve'); })
-        .catch(function(err) { console.error('GIS sign-in failed:', err); normalBoot(); });
-      return;
-    }
-
-    if (sessionId) {
-      redeemSessionToken(sessionId).then(function() { normalBoot(); }).catch(function() { normalBoot(); });
-    } else if (tToken) {
-      fetch(WORKER_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: tToken }) })
-        .then(function(r) { return r.ok ? r.json() : null; })
-        .then(function(b) {
-          if (b && b.customToken) return firebase.auth().signInWithCustomToken(b.customToken).then(function() { window.location.reload(); });
-          normalBoot();
-        })
-        .catch(function() { normalBoot(); });
-    } else {
-      normalBoot();
-    }
-
-    function normalBoot() {
-      var unsub = firebase.auth().onAuthStateChanged(function(user) {
-        unsub();
-        goTo(user ? 'improve' : 'auth');
-        showIOSBanner(user);
-      });
-    }
+    var li=false;for(var i=0;i<localStorage.length;i++){if(localStorage.key(i).indexOf('firebase:authUser:')===0){li=true;break}}
+    var p=new URLSearchParams(window.location.search),tT=p.get('t'),sI=p.get('session');
+    if(tT||sI)window.history.replaceState({},'',window.location.pathname);
+    var gT=sessionStorage.getItem('bd_gis_token');
+    if(gT){sessionStorage.removeItem('bd_gis_token');firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(gT)).then(function(r){return ensureUser(r.user)}).then(function(){goTo('improve')}).catch(function(){normalBoot()});return}
+    if(sI){redeemSessionToken(sI).then(function(){normalBoot()}).catch(function(){normalBoot()})}
+    else if(tT){fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tT})}).then(function(r){return r.ok?r.json():null}).then(function(b){if(b&&b.customToken)return firebase.auth().signInWithCustomToken(b.customToken).then(function(){window.location.reload()});normalBoot()}).catch(function(){normalBoot()})}
+    else{normalBoot()}
+    function normalBoot(){var unsub=firebase.auth().onAuthStateChanged(function(u){unsub();goTo(u?'improve':'auth');showIOSBanner(u)})}
   })();
 
-  var deferredPrompt = null;
-  window.addEventListener('beforeinstallprompt', function(e) { e.preventDefault(); deferredPrompt = e; });
-  window.triggerInstall = function() { if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(function() { deferredPrompt = null; }); } };
-  window.addEventListener('appinstalled', function() { deferredPrompt = null; document.getElementById('iosInstallBanner').style.display = 'none'; });
+  var deferredPrompt=null;
+  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e});
+  window.triggerInstall=function(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(){deferredPrompt=null})}};
+  window.addEventListener('appinstalled',function(){deferredPrompt=null;document.getElementById('iosInstallBanner').style.display='none'});
 </script>
 </body>
 </html>
