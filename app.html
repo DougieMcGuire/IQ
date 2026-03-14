@@ -5,52 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#192d63">
+  <meta name="theme-color" content="#FDFCFC">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="manifest" href="manifest.json">
   <title>Cebear</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #192d63;
-      --bg-deep: #12224d;
-      --navy: #223B7E;
-      --navy-light: #2e4d99;
-      --card: #1e3470;
-      --white: #FDFCFC;
-      --white-dim: rgba(253,252,252,0.55);
-      --white-faint: rgba(253,252,252,0.1);
-      --green: #4CD964;
-      --red: #FF3B5C;
-      --gold: #FFBF00;
-    }
     *{margin:0;padding:0;box-sizing:border-box}
-    html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Nunito',sans-serif;touch-action:manipulation}
+    html,body{width:100%;height:100%;overflow:hidden;background:#FDFCFC;font-family:'Nunito',sans-serif;touch-action:manipulation}
 
-    #splash{position:fixed;inset:0;z-index:9999;background:var(--bg-deep);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .3s}
+    /* ── Splash ── */
+    #splash{position:fixed;inset:0;z-index:9999;background:#1a3170;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .35s}
     #splash.hide{opacity:0;pointer-events:none}
-    #splash .mascot{font-size:64px;animation:bob 1.2s ease-in-out infinite}
-    #splash .name{font-size:28px;font-weight:900;color:#fff;margin-top:8px;letter-spacing:-.5px}
-    #splash .dots{margin-top:18px;display:flex;gap:7px}
-    #splash .dots span{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.25);animation:dotPulse 1s ease infinite}
-    #splash .dots span:nth-child(2){animation-delay:.15s}
-    #splash .dots span:nth-child(3){animation-delay:.3s}
-    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-    @keyframes dotPulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+    #splash .s-bear{width:72px;height:72px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;animation:bob 1.2s ease-in-out infinite}
+    #splash .s-bear svg{width:40px;height:40px}
+    #splash .s-name{font-size:26px;font-weight:900;color:#fff;margin-top:12px;letter-spacing:-.5px}
+    #splash .s-dots{margin-top:16px;display:flex;gap:6px}
+    #splash .s-dots span{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);animation:dotPulse 1s ease infinite}
+    #splash .s-dots span:nth-child(2){animation-delay:.15s}
+    #splash .s-dots span:nth-child(3){animation-delay:.3s}
+    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    @keyframes dotPulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
 
+    /* ── Screens ── */
     .screen{position:absolute;top:0;left:0;right:0;bottom:0;display:none;overflow:hidden}
     .screen.active{display:block}
     .screen iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;touch-action:manipulation}
-    body.has-nav .screen iframe{height:calc(100% - 52px - env(safe-area-inset-bottom,0px))}
+    body.has-nav .screen iframe{height:calc(100% - 54px - env(safe-area-inset-bottom,0px))}
 
-    /* ── Tight bottom nav ── */
+    /* ── Bottom Nav ── */
     #app-nav{
       position:fixed;bottom:0;left:0;right:0;
-      height:calc(52px + env(safe-area-inset-bottom,0px));
+      height:calc(54px + env(safe-area-inset-bottom,0px));
       padding-bottom:env(safe-area-inset-bottom,0px);
-      background:var(--bg-deep);
-      border-top:1.5px solid var(--white-faint);
+      background:#fff;
+      box-shadow:0 -1px 0 rgba(26,49,112,.08), 0 -4px 16px rgba(26,49,112,.06);
       display:none;
       justify-content:space-around;align-items:center;
       z-index:100;
@@ -58,31 +48,38 @@
     body.has-nav #app-nav{display:flex}
 
     .nav-btn{
-      padding:4px 0 2px;background:none;border:none;
-      display:flex;flex-direction:column;align-items:center;gap:1px;
-      color:var(--white-dim);font-family:'Nunito',sans-serif;
+      padding:6px 0 2px;background:none;border:none;
+      display:flex;flex-direction:column;align-items:center;gap:2px;
+      color:#B0B8D0;font-family:'Nunito',sans-serif;
       font-size:10px;font-weight:800;cursor:pointer;position:relative;
       transition:color .15s;-webkit-tap-highlight-color:transparent;
     }
-    .nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-    .nav-btn.active{color:#fff}
+    .nav-btn .nav-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+    .nav-btn .nav-icon svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .nav-btn.active{color:#1a3170}
+    .nav-btn.active .nav-icon{background:#1a3170;border-radius:10px;width:40px}
+    .nav-btn.active .nav-icon svg{stroke:#fff}
 
     .nav-badge{
       position:absolute;top:0;right:calc(50% - 14px);
       width:7px;height:7px;border-radius:50%;
-      background:var(--red);border:1.5px solid var(--bg-deep);
+      background:#FF3B5C;border:1.5px solid #fff;
       display:none;animation:badgePulse 2s ease infinite;
     }
     .nav-badge.show{display:block}
     @keyframes badgePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
 
-    #iosInstallBanner{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;color:var(--navy);padding:13px 22px;border-radius:16px;font-size:15px;font-weight:800;display:none;z-index:10000;max-width:90%;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.3);line-height:1.5}
-    #iosInstallBanner a{color:var(--navy);text-decoration:underline}
+    #iosInstallBanner{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a3170;color:#fff;padding:13px 22px;border-radius:16px;font-size:14px;font-weight:800;display:none;z-index:10000;max-width:90%;text-align:center;box-shadow:0 8px 32px rgba(26,49,112,.3);line-height:1.5}
+    #iosInstallBanner a{color:#fff;text-decoration:underline}
     #iosInstallBanner .close-banner{display:inline-block;margin-left:12px;font-size:16px;cursor:pointer;opacity:.5;vertical-align:middle}
   </style>
 </head>
 <body>
-<div id="splash"><div class="mascot">🐻</div><div class="name">Cebear</div><div class="dots"><span></span><span></span><span></span></div></div>
+<div id="splash">
+  <div class="s-bear"><svg viewBox="0 0 48 48" fill="none"><circle cx="14" cy="12" r="7" fill="#1a3170"/><circle cx="34" cy="12" r="7" fill="#1a3170"/><circle cx="24" cy="26" r="16" fill="#1a3170"/><circle cx="14" cy="12" r="4.5" fill="#2a4590"/><circle cx="34" cy="12" r="4.5" fill="#2a4590"/><ellipse cx="24" cy="30" rx="6" ry="4.5" fill="#2a4590"/><circle cx="20" cy="24" r="2" fill="#fff"/><circle cx="28" cy="24" r="2" fill="#fff"/><ellipse cx="24" cy="29" rx="2.5" ry="1.5" fill="#1a3170"/></svg></div>
+  <div class="s-name">Cebear</div>
+  <div class="s-dots"><span></span><span></span><span></span></div>
+</div>
 
 <div class="screen" id="screen-auth"></div>
 <div class="screen" id="screen-improve"></div>
@@ -92,20 +89,20 @@
 
 <nav id="app-nav">
   <button class="nav-btn" data-page="leaderboard" onclick="goTo('leaderboard')">
-    <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M6 9H2v12h4V9z"/><path d="M14 4h-4v17h4V4z"/><path d="M22 13h-4v8h4v-8z"/></svg></span>
     Ranks
   </button>
   <button class="nav-btn active" data-page="improve" onclick="goTo('improve')">
-    <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>
     Train
   </button>
   <button class="nav-btn" data-page="tasks" onclick="goTo('tasks')">
-    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-6"/></svg></span>
     Tasks
     <span class="nav-badge" id="tasks-badge"></span>
   </button>
   <button class="nav-btn" data-page="profile" onclick="goTo('profile')">
-    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg></span>
     Profile
   </button>
 </nav>
@@ -117,12 +114,9 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
   firebase.initializeApp({apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend",storageBucket:"braindeer-backend.firebasestorage.app",messagingSenderId:"331205139765",appId:"1:331205139765:web:20cfef8194af63fc55c07c",measurementId:"G-9B6885G0X0"});
-
   var WORKER_URL='https://cebear.com/api/redeem-install-token';
-
   function showNav(s){if(s)document.body.classList.add('has-nav');else document.body.classList.remove('has-nav')}
   function updateNavActive(p){document.querySelectorAll('#app-nav .nav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.page===p)})}
-
   window.addEventListener('message',function(e){
     if(!e.data||!e.data.type)return;
     if(e.data.type==='authSuccess'){goTo('improve');return}
@@ -131,7 +125,6 @@
     if(e.data.type==='tasksUpdated'){var tc=document.getElementById('screen-tasks');if(tc){var ti=tc.querySelector('iframe');if(ti&&ti.contentWindow)ti.contentWindow.postMessage({type:'tasksUpdated'},'*')}}
     if(e.data.type==='xpAwarded'){var ic=document.getElementById('screen-improve');if(ic){var ii=ic.querySelector('iframe');if(ii&&ii.contentWindow)ii.contentWindow.postMessage({type:'xpAwarded',xp:e.data.xp},'*')}}
   });
-
   var currentScreen=null,screensLoaded={};
   window.goTo=function(page){
     document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
@@ -142,38 +135,19 @@
     var sp=document.getElementById('splash');if(sp&&!sp.classList.contains('hide')){sp.classList.add('hide');setTimeout(function(){if(sp.parentNode)sp.remove()},400)}
   };
   window.authCheck=function(){};
-
   function ensureUser(u){var r=firebase.firestore().collection('users').doc(u.uid);return r.get().then(function(s){if(!s.exists)return r.set({uid:u.uid,email:u.email,username:u.displayName||null,pic:u.photoURL||null,createdAt:firebase.firestore.FieldValue.serverTimestamp(),lastSeen:firebase.firestore.FieldValue.serverTimestamp()});return r.set({lastSeen:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})})}
   function generateInstallToken(){var u=firebase.auth().currentUser;if(!u)return Promise.resolve(null);var t=Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2)+Date.now().toString(36);return firebase.firestore().collection('installTokens').doc(t).set({uid:u.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp(),expiresAt:new Date(Date.now()+600000),used:false}).then(function(){return t}).catch(function(){return null})}
-
-  function showIOSBanner(user){
-    if(('standalone' in navigator)&&navigator.standalone)return;
-    if(!/iphone|ipad|ipod/i.test(navigator.userAgent))return;
-    if(sessionStorage.getItem('iosBannerDismissed'))return;
-    function rb(h){var b=document.getElementById('iosInstallBanner');b.innerHTML=h;b.style.display='block';var btn=document.getElementById('closeBanner');if(btn)btn.addEventListener('click',function(){b.style.display='none';sessionStorage.setItem('iosBannerDismissed','1')})}
-    if(user){generateInstallToken().then(function(t){var url=t?'https://cebear.com/app.html?t='+t:'https://cebear.com/app.html';rb('📲 <a href="'+url+'">Tap here</a>, then <strong>Share ⬆️</strong> → <strong>Add to Home Screen</strong><span class="close-banner" id="closeBanner"> ✕</span>')})}
-    else{rb('📲 Tap <strong>Share ⬆️</strong> → <strong>Add to Home Screen</strong><span class="close-banner" id="closeBanner"> ✕</span>')}
-  }
-
+  function showIOSBanner(user){if(('standalone' in navigator)&&navigator.standalone)return;if(!/iphone|ipad|ipod/i.test(navigator.userAgent))return;if(sessionStorage.getItem('iosBannerDismissed'))return;function rb(h){var b=document.getElementById('iosInstallBanner');b.innerHTML=h;b.style.display='block';var btn=document.getElementById('closeBanner');if(btn)btn.addEventListener('click',function(){b.style.display='none';sessionStorage.setItem('iosBannerDismissed','1')})}if(user){generateInstallToken().then(function(t){var url=t?'https://cebear.com/app.html?t='+t:'https://cebear.com/app.html';rb('Install Cebear: <a href="'+url+'">Tap here</a>, then Share → Add to Home Screen<span class="close-banner" id="closeBanner"> ✕</span>')})}else{rb('Install: Tap <strong>Share</strong> → <strong>Add to Home Screen</strong><span class="close-banner" id="closeBanner"> ✕</span>')}}
   function redeemSessionToken(sid){return firebase.firestore().collection('authSessions').doc(sid).get().then(function(s){if(!s.exists)throw new Error('nf');var d=s.data();if(d.used)throw new Error('used');var exp=d.expiresAt&&d.expiresAt.toDate?d.expiresAt.toDate():new Date(d.expiresAt);if(new Date()>exp)throw new Error('exp');s.ref.update({used:true});return firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(d.idToken))})}
-
   (function(){
-    localStorage.removeItem('iq_guest');
-    var li=false;for(var i=0;i<localStorage.length;i++){if(localStorage.key(i).indexOf('firebase:authUser:')===0){li=true;break}}
-    var p=new URLSearchParams(window.location.search),tT=p.get('t'),sI=p.get('session');
-    if(tT||sI)window.history.replaceState({},'',window.location.pathname);
+    localStorage.removeItem('iq_guest');var li=false;for(var i=0;i<localStorage.length;i++){if(localStorage.key(i).indexOf('firebase:authUser:')===0){li=true;break}}
+    var p=new URLSearchParams(window.location.search),tT=p.get('t'),sI=p.get('session');if(tT||sI)window.history.replaceState({},'',window.location.pathname);
     var gT=sessionStorage.getItem('bd_gis_token');
     if(gT){sessionStorage.removeItem('bd_gis_token');firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(gT)).then(function(r){return ensureUser(r.user)}).then(function(){goTo('improve')}).catch(function(){normalBoot()});return}
-    if(sI){redeemSessionToken(sI).then(function(){normalBoot()}).catch(function(){normalBoot()})}
-    else if(tT){fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tT})}).then(function(r){return r.ok?r.json():null}).then(function(b){if(b&&b.customToken)return firebase.auth().signInWithCustomToken(b.customToken).then(function(){window.location.reload()});normalBoot()}).catch(function(){normalBoot()})}
-    else{normalBoot()}
+    if(sI){redeemSessionToken(sI).then(function(){normalBoot()}).catch(function(){normalBoot()})}else if(tT){fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tT})}).then(function(r){return r.ok?r.json():null}).then(function(b){if(b&&b.customToken)return firebase.auth().signInWithCustomToken(b.customToken).then(function(){window.location.reload()});normalBoot()}).catch(function(){normalBoot()})}else{normalBoot()}
     function normalBoot(){var unsub=firebase.auth().onAuthStateChanged(function(u){unsub();goTo(u?'improve':'auth');showIOSBanner(u)})}
   })();
-
-  var deferredPrompt=null;
-  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e});
-  window.triggerInstall=function(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(){deferredPrompt=null})}};
-  window.addEventListener('appinstalled',function(){deferredPrompt=null;document.getElementById('iosInstallBanner').style.display='none'});
+  var deferredPrompt=null;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e});window.triggerInstall=function(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(){deferredPrompt=null})}};window.addEventListener('appinstalled',function(){deferredPrompt=null;document.getElementById('iosInstallBanner').style.display='none'});
 </script>
 </body>
 </html>
