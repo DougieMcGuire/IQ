@@ -54,29 +54,32 @@
     }
     .navy-inner{max-width:420px;margin:0 auto}
 
-    /* ── Stats: 2×2 grid, cream cards ── */
-    .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
-    .sg{background:rgba(240,234,214,.08);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px}
-    .sg-ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    /* ── Stats: 2×2 grid, glass cards ── */
+    .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+    .sg{background:rgba(240,234,214,.06);border-radius:16px;padding:16px;display:flex;align-items:center;gap:12px;border:1px solid rgba(240,234,214,.06);position:relative;overflow:hidden}
+    .sg::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(240,234,214,.1),transparent)}
+    .sg-ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 0 rgba(0,0,0,.15)}
     .sg-ic svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
     .sg-ic.i1{background:var(--green)}.sg-ic.i2{background:var(--blue)}.sg-ic.i3{background:var(--orange)}.sg-ic.i4{background:var(--purple)}
     .sg-info{display:flex;flex-direction:column}
-    .sg-val{font-size:min(22px,5.5vw);font-weight:900;color:var(--cream);line-height:1.1}
-    .sg-lbl{font-size:10px;font-weight:800;color:rgba(240,234,214,.35);margin-top:1px}
+    .sg-val{font-size:min(24px,6vw);font-weight:900;color:var(--cream);line-height:1.1}
+    .sg-lbl{font-size:10px;font-weight:800;color:rgba(240,234,214,.3);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
 
-    /* ── Abilities: contained card with rows ── */
-    .ab-title{font-size:11px;font-weight:900;color:rgba(240,234,214,.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
-    .ab-card{background:rgba(240,234,214,.05);border-radius:18px;padding:6px 0;overflow:hidden}
-    .ab-row{display:flex;align-items:center;gap:12px;padding:10px 16px}
-    .ab-row+.ab-row{border-top:1px solid rgba(240,234,214,.04)}
-    .ab-dot{width:4px;height:24px;border-radius:2px;flex-shrink:0}
+    /* ── Abilities section ── */
+    .ab-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .ab-title{font-size:11px;font-weight:900;color:rgba(240,234,214,.3);letter-spacing:2px;text-transform:uppercase}
+    .ab-card{background:rgba(240,234,214,.04);border-radius:18px;padding:4px 0;overflow:hidden;border:1px solid rgba(240,234,214,.04)}
+    .ab-row{display:flex;align-items:center;gap:12px;padding:11px 16px;transition:background .15s}
+    .ab-row+.ab-row{border-top:1px solid rgba(240,234,214,.03)}
+    .ab-dot{width:4px;height:28px;border-radius:2px;flex-shrink:0}
     .ab-mid{flex:1;min-width:0}
-    .ab-name{font-size:12px;font-weight:800;color:rgba(240,234,214,.55);margin-bottom:5px}
-    .ab-bar{height:6px;background:rgba(240,234,214,.06);border-radius:3px;overflow:hidden}
-    .ab-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
-    .ab-val{font-size:16px;font-weight:900;color:var(--cream);min-width:30px;text-align:right}
+    .ab-name{font-size:12px;font-weight:800;color:rgba(240,234,214,.5);margin-bottom:5px}
+    .ab-bar{height:7px;background:rgba(240,234,214,.06);border-radius:4px;overflow:hidden}
+    .ab-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.34,1.56,.64,1);position:relative}
+    .ab-fill::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(255,255,255,.2) 0%,transparent 100%);border-radius:4px}
+    .ab-val{font-size:16px;font-weight:900;color:var(--cream);min-width:32px;text-align:right}
 
-    .reset-btn{margin:20px auto 0;background:none;border:none;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;color:rgba(240,234,214,.12);cursor:pointer;display:block;padding:12px;text-align:center}
+    .reset-btn{margin:24px auto 0;background:none;border:none;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;color:rgba(240,234,214,.12);cursor:pointer;display:block;padding:12px;text-align:center}
 
     /* ══ SHARE MODAL ══ */
     .modal-overlay{position:fixed;inset:0;background:rgba(27,45,91,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center;z-index:200}
@@ -130,7 +133,9 @@
         <div class="sg"><div class="sg-ic i4"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div><div class="sg-info"><div class="sg-val" id="level-val">1</div><div class="sg-lbl">Level</div></div></div>
       </div>
 
-      <div class="ab-title">Abilities</div>
+      <div class="ab-header">
+        <div class="ab-title">Abilities</div>
+      </div>
       <div class="ab-card" id="abilities"></div>
       <button class="reset-btn" id="reset-btn">Reset Progress</button>
     </div>
@@ -164,8 +169,8 @@ document.getElementById('signout-btn').onclick=()=>{Haptics.warning();IQData.sig
 document.getElementById('reset-btn').onclick=()=>{Haptics.warning();if(confirm('Reset all progress?')){Haptics.error();IQData.reset();location.reload()}};
 
 /* ══════════════════════════════════════════
-   SHARE CARD — redesigned, fills space,
-   loads profile pic properly, includes logo
+   SHARE CARD — full navy bg, tight layout,
+   no wasted space, everything packed in
    ══════════════════════════════════════════ */
 var shareCanvas=null,shareUrl='';
 function getShareUrl(){var u=IQData.getCurrentUser();return u?'https://cebear.com/share/'+u.uid:'https://cebear.com'}
@@ -173,111 +178,182 @@ function rr(c,x,y,w,h,r,f){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.qua
 
 function genShareCard(){
   var d=IQData.load(),W=1200,H=630,cv=document.createElement('canvas');
-  cv.width=W;cv.height=H;var c=c=cv.getContext('2d');
+  cv.width=W;cv.height=H;var c=cv.getContext('2d');
   var uname=d.username||IQData.getCurrentUser()?.displayName||'Brain';
   var acc=IQData.getAccuracy(),pic=d.pic||null;
 
   // Full navy bg
   c.fillStyle='#1b2d5b';c.fillRect(0,0,W,H);
 
-  // Cream accent band on left
-  c.fillStyle='#F0EAD6';
-  rr(c,0,0,W*0.42,H,0,'#F0EAD6');
+  // Subtle grid pattern for texture
+  c.strokeStyle='rgba(240,234,214,0.02)';c.lineWidth=1;
+  for(var gx=0;gx<W;gx+=40){c.beginPath();c.moveTo(gx,0);c.lineTo(gx,H);c.stroke()}
+  for(var gy=0;gy<H;gy+=40){c.beginPath();c.moveTo(0,gy);c.lineTo(W,gy);c.stroke()}
 
-  // ── LEFT SIDE (cream) ──
-  var leftCx=W*0.21;
+  // Subtle radial glow behind profile area
+  var grad=c.createRadialGradient(W*0.22,H*0.45,0,W*0.22,H*0.45,300);
+  grad.addColorStop(0,'rgba(232,168,23,0.06)');grad.addColorStop(1,'rgba(232,168,23,0)');
+  c.fillStyle=grad;c.fillRect(0,0,W,H);
 
-  // Profile pic — big
-  var picR=65;
-  var picY=110;
-  c.save();
-  c.fillStyle='#1b2d5b';
-  c.beginPath();c.arc(leftCx,picY,picR+4,0,Math.PI*2);c.fill();
+  // ── Layout: Left column = profile + IQ, Right column = stats + abilities ──
+  var pad=48;
+  var leftW=W*0.38;
+  var leftCx=pad+leftW/2;
+  var rightX=pad+leftW+32;
+  var rightW=W-rightX-pad;
+
+  // ── LEFT COLUMN ──
+
+  // Profile pic
+  var picR=58;
+  var picY=120;
+  // Ring behind avatar
+  c.strokeStyle='rgba(240,234,214,0.08)';c.lineWidth=3;
+  c.beginPath();c.arc(leftCx,picY,picR+8,0,Math.PI*2);c.stroke();
+  // Avatar circle bg
   c.fillStyle='#243a6e';
   c.beginPath();c.arc(leftCx,picY,picR,0,Math.PI*2);c.fill();
-  if(!pic){c.font='900 42px Nunito';c.textAlign='center';c.textBaseline='middle';c.fillStyle='#F0EAD6';c.fillText('CB',leftCx,picY)}
-  c.restore();
+  if(!pic){c.font='900 38px Nunito';c.textAlign='center';c.textBaseline='middle';c.fillStyle='rgba(240,234,214,0.3)';c.fillText('CB',leftCx,picY)}
 
   // Name
-  c.font='800 22px Nunito';c.fillStyle='#1b2d5b';c.textAlign='center';c.textBaseline='top';
-  c.fillText(uname,leftCx,picY+picR+16);
+  c.font='800 24px Nunito';c.fillStyle='#F0EAD6';c.textAlign='center';c.textBaseline='top';
+  c.fillText(uname,leftCx,picY+picR+18);
 
-  // IQ number — huge
-  c.font='900 120px Nunito';c.fillStyle='#1b2d5b';c.textBaseline='middle';
-  c.fillText(String(d.iq||'--'),leftCx,340);
+  // Divider line
+  var divY=picY+picR+56;
+  c.strokeStyle='rgba(240,234,214,0.06)';c.lineWidth=1;
+  c.beginPath();c.moveTo(leftCx-60,divY);c.lineTo(leftCx+60,divY);c.stroke();
+
+  // IQ number — big and bold
+  var iqY=divY+60;
+  c.font='900 130px Nunito';c.fillStyle='#F0EAD6';c.textBaseline='middle';c.textAlign='center';
+  c.fillText(String(d.iq||'--'),leftCx,iqY);
 
   // IQ label
-  c.font='900 16px Nunito';c.fillStyle='#8b9ab8';c.letterSpacing='6px';
-  c.fillText('I Q',leftCx,410);
+  c.font='900 14px Nunito';c.fillStyle='rgba(240,234,214,0.25)';
+  c.fillText('I Q',leftCx,iqY+70);
 
-  // Percentile badge
+  // Percentile badge — gold pill
   if(d.iq){
     var pctText='TOP '+formatPercentile(iqToPercentile(d.iq)).toUpperCase();
-    c.font='900 14px Nunito';var tw=c.measureText(pctText).width+32;
-    rr(c,leftCx-tw/2,430,tw,30,15,'#e8a817');
-    c.fillStyle='#1b2d5b';c.textBaseline='middle';c.fillText(pctText,leftCx,445);
+    c.font='900 15px Nunito';var tw=c.measureText(pctText).width+36;
+    var pillY=iqY+92;
+    rr(c,leftCx-tw/2,pillY,tw,32,16,'#e8a817');
+    c.fillStyle='#1b2d5b';c.textBaseline='middle';c.textAlign='center';
+    c.fillText(pctText,leftCx,pillY+16);
   }
 
-  // ── RIGHT SIDE (navy) ──
-  var rightX=W*0.48, rightW=W*0.48;
-  var ry=50;
+  // ── RIGHT COLUMN ──
 
-  // Stats grid
+  // Stats in 2×2 grid — compact cards
+  var ry=52;
   var stats=[
-    {v:String(d.answered||0),l:'Answered',color:'#3fba4f'},
-    {v:acc+'%',l:'Accuracy',color:'#3a7df2'},
-    {v:String(d.bestStreak||0),l:'Best Streak',color:'#e87d1a'},
-    {v:'Lvl '+(d.level||1),l:'Level',color:'#6d4aed'}
+    {v:String(d.answered||0),l:'ANSWERED',color:'#3fba4f',icon:'check'},
+    {v:acc+'%',l:'ACCURACY',color:'#3a7df2',icon:'target'},
+    {v:String(d.bestStreak||0),l:'BEST STREAK',color:'#e87d1a',icon:'bolt'},
+    {v:'Lvl '+(d.level||1),l:'LEVEL',color:'#6d4aed',icon:'chart'}
   ];
-  var gapX=16,gapY=12;
-  var cellW=(rightW-gapX)/2, cellH=80;
+  var sgGap=10;
+  var sgW=(rightW-sgGap)/2;
+  var sgH=72;
 
   stats.forEach(function(s,i){
     var col=i%2, row=Math.floor(i/2);
-    var cx=rightX+col*(cellW+gapX), cy=ry+row*(cellH+gapY);
-    rr(c,cx,cy,cellW,cellH,14,'rgba(240,234,214,0.06)');
-    // Color dot
-    c.fillStyle=s.color;
-    c.beginPath();c.arc(cx+18,cy+cellH/2,6,0,Math.PI*2);c.fill();
+    var sx=rightX+col*(sgW+sgGap);
+    var sy=ry+row*(sgH+sgGap);
+
+    // Card bg
+    rr(c,sx,sy,sgW,sgH,14,'rgba(240,234,214,0.05)');
+    // Top highlight
+    c.save();
+    c.beginPath();
+    c.moveTo(sx+14,sy);c.lineTo(sx+sgW-14,sy);
+    c.quadraticCurveTo(sx+sgW,sy,sx+sgW,sy+14);
+    c.lineTo(sx+sgW,sy+2);c.lineTo(sx,sy+2);c.lineTo(sx,sy+14);
+    c.quadraticCurveTo(sx,sy,sx+14,sy);c.closePath();
+    c.fillStyle='rgba(240,234,214,0.03)';c.fill();
+    c.restore();
+
+    // Color accent bar on left
+    rr(c,sx,sy+16,3,sgH-32,2,s.color);
+
     // Value
-    c.font='900 28px Nunito';c.fillStyle='#F0EAD6';c.textAlign='left';c.textBaseline='middle';
-    c.fillText(s.v,cx+32,cy+cellH/2-8);
+    c.font='900 30px Nunito';c.fillStyle='#F0EAD6';c.textAlign='left';c.textBaseline='middle';
+    c.fillText(s.v,sx+16,sy+sgH/2-6);
     // Label
-    c.font='700 12px Nunito';c.fillStyle='rgba(240,234,214,0.4)';
-    c.fillText(s.l,cx+32,cy+cellH/2+14);
+    c.font='800 10px Nunito';c.fillStyle='rgba(240,234,214,0.3)';
+    c.fillText(s.l,sx+16,sy+sgH/2+16);
   });
 
-  // Abilities bars
-  var aby=ry+2*(cellH+gapY)+20;
-  c.font='900 11px Nunito';c.fillStyle='rgba(240,234,214,0.25)';c.textAlign='left';c.textBaseline='top';
+  // ── Abilities section ──
+  var aby=ry+2*(sgH+sgGap)+24;
+
+  // Section header
+  c.font='900 11px Nunito';c.fillStyle='rgba(240,234,214,0.2)';c.textAlign='left';c.textBaseline='top';
   c.fillText('ABILITIES',rightX,aby);
-  aby+=22;
+  aby+=20;
 
-  var cats=AB.slice(0,6);
-  var barH=8,barGap=28;
+  // Abilities card bg
+  var abCardH=H-aby-pad-20;
+  rr(c,rightX,aby,rightW,abCardH,14,'rgba(240,234,214,0.03)');
+
+  // All 8 abilities, tightly packed
+  var cats=AB;
+  var abPadX=16, abPadY=12;
+  var barH=6;
+  var rowH=(abCardH-abPadY*2)/cats.length;
+
   cats.forEach(function(a,i){
-    var y=aby+i*barGap;
+    var y=aby+abPadY+i*rowH;
     var pct=IQData.getStatPercent(a.key);
-    // name
-    c.font='800 11px Nunito';c.fillStyle='rgba(240,234,214,0.4)';c.textAlign='left';c.textBaseline='top';
-    c.fillText(a.name,rightX,y);
-    // value
-    c.font='900 11px Nunito';c.fillStyle='#F0EAD6';c.textAlign='right';
-    c.fillText(String(pct),rightX+rightW,y);
-    // bar bg
-    var barY=y+16;
-    rr(c,rightX,barY,rightW,barH,4,'rgba(240,234,214,0.06)');
-    // bar fill
-    if(pct>0) rr(c,rightX,barY,rightW*(pct/100),barH,4,a.color);
+    var barStartX=rightX+abPadX;
+    var valW=36;
+    var barW=rightW-abPadX*2-valW-8;
+
+    // Color dot
+    c.fillStyle=a.color;
+    c.beginPath();c.arc(barStartX+3,y+rowH/2,3,0,Math.PI*2);c.fill();
+
+    // Name
+    c.font='800 11px Nunito';c.fillStyle='rgba(240,234,214,0.45)';c.textAlign='left';c.textBaseline='middle';
+    c.fillText(a.name,barStartX+14,y+rowH/2-9);
+
+    // Bar bg
+    var barY=y+rowH/2+3;
+    rr(c,barStartX+14,barY,barW-14,barH,3,'rgba(240,234,214,0.05)');
+    // Bar fill
+    if(pct>0){
+      var fillW=Math.max(4,(barW-14)*(pct/100));
+      rr(c,barStartX+14,barY,fillW,barH,3,a.color);
+    }
+
+    // Value
+    c.font='900 13px Nunito';c.fillStyle='#F0EAD6';c.textAlign='right';c.textBaseline='middle';
+    c.fillText(String(pct),rightX+rightW-abPadX,y+rowH/2);
+
+    // Separator line (except last)
+    if(i<cats.length-1){
+      c.strokeStyle='rgba(240,234,214,0.03)';c.lineWidth=1;
+      c.beginPath();c.moveTo(barStartX,y+rowH);c.lineTo(rightX+rightW-abPadX,y+rowH);c.stroke();
+    }
   });
 
-  // ── BOTTOM: logo + branding ──
-  c.font='800 14px Nunito';c.fillStyle='rgba(240,234,214,0.2)';c.textAlign='center';c.textBaseline='bottom';
-  c.fillText('cebear.com',W/2,H-24);
+  // ── Vertical divider between columns ──
+  var divX=rightX-16;
+  c.strokeStyle='rgba(240,234,214,0.05)';c.lineWidth=1;
+  c.beginPath();c.moveTo(divX,pad+20);c.lineTo(divX,H-pad-20);c.stroke();
+
+  // ── Bottom branding ──
+  c.font='800 13px Nunito';c.fillStyle='rgba(240,234,214,0.15)';c.textAlign='left';c.textBaseline='bottom';
+  c.fillText('cebear.com',pad,H-pad+10);
+
+  // Gold accent dot
+  c.fillStyle='#e8a817';
+  c.beginPath();c.arc(pad+c.measureText('cebear.com').width+12,H-pad+4,3,0,Math.PI*2);c.fill();
 
   shareCanvas=cv;
 
-  // Load profile pic async — draw into the circle
+  // Load profile pic async
   if(pic){
     var img=new Image();
     img.crossOrigin='anonymous';
@@ -290,13 +366,12 @@ function genShareCard(){
     img.src=pic;
   }
 
-  // Load logo.png async — place in bottom-left of cream area
+  // Load logo.png async
   var logo=new Image();
   logo.crossOrigin='anonymous';
   logo.onload=function(){
-    var lw=36,lh=36;
-    // Place logo above the branding text, left side
-    c.drawImage(logo,leftCx-lw/2,H-70,lw,lh);
+    var lw=30,lh=30;
+    c.drawImage(logo,pad-2,H-pad-40,lw,lh);
   };
   logo.src='logo.png';
 
@@ -305,7 +380,6 @@ function genShareCard(){
 
 async function uploadShareCard(){
   var user=IQData.getCurrentUser();if(!user||!shareCanvas)return;var d=IQData.load();
-  // Wait a beat for async images to paint
   await new Promise(r=>setTimeout(r,300));
   try{
     var du=shareCanvas.toDataURL('image/png');var b64=du.split(',')[1];
@@ -328,13 +402,11 @@ function handleShareAction(id){Haptics.medium();var text=getShareText();switch(i
 async function openShare(){
   var fab=document.getElementById('share-btn');fab.classList.add('uploading');fab.textContent='Generating...';
   shareUrl=getShareUrl();genShareCard();
-  // Wait for async image loads (profile pic + logo)
   await new Promise(r=>setTimeout(r,500));
   await uploadShareCard();
   fab.classList.remove('uploading');fab.innerHTML='<svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share Your IQ';
   document.getElementById('share-url').value=shareUrl;
   var pv=document.getElementById('card-preview');pv.innerHTML='';
-  // Re-grab canvas after images loaded
   var pc=document.createElement('canvas');pc.width=600;pc.height=315;pc.getContext('2d').drawImage(shareCanvas,0,0,600,315);pv.appendChild(pc);
   buildShareGrid();document.getElementById('share-modal').classList.add('show');
 }
