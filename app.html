@@ -28,15 +28,15 @@
     .screen.active{display:block}
     .screen iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;touch-action:manipulation}
     body.has-nav .screen iframe{height:calc(100dvh - 58px - env(safe-area-inset-bottom,0px))}
-    #nav{position:fixed;bottom:0;left:0;right:0;height:calc(58px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:#F0EAD6;display:none;justify-content:space-around;align-items:center;z-index:100}
+    #nav{position:fixed;bottom:0;left:0;right:0;height:calc(58px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:#1b2d5b;border-top:1px solid rgba(240,234,214,.08);display:none;justify-content:space-around;align-items:center;z-index:100}
     body.has-nav #nav{display:flex}
-    .nb{padding:8px 0 2px;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:#8b9ab8;font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;cursor:pointer;position:relative;transition:color .15s;-webkit-tap-highlight-color:transparent}
+    .nb{padding:8px 0 2px;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:rgba(240,234,214,.35);font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;cursor:pointer;position:relative;transition:color .15s;-webkit-tap-highlight-color:transparent}
     .nb .ni{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:10px;transition:all .2s}
     .nb .ni svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-    .nb.active{color:#1b2d5b}
-    .nb.active .ni{background:#1b2d5b;width:42px;height:28px}
+    .nb.active{color:#F0EAD6}
+    .nb.active .ni{background:rgba(240,234,214,.15);width:42px;height:28px}
     .nb.active .ni svg{stroke:#F0EAD6}
-    .nbdg{position:absolute;top:4px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:#e8443a;border:2px solid #F0EAD6;display:none}
+    .nbdg{position:absolute;top:4px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:#e8443a;border:2px solid #1b2d5b;display:none}
     .nbdg.show{display:block}
   </style>
 </head>
