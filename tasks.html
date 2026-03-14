@@ -3,331 +3,112 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Daily Tasks – BrainDeer</title>
+  <title>Daily Tasks – Cebear</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #3a2918; --card: #4a3625; --card-glow: #5a4232;
-      --brown-mid: #6b4f32; --brown-light: #8f6b4a;
-      --tan: #c2a476; --cream: #f0e2cc;
-      --green: #58cc02; --green-dark: #46a302;
-      --red: #ea2b2b; --red-dark: #c42020;
-      --gold: #ffc800; --gold-dark: #d9aa00;
-      --orange: #ff9600; --orange-dark: #d97e00;
-      --blue: #1cb0f6;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body {
-      width: 100%; height: 100%; overflow: hidden;
-      font-family: 'Nunito', sans-serif;
-      background: var(--bg); color: var(--cream);
-    }
+    :root{--bg:#162b5e;--navy:#162b5e;--navy-mid:#1e3872;--card:#fff;--text:#162b5e;--text-dim:#5a6a90;--text-light:#8a96b8;--pill:#EEF0F7;--green:#2DC653;--green-dark:#22a344;--red:#FF3B5C;--gold:#FFB800;--gold-dark:#d99e00;--orange:#FF8C00;--blue:#3B82F6}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{width:100%;height:100%;overflow:hidden;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text)}
+    .page{display:flex;flex-direction:column;height:100%;overflow:hidden}
 
-    .page { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+    .top-bar{padding:calc(env(safe-area-inset-top,0px)+14px) 18px 12px;background:var(--bg);flex-shrink:0}
+    .top-row{display:flex;align-items:center;justify-content:space-between}
+    .page-title{font-size:20px;font-weight:900;color:#fff}
 
-    /* ── Top bar ── */
-    .top-bar {
-      padding: calc(env(safe-area-inset-top, 0px) + 14px) 18px 12px;
-      background: var(--bg); flex-shrink: 0;
-    }
-    .top-row { display: flex; align-items: center; justify-content: space-between; }
-    .page-title { font-size: 22px; font-weight: 900; color: var(--cream); }
+    /* ── BIG countdown ── */
+    .countdown-card{background:var(--card);border-radius:16px;padding:14px 16px;margin-top:12px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+    .cd-icon{width:40px;height:40px;background:var(--navy);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .cd-icon svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .cd-info{flex:1}
+    .cd-label{font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px}
+    .cd-time{font-size:24px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:1px}
+    .cd-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:cdPulse 2s ease infinite;flex-shrink:0}
+    @keyframes cdPulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-    /* Countdown chip */
-    .countdown-chip {
-      background: var(--card); border-radius: 12px; padding: 6px 12px;
-      font-size: 12px; font-weight: 800; color: var(--tan);
-      box-shadow: 0 3px 0 rgba(0,0,0,0.2);
-      display: flex; align-items: center; gap: 5px;
-    }
-    .countdown-chip .chip-dot {
-      width: 7px; height: 7px; border-radius: 50%; background: var(--green);
-      animation: chipPulse 2s ease infinite;
-    }
-    @keyframes chipPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .scroll-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px 20px}
+    .scroll-body::-webkit-scrollbar{display:none}
 
-    /* ── Scrollable body ── */
-    .scroll-body {
-      flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-      padding: 10px 16px calc(env(safe-area-inset-bottom, 0px) + 84px);
-    }
-    .scroll-body::-webkit-scrollbar { display: none; }
+    /* ── Streak card — BIG ── */
+    .streak-card{background:var(--card);border-radius:20px;padding:18px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+    .streak-inner{display:flex;align-items:center;gap:14px}
+    .streak-flame-wrap{width:56px;height:56px;flex-shrink:0;background:rgba(255,140,0,.1);border-radius:16px;display:flex;align-items:center;justify-content:center}
+    .streak-flame-wrap svg{width:28px;height:28px;stroke:var(--orange);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .streak-info{flex:1}
+    .streak-label{font-size:10px;font-weight:800;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+    .streak-val{font-size:32px;font-weight:900;color:var(--orange);line-height:1}
+    .streak-sub{font-size:11px;font-weight:700;color:var(--text-dim);margin-top:3px;line-height:1.3}
+    .streak-pips{display:flex;gap:5px;margin-top:12px}
+    .streak-pip{flex:1;height:6px;border-radius:3px;background:var(--pill);transition:background .4s}
+    .streak-pip.active{background:var(--orange)}.streak-pip.done{background:var(--green)}
 
-    /* ── Streak card ── */
-    .streak-card {
-      background: var(--card); border-radius: 20px;
-      padding: 16px; margin-bottom: 10px;
-      box-shadow: 0 5px 0 rgba(0,0,0,0.2);
-      position: relative; overflow: hidden;
-    }
-    .streak-card::before {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(255,150,0,0.08) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .streak-inner { display: flex; align-items: center; gap: 14px; }
-    .streak-flame-wrap {
-      width: 56px; height: 56px; flex-shrink: 0;
-      background: rgba(255,150,0,0.15); border-radius: 16px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 30px;
-    }
-    .streak-info { flex: 1; }
-    .streak-label { font-size: 10px; font-weight: 800; color: var(--tan); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
-    .streak-val { font-size: 30px; font-weight: 900; color: var(--orange); line-height: 1; }
-    .streak-sub { font-size: 11px; font-weight: 700; color: var(--tan); margin-top: 3px; line-height: 1.3; }
+    /* ── Progress ── */
+    .progress-card{background:var(--card);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+    .progress-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .progress-label{font-size:13px;font-weight:800;color:var(--text)}.progress-count{font-size:13px;font-weight:900;color:var(--gold)}
+    .progress-bar-outer{height:12px;background:var(--pill);border-radius:6px;overflow:hidden}
+    .progress-bar-inner{height:100%;border-radius:6px;background:var(--green);transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+    .progress-bar-inner.all-done{background:var(--gold)}
 
-    /* Streak pip row */
-    .streak-pips { display: flex; gap: 5px; margin-top: 12px; }
-    .streak-pip {
-      flex: 1; height: 6px; border-radius: 3px;
-      background: var(--brown-mid);
-      transition: background 0.4s;
-    }
-    .streak-pip.active { background: var(--orange); }
-    .streak-pip.done   { background: var(--green); }
+    .complete-banner{display:none;background:var(--green);border-radius:20px;padding:18px 16px;margin-bottom:12px;align-items:center;gap:14px;box-shadow:0 4px 16px rgba(45,198,83,.3)}
+    .complete-banner.show{display:flex;animation:popIn .5s cubic-bezier(.34,1.56,.64,1)}
+    .cb-icon{width:48px;height:48px;background:rgba(255,255,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .cb-icon svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+    .cb-text .cb-title{font-size:17px;font-weight:900;color:#fff}.cb-text .cb-sub{font-size:12px;font-weight:700;color:rgba(255,255,255,.85);margin-top:3px;line-height:1.3}
 
-    /* ── Progress card ── */
-    .progress-card {
-      background: var(--card); border-radius: 20px;
-      padding: 16px; margin-bottom: 10px;
-      box-shadow: 0 5px 0 rgba(0,0,0,0.2);
-      position: relative; overflow: hidden;
-    }
-    .progress-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
-      pointer-events: none;
-    }
-    .progress-top {
-      display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
-    }
-    .progress-label { font-size: 13px; font-weight: 800; color: var(--cream); }
-    .progress-count { font-size: 13px; font-weight: 900; color: var(--gold); }
-    .progress-bar-outer { height: 14px; background: var(--brown-mid); border-radius: 7px; overflow: hidden; }
-    .progress-bar-inner {
-      height: 100%; border-radius: 7px;
-      background: linear-gradient(90deg, var(--green) 0%, #7eea00 100%);
-      transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-      position: relative;
-    }
-    .progress-bar-inner::after {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
-      background: rgba(255,255,255,0.3); border-radius: 7px 7px 0 0;
-    }
-    .progress-bar-inner.all-done {
-      background: linear-gradient(90deg, var(--gold) 0%, #ffdd55 100%);
-    }
-
-    /* ── All done banner ── */
-    .complete-banner {
-      display: none;
-      background: linear-gradient(135deg, #46a302 0%, #58cc02 100%);
-      border-radius: 20px; padding: 18px 16px; margin-bottom: 10px;
-      box-shadow: 0 5px 0 #2d7000;
-      align-items: center; gap: 14px;
-    }
-    .complete-banner.show { display: flex; animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1); }
-    .cb-emoji { font-size: 40px; }
-    .cb-text .cb-title { font-size: 17px; font-weight: 900; color: #fff; }
-    .cb-text .cb-sub   { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.85); margin-top: 3px; line-height: 1.3; }
-
-    /* ── Section label ── */
-    .section-label {
-      font-size: 10px; font-weight: 800; color: var(--tan);
-      letter-spacing: 1.5px; text-transform: uppercase;
-      margin: 4px 0 8px 2px;
-    }
+    .section-label{font-size:10px;font-weight:800;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin:4px 0 8px 2px}
 
     /* ── Task cards ── */
-    .task-card {
-      background: var(--card); border-radius: 20px;
-      padding: 14px; margin-bottom: 10px;
-      display: flex; align-items: center; gap: 12px;
-      box-shadow: 0 5px 0 rgba(0,0,0,0.2);
-      position: relative; overflow: hidden;
-      transition: opacity 0.5s, transform 0.3s;
-    }
-    .task-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
-      pointer-events: none; border-radius: 20px 20px 0 0;
-    }
-    .task-card.is-claimed { opacity: 0.4; }
+    .task-card{background:var(--card);border-radius:20px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);position:relative;overflow:hidden;transition:opacity .5s,transform .3s}
+    .task-card.is-claimed{opacity:.4}
+    .task-card.task-ready::after{content:'';position:absolute;left:0;top:12px;bottom:12px;width:4px;border-radius:0 3px 3px 0;background:var(--gold)}
+    .task-icon-wrap{width:48px;height:48px;flex-shrink:0;background:var(--pill);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px}
+    .task-icon-wrap.icon-done{background:rgba(45,198,83,.1)}
+    .task-body{flex:1;min-width:0}
+    .task-label{font-size:14px;font-weight:800;color:var(--text);margin-bottom:8px;line-height:1.25}
+    .task-progress-row{display:flex;align-items:center;gap:8px}
+    .task-bar-outer{flex:1;height:8px;background:var(--pill);border-radius:4px;overflow:hidden}
+    .task-bar-inner{height:100%;border-radius:4px;background:var(--blue);transition:width .5s cubic-bezier(.34,1.56,.64,1)}
+    .task-bar-inner.bar-done{background:var(--gold)}
+    .task-pct{font-size:11px;font-weight:800;color:var(--text-dim);white-space:nowrap;min-width:36px;text-align:right}
+    .task-claim{flex-shrink:0;background:var(--gold);color:var(--navy);border:none;border-radius:12px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 2px 0 var(--gold-dark);transition:transform .1s;white-space:nowrap;line-height:1}
+    .task-claim:active:not(:disabled){transform:translateY(2px);box-shadow:none}.task-claim:disabled{opacity:.5;cursor:default}
+    .task-done-badge{flex-shrink:0;width:32px;height:32px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;animation:popIn .4s cubic-bezier(.34,1.56,.64,1)}
+    .task-done-badge svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 
-    /* Done glow strip on left edge */
-    .task-card.task-ready::after {
-      content: ''; position: absolute; left: 0; top: 12px; bottom: 12px;
-      width: 4px; border-radius: 0 3px 3px 0;
-      background: var(--gold);
-      box-shadow: 0 0 8px var(--gold);
-    }
-
-    .task-icon-wrap {
-      width: 52px; height: 52px; flex-shrink: 0;
-      background: var(--bg); border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 28px; box-shadow: 0 3px 0 rgba(0,0,0,0.2);
-    }
-    .task-icon-wrap.icon-done { background: rgba(88,204,2,0.12); }
-
-    .task-body { flex: 1; min-width: 0; }
-    .task-label { font-size: 14px; font-weight: 800; color: var(--cream); margin-bottom: 8px; line-height: 1.25; }
-
-    .task-progress-row { display: flex; align-items: center; gap: 8px; }
-    .task-bar-outer {
-      flex: 1; height: 9px; background: var(--brown-mid); border-radius: 5px; overflow: hidden;
-    }
-    .task-bar-inner {
-      height: 100%; border-radius: 5px;
-      background: linear-gradient(90deg, var(--blue) 0%, #55d0ff 100%);
-      transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1);
-      position: relative;
-    }
-    .task-bar-inner::after {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
-      background: rgba(255,255,255,0.28); border-radius: 5px 5px 0 0;
-    }
-    .task-bar-inner.bar-done {
-      background: linear-gradient(90deg, var(--gold) 0%, #ffdd55 100%);
-    }
-    .task-pct { font-size: 11px; font-weight: 800; color: var(--tan); white-space: nowrap; min-width: 36px; text-align: right; }
-
-    /* Claim button */
-    .task-claim {
-      flex-shrink: 0;
-      background: var(--gold); color: #2a1800;
-      border: none; border-radius: 14px; padding: 10px 14px;
-      font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 900;
-      cursor: pointer; box-shadow: 0 4px 0 var(--gold-dark);
-      transition: transform 0.1s, box-shadow 0.1s, opacity 0.2s;
-      white-space: nowrap; line-height: 1;
-      position: relative; overflow: hidden;
-    }
-    .task-claim::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
-      background: rgba(255,255,255,0.2); border-radius: 14px 14px 0 0; pointer-events: none;
-    }
-    .task-claim:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--gold-dark); }
-    .task-claim:disabled { opacity: 0.5; cursor: default; }
-
-    .task-done-badge { flex-shrink: 0; font-size: 28px; animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
-
-    /* ── XP toast ── */
-    .xp-toast {
-      position: fixed;
-      top: calc(env(safe-area-inset-top, 0px) + 16px);
-      left: 50%; transform: translateX(-50%) translateY(-20px);
-      background: var(--gold); color: #2a1800;
-      border-radius: 20px; padding: 9px 22px;
-      font-size: 18px; font-weight: 900;
-      box-shadow: 0 4px 0 var(--gold-dark);
-      z-index: 999; opacity: 0; pointer-events: none;
-      transition: opacity 0.25s, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
-      white-space: nowrap;
-    }
-    .xp-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* ── Confetti ── */
-    .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 800; overflow: hidden; }
-    .confetti i { position: absolute; width: 10px; height: 10px; opacity: 0; border-radius: 3px; }
-    .confetti i.fall { animation: confettiFall 1.3s ease-out forwards; }
-
-    /* ── Nav ── */
-    nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      height: calc(64px + env(safe-area-inset-bottom, 0px));
-      background: var(--card); box-shadow: 0 -3px 0 rgba(0,0,0,0.15);
-      display: flex; justify-content: center; align-items: flex-start;
-      padding-top: 6px; gap: 4px; z-index: 100; flex-shrink: 0;
-    }
-    .nav-btn {
-      padding: 8px 18px; background: none; border: none;
-      display: flex; flex-direction: column; align-items: center; gap: 2px;
-      color: #6b4f32; font-family: 'Nunito', sans-serif;
-      font-size: 11px; font-weight: 800; border-radius: 14px;
-      transition: all 0.15s; cursor: pointer; position: relative;
-    }
-    .nav-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-    .nav-btn.active { color: var(--cream); background: #6b4f32; box-shadow: 0 3px 0 rgba(0,0,0,0.15); }
-
-    /* ── Loading ── */
-    .loading {
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; gap: 12px;
-      padding: 60px 20px; color: var(--tan);
-      font-size: 14px; font-weight: 700;
-    }
-    .loading-spinner {
-      width: 36px; height: 36px; border: 4px solid var(--brown-mid);
-      border-top-color: var(--gold); border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
-
-    /* ── Animations ── */
-    @keyframes popIn {
-      0%   { transform: scale(0.8); opacity: 0; }
-      60%  { transform: scale(1.06); }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    @keyframes confettiFall {
-      0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
-      100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(14px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .animate-in { animation: slideUp 0.35s ease both; }
-    .d1 { animation-delay: 0.04s; }
-    .d2 { animation-delay: 0.08s; }
-    .d3 { animation-delay: 0.12s; }
-    .d4 { animation-delay: 0.16s; }
-    .d5 { animation-delay: 0.20s; }
+    .xp-toast{position:fixed;top:calc(env(safe-area-inset-top,0px)+16px);left:50%;transform:translateX(-50%) translateY(-20px);background:var(--gold);color:var(--navy);border-radius:20px;padding:9px 22px;font-size:18px;font-weight:900;box-shadow:0 4px 16px rgba(0,0,0,.15);z-index:999;opacity:0;pointer-events:none;transition:opacity .25s,transform .35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
+    .xp-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .confetti{position:fixed;inset:0;pointer-events:none;z-index:800;overflow:hidden}
+    .confetti i{position:absolute;width:10px;height:10px;opacity:0;border-radius:3px}
+    .confetti i.fall{animation:confettiFall 1.3s ease-out forwards}
+    @keyframes popIn{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+    @keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(100vh) rotate(720deg)}}
+    .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:60px 20px;color:rgba(255,255,255,.5);font-size:14px;font-weight:700}
+    .loading-spinner{width:36px;height:36px;border:4px solid rgba(255,255,255,.1);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+    .animate-in{animation:slideUp .35s ease both}.d1{animation-delay:.04s}.d2{animation-delay:.08s}.d3{animation-delay:.12s}.d4{animation-delay:.16s}.d5{animation-delay:.2s}
   </style>
 </head>
 <body>
-
 <div class="page">
   <div class="top-bar">
     <div class="top-row">
-      <div class="page-title">📋 Daily Tasks</div>
-      <div class="countdown-chip" id="countdown-chip">
-        <div class="chip-dot"></div>
-        <span id="countdown-text">--:--:--</span>
+      <div class="page-title">Daily Tasks</div>
+    </div>
+    <div class="countdown-card" id="countdown-card">
+      <div class="cd-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+      <div class="cd-info">
+        <div class="cd-label">New tasks in</div>
+        <div class="cd-time" id="countdown-text">--:--:--</div>
       </div>
+      <div class="cd-dot"></div>
     </div>
   </div>
-
   <div class="scroll-body" id="scroll-body">
-    <div class="loading" id="loading-state">
-      <div class="loading-spinner"></div>
-      Loading tasks…
-    </div>
+    <div class="loading" id="loading-state"><div class="loading-spinner"></div>Loading tasks...</div>
   </div>
 </div>
-
-<nav>
-  <button class="nav-btn" onclick="navGo('leaderboard')">
-    <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
-    Ranks
-  </button>
-  <button class="nav-btn" onclick="navGo('improve')">
-    <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-    Train
-  </button>
-  <button class="nav-btn active" onclick="navGo('tasks')">
-    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-    Tasks
-  </button>
-  <button class="nav-btn" onclick="navGo('profile')">
-    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    Profile
-  </button>
-</nav>
-
 <div class="xp-toast" id="xp-toast"></div>
 <div class="confetti" id="confetti"></div>
 
@@ -335,406 +116,47 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-// ════════════════════════════════════════════════════
-// BrainDeer Daily Tasks
-// ════════════════════════════════════════════════════
-
-var firebaseConfig = {
-  apiKey:            "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
-  authDomain:        "braindeer-backend.firebaseapp.com",
-  projectId:         "braindeer-backend",
-  storageBucket:     "braindeer-backend.firebasestorage.app",
-  messagingSenderId: "331205139765",
-  appId:             "1:331205139765:web:20cfef8194af63fc55c07c"
-};
-
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-
-var db   = firebase.firestore();
-var auth = firebase.auth();
-
-function navGo(page) {
-  if (window.parent !== window) window.parent.goTo(page);
-  else window.location.href = page + '.html';
+var firebaseConfig={apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend",storageBucket:"braindeer-backend.firebasestorage.app",messagingSenderId:"331205139765",appId:"1:331205139765:web:20cfef8194af63fc55c07c"};
+if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+var db=firebase.firestore(),auth=firebase.auth();
+function navGo(page){if(window.parent!==window)window.parent.goTo(page);else window.location.href=page+'.html'}
+function getTodayKey(){var n=new Date();return n.getFullYear()+'-'+(n.getMonth()+1)+'-'+n.getDate()}
+function seededRandom(seed){var s=seed;return function(){s=(s*1664525+1013904223)&0xffffffff;return(s>>>0)/0xffffffff}}
+var TASK_POOL=[{id:'streak_5',type:'streak',target:5,label:'Get a streak of 5',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#FF8C00" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',xp:30},{id:'streak_10',type:'streak',target:10,label:'Get a streak of 10',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#FF8C00" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',xp:60},{id:'streak_15',type:'streak',target:15,label:'Get a streak of 15',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#FF8C00" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',xp:100},{id:'correct_10',type:'correct',target:10,label:'Get 10 correct',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#2DC653" stroke-width="2.5" stroke-linecap="round"><path d="M9 11l3 3L22 4"/></svg>',xp:25},{id:'correct_25',type:'correct',target:25,label:'Get 25 correct',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#2DC653" stroke-width="2.5" stroke-linecap="round"><path d="M9 11l3 3L22 4"/></svg>',xp:50},{id:'correct_50',type:'correct',target:50,label:'Get 50 correct',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#2DC653" stroke-width="2.5" stroke-linecap="round"><path d="M9 11l3 3L22 4"/></svg>',xp:90},{id:'answer_20',type:'answered',target:20,label:'Answer 20 questions',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9 9c0-1.5 1-3 3-3s3 1.5 3 3-1.5 2.5-3 3v1"/><circle cx="12" cy="17" r="0.5" fill="#3B82F6"/></svg>',xp:20},{id:'answer_50',type:'answered',target:50,label:'Answer 50 questions',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9 9c0-1.5 1-3 3-3s3 1.5 3 3-1.5 2.5-3 3v1"/><circle cx="12" cy="17" r="0.5" fill="#3B82F6"/></svg>',xp:45},{id:'answer_100',type:'answered',target:100,label:'Answer 100 questions',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9 9c0-1.5 1-3 3-3s3 1.5 3 3-1.5 2.5-3 3v1"/><circle cx="12" cy="17" r="0.5" fill="#3B82F6"/></svg>',xp:80},{id:'accuracy_70',type:'accuracy',target:70,label:'Hit 70% accuracy today',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#7C5CFC" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',xp:35},{id:'accuracy_80',type:'accuracy',target:80,label:'Hit 80% accuracy today',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#7C5CFC" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',xp:55},{id:'play_wordle',type:'game',game:'wordle',target:3,label:'Play 3 Wordle rounds',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#2DC653" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>',xp:40},{id:'play_math',type:'game',game:'mathRush',target:3,label:'Play 3 Math Rush rounds',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#FF3B5C" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',xp:40},{id:'play_memory',type:'game',game:'memory',target:2,label:'Play 2 Memory games',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#7C5CFC" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M12 4v16"/></svg>',xp:35},{id:'play_reaction',type:'game',game:'reaction',target:3,label:'Play 3 Reaction tests',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#FFB800" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',xp:30},{id:'play_ttt',type:'game',game:'ticTacToe',target:2,label:'Play 2 Tic Tac Toe games',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/></svg>',xp:30},{id:'play_simon',type:'game',game:'simon',target:2,label:'Play 2 Simon Says rounds',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#FF3B5C" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>',xp:35},{id:'play_scramble',type:'game',game:'wordScramble',target:3,label:'Unscramble 3 words',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#FF8C00" stroke-width="2" stroke-linecap="round"><path d="M4 7h16"/><path d="M4 12h10"/><path d="M4 17h14"/></svg>',xp:30},{id:'fast_5',type:'fast',target:5,label:'Answer 5 in under 3.5s',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#FFB800" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',xp:45},{id:'fast_10',type:'fast',target:10,label:'Answer 10 in under 3.5s',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#FFB800" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',xp:70}];
+function getDailyTaskDefs(){var dateKey=getTodayKey();var seed=dateKey.split('-').reduce(function(a,n){return a*31+parseInt(n)},0);var rng=seededRandom(seed);return TASK_POOL.slice().sort(function(){return rng()-0.5}).slice(0,3)}
+function getTasksRef(uid){return db.collection('users').doc(uid).collection('dailyTasks').doc(getTodayKey())}
+function getYesterdayKey(){var y=new Date();y.setDate(y.getDate()-1);return y.getFullYear()+'-'+(y.getMonth()+1)+'-'+y.getDate()}
+async function loadTaskState(uid){var ref=getTasksRef(uid);var snap=await ref.get();if(snap.exists)return snap.data();var yestSnap=await db.collection('users').doc(uid).collection('dailyTasks').doc(getYesterdayKey()).get();var prevStreak=0;if(yestSnap.exists){var yd=yestSnap.data();prevStreak=yd.allDone?(yd.dailyStreak||0):0}var fresh={date:getTodayKey(),tasks:getDailyTaskDefs().map(function(def){return Object.assign({},def,{progress:0,done:false,claimed:false})}),allDone:false,allClaimed:false,dailyStreak:prevStreak};await ref.set(fresh);return fresh}
+var _claimInFlight={};
+async function claimTask(uid,taskId){if(_claimInFlight[taskId])return null;_claimInFlight[taskId]=true;try{var ref=getTasksRef(uid);var earnedXP=null;await db.runTransaction(async function(tx){var snap=await tx.get(ref);if(!snap.exists)throw new Error('no state');var state=snap.data();var task=state.tasks.find(function(t){return t.id===taskId});if(!task||!task.done||task.claimed){earnedXP=null;return}task.claimed=true;earnedXP=task.xp;if(state.tasks.every(function(t){return t.claimed}))state.allClaimed=true;tx.set(ref,state)});return earnedXP}catch(e){return null}finally{delete _claimInFlight[taskId]}}
+async function incrementStreakToday(uid){var ref=getTasksRef(uid);try{await db.runTransaction(async function(tx){var snap=await tx.get(ref);if(!snap.exists)return;var state=snap.data();if(!state.allDone||state.streakBumped)return;state.streakBumped=true;state.dailyStreak=(state.dailyStreak||0)+1;tx.set(ref,state)})}catch(e){}}
+function awardXP(xp){try{if(window.parent!==window)window.parent.postMessage({type:'xpAwarded',xp:xp},'*')}catch(e){}}
+function updateCountdown(){var now=new Date();var midnight=new Date(now);midnight.setHours(24,0,0,0);var diff=midnight-now;var h=Math.floor(diff/3600000);var m=Math.floor((diff%3600000)/60000);var s=Math.floor((diff%60000)/1000);var pad=function(n){return String(n).padStart(2,'0')};var el=document.getElementById('countdown-text');if(el)el.textContent=pad(h)+':'+pad(m)+':'+pad(s)}
+function spawnConfetti(n){var colors=['#2DC653','#FFB800','#FF3B5C','#3B82F6','#7C5CFC','#FF8C00'];var el=document.getElementById('confetti');for(var i=0;i<n;i++){var p=document.createElement('i');p.style.left=Math.random()*100+'%';p.style.top='-12px';p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDelay=Math.random()*0.3+'s';el.appendChild(p);setTimeout(function(el){el.classList.add('fall')}.bind(null,p),10);setTimeout(function(el){el.remove()}.bind(null,p),1600)}}
+function showXpToast(msg){var t=document.getElementById('xp-toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2400)}
+var _currentUid=null;
+function render(state){var body=document.getElementById('scroll-body');var done=state.tasks.filter(function(t){return t.done}).length;var total=state.tasks.length;var allDone=state.allDone;body.innerHTML='';
+  var streakDays=state.dailyStreak||0;var streakSub=streakDays===0?'Complete all tasks to start your streak!':streakDays===1?'First day done — keep it going!':streakDays+' days in a row — don\'t break it!';
+  var pipCount=7;var pipsFilled=Math.min(streakDays%pipCount||(streakDays>0&&streakDays%pipCount===0?pipCount:0),pipCount);var pipsHtml='';for(var p=0;p<pipCount;p++){pipsHtml+='<div class="streak-pip'+(p<pipsFilled?' done':(p===pipsFilled?' active':''))+'"></div>'}
+  var sc=document.createElement('div');sc.className='streak-card animate-in';
+  sc.innerHTML='<div class="streak-inner"><div class="streak-flame-wrap"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="streak-info"><div class="streak-label">Daily Streak</div><div class="streak-val">'+streakDays+' '+(streakDays===1?'day':'days')+'</div><div class="streak-sub">'+streakSub+'</div></div></div><div class="streak-pips">'+pipsHtml+'</div>';
+  body.appendChild(sc);
+  var pc=document.createElement('div');pc.className='progress-card animate-in d1';
+  pc.innerHTML='<div class="progress-top"><span class="progress-label">Today\'s Progress</span><span class="progress-count">'+done+' / '+total+'</span></div><div class="progress-bar-outer"><div class="progress-bar-inner'+(allDone?' all-done':'')+'" style="width:'+Math.round((done/total)*100)+'%"></div></div>';
+  body.appendChild(pc);
+  if(allDone){var banner=document.createElement('div');banner.className='complete-banner show animate-in d2';banner.innerHTML='<div class="cb-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div class="cb-text"><div class="cb-title">All tasks complete!</div><div class="cb-sub">Streak updated. New tasks in <strong id="banner-countdown">--:--:--</strong></div></div>';body.appendChild(banner)}
+  var lbl=document.createElement('div');lbl.className='section-label animate-in d2';lbl.textContent="Today's Tasks";body.appendChild(lbl);
+  state.tasks.forEach(function(task,i){var pct=Math.min(100,Math.round((task.progress/task.target)*100));var card=document.createElement('div');var delayClass='d'+Math.min(i+3,5);var isReady=task.done&&!task.claimed;
+    card.className='task-card animate-in '+delayClass+(task.claimed?' is-claimed':'')+(isReady?' task-ready':'');
+    var rightEl='';if(task.claimed){rightEl='<div class="task-done-badge"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div>'}else if(task.done){rightEl='<button class="task-claim" data-id="'+task.id+'" data-xp="'+task.xp+'">+'+task.xp+' XP</button>'}
+    card.innerHTML='<div class="task-icon-wrap'+(task.done?' icon-done':'')+'">'+task.icon+'</div><div class="task-body"><div class="task-label">'+task.label+'</div><div class="task-progress-row"><div class="task-bar-outer"><div class="task-bar-inner'+(task.done?' bar-done':'')+'" style="width:'+pct+'%"></div></div><div class="task-pct">'+task.progress+'/'+task.target+'</div></div></div>'+rightEl;
+    var claimBtn=card.querySelector('.task-claim');if(claimBtn){(function(btn,uid){btn.addEventListener('click',async function(){btn.disabled=true;btn.textContent='...';var xp=await claimTask(uid,btn.dataset.id);if(xp===null){var fresh=await loadTaskState(uid);render(fresh);return}awardXP(xp);spawnConfetti(18);showXpToast('+'+xp+' XP');var fresh=await loadTaskState(uid);if(fresh.allDone&&!fresh.streakBumped){await incrementStreakToday(uid);fresh=await loadTaskState(uid)}render(fresh)})})(claimBtn,_currentUid)}
+    body.appendChild(card)});
 }
-
-// ── Helpers ──
-function getTodayKey() {
-  var n = new Date();
-  return n.getFullYear() + '-' + (n.getMonth() + 1) + '-' + n.getDate();
-}
-
-function seededRandom(seed) {
-  var s = seed;
-  return function() {
-    s = (s * 1664525 + 1013904223) & 0xffffffff;
-    return (s >>> 0) / 0xffffffff;
-  };
-}
-
-var TASK_POOL = [
-  { id: 'streak_5',       type: 'streak',   target: 5,   label: 'Get a streak of 5',          icon: '🔥', xp: 30  },
-  { id: 'streak_10',      type: 'streak',   target: 10,  label: 'Get a streak of 10',         icon: '🔥', xp: 60  },
-  { id: 'streak_15',      type: 'streak',   target: 15,  label: 'Get a streak of 15',         icon: '🔥', xp: 100 },
-  { id: 'correct_10',     type: 'correct',  target: 10,  label: 'Get 10 correct',              icon: '✅', xp: 25  },
-  { id: 'correct_25',     type: 'correct',  target: 25,  label: 'Get 25 correct',              icon: '✅', xp: 50  },
-  { id: 'correct_50',     type: 'correct',  target: 50,  label: 'Get 50 correct',              icon: '✅', xp: 90  },
-  { id: 'answer_20',      type: 'answered', target: 20,  label: 'Answer 20 questions',         icon: '🧠', xp: 20  },
-  { id: 'answer_50',      type: 'answered', target: 50,  label: 'Answer 50 questions',         icon: '🧠', xp: 45  },
-  { id: 'answer_100',     type: 'answered', target: 100, label: 'Answer 100 questions',        icon: '🧠', xp: 80  },
-  { id: 'accuracy_70',    type: 'accuracy', target: 70,  label: 'Hit 70% accuracy today',      icon: '🎯', xp: 35  },
-  { id: 'accuracy_80',    type: 'accuracy', target: 80,  label: 'Hit 80% accuracy today',      icon: '🎯', xp: 55  },
-  { id: 'play_wordle',    type: 'game', game: 'wordle',       target: 3, label: 'Play 3 Wordle rounds',      icon: '🟩', xp: 40 },
-  { id: 'play_math',      type: 'game', game: 'mathRush',     target: 3, label: 'Play 3 Math Rush rounds',   icon: '➕', xp: 40 },
-  { id: 'play_memory',    type: 'game', game: 'memory',       target: 2, label: 'Play 2 Memory games',       icon: '🃏', xp: 35 },
-  { id: 'play_reaction',  type: 'game', game: 'reaction',     target: 3, label: 'Play 3 Reaction tests',     icon: '⚡', xp: 30 },
-  { id: 'play_ttt',       type: 'game', game: 'ticTacToe',    target: 2, label: 'Play 2 Tic Tac Toe games',  icon: '⭕', xp: 30 },
-  { id: 'play_simon',     type: 'game', game: 'simon',        target: 2, label: 'Play 2 Simon Says rounds',  icon: '🔴', xp: 35 },
-  { id: 'play_scramble',  type: 'game', game: 'wordScramble', target: 3, label: 'Unscramble 3 words',        icon: '🔤', xp: 30 },
-  { id: 'fast_5',         type: 'fast',     target: 5,   label: 'Answer 5 in under 3.5s',      icon: '⚡', xp: 45  },
-  { id: 'fast_10',        type: 'fast',     target: 10,  label: 'Answer 10 in under 3.5s',     icon: '⚡', xp: 70  },
-];
-
-function getDailyTaskDefs() {
-  var dateKey = getTodayKey();
-  var seed    = dateKey.split('-').reduce(function(a, n) { return a * 31 + parseInt(n); }, 0);
-  var rng     = seededRandom(seed);
-  return TASK_POOL.slice().sort(function() { return rng() - 0.5; }).slice(0, 3);
-}
-
-function getTasksRef(uid) {
-  return db.collection('users').doc(uid).collection('dailyTasks').doc(getTodayKey());
-}
-
-function getYesterdayKey() {
-  var y = new Date();
-  y.setDate(y.getDate() - 1);
-  return y.getFullYear() + '-' + (y.getMonth() + 1) + '-' + y.getDate();
-}
-
-// ── Load or create today's task state ──
-async function loadTaskState(uid) {
-  var ref  = getTasksRef(uid);
-  var snap = await ref.get();
-  if (snap.exists) return snap.data();
-
-  // Check yesterday for streak continuity
-  var yestSnap   = await db.collection('users').doc(uid).collection('dailyTasks').doc(getYesterdayKey()).get();
-  var prevStreak = 0;
-  if (yestSnap.exists) {
-    var yd = yestSnap.data();
-    // Only carry streak if yesterday was fully completed
-    prevStreak = yd.allDone ? (yd.dailyStreak || 0) : 0;
-  }
-
-  var fresh = {
-    date:        getTodayKey(),
-    tasks:       getDailyTaskDefs().map(function(def) {
-      return Object.assign({}, def, { progress: 0, done: false, claimed: false });
-    }),
-    allDone:    false,
-    allClaimed: false,
-    dailyStreak: prevStreak,
-  };
-  await ref.set(fresh);
-  return fresh;
-}
-
-// ── Claim a task — bulletproof single-claim via Firestore transaction ──
-// Uses a Firestore transaction so even rapid double-taps are safe
-var _claimInFlight = {}; // local lock per taskId
-
-async function claimTask(uid, taskId) {
-  // Local lock — prevent double-tap before server responds
-  if (_claimInFlight[taskId]) return null;
-  _claimInFlight[taskId] = true;
-
-  try {
-    var ref = getTasksRef(uid);
-    var earnedXP = null;
-
-    await db.runTransaction(async function(tx) {
-      var snap  = await tx.get(ref);
-      if (!snap.exists) throw new Error('no state');
-
-      var state = snap.data();
-      var task  = state.tasks.find(function(t) { return t.id === taskId; });
-
-      // Guard: must be done but NOT yet claimed
-      if (!task || !task.done || task.claimed) {
-        earnedXP = null;
-        return; // abort — don't write anything
-      }
-
-      task.claimed = true;
-      earnedXP     = task.xp;
-
-      // Check if all tasks are now claimed
-      if (state.tasks.every(function(t) { return t.claimed; })) {
-        state.allClaimed = true;
-      }
-
-      tx.set(ref, state);
-    });
-
-    return earnedXP;
-  } catch (e) {
-    console.warn('[tasks] claimTask failed', e);
-    return null;
-  } finally {
-    delete _claimInFlight[taskId];
-  }
-}
-
-// ── FIX: Streak — increment as soon as allDone flips true today ──
-// Called right after we detect allDone just became true (not already set before)
-async function incrementStreakToday(uid) {
-  var ref = getTasksRef(uid);
-  try {
-    await db.runTransaction(async function(tx) {
-      var snap = await tx.get(ref);
-      if (!snap.exists) return;
-      var state = snap.data();
-      // Only increment if allDone is true and we haven't already bumped it
-      // We track this with streakBumped flag to prevent double increments
-      if (!state.allDone || state.streakBumped) return;
-      state.streakBumped = true;
-      state.dailyStreak  = (state.dailyStreak || 0) + 1;
-      tx.set(ref, state);
-    });
-  } catch (e) {
-    console.warn('[tasks] incrementStreakToday failed', e);
-  }
-}
-
-function awardXP(xp) {
-  try {
-    if (window.parent !== window) {
-      window.parent.postMessage({ type: 'xpAwarded', xp: xp }, '*');
-    }
-  } catch (e) { console.warn('[tasks] awardXP failed', e); }
-}
-
-// ── Countdown timer ──
-function updateCountdown() {
-  var now      = new Date();
-  var midnight = new Date(now);
-  midnight.setHours(24, 0, 0, 0);
-  var diff = midnight - now;
-  var h  = Math.floor(diff / 3600000);
-  var m  = Math.floor((diff % 3600000) / 60000);
-  var s  = Math.floor((diff % 60000) / 1000);
-  var pad = function(n) { return String(n).padStart(2, '0'); };
-  var el = document.getElementById('countdown-text');
-  if (el) el.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
-}
-
-// ── Confetti ──
-function spawnConfetti(n) {
-  var colors = ['#58cc02','#ffc800','#ea2b2b','#1cb0f6','#ce82ff','#ff9600'];
-  var el     = document.getElementById('confetti');
-  for (var i = 0; i < n; i++) {
-    var p = document.createElement('i');
-    p.style.left           = Math.random() * 100 + '%';
-    p.style.top            = '-12px';
-    p.style.background     = colors[Math.floor(Math.random() * colors.length)];
-    p.style.animationDelay = Math.random() * 0.3 + 's';
-    el.appendChild(p);
-    setTimeout(function(el) { el.classList.add('fall'); }.bind(null, p), 10);
-    setTimeout(function(el) { el.remove(); }.bind(null, p), 1600);
-  }
-}
-
-// ── XP toast ──
-function showXpToast(msg) {
-  var t = document.getElementById('xp-toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, 2400);
-}
-
-// ════════════════════════════════════════════════════
-// RENDER
-// ════════════════════════════════════════════════════
-var _currentUid = null;
-
-function render(state) {
-  var body  = document.getElementById('scroll-body');
-  var done  = state.tasks.filter(function(t) { return t.done; }).length;
-  var total = state.tasks.length;
-  var allDone = state.allDone;
-
-  body.innerHTML = '';
-
-  // ── Streak card ──
-  var streakDays = state.dailyStreak || 0;
-  var streakSub  = streakDays === 0
-    ? 'Complete all tasks to start your streak!'
-    : streakDays === 1
-      ? 'First day done — keep it going!'
-      : streakDays + ' days in a row — don\'t break it!';
-
-  // Show 7 pips max, filled based on streak mod 7
-  var pipCount   = 7;
-  var pipsFilled = Math.min(streakDays % pipCount || (streakDays > 0 && streakDays % pipCount === 0 ? pipCount : 0), pipCount);
-  var pipsHtml   = '';
-  for (var p = 0; p < pipCount; p++) {
-    pipsHtml += '<div class="streak-pip' + (p < pipsFilled ? ' done' : (p === pipsFilled ? ' active' : '')) + '"></div>';
-  }
-
-  var streakCard = document.createElement('div');
-  streakCard.className = 'streak-card animate-in';
-  streakCard.innerHTML =
-    '<div class="streak-inner">' +
-      '<div class="streak-flame-wrap">' + (streakDays > 0 ? '🔥' : '📅') + '</div>' +
-      '<div class="streak-info">' +
-        '<div class="streak-label">Daily Streak</div>' +
-        '<div class="streak-val">' + streakDays + ' ' + (streakDays === 1 ? 'day' : 'days') + '</div>' +
-        '<div class="streak-sub">' + streakSub + '</div>' +
-      '</div>' +
-    '</div>' +
-    '<div class="streak-pips">' + pipsHtml + '</div>';
-  body.appendChild(streakCard);
-
-  // ── Progress card ──
-  var progressCard = document.createElement('div');
-  progressCard.className = 'progress-card animate-in d1';
-  progressCard.innerHTML =
-    '<div class="progress-top">' +
-      '<span class="progress-label">Today\'s Progress</span>' +
-      '<span class="progress-count">' + done + ' / ' + total + '</span>' +
-    '</div>' +
-    '<div class="progress-bar-outer">' +
-      '<div class="progress-bar-inner' + (allDone ? ' all-done' : '') + '" style="width:' + Math.round((done / total) * 100) + '%"></div>' +
-    '</div>';
-  body.appendChild(progressCard);
-
-  // ── All done banner ──
-  if (allDone) {
-    var banner = document.createElement('div');
-    banner.className = 'complete-banner show animate-in d2';
-    banner.innerHTML =
-      '<div class="cb-emoji">🎉</div>' +
-      '<div class="cb-text">' +
-        '<div class="cb-title">All tasks complete!</div>' +
-        '<div class="cb-sub">Streak updated. New tasks in <strong id="banner-countdown">--:--:--</strong></div>' +
-      '</div>';
-    body.appendChild(banner);
-  }
-
-  // ── Section label ──
-  var lbl = document.createElement('div');
-  lbl.className = 'section-label animate-in d2';
-  lbl.textContent = "Today's Tasks";
-  body.appendChild(lbl);
-
-  // ── Task cards ──
-  state.tasks.forEach(function(task, i) {
-    var pct  = Math.min(100, Math.round((task.progress / task.target) * 100));
-    var card = document.createElement('div');
-    var delayClass = 'd' + Math.min(i + 3, 5);
-
-    var isReady = task.done && !task.claimed;
-    card.className = 'task-card animate-in ' + delayClass +
-      (task.claimed ? ' is-claimed' : '') +
-      (isReady     ? ' task-ready'  : '');
-
-    var rightEl = '';
-    if (task.claimed) {
-      rightEl = '<div class="task-done-badge">✅</div>';
-    } else if (task.done) {
-      rightEl = '<button class="task-claim" data-id="' + task.id + '" data-xp="' + task.xp + '">+' + task.xp + ' XP</button>';
-    }
-
-    card.innerHTML =
-      '<div class="task-icon-wrap' + (task.done ? ' icon-done' : '') + '">' + task.icon + '</div>' +
-      '<div class="task-body">' +
-        '<div class="task-label">' + task.label + '</div>' +
-        '<div class="task-progress-row">' +
-          '<div class="task-bar-outer">' +
-            '<div class="task-bar-inner' + (task.done ? ' bar-done' : '') + '" style="width:' + pct + '%"></div>' +
-          '</div>' +
-          '<div class="task-pct">' + task.progress + '/' + task.target + '</div>' +
-        '</div>' +
-      '</div>' +
-      rightEl;
-
-    // Attach claim handler
-    var claimBtn = card.querySelector('.task-claim');
-    if (claimBtn) {
-      (function(btn, uid) {
-        btn.addEventListener('click', async function() {
-          // Immediately disable to prevent any double-tap
-          btn.disabled = true;
-          btn.textContent = '…';
-
-          var xp = await claimTask(uid, btn.dataset.id);
-
-          if (xp === null) {
-            // Already claimed (race condition) — just re-render
-            var fresh = await loadTaskState(uid);
-            render(fresh);
-            return;
-          }
-
-          awardXP(xp);
-          spawnConfetti(18);
-          showXpToast('+' + xp + ' XP 🎉');
-
-          // Re-load state and check if allDone just became true
-          var fresh = await loadTaskState(uid);
-
-          // FIX: If all tasks are claimed and streak hasn't been bumped yet — bump it now
-          if (fresh.allDone && !fresh.streakBumped) {
-            await incrementStreakToday(uid);
-            fresh = await loadTaskState(uid); // reload with updated streak
-          }
-
-          render(fresh);
-        });
-      })(claimBtn, _currentUid);
-    }
-
-    body.appendChild(card);
-  });
-}
-
-// ════════════════════════════════════════════════════
-// BOOT
-// ════════════════════════════════════════════════════
-updateCountdown();
-setInterval(updateCountdown, 1000);
-
-auth.onAuthStateChanged(async function(user) {
-  if (!user) {
-    document.getElementById('loading-state').textContent = 'Please log in.';
-    return;
-  }
-  _currentUid = user.uid;
-  try {
-    var state = await loadTaskState(user.uid);
-    render(state);
-  } catch (e) {
-    console.error('[tasks] boot failed', e);
-    document.getElementById('loading-state').textContent = 'Failed to load tasks.';
-  }
-});
-
-// Listen for progress updates from improve.html
-window.addEventListener('message', async function(e) {
-  if (e.data && e.data.type === 'tasksUpdated' && _currentUid) {
-    var fresh = await loadTaskState(_currentUid);
-    render(fresh);
-  }
-});
-
-// Refresh when tab becomes visible
-document.addEventListener('visibilitychange', async function() {
-  if (!document.hidden && _currentUid) {
-    var fresh = await loadTaskState(_currentUid);
-    render(fresh);
-  }
-});
+updateCountdown();setInterval(updateCountdown,1000);
+auth.onAuthStateChanged(async function(user){if(!user){document.getElementById('loading-state').textContent='Please log in.';return}_currentUid=user.uid;try{var state=await loadTaskState(user.uid);render(state)}catch(e){document.getElementById('loading-state').textContent='Failed to load tasks.'}});
+window.addEventListener('message',async function(e){if(e.data&&e.data.type==='tasksUpdated'&&_currentUid){var fresh=await loadTaskState(_currentUid);render(fresh)}});
+document.addEventListener('visibilitychange',async function(){if(!document.hidden&&_currentUid){var fresh=await loadTaskState(_currentUid);render(fresh)}});
 </script>
 </body>
 </html>
