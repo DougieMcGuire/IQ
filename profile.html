@@ -3,106 +3,102 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Profile — BrainDeer</title>
+  <title>Profile — Cebear</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #3a2918; --card: #4a3625; --card-glow: #5a4232;
-      --brown-mid: #6b4f32; --brown-light: #8f6b4a;
-      --tan: #c2a476; --cream: #f0e2cc;
-      --green: #58cc02; --green-dark: #46a302;
-      --red: #ea2b2b;
-      --gold: #ffc800; --gold-dark: #d9aa00;
-      --blue: #1cb0f6; --blue-dark: #1899d6;
-      --purple: #ce82ff; --orange: #ff9600; --pink: #ff4b8a;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { width: 100%; height: 100%; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--cream); }
-    body { display: flex; flex-direction: column; }
-    nav { position: fixed; bottom: 0; left: 0; right: 0; height: calc(64px + env(safe-area-inset-bottom, 0px)); background: var(--card); box-shadow: 0 -3px 0 rgba(0,0,0,0.15); display: flex; justify-content: center; align-items: flex-start; padding-top: 6px; gap: 4px; z-index: 100; }
-    .nav-btn { padding: 8px 18px; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--brown-light); font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 800; border-radius: 14px; transition: all 0.15s; cursor: pointer; position: relative; }
-    .nav-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-    .nav-btn.active { color: var(--cream); background: var(--brown-mid); box-shadow: 0 3px 0 rgba(0,0,0,0.15); }
-    .nav-badge { position: absolute; top: 5px; right: 12px; width: 9px; height: 9px; border-radius: 50%; background: var(--red); border: 2px solid var(--card); display: none; animation: badgePulse 2s ease infinite; }
-    .nav-badge.show { display: block; }
-    @keyframes badgePulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.35)} }
-    main { flex: 1; overflow-y: auto; padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(72px + env(safe-area-inset-bottom, 0px)); }
-    main::-webkit-scrollbar { display: none; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .header-left { font-size: 14px; font-weight: 800; color: var(--tan); }
-    .signout-btn { background: none; border: none; padding: 8px 14px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; color: var(--brown-light); cursor: pointer; }
-    .signout-btn:active { opacity: 0.6; }
-    .profile-hero { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; padding: 8px 0 16px; }
-    .avatar-wrap { position: relative; margin-bottom: 14px; }
-    .avatar { width: clamp(80px, 22vw, 100px); height: clamp(80px, 22vw, 100px); border-radius: 50%; background: var(--card); overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.15); transition: transform 0.1s; }
-    .avatar:active { transform: scale(0.95); }
-    .avatar img { width: 100%; height: 100%; object-fit: cover; display: none; }
-    .avatar svg { width: 40px; height: 40px; stroke: var(--brown-light); fill: none; stroke-width: 1.5; }
-    .avatar-edit { position: absolute; bottom: 2px; right: 2px; width: 28px; height: 28px; background: var(--blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 3px 0 var(--blue-dark); }
-    .avatar-edit svg { width: 12px; height: 12px; stroke: #fff; fill: none; stroke-width: 2.5; }
-    #avatar-input { display: none; }
-    .iq-num { font-size: clamp(64px, 20vw, 88px); font-weight: 900; line-height: 1; color: var(--cream); text-shadow: 0 4px 0 rgba(0,0,0,0.2); }
-    .iq-label { font-size: clamp(14px, 4vw, 18px); font-weight: 900; color: var(--brown-light); letter-spacing: 6px; text-transform: uppercase; margin-bottom: 10px; }
-    .pct-badge { background: var(--gold); color: var(--bg); font-size: 14px; font-weight: 900; padding: 5px 16px; border-radius: 12px; box-shadow: 0 3px 0 var(--gold-dark); text-transform: uppercase; }
-    .stats-row { display: flex; gap: 8px; width: 100%; margin-bottom: 24px; }
-    .stat-pill { flex: 1; background: var(--card); border-radius: 14px; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-    .stat-pill .sp-icon { margin-bottom: 2px; }
-    .stat-pill .sp-icon svg { width: 16px; height: 16px; stroke: var(--tan); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-    .stat-pill .sp-val { font-size: clamp(18px, 5vw, 22px); font-weight: 900; color: var(--cream); line-height: 1.2; }
-    .stat-pill .sp-lbl { font-size: 11px; font-weight: 800; color: var(--tan); }
-    .section-title { font-size: 12px; font-weight: 900; color: var(--tan); letter-spacing: 2px; text-transform: uppercase; margin: 0 0 10px; }
-    .abilities-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px; }
-    .ability-row { background: var(--card); border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; }
-    .ability-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
-    .ability-info { flex: 1; min-width: 0; }
-    .ability-name { font-size: 12px; font-weight: 800; color: var(--cream); margin-bottom: 5px; }
-    .ability-track { height: 8px; background: var(--brown-mid); border-radius: 4px; overflow: hidden; }
-    .ability-fill { height: 100%; border-radius: 4px; transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
-    .ability-val { font-size: 13px; font-weight: 900; color: var(--cream); min-width: 32px; text-align: right; }
-    .share-fab { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; margin-bottom: 12px; background: var(--cream); color: var(--bg); border: none; border-radius: 14px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.15); transition: transform 0.1s; text-transform: uppercase; letter-spacing: 1px; }
-    .share-fab:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
-    .share-fab svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; }
-    .share-fab.uploading { opacity: 0.6; pointer-events: none; }
-    .reset-btn { margin-top: 12px; background: none; border: none; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; color: var(--brown-light); cursor: pointer; opacity: 0.3; display: block; width: 100%; text-align: center; padding: 12px; }
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: none; align-items: flex-end; justify-content: center; z-index: 200; }
-    .modal-overlay.show { display: flex; }
-    .modal-sheet { background: var(--card); border-radius: 20px 20px 0 0; width: 100%; max-width: 440px; padding: 10px 16px calc(16px + env(safe-area-inset-bottom, 0px)); animation: sheetUp 0.28s cubic-bezier(0.32, 0.72, 0, 1); }
-    @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    .sheet-handle { width: 36px; height: 4px; background: var(--brown-mid); border-radius: 2px; margin: 0 auto 16px; }
-    .card-preview { background: var(--bg); border-radius: 16px; overflow: hidden; margin-bottom: 16px; }
-    .card-preview canvas { width: 100%; display: block; }
-    .share-link-bar { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; }
-    .share-link-url { flex: 1; background: var(--bg); border: none; border-radius: 10px; padding: 11px 14px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; color: var(--cream); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .share-link-copy { background: var(--cream); color: var(--bg); border: none; border-radius: 10px; padding: 11px 16px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 900; cursor: pointer; white-space: nowrap; transition: transform 0.1s; }
-    .share-link-copy:active { transform: scale(0.95); }
-    .share-label { font-size: 11px; font-weight: 800; color: var(--tan); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
-    .share-grid { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 4px; }
-    .share-grid::-webkit-scrollbar { display: none; }
-    .share-dest { flex-shrink: 0; width: 72px; background: var(--bg); border: none; border-radius: 14px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 10px; font-weight: 800; color: var(--cream); transition: transform 0.1s; }
-    .share-dest:active { transform: scale(0.93); }
-    .share-dest .sd-icon { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-    .share-dest .sd-icon svg { width: 20px; height: 20px; fill: #fff; }
-    .sd-native .sd-icon { background: var(--blue); }
-    .sd-native .sd-icon svg { fill: none; stroke: #fff; stroke-width: 2.5; }
-    .sd-copy .sd-icon { background: var(--brown-mid); }
-    .sd-copy .sd-icon svg { fill: none; stroke: #fff; stroke-width: 2.5; }
-    .sd-x .sd-icon { background: #000; }
-    .sd-wa .sd-icon { background: #25D366; }
-    .sd-tg .sd-icon { background: #0088cc; }
-    .sd-reddit .sd-icon { background: #FF4500; }
-    .sd-save .sd-icon { background: var(--green); }
-    .sd-save .sd-icon svg { fill: none; stroke: #fff; stroke-width: 2.5; }
-    .toast { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--green); color: #fff; padding: 10px 20px; border-radius: 14px; font-size: 14px; font-weight: 800; opacity: 0; transition: all 0.3s; z-index: 300; white-space: nowrap; box-shadow: 0 3px 0 var(--green-dark); pointer-events: none; }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    :root{--bg:#162b5e;--navy:#162b5e;--navy-mid:#1e3872;--card:#fff;--text:#162b5e;--text-dim:#5a6a90;--text-light:#8a96b8;--pill:#EEF0F7;--green:#2DC653;--green-dark:#22a344;--red:#FF3B5C;--gold:#FFB800;--gold-dark:#d99e00;--blue:#3B82F6;--purple:#7C5CFC;--orange:#FF8C00;--pink:#FF6B9D}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{width:100%;height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text)}
+    body{display:flex;flex-direction:column}
+    main{flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top,0px)+14px) 16px 20px}
+    main::-webkit-scrollbar{display:none}
+
+    .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .header-left{font-size:13px;font-weight:800;color:rgba(255,255,255,.6)}
+    .signout-btn{background:rgba(255,255,255,.1);border:none;padding:7px 14px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:rgba(255,255,255,.5);cursor:pointer}
+    .signout-btn:active{opacity:.6}
+
+    /* ── Hero — pic + IQ in exact same position ── */
+    .profile-hero{display:flex;flex-direction:column;align-items:center;margin-bottom:20px;padding:8px 0 16px}
+    .avatar-wrap{position:relative;margin-bottom:14px}
+    .avatar{width:clamp(80px,22vw,100px);height:clamp(80px,22vw,100px);border-radius:50%;background:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.15);transition:transform .1s;border:3px solid rgba(255,255,255,.3)}
+    .avatar:active{transform:scale(.95)}
+    .avatar img{width:100%;height:100%;object-fit:cover;display:none}
+    .avatar svg{width:40px;height:40px;stroke:var(--text-light);fill:none;stroke-width:1.5}
+    .avatar-edit{position:absolute;bottom:2px;right:2px;width:28px;height:28px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+    .avatar-edit svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.5}
+    #avatar-input{display:none}
+    .iq-num{font-size:clamp(64px,20vw,88px);font-weight:900;line-height:1;color:#fff}
+    .iq-label{font-size:clamp(14px,4vw,18px);font-weight:900;color:rgba(255,255,255,.35);letter-spacing:6px;text-transform:uppercase;margin-bottom:10px}
+    .pct-badge{background:var(--gold);color:var(--navy);font-size:13px;font-weight:900;padding:5px 16px;border-radius:10px;box-shadow:0 2px 0 var(--gold-dark);text-transform:uppercase;letter-spacing:.5px}
+
+    /* ── Stats row — white cards ── */
+    .stats-row{display:flex;gap:8px;width:100%;margin-bottom:20px}
+    .stat-pill{flex:1;background:var(--card);border-radius:16px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+    .stat-pill .sp-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:2px}
+    .stat-pill .sp-icon svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .sp-icon.ic-done{background:var(--green)}.sp-icon.ic-acc{background:var(--blue)}.sp-icon.ic-best{background:var(--orange)}
+    .stat-pill .sp-val{font-size:clamp(18px,5vw,22px);font-weight:900;color:var(--text);line-height:1.2}
+    .stat-pill .sp-lbl{font-size:10px;font-weight:800;color:var(--text-dim)}
+
+    /* ── Abilities — white card ── */
+    .section-title{font-size:11px;font-weight:900;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin:0 0 10px}
+    .abilities-card{background:var(--card);border-radius:20px;padding:16px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+    .ability-row{display:flex;align-items:center;gap:12px;padding:8px 0}
+    .ability-row+.ability-row{border-top:1px solid #EEF0F7}
+    .ability-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+    .ability-info{flex:1;min-width:0}
+    .ability-name{font-size:12px;font-weight:800;color:var(--text);margin-bottom:5px}
+    .ability-track{height:8px;background:#EEF0F7;border-radius:4px;overflow:hidden}
+    .ability-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+    .ability-val{font-size:13px;font-weight:900;color:var(--text);min-width:32px;text-align:right}
+
+    /* ── SHARE BUTTON — BIG & PROMINENT ── */
+    .share-fab{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;margin-bottom:12px;background:var(--navy);color:#fff;border:none;border-radius:16px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(22,43,94,.4);transition:transform .1s;text-transform:uppercase;letter-spacing:1px;position:relative;overflow:hidden}
+    .share-fab::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);animation:shimmer 3s infinite}
+    @keyframes shimmer{0%{left:-100%}100%{left:200%}}
+    .share-fab:active{transform:translateY(2px);box-shadow:0 2px 8px rgba(22,43,94,.3)}
+    .share-fab svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.5}
+    .share-fab.uploading{opacity:.6;pointer-events:none}
+
+    .reset-btn{margin-top:8px;background:none;border:none;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,.2);cursor:pointer;opacity:.5;display:block;width:100%;text-align:center;padding:12px}
+
+    /* ── Share modal ── */
+    .modal-overlay{position:fixed;inset:0;background:rgba(22,43,94,.92);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;z-index:200}
+    .modal-overlay.show{display:flex}
+    .modal-sheet{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:440px;padding:10px 16px calc(16px + env(safe-area-inset-bottom,0px));animation:sheetUp .28s cubic-bezier(.32,.72,0,1)}
+    @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .sheet-handle{width:36px;height:4px;background:#dde0ea;border-radius:2px;margin:0 auto 16px}
+    .card-preview{background:#EEF0F7;border-radius:16px;overflow:hidden;margin-bottom:16px}
+    .card-preview canvas{width:100%;display:block}
+    .share-link-bar{display:flex;gap:8px;margin-bottom:16px;align-items:center}
+    .share-link-url{flex:1;background:#EEF0F7;border:none;border-radius:10px;padding:11px 14px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .share-link-copy{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer;white-space:nowrap;transition:transform .1s}
+    .share-link-copy:active{transform:scale(.95)}
+    .share-label{font-size:11px;font-weight:800;color:var(--text-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+    .share-grid{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px}
+    .share-grid::-webkit-scrollbar{display:none}
+    .share-dest{flex-shrink:0;width:72px;background:#EEF0F7;border:none;border-radius:14px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;color:var(--text);transition:transform .1s}
+    .share-dest:active{transform:scale(.93)}
+    .share-dest .sd-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+    .share-dest .sd-icon svg{width:20px;height:20px;fill:#fff}
+    .sd-native .sd-icon{background:var(--blue)}.sd-native .sd-icon svg{fill:none;stroke:#fff;stroke-width:2.5}
+    .sd-copy .sd-icon{background:var(--navy)}.sd-copy .sd-icon svg{fill:none;stroke:#fff;stroke-width:2.5}
+    .sd-x .sd-icon{background:#000}.sd-wa .sd-icon{background:#25D366}.sd-tg .sd-icon{background:#0088cc}
+    .sd-reddit .sd-icon{background:#FF4500}
+    .sd-save .sd-icon{background:var(--green)}.sd-save .sd-icon svg{fill:none;stroke:#fff;stroke-width:2.5}
+    .toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--green);color:#fff;padding:10px 20px;border-radius:14px;font-size:14px;font-weight:800;opacity:0;transition:all .3s;z-index:300;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.15);pointer-events:none}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   </style>
 </head>
 <body>
 <main>
   <div class="header">
     <div class="header-left" id="username-display"></div>
-    <div class="header-right"><button class="signout-btn" id="signout-btn">Sign out</button></div>
+    <button class="signout-btn" id="signout-btn">Sign out</button>
   </div>
+
   <div class="profile-hero">
     <div class="avatar-wrap">
       <div class="avatar" id="avatar-tap">
@@ -116,22 +112,25 @@
     <div class="iq-label">I Q</div>
     <div class="pct-badge" id="pct-badge" style="display:none;"></div>
   </div>
+
   <div class="stats-row">
-    <div class="stat-pill"><div class="sp-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div class="sp-val" id="answered">0</div><div class="sp-lbl">Done</div></div>
-    <div class="stat-pill"><div class="sp-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none"/><path d="M12 6v6l4 2"/></svg></div><div class="sp-val" id="accuracy">0%</div><div class="sp-lbl">Accuracy</div></div>
-    <div class="stat-pill"><div class="sp-icon"><svg viewBox="0 0 24 24" fill="#ff9600" fill-opacity="0.2" stroke="#ff9600" stroke-width="2.5"><path d="M12 22c-4.97 0-8-3.58-8-7.5 0-3.07 1.74-5.25 3.53-7.28C9.18 5.38 10.34 3.7 10.34 2c0 0 1.77 2.18 2.34 4.18.27.94.5 1.82 1.32 1.82 0-2 1-3 1-3s1 1.5 1 3.5c.5-.5 1.5-1.5 1.5-1.5s1 2.5 1 5c0 3.92-3.03 7.5-8 7.5z"/></svg></div><div class="sp-val" id="best-streak">0</div><div class="sp-lbl">Best</div></div>
+    <div class="stat-pill"><div class="sp-icon ic-done"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div class="sp-val" id="answered">0</div><div class="sp-lbl">Done</div></div>
+    <div class="stat-pill"><div class="sp-icon ic-acc"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div class="sp-val" id="accuracy">0%</div><div class="sp-lbl">Accuracy</div></div>
+    <div class="stat-pill"><div class="sp-icon ic-best"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="sp-val" id="best-streak">0</div><div class="sp-lbl">Best</div></div>
   </div>
+
+  <!-- BIG share button -->
+  <button class="share-fab" id="share-btn">
+    <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+    Share Your IQ Score
+  </button>
+
   <div class="section-title">Abilities</div>
-  <div class="abilities-list" id="abilities"></div>
-  <button class="share-fab" id="share-btn"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share Stats</button>
+  <div class="abilities-card" id="abilities"></div>
+
   <button class="reset-btn" id="reset-btn">Reset Progress</button>
 </main>
-<nav>
-  <button class="nav-btn" onclick="navGo('leaderboard')"><svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>Ranks</button>
-  <button class="nav-btn" onclick="navGo('improve')"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Train</button>
-  <button class="nav-btn" onclick="navGo('tasks')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tasks<span class="nav-badge" id="tasks-badge"></span></button>
-  <button class="nav-btn active" onclick="navGo('profile')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
-</nav>
+
 <div class="modal-overlay" id="share-modal">
   <div class="modal-sheet">
     <div class="sheet-handle"></div>
@@ -145,6 +144,7 @@
   </div>
 </div>
 <div class="toast" id="toast"></div>
+
 <script type="module">
   import { IQData, iqToPercentile, formatPercentile } from './data.js';
   import Haptics from './haptics.js';
@@ -152,77 +152,49 @@
   window.navGo = function(page) { Haptics.light(); parent.goTo(page); };
 
   var ABILITIES = [
-    { key: 'patternRecognition', name: 'Pattern',        color: '#ff9600' },
-    { key: 'problemSolving',     name: 'Problem Solving', color: '#ea2b2b' },
-    { key: 'mentalAgility',      name: 'Mental Agility',  color: '#58cc02' },
-    { key: 'workingMemory',      name: 'Memory',          color: '#ce82ff' },
-    { key: 'verbalReasoning',    name: 'Verbal',          color: '#1cb0f6' },
-    { key: 'logicalReasoning',   name: 'Logic',           color: '#1899d6' },
-    { key: 'spatialAwareness',   name: 'Emotional',       color: '#ff4b8a' },
-    { key: 'numericalReasoning', name: 'Spatial',         color: '#ffc800' },
+    { key: 'patternRecognition', name: 'Pattern',        color: '#FF8C00' },
+    { key: 'problemSolving',     name: 'Problem Solving', color: '#FF3B5C' },
+    { key: 'mentalAgility',      name: 'Mental Agility',  color: '#2DC653' },
+    { key: 'workingMemory',      name: 'Memory',          color: '#7C5CFC' },
+    { key: 'verbalReasoning',    name: 'Verbal',          color: '#3B82F6' },
+    { key: 'logicalReasoning',   name: 'Logic',           color: '#162b5e' },
+    { key: 'spatialAwareness',   name: 'Emotional',       color: '#FF6B9D' },
+    { key: 'numericalReasoning', name: 'Spatial',         color: '#FFB800' },
   ];
 
-  function toast(msg) {
-    var t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
-    setTimeout(function() { t.classList.remove('show'); }, 2000);
-  }
+  function toast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(function() { t.classList.remove('show'); }, 2000); }
 
   function load() {
     var d = IQData.load();
     var uname = d.username || IQData.getCurrentUser()?.displayName || '';
     document.getElementById('username-display').textContent = uname;
-    if (d.iq) {
-      document.getElementById('iq-num').textContent = d.iq;
-      var badge = document.getElementById('pct-badge');
-      badge.textContent = 'Top ' + formatPercentile(iqToPercentile(d.iq));
-      badge.style.display = 'inline-block';
-    }
+    if (d.iq) { document.getElementById('iq-num').textContent = d.iq; var badge = document.getElementById('pct-badge'); badge.textContent = 'Top ' + formatPercentile(iqToPercentile(d.iq)); badge.style.display = 'inline-block'; }
     document.getElementById('answered').textContent = d.answered;
     document.getElementById('accuracy').textContent = IQData.getAccuracy() + '%';
     document.getElementById('best-streak').textContent = d.bestStreak;
-    if (d.pic) {
-      document.getElementById('avatar-img').src = d.pic;
-      document.getElementById('avatar-img').style.display = 'block';
-      document.getElementById('avatar-icon').style.display = 'none';
-    }
-    var list = document.getElementById('abilities');
-    list.innerHTML = '';
+    if (d.pic) { document.getElementById('avatar-img').src = d.pic; document.getElementById('avatar-img').style.display = 'block'; document.getElementById('avatar-icon').style.display = 'none'; }
+    var list = document.getElementById('abilities'); list.innerHTML = '';
     ABILITIES.forEach(function(a) {
       var pct = IQData.getStatPercent(a.key);
-      var row = document.createElement('div');
-      row.className = 'ability-row';
+      var row = document.createElement('div'); row.className = 'ability-row';
       row.innerHTML = '<div class="ability-dot" style="background:'+a.color+'"></div><div class="ability-info"><div class="ability-name">'+a.name+'</div><div class="ability-track"><div class="ability-fill" style="background:'+a.color+';width:0%" data-val="'+pct+'"></div></div></div><div class="ability-val">'+pct+'</div>';
       list.appendChild(row);
     });
-    requestAnimationFrame(function() { setTimeout(function() {
-      document.querySelectorAll('.ability-fill').forEach(function(bar) {
-        bar.style.width = Math.max(8, parseInt(bar.dataset.val)) + '%';
-      });
-    }, 60); });
+    requestAnimationFrame(function() { setTimeout(function() { document.querySelectorAll('.ability-fill').forEach(function(bar) { bar.style.width = Math.max(8, parseInt(bar.dataset.val)) + '%'; }); }, 60); });
   }
 
   function handleAvatarFile(file) {
     if (!file) return;
     var reader = new FileReader();
     reader.onload = function(e) {
-      var img = new Image();
-      img.onload = function() {
-        var c = document.createElement('canvas');
-        c.width = c.height = 200;
-        var ctx = c.getContext('2d');
-        var min = Math.min(img.width, img.height);
-        ctx.drawImage(img, (img.width - min) / 2, (img.height - min) / 2, min, min, 0, 0, 200, 200);
-        var url = c.toDataURL('image/jpeg', 0.8);
-        IQData.setProfilePic(url);
-        document.getElementById('avatar-img').src = url;
-        document.getElementById('avatar-img').style.display = 'block';
-        document.getElementById('avatar-icon').style.display = 'none';
+      var img = new Image(); img.onload = function() {
+        var c = document.createElement('canvas'); c.width = c.height = 200; var ctx = c.getContext('2d');
+        var min = Math.min(img.width, img.height); ctx.drawImage(img, (img.width - min) / 2, (img.height - min) / 2, min, min, 0, 0, 200, 200);
+        var url = c.toDataURL('image/jpeg', 0.8); IQData.setProfilePic(url);
+        document.getElementById('avatar-img').src = url; document.getElementById('avatar-img').style.display = 'block'; document.getElementById('avatar-icon').style.display = 'none';
         Haptics.success(); toast('Photo updated!');
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
+      }; img.src = e.target.result;
+    }; reader.readAsDataURL(file);
   }
   document.getElementById('avatar-tap').onclick = function() { Haptics.medium(); document.getElementById('avatar-input').click(); };
   document.getElementById('avatar-edit-btn').onclick = function() { Haptics.medium(); document.getElementById('avatar-input').click(); };
@@ -230,300 +202,53 @@
   document.getElementById('signout-btn').onclick = function() { Haptics.warning(); IQData.signOut(); };
   document.getElementById('reset-btn').onclick = function() { Haptics.warning(); if (confirm('Reset all progress?')) { Haptics.error(); IQData.reset(); location.reload(); } };
 
-  // ═══════════════════════════════════
-  // SHARE SYSTEM
-  // ═══════════════════════════════════
+  var shareCanvas = null, shareUrl = '';
+  function getShareUrl() { var user = IQData.getCurrentUser(); return user ? 'https://cebear.com/share/' + user.uid : 'https://cebear.com'; }
 
-  var shareCanvas = null;
-  var shareUrl = '';
-
-  function getShareUrl() {
-    var user = IQData.getCurrentUser();
-    return user ? 'https://braindeer.org/share/' + user.uid : 'https://braindeer.org';
-  }
-
-  function rr(ctx, x, y, w, h, r, fill) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
-    if (fill) { ctx.fillStyle = fill; ctx.fill(); }
-  }
-
-  function drawDonut(ctx, cx, cy, outerR, innerR, startAngle, endAngle, color) {
-    ctx.beginPath();
-    ctx.arc(cx, cy, outerR, startAngle, endAngle, false);
-    ctx.arc(cx, cy, innerR, endAngle, startAngle, true);
-    ctx.closePath();
-    ctx.fillStyle = color;
-    ctx.fill();
-  }
+  function rr(ctx,x,y,w,h,r,fill){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill()}}
+  function drawDonut(ctx,cx,cy,oR,iR,sA,eA,color){ctx.beginPath();ctx.arc(cx,cy,oR,sA,eA,false);ctx.arc(cx,cy,iR,eA,sA,true);ctx.closePath();ctx.fillStyle=color;ctx.fill()}
 
   function genShareCard() {
-    var d = IQData.load();
-    var W = 1200, H = 630;
-    var cv = document.createElement('canvas');
-    cv.width = W; cv.height = H;
-    var ctx = cv.getContext('2d');
-    var uname = d.username || IQData.getCurrentUser()?.displayName || 'Brain';
-    var acc = IQData.getAccuracy();
-    var pic = d.pic || null;
-
-    // Background
-    ctx.fillStyle = '#2a1c10'; ctx.fillRect(0, 0, W, H);
-    rr(ctx, 20, 20, W - 40, H - 40, 24, '#3a2918');
-
-    var topCx = W / 2;
-    var picSize = 64;
-    var picY = 52;
-
-    // Profile pic placeholder
-    ctx.fillStyle = '#4a3625';
-    ctx.beginPath(); ctx.arc(topCx, picY + picSize / 2, picSize / 2, 0, Math.PI * 2); ctx.fill();
-    if (!pic) {
-      ctx.font = '28px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('🦌', topCx, picY + picSize / 2 + 2);
-    }
-
-    // Username
-    ctx.textBaseline = 'alphabetic';
-    ctx.font = '700 16px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a';
-    ctx.textAlign = 'center';
-    ctx.fillText(uname, topCx, picY + picSize + 22);
-
-    // IQ
-    ctx.font = '900 100px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(d.iq || '--', topCx, picY + picSize + 85);
-    ctx.textBaseline = 'alphabetic';
-
-    // IQ label
-    ctx.font = '900 14px Nunito, sans-serif'; ctx.fillStyle = '#6b4f32';
-    ctx.fillText('I Q', topCx, picY + picSize + 125);
-
-    // Percentile badge
-    var badgeBottom = picY + picSize + 130;
-    if (d.iq) {
-      var pctText = 'TOP ' + formatPercentile(iqToPercentile(d.iq)).toUpperCase();
-      ctx.font = '900 13px Nunito, sans-serif';
-      var tw = ctx.measureText(pctText).width + 36;
-      rr(ctx, topCx - tw / 2, badgeBottom + 5, tw, 28, 8, '#ffc800');
-      ctx.fillStyle = '#2a1c10'; ctx.fillText(pctText, topCx, badgeBottom + 24);
-      badgeBottom += 40;
-    }
-
-    // Stats row
-    var statsY = badgeBottom + 14;
-    var miniStats = [
-      { v: String(d.answered || 0), l: 'ANSWERED' },
-      { v: acc + '%', l: 'ACCURACY' },
-      { v: String(d.bestStreak || 0), l: 'BEST STREAK' },
-    ];
-    var pillW = 130, pillGap = 12;
-    var totalPillW = miniStats.length * pillW + (miniStats.length - 1) * pillGap;
-    var pillStartX = topCx - totalPillW / 2;
-    miniStats.forEach(function(s, i) {
-      var px = pillStartX + i * (pillW + pillGap);
-      rr(ctx, px, statsY, pillW, 48, 10, '#4a3625');
-      ctx.font = '900 20px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
-      ctx.textAlign = 'center'; ctx.fillText(s.v, px + pillW / 2, statsY + 22);
-      ctx.font = '800 9px Nunito, sans-serif'; ctx.fillStyle = '#8f6b4a';
-      ctx.fillText(s.l, px + pillW / 2, statsY + 39);
-    });
-
-    // Donut charts
-    var cats = ABILITIES.slice(0, 6);
-    var donutY = statsY + 72;
-    var donutR = 38;
-    var donutInner = 24;
-    var donutGap = (W - 120) / cats.length;
-    var donutStartX = 60 + donutGap / 2;
-
-    cats.forEach(function(a, i) {
-      var dcx = donutStartX + i * donutGap;
-      var dcy = donutY + donutR;
-      var v = IQData.getStatPercent(a.key);
-      var angle = (v / 100) * Math.PI * 2;
-
-      // Background ring
-      drawDonut(ctx, dcx, dcy, donutR, donutInner, 0, Math.PI * 2, '#4a3625');
-      // Filled ring
-      if (v > 0) drawDonut(ctx, dcx, dcy, donutR, donutInner, -Math.PI / 2, -Math.PI / 2 + angle, a.color);
-
-      // Value in center
-      ctx.font = '900 18px Nunito, sans-serif'; ctx.fillStyle = '#f0e2cc';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(String(v), dcx, dcy);
-      ctx.textBaseline = 'alphabetic';
-
-      // Label below
-      ctx.font = '800 11px Nunito, sans-serif'; ctx.fillStyle = '#c2a476';
-      ctx.fillText(a.name, dcx, dcy + donutR + 18);
-    });
-
-    // Branding
-    ctx.font = '800 13px Nunito, sans-serif'; ctx.fillStyle = '#5a4232';
-    ctx.textAlign = 'center';
-    ctx.fillText('braindeer.org', W / 2, H - 32);
-
-    shareCanvas = cv;
-
-    // Load profile pic async
-    if (pic) {
-      var img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = function() {
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(topCx, picY + picSize / 2, picSize / 2, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(img, topCx - picSize / 2, picY, picSize, picSize);
-        ctx.restore();
-      };
-      img.src = pic;
-    }
-
+    var d=IQData.load(),W=1200,H=630,cv=document.createElement('canvas');cv.width=W;cv.height=H;var ctx=cv.getContext('2d');
+    var uname=d.username||IQData.getCurrentUser()?.displayName||'Brain',acc=IQData.getAccuracy(),pic=d.pic||null;
+    ctx.fillStyle='#111f45';ctx.fillRect(0,0,W,H);rr(ctx,20,20,W-40,H-40,24,'#162b5e');
+    var topCx=W/2,picSize=64,picY=52;
+    ctx.fillStyle='#1e3872';ctx.beginPath();ctx.arc(topCx,picY+picSize/2,picSize/2,0,Math.PI*2);ctx.fill();
+    if(!pic){ctx.font='28px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fff';ctx.fillText('CB',topCx,picY+picSize/2+2)}
+    ctx.textBaseline='alphabetic';ctx.font='700 16px Nunito, sans-serif';ctx.fillStyle='#8a96b8';ctx.textAlign='center';ctx.fillText(uname,topCx,picY+picSize+22);
+    ctx.font='900 100px Nunito, sans-serif';ctx.fillStyle='#fff';ctx.textBaseline='middle';ctx.fillText(d.iq||'--',topCx,picY+picSize+85);ctx.textBaseline='alphabetic';
+    ctx.font='900 14px Nunito, sans-serif';ctx.fillStyle='#5a6a90';ctx.fillText('I Q',topCx,picY+picSize+125);
+    var badgeBottom=picY+picSize+130;
+    if(d.iq){var pctText='TOP '+formatPercentile(iqToPercentile(d.iq)).toUpperCase();ctx.font='900 13px Nunito, sans-serif';var tw=ctx.measureText(pctText).width+36;rr(ctx,topCx-tw/2,badgeBottom+5,tw,28,8,'#FFB800');ctx.fillStyle='#162b5e';ctx.fillText(pctText,topCx,badgeBottom+24);badgeBottom+=40}
+    var statsY=badgeBottom+14,miniStats=[{v:String(d.answered||0),l:'ANSWERED'},{v:acc+'%',l:'ACCURACY'},{v:String(d.bestStreak||0),l:'BEST STREAK'}],pillW=130,pillGap=12,totalPillW=miniStats.length*pillW+(miniStats.length-1)*pillGap,pillStartX=topCx-totalPillW/2;
+    miniStats.forEach(function(s,i){var px=pillStartX+i*(pillW+pillGap);rr(ctx,px,statsY,pillW,48,10,'#1e3872');ctx.font='900 20px Nunito, sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText(s.v,px+pillW/2,statsY+22);ctx.font='800 9px Nunito, sans-serif';ctx.fillStyle='#8a96b8';ctx.fillText(s.l,px+pillW/2,statsY+39)});
+    var cats=ABILITIES.slice(0,6),donutY=statsY+72,donutR=38,donutInner=24,donutGap=(W-120)/cats.length,donutStartX=60+donutGap/2;
+    cats.forEach(function(a,i){var dcx=donutStartX+i*donutGap,dcy=donutY+donutR,v=IQData.getStatPercent(a.key),angle=(v/100)*Math.PI*2;drawDonut(ctx,dcx,dcy,donutR,donutInner,0,Math.PI*2,'#1e3872');if(v>0)drawDonut(ctx,dcx,dcy,donutR,donutInner,-Math.PI/2,-Math.PI/2+angle,a.color);ctx.font='900 18px Nunito, sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(v),dcx,dcy);ctx.textBaseline='alphabetic';ctx.font='800 11px Nunito, sans-serif';ctx.fillStyle='#8a96b8';ctx.fillText(a.name,dcx,dcy+donutR+18)});
+    ctx.font='800 13px Nunito, sans-serif';ctx.fillStyle='#3d5080';ctx.textAlign='center';ctx.fillText('cebear.com',W/2,H-32);
+    shareCanvas=cv;
+    if(pic){var img=new Image();img.crossOrigin='anonymous';img.onload=function(){ctx.save();ctx.beginPath();ctx.arc(topCx,picY+picSize/2,picSize/2,0,Math.PI*2);ctx.clip();ctx.drawImage(img,topCx-picSize/2,picY,picSize,picSize);ctx.restore()};img.src=pic}
     return cv;
   }
 
-  async function uploadShareCard() {
-    var user = IQData.getCurrentUser();
-    if (!user || !shareCanvas) return;
-    var d = IQData.load();
-    try {
-      var dataUrl = shareCanvas.toDataURL('image/png');
-      var base64 = dataUrl.split(',')[1];
-      var shareDoc = new parent.Object();
-      shareDoc.iq = d.iq || 0;
-      shareDoc.username = d.username || user.displayName || 'Brain';
-      shareDoc.answered = d.answered || 0;
-      shareDoc.accuracy = parseInt(IQData.getAccuracy()) || 0;
-      shareDoc.bestStreak = d.bestStreak || 0;
-      shareDoc.cardBase64 = base64;
-      shareDoc.updatedAt = new Date().toISOString();
-      var fb = parent.firebase;
-      await fb.firestore().collection('shares').doc(user.uid).set(shareDoc);
-      toast('Share card ready!');
-    } catch (e) {
-      console.warn('Share upload error:', e);
-      toast('Share failed — try again');
-    }
+  async function uploadShareCard(){var user=IQData.getCurrentUser();if(!user||!shareCanvas)return;var d=IQData.load();try{var dataUrl=shareCanvas.toDataURL('image/png');var base64=dataUrl.split(',')[1];var shareDoc=new parent.Object();shareDoc.iq=d.iq||0;shareDoc.username=d.username||user.displayName||'Brain';shareDoc.answered=d.answered||0;shareDoc.accuracy=parseInt(IQData.getAccuracy())||0;shareDoc.bestStreak=d.bestStreak||0;shareDoc.cardBase64=base64;shareDoc.updatedAt=new Date().toISOString();var fb=parent.firebase;await fb.firestore().collection('shares').doc(user.uid).set(shareDoc);toast('Share card ready!')}catch(e){console.warn('Share upload error:',e);toast('Share failed — try again')}}
+
+  function getPlatform(){var ua=navigator.userAgent||'';if(/iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1))return'ios';if(/android/i.test(ua))return'android';return'desktop'}
+  function buildShareGrid(){var hasNativeShare=!!navigator.share;var grid=document.getElementById('share-grid');grid.innerHTML='';var options=[];
+    if(hasNativeShare)options.push({id:'native',label:'Share',cls:'sd-native',icon:'<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>'});
+    options.push({id:'copylink',label:'Copy Link',cls:'sd-copy',icon:'<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>'});
+    options.push({id:'x',label:'X',cls:'sd-x',icon:'<svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>'});
+    options.push({id:'whatsapp',label:'WhatsApp',cls:'sd-wa',icon:'<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.13.556 4.13 1.532 5.87L.06 23.71l5.99-1.572A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.82c-1.97 0-3.87-.53-5.53-1.53l-.39-.24-3.56.93.95-3.48-.26-.41A9.8 9.8 0 0 1 2.18 12c0-5.42 4.4-9.82 9.82-9.82 5.42 0 9.82 4.4 9.82 9.82 0 5.42-4.4 9.82-9.82 9.82z"/></svg>'});
+    options.push({id:'save',label:'Save',cls:'sd-save',icon:'<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>'});
+    options.forEach(function(opt){var btn=document.createElement('button');btn.className='share-dest '+opt.cls;btn.innerHTML='<div class="sd-icon">'+opt.icon+'</div>'+opt.label;btn.onclick=function(){handleShareAction(opt.id)};grid.appendChild(btn)});
   }
+  function getShareText(){var d=IQData.load();return d.iq?'My IQ is '+d.iq+' on Cebear! Top '+formatPercentile(iqToPercentile(d.iq))+' — think you can beat me?':'Training my brain on Cebear!'}
+  function handleShareAction(id){Haptics.medium();var text=getShareText();switch(id){case'native':navigator.share({title:'My Cebear IQ',text:text,url:shareUrl}).then(function(){Haptics.success()}).catch(function(e){if(e.name!=='AbortError')toast('Share cancelled')});break;case'copylink':navigator.clipboard.writeText(shareUrl).then(function(){Haptics.success();toast('Link copied!')}).catch(function(){toast('Copy failed')});break;case'x':window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(shareUrl),'_blank');break;case'whatsapp':window.open('https://wa.me/?text='+encodeURIComponent(text+' '+shareUrl),'_blank');break;case'save':if(!shareCanvas)return;Haptics.success();var a=document.createElement('a');a.download='cebear-stats.png';a.href=shareCanvas.toDataURL('image/png');a.click();toast('Image saved!');break}}
 
-  // ── SHARE OPTIONS ──
-
-  function getPlatform() {
-    var ua = navigator.userAgent || '';
-    if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
-    if (/android/i.test(ua)) return 'android';
-    return 'desktop';
-  }
-
-  function buildShareGrid() {
-    var hasNativeShare = !!navigator.share;
-    var grid = document.getElementById('share-grid');
-    grid.innerHTML = '';
-    var options = [];
-
-    if (hasNativeShare) {
-      options.push({ id: 'native', label: 'Share', cls: 'sd-native',
-        icon: '<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>' });
-    }
-    options.push({ id: 'copylink', label: 'Copy Link', cls: 'sd-copy',
-      icon: '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' });
-    options.push({ id: 'x', label: 'X', cls: 'sd-x',
-      icon: '<svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>' });
-    options.push({ id: 'whatsapp', label: 'WhatsApp', cls: 'sd-wa',
-      icon: '<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.13.556 4.13 1.532 5.87L.06 23.71l5.99-1.572A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.82c-1.97 0-3.87-.53-5.53-1.53l-.39-.24-3.56.93.95-3.48-.26-.41A9.8 9.8 0 0 1 2.18 12c0-5.42 4.4-9.82 9.82-9.82 5.42 0 9.82 4.4 9.82 9.82 0 5.42-4.4 9.82-9.82 9.82z"/></svg>' });
-    options.push({ id: 'telegram', label: 'Telegram', cls: 'sd-tg',
-      icon: '<svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>' });
-    options.push({ id: 'reddit', label: 'Reddit', cls: 'sd-reddit',
-      icon: '<svg viewBox="0 0 24 24"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>' });
-    options.push({ id: 'save', label: 'Save', cls: 'sd-save',
-      icon: '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' });
-
-    options.forEach(function(opt) {
-      var btn = document.createElement('button');
-      btn.className = 'share-dest ' + opt.cls;
-      btn.innerHTML = '<div class="sd-icon">' + opt.icon + '</div>' + opt.label;
-      btn.onclick = function() { handleShareAction(opt.id); };
-      grid.appendChild(btn);
-    });
-  }
-
-  function getShareText() {
-    var d = IQData.load();
-    return d.iq
-      ? 'My IQ is ' + d.iq + ' on BrainDeer! Top ' + formatPercentile(iqToPercentile(d.iq)) + ' — think you can beat me? 🦌🧠'
-      : 'Training my brain on BrainDeer! 🦌🧠';
-  }
-
-  function handleShareAction(id) {
-    Haptics.medium();
-    var text = getShareText();
-    switch (id) {
-      case 'native':
-        navigator.share({ title: 'My BrainDeer IQ', text: text, url: shareUrl })
-          .then(function() { Haptics.success(); })
-          .catch(function(e) { if (e.name !== 'AbortError') toast('Share cancelled'); });
-        break;
-      case 'copylink':
-        navigator.clipboard.writeText(shareUrl)
-          .then(function() { Haptics.success(); toast('Link copied!'); })
-          .catch(function() { toast('Copy failed'); });
-        break;
-      case 'x':
-        window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(shareUrl), '_blank');
-        break;
-      case 'whatsapp':
-        window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + shareUrl), '_blank');
-        break;
-      case 'telegram':
-        window.open('https://t.me/share/url?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(text), '_blank');
-        break;
-      case 'reddit':
-        window.open('https://reddit.com/submit?url=' + encodeURIComponent(shareUrl) + '&title=' + encodeURIComponent(text), '_blank');
-        break;
-      case 'save':
-        if (!shareCanvas) return;
-        Haptics.success();
-        var a = document.createElement('a');
-        a.download = 'braindeer-stats.png';
-        a.href = shareCanvas.toDataURL('image/png');
-        a.click();
-        toast('Image saved!');
-        break;
-    }
-  }
-
-  async function openShare() {
-    var fab = document.getElementById('share-btn');
-    fab.classList.add('uploading');
-    fab.textContent = 'Generating...';
-    shareUrl = getShareUrl();
-    genShareCard();
-    await uploadShareCard();
-    fab.classList.remove('uploading');
-    fab.innerHTML = '<svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share Stats';
-    document.getElementById('share-url').value = shareUrl;
-    var preview = document.getElementById('card-preview');
-    preview.innerHTML = '';
-    var previewCv = document.createElement('canvas');
-    previewCv.width = 600; previewCv.height = 315;
-    previewCv.getContext('2d').drawImage(shareCanvas, 0, 0, 600, 315);
-    preview.appendChild(previewCv);
-    buildShareGrid();
-    document.getElementById('share-modal').classList.add('show');
-  }
-
-  function closeShare() { Haptics.light(); document.getElementById('share-modal').classList.remove('show'); }
-  document.getElementById('share-btn').onclick = function() { Haptics.medium(); openShare(); };
-  document.getElementById('share-modal').onclick = function(e) { if (e.target.id === 'share-modal') closeShare(); };
-  document.getElementById('copy-link').onclick = function() { handleShareAction('copylink'); };
-
+  async function openShare(){var fab=document.getElementById('share-btn');fab.classList.add('uploading');fab.textContent='Generating...';shareUrl=getShareUrl();genShareCard();await uploadShareCard();fab.classList.remove('uploading');fab.innerHTML='<svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share Your IQ Score';document.getElementById('share-url').value=shareUrl;var preview=document.getElementById('card-preview');preview.innerHTML='';var previewCv=document.createElement('canvas');previewCv.width=600;previewCv.height=315;previewCv.getContext('2d').drawImage(shareCanvas,0,0,600,315);preview.appendChild(previewCv);buildShareGrid();document.getElementById('share-modal').classList.add('show')}
+  function closeShare(){Haptics.light();document.getElementById('share-modal').classList.remove('show')}
+  document.getElementById('share-btn').onclick=function(){Haptics.medium();openShare()};
+  document.getElementById('share-modal').onclick=function(e){if(e.target.id==='share-modal')closeShare()};
+  document.getElementById('copy-link').onclick=function(){handleShareAction('copylink')};
   load();
 </script>
 </body>
