@@ -4,41 +4,205 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#3a2918">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#FDFCFC">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="manifest" href="manifest.json">
-  <title>BrainDeer</title>
+  <title>Cebear</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#4a3625}*{margin:0;padding:0;box-sizing:border-box}
-    html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Nunito',sans-serif;touch-action:manipulation;transition:background .3s ease}
-    #splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .3s ease}
-    #splash.hide{opacity:0;pointer-events:none}
-    #splash .mascot{font-size:56px;animation:bob 1.2s ease-in-out infinite}
-    #splash .name{font-size:26px;font-weight:900;color:#f0e2cc;margin-top:8px}
-    #splash .dots{margin-top:16px;display:flex;gap:6px}
-    #splash .dots span{width:8px;height:8px;border-radius:50%;background:#6b4f32;animation:dotPulse 1s ease infinite}
-    #splash .dots span:nth-child(2){animation-delay:.15s}
-    #splash .dots span:nth-child(3){animation-delay:.3s}
-    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-    @keyframes dotPulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
-    .screen{position:absolute;inset:0;width:100%;height:100%;display:none;overflow:hidden}
-    .screen.active{display:block}
-    .screen iframe{position:absolute;inset:0;width:100%;height:100%;border:none;touch-action:manipulation}
-    #iosInstallBanner{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#f0e2cc;color:#3a2918;padding:13px 22px;border-radius:12px;font-size:15px;font-weight:800;display:none;z-index:10000;max-width:90%;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.3);line-height:1.5}
-    #iosInstallBanner a{color:#3a2918;text-decoration:underline}
-    #iosInstallBanner .close-banner{display:inline-block;margin-left:12px;font-size:16px;cursor:pointer;opacity:.4;vertical-align:middle}
+    :root {
+      --bg: #FDFCFC;
+      --navy: #223B7E;
+      --navy-dark: #182a5c;
+      --navy-light: #3a5bb0;
+      --card: #FFFFFF;
+      --card-border: #E8EAF0;
+      --text: #1a1a2e;
+      --text-dim: #7a7f9a;
+      --green: #4CD964;
+      --green-dark: #34b84c;
+      --red: #FF3B5C;
+      --red-dark: #d92e4a;
+      --gold: #FFBF00;
+      --gold-dark: #d9a200;
+      --blue: #3B82F6;
+      --purple: #8B5CF6;
+      --orange: #FF8C00;
+      --pink: #FF6B9D;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      background: var(--bg); font-family: 'Nunito', sans-serif;
+      touch-action: manipulation;
+    }
+
+    /* ── Splash ── */
+    #splash {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--navy);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      transition: opacity 0.3s ease;
+    }
+    #splash.hide { opacity: 0; pointer-events: none; }
+    #splash .mascot {
+      font-size: 64px;
+      animation: bob 1.2s ease-in-out infinite;
+    }
+    #splash .name {
+      font-size: 28px; font-weight: 900;
+      color: #fff; margin-top: 8px;
+      letter-spacing: -0.5px;
+    }
+    #splash .dots {
+      margin-top: 18px; display: flex; gap: 7px;
+    }
+    #splash .dots span {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      animation: dotPulse 1s ease infinite;
+    }
+    #splash .dots span:nth-child(2) { animation-delay: 0.15s; }
+    #splash .dots span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes dotPulse {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    /* ── Screens ── */
+    .screen {
+      position: absolute; top: 0; left: 0; right: 0;
+      bottom: 0;
+      display: none; overflow: hidden;
+    }
+    .screen.active { display: block; }
+    .screen iframe {
+      position: absolute; top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      touch-action: manipulation;
+    }
+    /* When nav is visible, iframe needs bottom padding */
+    body.has-nav .screen iframe {
+      height: calc(100% - 68px - env(safe-area-inset-bottom, 0px));
+    }
+
+    /* ── Bottom Nav (in app shell) ── */
+    #app-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: calc(68px + env(safe-area-inset-bottom, 0px));
+      background: #fff;
+      border-top: 2px solid var(--card-border);
+      display: none; /* hidden by default, shown when logged in */
+      justify-content: center; align-items: flex-start;
+      padding-top: 8px; gap: 0;
+      z-index: 100;
+    }
+    body.has-nav #app-nav { display: flex; }
+
+    .nav-btn {
+      flex: 1; max-width: 90px;
+      padding: 6px 0 2px;
+      background: none; border: none;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 3px;
+      color: var(--text-dim);
+      font-family: 'Nunito', sans-serif;
+      font-size: 11px; font-weight: 800;
+      cursor: pointer; position: relative;
+      transition: color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-btn svg {
+      width: 26px; height: 26px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .nav-btn.active {
+      color: var(--navy);
+    }
+    .nav-btn.active::before {
+      content: '';
+      position: absolute; top: -8px;
+      left: 50%; transform: translateX(-50%);
+      width: 32px; height: 4px;
+      background: var(--navy);
+      border-radius: 0 0 4px 4px;
+    }
+
+    .nav-badge {
+      position: absolute; top: 2px; right: calc(50% - 18px);
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--red);
+      border: 2px solid #fff;
+      display: none;
+      animation: badgePulse 2s ease infinite;
+    }
+    .nav-badge.show { display: block; }
+    @keyframes badgePulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+
+    /* ── iOS Install Banner ── */
+    #iosInstallBanner {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: var(--navy); color: #fff;
+      padding: 13px 22px; border-radius: 16px;
+      font-size: 15px; font-weight: 800;
+      display: none; z-index: 10000;
+      max-width: 90%; text-align: center;
+      box-shadow: 0 4px 20px rgba(34,59,126,0.3);
+      line-height: 1.5;
+    }
+    #iosInstallBanner a { color: #fff; text-decoration: underline; }
+    #iosInstallBanner .close-banner {
+      display: inline-block; margin-left: 12px;
+      font-size: 16px; cursor: pointer; opacity: 0.5;
+      vertical-align: middle;
+    }
   </style>
 </head>
 <body>
-<div id="splash"><div class="mascot">🦌</div><div class="name">BrainDeer</div><div class="dots"><span></span><span></span><span></span></div></div>
+
+<div id="splash">
+  <div class="mascot">🐻</div>
+  <div class="name">Cebear</div>
+  <div class="dots"><span></span><span></span><span></span></div>
+</div>
+
 <div class="screen" id="screen-auth"></div>
 <div class="screen" id="screen-improve"></div>
 <div class="screen" id="screen-profile"></div>
 <div class="screen" id="screen-leaderboard"></div>
 <div class="screen" id="screen-tasks"></div>
+
+<nav id="app-nav">
+  <button class="nav-btn" data-page="leaderboard" onclick="goTo('leaderboard')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+    Ranks
+  </button>
+  <button class="nav-btn active" data-page="improve" onclick="goTo('improve')">
+    <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+    Train
+  </button>
+  <button class="nav-btn" data-page="tasks" onclick="goTo('tasks')">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    Tasks
+    <span class="nav-badge" id="tasks-badge"></span>
+  </button>
+  <button class="nav-btn" data-page="profile" onclick="goTo('profile')">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </button>
+</nav>
+
 <div id="iosInstallBanner" role="alert"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -56,17 +220,20 @@
   });
 
   var WORKER_URL = 'https://braindeer.org/api/redeem-install-token';
-  var BG_COLORS  = { auth:'#3a2918', improve:'#4a3625', profile:'#4a3625', leaderboard:'#4a3625', tasks:'#3a2918' };
 
-  function setScreenBg(p) {
-    var c = BG_COLORS[p] || '#4a3625';
-    document.documentElement.style.setProperty('--bg', c);
-    document.body.style.background = c;
-    var s = document.getElementById('splash');
-    if (s) s.style.background = c;
+  /* ── Nav management ── */
+  function showNav(show) {
+    if (show) document.body.classList.add('has-nav');
+    else document.body.classList.remove('has-nav');
   }
 
-  /* ── Message handler ─────────────────────────────────────────────── */
+  function updateNavActive(page) {
+    document.querySelectorAll('#app-nav .nav-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.dataset.page === page);
+    });
+  }
+
+  /* ── Message handler ── */
   window.addEventListener('message', function(e) {
     if (!e.data || !e.data.type) return;
     if (e.data.type === 'authSuccess') { goTo('improve'); return; }
@@ -90,17 +257,20 @@
     }
   });
 
-  /* ── Screen management ───────────────────────────────────────────── */
+  /* ── Screen management ── */
   var currentScreen = null;
   var screensLoaded = {};
 
   window.goTo = function(page) {
     document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+
+    // Reload profile and leaderboard each visit for fresh data
     if ((page === 'profile' || page === 'leaderboard') && screensLoaded[page]) {
       var old = document.querySelector('#screen-' + page + ' iframe');
       if (old) old.remove();
       screensLoaded[page] = false;
     }
+
     if (!screensLoaded[page]) {
       var c = document.getElementById('screen-' + page);
       if (!c) return;
@@ -110,9 +280,15 @@
       c.appendChild(f);
       screensLoaded[page] = true;
     }
+
     var el = document.getElementById('screen-' + page);
     if (el) { el.classList.add('active'); currentScreen = page; }
-    setScreenBg(page);
+
+    // Show/hide nav based on auth state
+    showNav(page !== 'auth');
+    updateNavActive(page);
+
+    // Kill splash
     var sp = document.getElementById('splash');
     if (sp && !sp.classList.contains('hide')) {
       sp.classList.add('hide');
@@ -122,7 +298,7 @@
 
   window.authCheck = function() {};
 
-  /* ── Helpers ─────────────────────────────────────────────────────── */
+  /* ── Helpers ── */
   function ensureUser(user) {
     var ref = firebase.firestore().collection('users').doc(user.uid);
     return ref.get().then(function(snap) {
@@ -181,7 +357,7 @@
     });
   }
 
-  /* ── Boot ─────────────────────────────────────────────────────────── */
+  /* ── Boot ── */
   (function() {
     localStorage.removeItem('iq_guest');
 
@@ -189,35 +365,24 @@
     for (var i = 0; i < localStorage.length; i++) {
       if (localStorage.key(i).indexOf('firebase:authUser:') === 0) { loggedIn = true; break; }
     }
-    setScreenBg(loggedIn ? 'improve' : 'auth');
 
     var params = new URLSearchParams(window.location.search);
     var tToken = params.get('t');
     var sessionId = params.get('session');
     if (tToken || sessionId) window.history.replaceState({}, '', window.location.pathname);
 
-    // ── CHECK FOR GIS TOKEN FIRST ──────────────────────────────────
-    // google-redirect.html stores the Google idToken in sessionStorage
-    // so we can sign in HERE, on app.html's own Firebase instance.
+    // GIS token check
     var gisToken = sessionStorage.getItem('bd_gis_token');
     if (gisToken) {
       sessionStorage.removeItem('bd_gis_token');
       var credential = firebase.auth.GoogleAuthProvider.credential(gisToken);
       firebase.auth().signInWithCredential(credential)
-        .then(function(result) {
-          return ensureUser(result.user);
-        })
-        .then(function() {
-          goTo('improve');
-        })
-        .catch(function(err) {
-          console.error('GIS sign-in failed:', err);
-          normalBoot();
-        });
-      return; // Don't run normalBoot yet
+        .then(function(result) { return ensureUser(result.user); })
+        .then(function() { goTo('improve'); })
+        .catch(function(err) { console.error('GIS sign-in failed:', err); normalBoot(); });
+      return;
     }
 
-    // ── Other token flows ──────────────────────────────────────────
     if (sessionId) {
       redeemSessionToken(sessionId).then(function() { normalBoot(); }).catch(function() { normalBoot(); });
     } else if (tToken) {
@@ -246,6 +411,5 @@
   window.triggerInstall = function() { if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(function() { deferredPrompt = null; }); } };
   window.addEventListener('appinstalled', function() { deferredPrompt = null; document.getElementById('iosInstallBanner').style.display = 'none'; });
 </script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7417896211953533" crossorigin="anonymous"></script>
 </body>
 </html>
