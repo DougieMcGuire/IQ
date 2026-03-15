@@ -19,7 +19,9 @@
     .dots span{width:8px;height:8px;border-radius:50%;background:rgba(240,234,214,.15);animation:dotPulse 1s ease infinite}
     .dots span:nth-child(2){animation-delay:.15s}
     .dots span:nth-child(3){animation-delay:.3s}
-    .btn-back{padding:10px 24px;border:2px solid rgba(240,234,214,.12);border-radius:12px;background:transparent;color:rgba(240,234,214,.4);font-size:14px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:12px}
+    /* Google button container — shown as fallback */
+    #g-btn-wrap{margin-bottom:16px;min-height:44px;display:flex;align-items:center;justify-content:center}
+    .btn-back{padding:10px 24px;border:2px solid rgba(240,234,214,.12);border-radius:12px;background:transparent;color:rgba(240,234,214,.4);font-size:14px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:8px}
     .btn-back:active{opacity:.7}
     .hidden{display:none!important}
     @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -30,10 +32,15 @@
 <div class="logo"><img src="logo.png" alt="Cebear"></div>
 <div class="title">Cebear</div>
 <div class="sub" id="sub">Choose your Google account</div>
-<div class="dots hidden" id="dots"><span></span><span></span><span></span></div>
+<div class="dots" id="dots"><span></span><span></span><span></span></div>
+
+<!-- Google renders its button here as fallback -->
+<div id="g-btn-wrap"></div>
+
 <button class="btn-back" id="btnBack" onclick="window.location.replace('app.html')">Back</button>
 
 <script>
+  // Handle the credential from either One Tap or the rendered button
   window.handleGISCredential = function(response) {
     var idToken = response.credential;
     if (!idToken) {
@@ -43,16 +50,51 @@
     document.getElementById('sub').textContent = 'Signed in! Returning to app…';
     document.getElementById('dots').classList.remove('hidden');
     document.getElementById('btnBack').classList.add('hidden');
+    document.getElementById('g-btn-wrap').classList.add('hidden');
     sessionStorage.setItem('bd_gis_token', idToken);
     window.location.replace('app.html');
   };
+
+  // Show the rendered Google button (fallback when One Tap is suppressed)
+  function showGoogleButton() {
+    document.getElementById('dots').classList.add('hidden');
+    document.getElementById('sub').textContent = 'Tap below to sign in';
+    google.accounts.id.renderButton(
+      document.getElementById('g-btn-wrap'),
+      {
+        type: 'standard',
+        theme: 'outline',
+        size: 'large',
+        shape: 'pill',
+        text: 'continue_with',
+        width: 280
+      }
+    );
+  }
 </script>
 <script src="https://accounts.google.com/gsi/client" onload="
   google.accounts.id.initialize({
     client_id: '331205139765-3gapl6adar49lag63483id304v04mdd4.apps.googleusercontent.com',
-    callback: handleGISCredential
+    callback: handleGISCredential,
+    auto_select: true,
+    itp_support: true
   });
-  google.accounts.id.prompt();
+
+  // Try One Tap first — the bottom sheet prompt
+  google.accounts.id.prompt(function(notification) {
+    // If One Tap was suppressed or dismissed, show the button
+    if (notification.isNotDisplayed() || notification.isSkippedMoment() || notification.isDismissedMoment()) {
+      showGoogleButton();
+    }
+  });
+
+  // Safety net: if One Tap hasn't fired after 3s, show button anyway
+  setTimeout(function() {
+    var wrap = document.getElementById('g-btn-wrap');
+    if (!wrap.classList.contains('hidden') && wrap.children.length === 0) {
+      showGoogleButton();
+    }
+  }, 3000);
 "></script>
 </body>
 </html>
