@@ -3,49 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>BrainDeer — Sign in with Google</title>
+  <title>Cebear — Sign in with Google</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{
-      background:#3a2918;font-family:'Nunito',sans-serif;color:#f0e2cc;
+      background:#1b2d5b;font-family:'Nunito',sans-serif;color:#F0EAD6;
       min-height:100dvh;display:flex;flex-direction:column;
-      align-items:center;justify-content:center;padding:24px;
+      align-items:center;justify-content:center;
+      padding:calc(env(safe-area-inset-top,20px) + 10px) 24px calc(env(safe-area-inset-bottom,20px) + 10px);
       text-align:center;
     }
-    .mascot{font-size:52px;animation:bob 1.2s ease-in-out infinite}
-    .title{font-size:22px;font-weight:900;margin:10px 0 4px}
-    .sub{font-size:14px;font-weight:700;color:#c2a476;margin-bottom:24px;line-height:1.5;max-width:300px}
+    .mascot{width:64px;height:64px;background:#F0EAD6;border-radius:50%;display:flex;align-items:center;justify-content:center;animation:bob 1.2s ease-in-out infinite}
+    .mascot svg{width:36px;height:36px}
+    .title{font-size:22px;font-weight:900;margin:12px 0 4px}
+    .sub{font-size:14px;font-weight:700;color:rgba(240,234,214,.45);margin-bottom:24px;line-height:1.5;max-width:300px}
 
     .dots{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
-    .dots span{
-      width:8px;height:8px;border-radius:50%;background:#6b4f32;
-      animation:dotPulse 1s ease infinite;
-    }
+    .dots span{width:8px;height:8px;border-radius:50%;background:rgba(240,234,214,.15);animation:dotPulse 1s ease infinite}
     .dots span:nth-child(2){animation-delay:.15s}
     .dots span:nth-child(3){animation-delay:.3s}
 
     .btn-go{
       padding:15px 36px;border:none;border-radius:14px;
-      background:#58cc02;color:#fff;font-size:16px;font-weight:900;
+      background:#3fba4f;color:#fff;font-size:16px;font-weight:900;
       font-family:'Nunito',sans-serif;cursor:pointer;
-      box-shadow:0 5px 0 #46a302;
-      transition:transform .1s,box-shadow .1s;
+      box-shadow:0 3px 0 #2d9a3c;
+      transition:transform .1s;
       display:none;margin-bottom:16px;
     }
-    .btn-go:active{transform:translateY(4px);box-shadow:0 1px 0 #46a302}
+    .btn-go:active{transform:translateY(3px);box-shadow:none}
     .btn-go.show{display:inline-flex;align-items:center;gap:10px}
-
     .btn-go svg{width:20px;height:20px;flex-shrink:0}
 
     .err{
-      background:#ea2b2b;color:#fff;padding:12px 18px;
+      background:#e8443a;color:#fff;padding:12px 18px;
       border-radius:12px;font-size:14px;font-weight:700;
       max-width:340px;display:none;margin-top:16px;
-      box-shadow:0 3px 0 #c42020;
     }
     .err.show{display:block}
-
     .hidden{display:none!important}
 
     @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -54,8 +50,8 @@
 </head>
 <body>
 
-<div class="mascot">🦌</div>
-<div class="title">BrainDeer</div>
+<div class="mascot"><img src="logo.png" alt="Cebear" style="width:48px;height:48px;object-fit:contain"></div>
+<div class="title">Cebear</div>
 <div class="sub" id="sub">Preparing sign-in…</div>
 <div class="dots" id="dots"><span></span><span></span><span></span></div>
 
@@ -73,12 +69,8 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import {
-    getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import {
-    getFirestore, doc, setDoc, serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const cfg = {
     apiKey:            "AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
@@ -94,103 +86,65 @@
   const db   = getFirestore(app);
   const gp   = new GoogleAuthProvider();
 
+  // ═══════════════════════════════════════════════════════════════
+  // DOMAIN: cebear.com (was braindeer.org)
+  // Make sure in Google Cloud Console → Credentials → OAuth 2.0:
+  //   Authorized redirect URIs includes:
+  //     https://braindeer-backend.firebaseapp.com/__/auth/handler
+  //   Authorized JavaScript origins includes:
+  //     https://cebear.com
+  //     https://braindeer-backend.firebaseapp.com
+  // ═══════════════════════════════════════════════════════════════
+  const APP_URL = 'https://cebear.com/app.html';
+
   const params    = new URLSearchParams(window.location.search);
   const sessionId = params.get('session');
 
-  const sub  = document.getElementById('sub');
-  const dots = document.getElementById('dots');
+  const sub   = document.getElementById('sub');
+  const dots  = document.getElementById('dots');
   const errEl = document.getElementById('err');
-  const btn  = document.getElementById('btnGo');
+  const btn   = document.getElementById('btnGo');
 
-  function showError(msg) {
-    errEl.textContent = msg;
-    errEl.classList.add('show');
-    dots.classList.add('hidden');
-    sub.textContent = 'Something went wrong';
-    btn.classList.add('show');
-    btn.innerHTML = 'Try Again';
-  }
-
-  function showLoading(msg) {
-    errEl.classList.remove('show');
-    dots.classList.remove('hidden');
-    btn.classList.remove('show');
-    sub.textContent = msg;
-  }
-
-  function showButton(msg) {
-    dots.classList.add('hidden');
-    sub.textContent = msg;
-    btn.classList.add('show');
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  FLOW (iOS standalone PWA → Safari bridge):
-  //
-  //  1. auth.html detects iOS standalone, redirects here with ?session=ID
-  //     (this opens in Safari, escaping the sandboxed WKWebView)
-  //  2. We store sessionId in sessionStorage for persistence across redirect
-  //  3. User taps "Continue with Google" → signInWithRedirect kicks off
-  //  4. Google auth completes, Safari redirects back to this page
-  //  5. getRedirectResult() picks up the credential + idToken
-  //  6. We write idToken to Firestore authSessions doc
-  //  7. Redirect to app.html?session=ID — app.html redeems it
-  // ═══════════════════════════════════════════════════════════════════════
+  function showError(msg) { errEl.textContent = msg; errEl.classList.add('show'); dots.classList.add('hidden'); sub.textContent = 'Something went wrong'; btn.classList.add('show'); btn.innerHTML = 'Try Again'; }
+  function showLoading(msg) { errEl.classList.remove('show'); dots.classList.remove('hidden'); btn.classList.remove('show'); sub.textContent = msg; }
+  function showButton(msg) { dots.classList.add('hidden'); sub.textContent = msg; btn.classList.add('show'); }
 
   // Store session ID so it survives the Google redirect round-trip
-  if (sessionId) {
-    sessionStorage.setItem('bd_session', sessionId);
-  }
+  if (sessionId) sessionStorage.setItem('bd_session', sessionId);
   const activeSession = sessionId || sessionStorage.getItem('bd_session');
 
-  if (!activeSession) {
-    showError('Missing session — please go back to BrainDeer and try again.');
-  }
+  if (!activeSession) showError('Missing session — please go back to Cebear and try again.');
 
-  // ── Check if returning from Google redirect ──────────────────────────
+  // Check if returning from Google redirect
   getRedirectResult(auth).then(async (result) => {
     if (!result || !result.user) {
-      // First visit — no redirect result yet. Show button.
-      if (activeSession) {
-        showButton('Tap below to sign in with Google');
-      }
+      if (activeSession) showButton('Tap below to sign in with Google');
       return;
     }
 
-    // ── We have a result! Extract idToken ─────────────────────────────
     showLoading('Signed in! Returning to app…');
 
     const credential = GoogleAuthProvider.credentialFromResult(result);
     const idToken = credential ? credential.idToken : null;
 
-    if (!idToken) {
-      showError('Could not get Google token. Please try again.');
-      return;
-    }
+    if (!idToken) { showError('Could not get Google token. Please try again.'); return; }
 
     const sid = activeSession;
-    if (!sid) {
-      showError('Session lost. Please go back to BrainDeer and try again.');
-      return;
-    }
+    if (!sid) { showError('Session lost. Please go back to Cebear and try again.'); return; }
 
     try {
-      // Write the session doc so app.html can redeem it
       const sessionRef = doc(db, 'authSessions', sid);
       await setDoc(sessionRef, {
-        idToken:     idToken,
-        createdAt:   serverTimestamp(),
-        expiresAt:   new Date(Date.now() + 5 * 60 * 1000),
-        used:        false,
-        completedAt: serverTimestamp()
+        idToken, createdAt: serverTimestamp(),
+        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+        used: false, completedAt: serverTimestamp()
       });
 
-      // Sign out of Safari so there's no stale auth
       await auth.signOut();
       sessionStorage.removeItem('bd_session');
 
-      // Send user back — app.html picks up ?session= and signs in
-      window.location.href = 'https://braindeer.org/app.html?session=' + sid;
+      // *** THE FIX: redirect to cebear.com, not braindeer.org ***
+      window.location.href = APP_URL + '?session=' + sid;
 
     } catch (e) {
       console.error('Firestore write failed:', e);
@@ -199,17 +153,11 @@
 
   }).catch((e) => {
     console.error('getRedirectResult error:', e);
-    if (activeSession) {
-      showButton('Tap below to sign in with Google');
-    }
+    if (activeSession) showButton('Tap below to sign in with Google');
   });
 
-  // ── Button handler → signInWithRedirect ──────────────────────────────
   window.doRedirect = function() {
-    if (!activeSession) {
-      showError('Missing session. Go back to BrainDeer and try again.');
-      return;
-    }
+    if (!activeSession) { showError('Missing session. Go back to Cebear and try again.'); return; }
     showLoading('Redirecting to Google…');
     signInWithRedirect(auth, gp).catch((e) => {
       console.error('Redirect failed:', e);
@@ -217,6 +165,5 @@
     });
   };
 </script>
-
 </body>
 </html>
