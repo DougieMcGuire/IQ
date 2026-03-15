@@ -59,17 +59,154 @@
 <script>
 firebase.initializeApp({apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend",storageBucket:"braindeer-backend.firebasestorage.app",messagingSenderId:"331205139765",appId:"1:331205139765:web:20cfef8194af63fc55c07c",measurementId:"G-9B6885G0X0"});
 var WORKER_URL='https://cebear.com/api/redeem-install-token';
+
 function showNav(s){document.body.classList.toggle('has-nav',s)}
 function updateNavActive(p){document.querySelectorAll('#nav .nb').forEach(b=>b.classList.toggle('active',b.dataset.page===p))}
-window.addEventListener('message',function(e){if(!e.data?.type)return;var t=e.data.type;if(t==='authSuccess')return goTo('improve');if(t==='googleRedirect')return void(location.href='google-redirect.html');if(t==='savePushSub')firebase.auth().onAuthStateChanged(u=>{if(u)firebase.firestore().collection('pushSubscriptions').doc(u.uid).set({subscription:e.data.sub,uid:u.uid,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{})});if(t==='tasksUpdated'){var f=document.querySelector('#screen-tasks iframe');f?.contentWindow?.postMessage({type:'tasksUpdated'},'*')}if(t==='xpAwarded'){var f2=document.querySelector('#screen-improve iframe');f2?.contentWindow?.postMessage({type:'xpAwarded',xp:e.data.xp},'*')}});
+
+/* ══ GUEST WALL NAV INTERCEPTION ══
+   For pages that should show the guest wall instead of navigating,
+   we ask the improve iframe first. If it handles it, we bail.
+   Only applies when user is NOT authed and NOT standalone.        */
+var _isAuthed=false;
+firebase.auth().onAuthStateChanged(function(u){_isAuthed=!!u});
+
+var isStandalone=!!(('standalone' in navigator&&navigator.standalone)||window.matchMedia('(display-mode: standalone)').matches);
+
+function tryGuestWall(page){
+  // Standalone always navigates normally
+  if(isStandalone)return false;
+  // If authed, navigate normally
+  if(_isAuthed)return false;
+  // Only intercept these three pages
+  if(page!=='profile'&&page!=='tasks'&&page!=='leaderboard')return false;
+  // Ask the improve iframe to show its guest wall
+  try{
+    var improveFrame=document.querySelector('#screen-improve iframe');
+    if(improveFrame&&improveFrame.contentWindow&&typeof improveFrame.contentWindow.showGuestWallForNav==='function'){
+      return improveFrame.contentWindow.showGuestWallForNav(page);
+    }
+  }catch(err){}
+  // Improve iframe not ready yet — fall back to navigating to auth
+  goTo('auth');
+  return true;
+}
+
+window.addEventListener('message',function(e){
+  if(!e.data?.type)return;
+  var t=e.data.type;
+  if(t==='authSuccess'){
+    _isAuthed=true;
+    // If we're currently sitting on auth screen, go to improve
+    if(currentScreen==='auth')goTo('improve');
+    return;
+  }
+  if(t==='googleRedirect')return void(location.href='google-redirect.html');
+  if(t==='savePushSub')firebase.auth().onAuthStateChanged(function(u){if(u)firebase.firestore().collection('pushSubscriptions').doc(u.uid).set({subscription:e.data.sub,uid:u.uid,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){})});
+  if(t==='tasksUpdated'){var f=document.querySelector('#screen-tasks iframe');f&&f.contentWindow&&f.contentWindow.postMessage({type:'tasksUpdated'},'*')}
+  if(t==='xpAwarded'){var f2=document.querySelector('#screen-improve iframe');f2&&f2.contentWindow&&f2.contentWindow.postMessage({type:'xpAwarded',xp:e.data.xp},'*')}
+});
+
 var currentScreen=null,screensLoaded={};
-window.goTo=function(page){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));if((page==='profile'||page==='leaderboard')&&screensLoaded[page]){document.querySelector('#screen-'+page+' iframe')?.remove();screensLoaded[page]=false}if(!screensLoaded[page]){var c=document.getElementById('screen-'+page);if(!c)return;var f=document.createElement('iframe');f.src=page+'.html';f.allow='web-share';c.appendChild(f);screensLoaded[page]=true}document.getElementById('screen-'+page)?.classList.add('active');currentScreen=page;showNav(page!=='auth');updateNavActive(page);var sp=document.getElementById('splash');if(sp&&!sp.classList.contains('hide')){sp.classList.add('hide');setTimeout(()=>sp.parentNode&&sp.remove(),400)}};
+
+window.goTo=function(page){
+  // Intercept guest nav attempts before doing anything
+  if(tryGuestWall(page))return;
+
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+
+  // Always reload profile + leaderboard (they pull live data)
+  if((page==='profile'||page==='leaderboard')&&screensLoaded[page]){
+    var old=document.querySelector('#screen-'+page+' iframe');
+    if(old)old.remove();
+    screensLoaded[page]=false;
+  }
+
+  if(!screensLoaded[page]){
+    var c=document.getElementById('screen-'+page);
+    if(!c)return;
+    var f=document.createElement('iframe');
+    f.src=page+'.html';
+    f.allow='web-share';
+    c.appendChild(f);
+    screensLoaded[page]=true;
+  }
+
+  var sc=document.getElementById('screen-'+page);
+  if(sc)sc.classList.add('active');
+  currentScreen=page;
+  showNav(page!=='auth');
+  updateNavActive(page);
+
+  // Dismiss splash on first navigation
+  var sp=document.getElementById('splash');
+  if(sp&&!sp.classList.contains('hide')){sp.classList.add('hide');setTimeout(function(){sp.parentNode&&sp.remove()},400)}
+};
+
 window.authCheck=function(){};
-function ensureUser(u){var r=firebase.firestore().collection('users').doc(u.uid);return r.get().then(s=>s.exists?r.set({lastSeen:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}):r.set({uid:u.uid,email:u.email,username:u.displayName||null,pic:u.photoURL||null,createdAt:firebase.firestore.FieldValue.serverTimestamp(),lastSeen:firebase.firestore.FieldValue.serverTimestamp()}))}
-function generateInstallToken(){var u=firebase.auth().currentUser;if(!u)return Promise.resolve(null);var t=Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2)+Date.now().toString(36);return firebase.firestore().collection('installTokens').doc(t).set({uid:u.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp(),expiresAt:new Date(Date.now()+600000),used:false}).then(()=>t).catch(()=>null)}
-function redeemSessionToken(sid){return firebase.firestore().collection('authSessions').doc(sid).get().then(s=>{if(!s.exists)throw'nf';var d=s.data();if(d.used)throw'u';var exp=d.expiresAt?.toDate?d.expiresAt.toDate():new Date(d.expiresAt);if(new Date()>exp)throw'e';s.ref.update({used:true});return firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(d.idToken))})}
-(function(){localStorage.removeItem('iq_guest');var p=new URLSearchParams(location.search),tT=p.get('t'),sI=p.get('session');if(tT||sI)history.replaceState({},'',location.pathname);var gT=sessionStorage.getItem('bd_gis_token');if(gT){sessionStorage.removeItem('bd_gis_token');firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(gT)).then(r=>ensureUser(r.user)).then(()=>goTo('improve')).catch(()=>nb());return}if(sI)redeemSessionToken(sI).then(()=>nb()).catch(()=>nb());else if(tT)fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tT})}).then(r=>r.ok?r.json():null).then(b=>{if(b?.customToken)return firebase.auth().signInWithCustomToken(b.customToken).then(()=>location.reload());nb()}).catch(()=>nb());else nb();function nb(){var unsub=firebase.auth().onAuthStateChanged(u=>{unsub();goTo(u?'improve':'auth')})}})();
-var deferredPrompt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e});window.triggerInstall=function(){deferredPrompt?.prompt()};
+
+function ensureUser(u){
+  var r=firebase.firestore().collection('users').doc(u.uid);
+  return r.get().then(function(s){
+    return s.exists
+      ?r.set({lastSeen:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})
+      :r.set({uid:u.uid,email:u.email,username:u.displayName||null,pic:u.photoURL||null,createdAt:firebase.firestore.FieldValue.serverTimestamp(),lastSeen:firebase.firestore.FieldValue.serverTimestamp()});
+  });
+}
+
+function generateInstallToken(){
+  var u=firebase.auth().currentUser;
+  if(!u)return Promise.resolve(null);
+  var t=Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2)+Date.now().toString(36);
+  return firebase.firestore().collection('installTokens').doc(t).set({uid:u.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp(),expiresAt:new Date(Date.now()+600000),used:false}).then(function(){return t}).catch(function(){return null});
+}
+
+function redeemSessionToken(sid){
+  return firebase.firestore().collection('authSessions').doc(sid).get().then(function(s){
+    if(!s.exists)throw'nf';
+    var d=s.data();
+    if(d.used)throw'u';
+    var exp=d.expiresAt?.toDate?d.expiresAt.toDate():new Date(d.expiresAt);
+    if(new Date()>exp)throw'e';
+    s.ref.update({used:true});
+    return firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(d.idToken));
+  });
+}
+
+(function(){
+  localStorage.removeItem('iq_guest');
+  var p=new URLSearchParams(location.search),tT=p.get('t'),sI=p.get('session');
+  if(tT||sI)history.replaceState({},'',location.pathname);
+  var gT=sessionStorage.getItem('bd_gis_token');
+  if(gT){
+    sessionStorage.removeItem('bd_gis_token');
+    firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(gT))
+      .then(function(r){return ensureUser(r.user)})
+      .then(function(){goTo('improve')})
+      .catch(function(){nb()});
+    return;
+  }
+  if(sI)redeemSessionToken(sI).then(function(){nb()}).catch(function(){nb()});
+  else if(tT)fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tT})})
+    .then(function(r){return r.ok?r.json():null})
+    .then(function(b){
+      if(b?.customToken)return firebase.auth().signInWithCustomToken(b.customToken).then(function(){location.reload()});
+      nb();
+    })
+    .catch(function(){nb()});
+  else nb();
+
+  function nb(){
+    var unsub=firebase.auth().onAuthStateChanged(function(u){
+      unsub();
+      _isAuthed=!!u;
+      goTo(u?'improve':'improve'); // always start on improve — guest wall handles auth prompts
+    });
+  }
+})();
+
+var deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e});
+window.triggerInstall=function(){deferredPrompt&&deferredPrompt.prompt()};
 </script>
 </body>
 </html>
