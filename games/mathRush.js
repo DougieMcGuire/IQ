@@ -41,7 +41,7 @@
         '<div class="mr-score" id="mr-score-' + idx + '"></div>' +
         '<div class="mr-progress" id="mr-progress-' + idx + '"></div>' +
         '<div class="explanation" id="exp-' + idx + '"></div>' +
-        '<div class="branding">braindeer.org</div>' +
+        '<div class="branding">cebear.com</div>' +
         '</div>';
     },
     attach: function (slideEl, q, idx, ctx) {
