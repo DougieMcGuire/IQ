@@ -5,20 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#3a2918">
-  <title>BrainDeer</title>
+  <meta name="theme-color" content="#1b2d5b">
+  <title>Cebear</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{background:#3a2918;font-family:'Nunito',sans-serif;color:#f0e2cc;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
-    .mascot{font-size:52px;animation:bob 1.2s ease-in-out infinite}
-    .title{font-size:22px;font-weight:900;margin:10px 0 6px}
-    .sub{font-size:14px;font-weight:700;color:#c2a476;margin-bottom:20px;max-width:300px;line-height:1.5}
+    body{background:#1b2d5b;font-family:'Nunito',sans-serif;color:#F0EAD6;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,20px) + 10px) 24px calc(env(safe-area-inset-bottom,20px) + 10px);text-align:center}
+    .logo{width:64px;height:64px;margin-bottom:8px;animation:bob 1.2s ease-in-out infinite}
+    .logo img{width:100%;height:100%;object-fit:contain}
+    .title{font-size:22px;font-weight:900;margin-bottom:6px}
+    .sub{font-size:14px;font-weight:700;color:rgba(240,234,214,.45);margin-bottom:20px;max-width:300px;line-height:1.5}
     .dots{display:flex;gap:6px;justify-content:center;margin-bottom:16px}
-    .dots span{width:8px;height:8px;border-radius:50%;background:#6b4f32;animation:dotPulse 1s ease infinite}
+    .dots span{width:8px;height:8px;border-radius:50%;background:rgba(240,234,214,.15);animation:dotPulse 1s ease infinite}
     .dots span:nth-child(2){animation-delay:.15s}
     .dots span:nth-child(3){animation-delay:.3s}
-    .btn-back{padding:10px 24px;border:2px solid #6b4f32;border-radius:12px;background:transparent;color:#c2a476;font-size:14px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:12px}
+    .btn-back{padding:10px 24px;border:2px solid rgba(240,234,214,.12);border-radius:12px;background:transparent;color:rgba(240,234,214,.4);font-size:14px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:12px}
     .btn-back:active{opacity:.7}
     .hidden{display:none!important}
     @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -26,11 +27,11 @@
   </style>
 </head>
 <body>
-<div class="mascot">🦌</div>
-<div class="title">BrainDeer</div>
+<div class="logo"><img src="logo.png" alt="Cebear"></div>
+<div class="title">Cebear</div>
 <div class="sub" id="sub">Choose your Google account</div>
 <div class="dots hidden" id="dots"><span></span><span></span><span></span></div>
-<button class="btn-back" id="btnBack" onclick="window.location.replace('app.html')">← Back</button>
+<button class="btn-back" id="btnBack" onclick="window.location.replace('app.html')">Back</button>
 
 <script>
   window.handleGISCredential = function(response) {
