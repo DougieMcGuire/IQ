@@ -3,340 +3,118 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="BrainDeer — Train your brain with endless puzzles, brainteasers, and cognitive challenges. Track your IQ, compete on leaderboards, and build daily streaks.">
-  <meta name="theme-color" content="#3a2918">
+  <meta name="description" content="Cebear — Train your brain with endless puzzles, brainteasers, and cognitive challenges. Track your IQ, compete on leaderboards, and build daily streaks.">
+  <meta name="theme-color" content="#1b2d5b">
   <link rel="manifest" href="manifest.json">
-  <title>BrainDeer — Train Your Brain Daily</title>
+  <title>Cebear — Train Your Brain Daily</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #2c1e10; --bg2: #3a2918; --card: #4a3625; --card2: #5a4232;
-      --cream: #f0e2cc; --tan: #c2a476; --mid: #6b4f32; --light: #8f6b4a;
-      --green: #58cc02; --greend: #46a302; --amber: #ffb020;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg); color: var(--cream);
-      font-family: 'Nunito', sans-serif; overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── Grain overlay ── */
-    body::after {
-      content: ''; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
-      opacity: .03;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    }
-
-    /* ── Hero ── */
-    .hero {
-      min-height: 100vh; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; text-align: center;
-      padding: 60px 24px 80px;
-      background:
-        radial-gradient(ellipse at 50% 0%, rgba(90,66,50,.6) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 80%, rgba(88,204,2,.06) 0%, transparent 40%),
-        var(--bg);
-      position: relative;
-    }
-    .hero-mascot {
-      font-size: 96px; line-height: 1; margin-bottom: 8px;
-      filter: drop-shadow(0 8px 0 rgba(0,0,0,.3));
-      animation: heroFloat 3s ease-in-out infinite;
-    }
-    @keyframes heroFloat {
-      0%,100% { transform: translateY(0) rotate(-2deg); }
-      50% { transform: translateY(-12px) rotate(2deg); }
-    }
-    .hero h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(42px, 8vw, 72px); font-weight: 900;
-      line-height: 1.05; margin-bottom: 12px;
-      text-shadow: 0 4px 0 rgba(0,0,0,.2);
-    }
-    .hero h1 .accent { color: var(--green); }
-    .hero-sub {
-      font-size: clamp(16px, 3vw, 20px); font-weight: 700;
-      color: var(--tan); max-width: 520px; line-height: 1.6; margin-bottom: 36px;
-    }
-    .btn-cta {
-      display: inline-flex; align-items: center; gap: 10px;
-      padding: 18px 44px; border: none; border-radius: 16px;
-      background: var(--green); color: #fff;
-      font-size: 18px; font-weight: 900; font-family: 'Nunito', sans-serif;
-      text-transform: uppercase; letter-spacing: .5px;
-      text-decoration: none; cursor: pointer;
-      box-shadow: 0 6px 0 var(--greend);
-      transition: transform .12s, box-shadow .12s;
-    }
-    .btn-cta:active { transform: translateY(5px); box-shadow: 0 1px 0 var(--greend); }
-    .btn-cta:hover { filter: brightness(1.05); }
-    .btn-cta svg { width: 20px; height: 20px; }
-
-    .scroll-hint {
-      position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
-      font-size: 13px; font-weight: 700; color: var(--mid);
-      animation: scrollBounce 2s ease infinite;
-    }
-    @keyframes scrollBounce { 0%,100%{ transform: translateX(-50%) translateY(0); } 50%{ transform: translateX(-50%) translateY(6px); } }
-
-    /* ── Sections ── */
-    section { padding: 80px 24px; }
-    .container { max-width: 960px; margin: 0 auto; }
-
-    /* ── Features ── */
-    .features { background: var(--bg2); }
-    .section-label {
-      font-size: 12px; font-weight: 800; color: var(--green);
-      text-transform: uppercase; letter-spacing: 2px; text-align: center;
-      margin-bottom: 8px;
-    }
-    .section-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(28px, 5vw, 42px); font-weight: 900;
-      text-align: center; margin-bottom: 48px;
-      text-shadow: 0 3px 0 rgba(0,0,0,.15);
-    }
-    .features-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
-    }
-    .feature-card {
-      background: var(--card); border-radius: 20px; padding: 28px 24px;
-      box-shadow: 0 6px 0 rgba(0,0,0,.15);
-      transition: transform .2s;
-      position: relative; overflow: hidden;
-    }
-    .feature-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
-      background: linear-gradient(180deg, rgba(255,255,255,.03) 0%, transparent 100%);
-      border-radius: 20px 20px 0 0; pointer-events: none;
-    }
-    .feature-card:hover { transform: translateY(-3px); }
-    .feature-icon { font-size: 36px; margin-bottom: 12px; display: block; }
-    .feature-card h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
-    .feature-card p { font-size: 14px; font-weight: 600; color: var(--tan); line-height: 1.6; }
-
-    /* ── How it works ── */
-    .how { background: var(--bg); }
-    .steps {
-      display: flex; flex-direction: column; gap: 28px;
-      max-width: 600px; margin: 0 auto;
-    }
-    .step {
-      display: flex; gap: 20px; align-items: flex-start;
-    }
-    .step-num {
-      width: 48px; height: 48px; flex-shrink: 0;
-      background: var(--card); border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px; font-weight: 900; color: var(--green);
-      box-shadow: 0 4px 0 rgba(0,0,0,.15);
-    }
-    .step-text h3 { font-size: 17px; font-weight: 800; margin-bottom: 4px; }
-    .step-text p { font-size: 14px; font-weight: 600; color: var(--tan); line-height: 1.5; }
-
-    /* ── Stats bar ── */
-    .stats {
-      background: var(--card); padding: 48px 24px;
-    }
-    .stats-grid {
-      display: flex; justify-content: center; gap: 48px; flex-wrap: wrap;
-      max-width: 700px; margin: 0 auto;
-    }
-    .stat { text-align: center; }
-    .stat-num {
-      font-family: 'Playfair Display', serif;
-      font-size: 40px; font-weight: 900; color: var(--green);
-      line-height: 1;
-    }
-    .stat-label { font-size: 13px; font-weight: 700; color: var(--tan); margin-top: 4px; }
-
-    /* ── CTA ── */
-    .cta-section {
-      background:
-        radial-gradient(ellipse at 50% 100%, rgba(88,204,2,.08) 0%, transparent 50%),
-        var(--bg2);
-      text-align: center; padding: 80px 24px 100px;
-    }
-    .cta-section .section-title { margin-bottom: 16px; }
-    .cta-sub {
-      font-size: 16px; font-weight: 700; color: var(--tan);
-      margin-bottom: 32px; max-width: 440px; margin-left: auto; margin-right: auto;
-      line-height: 1.6;
-    }
-
-    /* ── Footer ── */
-    footer {
-      background: var(--bg); padding: 32px 24px;
-      text-align: center; border-top: 2px solid var(--mid);
-    }
-    .footer-links { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 12px; }
-    .footer-links a { color: var(--tan); font-size: 14px; font-weight: 700; text-decoration: none; transition: color .2s; }
-    .footer-links a:hover { color: var(--cream); }
-    .footer-copy { font-size: 12px; font-weight: 600; color: var(--mid); }
-
-    /* ── Animations ── */
-    .reveal {
-      opacity: 0; transform: translateY(24px);
-      transition: opacity .5s ease, transform .5s ease;
-    }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
+    :root{--bg:#1b2d5b;--bg2:#243a6e;--card:rgba(240,234,214,.06);--card2:rgba(240,234,214,.1);--cream:#F0EAD6;--tan:rgba(240,234,214,.5);--mid:rgba(240,234,214,.12);--light:rgba(240,234,214,.35);--green:#3fba4f;--greend:#2d9a3c;--gold:#e8a817}
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--cream);font-family:'Nunito',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+    .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px 80px;background:radial-gradient(ellipse at 50% 0%,rgba(36,58,110,.8) 0%,transparent 60%),var(--bg);position:relative}
+    .hero-logo{width:96px;height:96px;margin-bottom:12px;animation:heroFloat 3s ease-in-out infinite}
+    .hero-logo img{width:100%;height:100%;object-fit:contain}
+    @keyframes heroFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-12px) rotate(2deg)}}
+    .hero h1{font-size:clamp(42px,8vw,72px);font-weight:900;line-height:1.05;margin-bottom:12px}
+    .hero h1 .accent{color:var(--green)}
+    .hero-sub{font-size:clamp(16px,3vw,20px);font-weight:700;color:var(--tan);max-width:520px;line-height:1.6;margin-bottom:36px}
+    .btn-cta{display:inline-flex;align-items:center;gap:10px;padding:18px 44px;border:none;border-radius:16px;background:var(--green);color:#fff;font-size:18px;font-weight:900;font-family:'Nunito',sans-serif;text-transform:uppercase;letter-spacing:.5px;text-decoration:none;cursor:pointer;box-shadow:0 4px 0 var(--greend);transition:transform .12s}
+    .btn-cta:active{transform:translateY(4px);box-shadow:none}
+    .btn-cta svg{width:20px;height:20px}
+    .scroll-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);font-size:13px;font-weight:700;color:var(--mid);animation:scrollBounce 2s ease infinite}
+    @keyframes scrollBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
+    section{padding:80px 24px}
+    .container{max-width:960px;margin:0 auto}
+    .features{background:var(--bg2)}
+    .section-label{font-size:12px;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:2px;text-align:center;margin-bottom:8px}
+    .section-title{font-size:clamp(28px,5vw,42px);font-weight:900;text-align:center;margin-bottom:48px}
+    .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+    .feature-card{background:var(--card);border-radius:20px;padding:28px 24px;transition:transform .2s;position:relative;overflow:hidden}
+    .feature-card:hover{transform:translateY(-3px)}
+    .feature-ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+    .feature-ic svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+    .fc-green{background:#3fba4f}.fc-blue{background:#3a7df2}.fc-gold{background:#e8a817}.fc-orange{background:#e87d1a}.fc-purple{background:#6d4aed}.fc-red{background:#e8443a}
+    .feature-card h3{font-size:18px;font-weight:800;margin-bottom:8px}
+    .feature-card p{font-size:14px;font-weight:600;color:var(--tan);line-height:1.6}
+    .how{background:var(--bg)}
+    .steps{display:flex;flex-direction:column;gap:28px;max-width:600px;margin:0 auto}
+    .step{display:flex;gap:20px;align-items:flex-start}
+    .step-num{width:48px;height:48px;flex-shrink:0;background:var(--card);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:var(--green)}
+    .step-text h3{font-size:17px;font-weight:800;margin-bottom:4px}
+    .step-text p{font-size:14px;font-weight:600;color:var(--tan);line-height:1.5}
+    .stats{background:rgba(240,234,214,.04);padding:48px 24px}
+    .stats-grid{display:flex;justify-content:center;gap:48px;flex-wrap:wrap;max-width:700px;margin:0 auto}
+    .stat{text-align:center}
+    .stat-num{font-size:40px;font-weight:900;color:var(--green);line-height:1}
+    .stat-label{font-size:13px;font-weight:700;color:var(--tan);margin-top:4px}
+    .cta-section{background:var(--bg2);text-align:center;padding:80px 24px 100px}
+    .cta-section .section-title{margin-bottom:16px}
+    .cta-sub{font-size:16px;font-weight:700;color:var(--tan);margin-bottom:32px;max-width:440px;margin-left:auto;margin-right:auto;line-height:1.6}
+    footer{background:var(--bg);padding:32px 24px;text-align:center;border-top:1px solid var(--mid)}
+    .footer-links{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:12px}
+    .footer-links a{color:var(--tan);font-size:14px;font-weight:700;text-decoration:none;transition:color .2s}
+    .footer-links a:hover{color:var(--cream)}
+    .footer-copy{font-size:12px;font-weight:600;color:var(--light)}
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity .5s ease,transform .5s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}
   </style>
 </head>
 <body>
-
-<!-- ═══════════════════ HERO ═══════════════════ -->
 <section class="hero">
-  <div class="hero-mascot">🦌</div>
-  <h1>Brain<span class="accent">Deer</span></h1>
+  <div class="hero-logo"><img src="logo.png" alt="Cebear"></div>
+  <h1>Ce<span class="accent">bear</span></h1>
   <p class="hero-sub">Endless brainteasers and cognitive challenges that sharpen your mind. Watch your IQ rise in real time.</p>
-  <a href="/app" class="btn-cta">
-    Open BrainDeer
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-  </a>
+  <a href="/app" class="btn-cta">Open Cebear <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
   <div class="scroll-hint">Scroll to learn more ↓</div>
 </section>
 
-<!-- ═══════════════════ FEATURES ═══════════════════ -->
-<section class="features">
-  <div class="container">
-    <div class="section-label reveal">What's inside</div>
-    <h2 class="section-title reveal">Your daily brain workout</h2>
-    <div class="features-grid">
-      <div class="feature-card reveal">
-        <span class="feature-icon">🧩</span>
-        <h3>Endless Brainteasers</h3>
-        <p>Pattern recognition, logic puzzles, spatial reasoning, math challenges, and more — procedurally generated so you never run out.</p>
-      </div>
-      <div class="feature-card reveal">
-        <span class="feature-icon">📈</span>
-        <h3>Live IQ Tracking</h3>
-        <p>Your cognitive profile updates after every challenge. Watch your scores rise across eight categories including memory, logic, and speed.</p>
-      </div>
-      <div class="feature-card reveal">
-        <span class="feature-icon">🏆</span>
-        <h3>Leaderboards</h3>
-        <p>Compete against other players and climb the global rankings. See where you stand among thousands of brain trainers.</p>
-      </div>
-      <div class="feature-card reveal">
-        <span class="feature-icon">🔥</span>
-        <h3>Daily Streaks &amp; Tasks</h3>
-        <p>Complete daily challenges to build your streak and earn XP. Consistency is the key to real cognitive growth.</p>
-      </div>
-      <div class="feature-card reveal">
-        <span class="feature-icon">👤</span>
-        <h3>Your Profile</h3>
-        <p>A personal dashboard showing your IQ trajectory, category breakdowns, and performance history over time.</p>
-      </div>
-      <div class="feature-card reveal">
-        <span class="feature-icon">📱</span>
-        <h3>Works Everywhere</h3>
-        <p>Play instantly in your browser or install as an app on your phone. No downloads, no app store — just tap and train.</p>
-      </div>
-    </div>
+<section class="features"><div class="container">
+  <div class="section-label reveal">What's inside</div>
+  <h2 class="section-title reveal">Your daily brain workout</h2>
+  <div class="features-grid">
+    <div class="feature-card reveal"><div class="feature-ic fc-green"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><h3>Endless Brainteasers</h3><p>Pattern recognition, logic puzzles, spatial reasoning, math challenges, and more — procedurally generated so you never run out.</p></div>
+    <div class="feature-card reveal"><div class="feature-ic fc-blue"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div><h3>Live IQ Tracking</h3><p>Your cognitive profile updates after every challenge. Watch your scores rise across eight categories including memory, logic, and speed.</p></div>
+    <div class="feature-card reveal"><div class="feature-ic fc-gold"><svg viewBox="0 0 24 24"><path d="M6 9H2v12h4V9z"/><path d="M14 4h-4v17h4V4z"/><path d="M22 13h-4v8h4v-8z"/></svg></div><h3>Leaderboards</h3><p>Compete against other players and climb the global rankings. See where you stand among thousands of brain trainers.</p></div>
+    <div class="feature-card reveal"><div class="feature-ic fc-orange"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><h3>Daily Streaks & Tasks</h3><p>Complete daily challenges to build your streak and earn XP. Consistency is the key to real cognitive growth.</p></div>
+    <div class="feature-card reveal"><div class="feature-ic fc-purple"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg></div><h3>Your Profile</h3><p>A personal dashboard showing your IQ trajectory, category breakdowns, and performance history over time.</p></div>
+    <div class="feature-card reveal"><div class="feature-ic fc-red"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><h3>Works Everywhere</h3><p>Play instantly in your browser or install as an app on your phone. No downloads, no app store — just tap and train.</p></div>
   </div>
-</section>
+</div></section>
 
-<!-- ═══════════════════ HOW IT WORKS ═══════════════════ -->
-<section class="how">
-  <div class="container">
-    <div class="section-label reveal">Getting started</div>
-    <h2 class="section-title reveal">How BrainDeer works</h2>
-    <div class="steps">
-      <div class="step reveal">
-        <div class="step-num">1</div>
-        <div class="step-text">
-          <h3>Create your account</h3>
-          <p>Sign up with Google or email in seconds. No credit card, no commitment — just start training.</p>
-        </div>
-      </div>
-      <div class="step reveal">
-        <div class="step-num">2</div>
-        <div class="step-text">
-          <h3>Solve daily challenges</h3>
-          <p>Swipe through a feed of visual puzzles and brainteasers tailored to your level. Each one tests a different cognitive skill.</p>
-        </div>
-      </div>
-      <div class="step reveal">
-        <div class="step-num">3</div>
-        <div class="step-text">
-          <h3>Track your progress</h3>
-          <p>Your IQ profile updates in real time as you play. See exactly which skills are improving and where to focus next.</p>
-        </div>
-      </div>
-      <div class="step reveal">
-        <div class="step-num">4</div>
-        <div class="step-text">
-          <h3>Compete &amp; climb</h3>
-          <p>Check the leaderboard to see how you rank. Complete daily tasks to maintain your streak and earn bonus XP.</p>
-        </div>
-      </div>
-    </div>
+<section class="how"><div class="container">
+  <div class="section-label reveal">Getting started</div>
+  <h2 class="section-title reveal">How Cebear works</h2>
+  <div class="steps">
+    <div class="step reveal"><div class="step-num">1</div><div class="step-text"><h3>Create your account</h3><p>Sign up with Google or email in seconds. No credit card, no commitment — just start training.</p></div></div>
+    <div class="step reveal"><div class="step-num">2</div><div class="step-text"><h3>Solve daily challenges</h3><p>Swipe through a feed of visual puzzles and brainteasers tailored to your level. Each one tests a different cognitive skill.</p></div></div>
+    <div class="step reveal"><div class="step-num">3</div><div class="step-text"><h3>Track your progress</h3><p>Your IQ profile updates in real time as you play. See exactly which skills are improving and where to focus next.</p></div></div>
+    <div class="step reveal"><div class="step-num">4</div><div class="step-text"><h3>Compete & climb</h3><p>Check the leaderboard to see how you rank. Complete daily tasks to maintain your streak and earn bonus XP.</p></div></div>
   </div>
-</section>
+</div></section>
 
-<!-- ═══════════════════ STATS ═══════════════════ -->
-<section class="stats">
-  <div class="stats-grid">
-    <div class="stat reveal">
-      <div class="stat-num">26+</div>
-      <div class="stat-label">Question types</div>
-    </div>
-    <div class="stat reveal">
-      <div class="stat-num">8</div>
-      <div class="stat-label">Cognitive categories</div>
-    </div>
-    <div class="stat reveal">
-      <div class="stat-num">5</div>
-      <div class="stat-label">Difficulty levels</div>
-    </div>
-    <div class="stat reveal">
-      <div class="stat-num">∞</div>
-      <div class="stat-label">Challenges generated</div>
-    </div>
-  </div>
-</section>
+<section class="stats"><div class="stats-grid">
+  <div class="stat reveal"><div class="stat-num">26+</div><div class="stat-label">Question types</div></div>
+  <div class="stat reveal"><div class="stat-num">8</div><div class="stat-label">Cognitive categories</div></div>
+  <div class="stat reveal"><div class="stat-num">5</div><div class="stat-label">Difficulty levels</div></div>
+  <div class="stat reveal"><div class="stat-num">∞</div><div class="stat-label">Challenges generated</div></div>
+</div></section>
 
-<!-- ═══════════════════ BOTTOM CTA ═══════════════════ -->
 <section class="cta-section">
   <div class="section-label reveal">Free to play</div>
   <h2 class="section-title reveal">Ready to train your brain?</h2>
-  <p class="cta-sub reveal">Join BrainDeer and start improving your cognitive abilities today. It takes 30 seconds to get started.</p>
-  <a href="/app" class="btn-cta reveal">
-    Start Training
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-  </a>
+  <p class="cta-sub reveal">Join Cebear and start improving your cognitive abilities today. It takes 30 seconds to get started.</p>
+  <a href="/app" class="btn-cta reveal">Start Training <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
 </section>
 
-<!-- ═══════════════════ FOOTER ═══════════════════ -->
-<footer>
-  <div class="footer-links">
-    <a href="about.html">About</a>
-    <a href="privacy.html">Privacy Policy</a>
-    <a href="contact.html">Contact</a>
-    <a href="/app">Open App</a>
-  </div>
-  <div class="footer-copy">© 2025 BrainDeer. All rights reserved.</div>
-</footer>
+<footer><div class="footer-links"><a href="about.html">About</a><a href="privacy.html">Privacy Policy</a><a href="contact.html">Contact</a><a href="/app">Open App</a></div><div class="footer-copy">© 2026 Cebear. All rights reserved.</div></footer>
 
-<!-- ═══════════════════ SCROLL REVEAL ═══════════════════ -->
 <script>
-  var reveals = document.querySelectorAll('.reveal');
-  var observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.15 });
-  reveals.forEach(function(el) { observer.observe(el); });
+var reveals=document.querySelectorAll('.reveal');
+var observer=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}})},{threshold:.15});
+reveals.forEach(function(el){observer.observe(el)});
 </script>
-
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7417896211953533"
-     crossorigin="anonymous"></script>
 </body>
 </html>
