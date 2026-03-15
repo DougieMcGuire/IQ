@@ -79,7 +79,7 @@
         '<div class="ws-source" id="ws-source-' + idx + '">' + scrTiles + '</div>' +
         '<div class="ws-status" id="ws-status-' + idx + '"></div>' +
         '<div class="explanation" id="exp-' + idx + '"></div>' +
-        '<div class="branding">braindeer.org</div>' +
+        '<div class="branding">cebear.com</div>' +
         '</div>';
     },
     attach: function (slideEl, q, idx, ctx) {
