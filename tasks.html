@@ -6,59 +6,82 @@
   <title>Tasks – Cebear</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#F0EAD6;--navy:#1b2d5b;--navyM:#243a6e;--cream:#F0EAD6;--card:#fff;--text:#1b2d5b;--dim:#6b7a9e;--light:#a0acc4;--green:#3fba4f;--gd:#2d9a3c;--red:#e8443a;--gold:#e8a817;--goldd:#c48e10;--orange:#e87d1a;--blue:#3a7df2;--purple:#6d4aed}
+    :root{--cream:#F0EAD6;--navy:#1b2d5b;--navyM:#243a6e;--card:#fff;--text:#1b2d5b;--dim:#6b7a9e;--light:#a0acc4;--green:#3fba4f;--gd:#2d9a3c;--red:#e8443a;--gold:#e8a817;--goldd:#c48e10;--orange:#e87d1a;--blue:#3a7df2;--purple:#6d4aed}
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-    html,body{width:100%;height:100dvh;overflow:hidden;font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text)}
+    html,body{width:100%;height:100dvh;overflow:hidden;font-family:'Nunito',sans-serif;background:var(--navy);color:var(--text)}
     .page{display:flex;flex-direction:column;height:100dvh}
-    /* ── Navy hero top ── */
-    .hero{background:var(--navy);padding:calc(env(safe-area-inset-top,20px) + 10px) 16px 28px;flex-shrink:0}
-    .hero-title{font-size:20px;font-weight:900;color:var(--cream);margin-bottom:12px}
-    .hero-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .hc{background:rgba(240,234,214,.08);border-radius:16px;padding:14px;display:flex;flex-direction:column;align-items:center;text-align:center}
-    .hc-ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:6px}
-    .hc-ic svg{width:18px;height:18px;stroke:var(--cream);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-    .hc-ic.ic-cl{background:var(--blue)}.hc-ic.ic-st{background:var(--orange)}
-    .hc-val{font-size:min(26px,6.5vw);font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:1px;line-height:1.1}
-    .hc-val.v-cl{color:var(--cream)}.hc-val.v-st{color:var(--gold)}
-    .hc-lbl{font-size:10px;font-weight:800;color:rgba(240,234,214,.4);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
 
-    /* ── Cream body ── */
-    .body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--cream);border-radius:24px 24px 0 0;margin-top:-16px;position:relative;z-index:1;padding:20px 16px 24px}
+    /* ══ CREAM TOP — hero section ══ */
+    .hero{background:var(--cream);padding:calc(env(safe-area-inset-top,20px) + 8px) 16px 0;flex-shrink:0}
+    .hero-inner{max-width:420px;margin:0 auto}
+    .hero-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .hero-title{font-size:22px;font-weight:900;color:var(--navy)}
+    .hero-countdown{display:flex;align-items:center;gap:6px;background:rgba(27,45,91,.06);border-radius:10px;padding:6px 12px}
+    .hero-countdown svg{width:14px;height:14px;stroke:var(--dim);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .hero-countdown .cd-time{font-size:14px;font-weight:900;color:var(--navy);font-variant-numeric:tabular-nums}
+
+    /* ── Streak + Progress side by side ── */
+    .hero-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+    .h-card{background:var(--card);border-radius:18px;padding:16px;display:flex;flex-direction:column;align-items:center;text-align:center}
+
+    /* Streak card */
+    .streak-num{font-size:min(42px,11vw);font-weight:900;color:var(--orange);line-height:1}
+    .streak-label{font-size:10px;font-weight:800;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+    .streak-pips{display:flex;gap:4px;margin-top:10px;width:100%;justify-content:center}
+    .streak-pip{flex:1;max-width:20px;height:5px;border-radius:3px;background:rgba(27,45,91,.06)}
+    .streak-pip.done{background:var(--green)}
+    .streak-pip.active{background:var(--orange)}
+
+    /* Progress ring card */
+    .prog-ring-wrap{position:relative;width:min(72px,18vw);height:min(72px,18vw);margin-bottom:4px}
+    .prog-ring{width:100%;height:100%;transform:rotate(-90deg)}
+    .prog-ring-bg{fill:none;stroke:rgba(27,45,91,.06);stroke-width:6}
+    .prog-ring-fill{fill:none;stroke:var(--green);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.34,1.56,.64,1)}
+    .prog-ring-fill.alldone{stroke:var(--gold)}
+    .prog-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:min(18px,4.5vw);font-weight:900;color:var(--navy)}
+
+    /* ══ NAVY BOTTOM — tasks, flows into nav ══ */
+    .body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--navy);border-radius:24px 24px 0 0;padding:20px 16px 24px;position:relative;z-index:1}
     .body::-webkit-scrollbar{display:none}
+    .body-inner{max-width:420px;margin:0 auto}
 
-    .prog{background:var(--card);border-radius:16px;padding:14px 16px;margin-bottom:12px}
-    .prog-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-    .prog-lbl{font-size:13px;font-weight:800}.prog-ct{font-size:14px;font-weight:900;color:var(--gold)}
-    .prog-bar{height:10px;background:rgba(27,45,91,.06);border-radius:5px;overflow:hidden}
-    .prog-fill{height:100%;border-radius:5px;background:var(--green);transition:width .6s cubic-bezier(.34,1.56,.64,1)}.prog-fill.done{background:var(--gold)}
-
+    /* Complete banner */
     .complete{display:none;background:var(--green);border-radius:16px;padding:14px 16px;margin-bottom:12px;align-items:center;gap:12px;color:#fff}
     .complete.show{display:flex;animation:popIn .5s cubic-bezier(.34,1.56,.64,1)}
     .complete-ic{width:40px;height:40px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .complete-ic svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-    .ct-title{font-size:15px;font-weight:900}.ct-sub{font-size:11px;font-weight:700;opacity:.85;margin-top:2px}
+    .ct-title{font-size:15px;font-weight:900}
+    .ct-sub{font-size:11px;font-weight:700;opacity:.85;margin-top:2px}
 
-    .sec-lbl{font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin:4px 0 8px}
+    .sec-lbl{font-size:10px;font-weight:900;color:rgba(240,234,214,.25);letter-spacing:2px;text-transform:uppercase;margin:0 0 10px}
 
-    .task{background:var(--card);border-radius:16px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;position:relative;overflow:hidden;transition:opacity .5s}
-    .task.claimed{opacity:.3}
-    .task.ready{border-left:4px solid var(--gold)}
-    .task-ic{width:42px;height:42px;background:rgba(27,45,91,.04);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .task-ic svg{width:20px;height:20px}
-    .task-ic.ic-done{background:rgba(63,186,79,.08)}
-    .task-right{flex:1;min-width:0}
-    .task-name{font-size:14px;font-weight:800;margin-bottom:4px;line-height:1.3;padding-right:70px}
-    .task-meta{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+    /* ── Task cards on navy ── */
+    .task{background:rgba(240,234,214,.06);border-radius:18px;padding:16px;margin-bottom:10px;position:relative;overflow:hidden;transition:opacity .5s}
+    .task.claimed{opacity:.25}
+    .task.ready{box-shadow:inset 0 0 0 1.5px var(--gold)}
+    .task-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+    .task-ic{width:44px;height:44px;background:rgba(240,234,214,.06);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .task-ic svg{width:22px;height:22px}
+    .task-ic.ic-done{background:rgba(63,186,79,.1)}
+    .task-info{flex:1;min-width:0}
+    .task-name{font-size:14px;font-weight:800;color:var(--cream);line-height:1.3}
+    .task-meta{display:flex;align-items:center;gap:8px;margin-top:3px}
     .task-xp{font-size:11px;font-weight:900;color:var(--gold);background:rgba(232,168,23,.1);padding:2px 8px;border-radius:6px}
-    .task-ct{font-size:11px;font-weight:800;color:var(--dim)}
-    .task-bar{height:6px;background:rgba(27,45,91,.06);border-radius:3px;overflow:hidden}
-    .task-fill{height:100%;border-radius:3px;background:var(--blue);transition:width .5s cubic-bezier(.34,1.56,.64,1)}.task-fill.tdone{background:var(--gold)}
-    .task-act{position:absolute;right:14px;top:50%;transform:translateY(-50%)}
-    .task-claim{background:var(--gold);color:var(--navy);border:none;border-radius:10px;padding:9px 14px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;cursor:pointer;box-shadow:0 3px 0 var(--goldd);transition:transform .1s;white-space:nowrap}
-    .task-claim:active:not(:disabled){transform:translateY(3px);box-shadow:none}.task-claim:disabled{opacity:.5;cursor:default}
-    .task-check{width:30px;height:30px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center}
-    .task-check svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+    .task-ct{font-size:11px;font-weight:800;color:rgba(240,234,214,.3)}
+    .task-bar{height:7px;background:rgba(240,234,214,.06);border-radius:4px;overflow:hidden}
+    .task-fill{height:100%;border-radius:4px;background:var(--blue);transition:width .5s cubic-bezier(.34,1.56,.64,1)}
+    .task-fill.tdone{background:var(--gold)}
+    /* Action row below the bar */
+    .task-action{display:flex;justify-content:flex-end;margin-top:10px}
+    .task-claim{background:var(--gold);color:var(--navy);border:none;border-radius:12px;padding:10px 20px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 3px 0 var(--goldd);transition:transform .1s;display:flex;align-items:center;gap:6px}
+    .task-claim:active:not(:disabled){transform:translateY(3px);box-shadow:none}
+    .task-claim:disabled{opacity:.5;cursor:default}
+    .task-claim svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5}
+    .task-check{display:flex;align-items:center;gap:6px;color:var(--green);font-size:13px;font-weight:900}
+    .task-check-circle{width:28px;height:28px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center}
+    .task-check-circle svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 
+    /* Toasts & confetti */
     .xp-toast{position:fixed;top:calc(env(safe-area-inset-top,20px) + 16px);left:50%;transform:translateX(-50%) translateY(-20px);background:var(--gold);color:var(--navy);border-radius:16px;padding:9px 22px;font-size:18px;font-weight:900;z-index:999;opacity:0;pointer-events:none;transition:opacity .25s,transform .35s cubic-bezier(.34,1.56,.64,1)}
     .xp-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .confetti{position:fixed;inset:0;pointer-events:none;z-index:800;overflow:hidden}
@@ -66,8 +89,8 @@
     .confetti i.fall{animation:cf 1.3s ease-out forwards}
     @keyframes popIn{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
     @keyframes cf{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(100vh) rotate(720deg)}}
-    .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:60px 20px;color:var(--dim);font-size:14px;font-weight:700}
-    .ld-spin{width:36px;height:36px;border:4px solid rgba(27,45,91,.08);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
+    .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:60px 20px;color:rgba(240,234,214,.3);font-size:14px;font-weight:700}
+    .ld-spin{width:36px;height:36px;border:4px solid rgba(240,234,214,.08);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
     @keyframes su{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
     .anim{animation:su .3s ease both}.d1{animation-delay:.04s}.d2{animation-delay:.08s}.d3{animation-delay:.12s}.d4{animation-delay:.16s}
@@ -75,18 +98,50 @@
 </head>
 <body>
 <div class="page">
+  <!-- ══ CREAM TOP ══ -->
   <div class="hero">
-    <div class="hero-title">Daily Tasks</div>
-    <div class="hero-row">
-      <div class="hc"><div class="hc-ic ic-cl"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div class="hc-val v-cl" id="countdown-text">--:--:--</div><div class="hc-lbl">New tasks in</div></div>
-      <div class="hc"><div class="hc-ic ic-st"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="hc-val v-st" id="streak-val">0</div><div class="hc-lbl">Day streak</div></div>
+    <div class="hero-inner">
+      <div class="hero-hdr">
+        <div class="hero-title">Daily Tasks</div>
+        <div class="hero-countdown">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span class="cd-time" id="countdown-text">--:--:--</span>
+        </div>
+      </div>
+      <div class="hero-cards">
+        <!-- Streak -->
+        <div class="h-card" id="streak-card">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#e87d1a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <div class="streak-num" id="streak-val">0</div>
+          <div class="streak-label">Day Streak</div>
+          <div class="streak-pips" id="streak-pips"></div>
+        </div>
+        <!-- Progress ring -->
+        <div class="h-card" id="progress-card">
+          <div class="prog-ring-wrap">
+            <svg class="prog-ring" viewBox="0 0 36 36">
+              <circle class="prog-ring-bg" cx="18" cy="18" r="15"/>
+              <circle class="prog-ring-fill" id="prog-ring-fill" cx="18" cy="18" r="15" stroke-dasharray="94.25" stroke-dashoffset="94.25"/>
+            </svg>
+            <div class="prog-center" id="prog-center">0/3</div>
+          </div>
+          <div class="streak-label">Completed</div>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- ══ NAVY BOTTOM ══ -->
   <div class="body" id="scroll-body">
-    <div class="loading" id="loading-state"><div class="ld-spin"></div>Loading tasks...</div>
+    <div class="body-inner">
+      <div class="loading" id="loading-state"><div class="ld-spin"></div>Loading tasks...</div>
+    </div>
   </div>
 </div>
-<div class="xp-toast" id="xp-toast"></div><div class="confetti" id="confetti"></div>
+
+<div class="xp-toast" id="xp-toast"></div>
+<div class="confetti" id="confetti"></div>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -108,20 +163,98 @@ function updateCountdown(){var now=new Date(),mid=new Date(now);mid.setHours(24,
 function spawnConfetti(n){var colors=['#3fba4f','#e8a817','#e8443a','#3a7df2','#6d4aed','#e87d1a'];var el=document.getElementById('confetti');for(var i=0;i<n;i++){var p=document.createElement('i');p.style.left=Math.random()*100+'%';p.style.top='-12px';p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDelay=Math.random()*.3+'s';el.appendChild(p);setTimeout(function(e){e.classList.add('fall')}.bind(null,p),10);setTimeout(function(e){e.remove()}.bind(null,p),1600)}}
 function showXpToast(m){var t=document.getElementById('xp-toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2400)}
 var _uid=null;
-function render(state){var body=document.getElementById('scroll-body');var done=state.tasks.filter(function(t){return t.done}).length;var total=state.tasks.length;body.innerHTML='';document.getElementById('streak-val').textContent=state.dailyStreak||0;
-  var pc=document.createElement('div');pc.className='prog anim';pc.innerHTML='<div class="prog-top"><span class="prog-lbl">Today\'s Progress</span><span class="prog-ct">'+done+'/'+total+'</span></div><div class="prog-bar"><div class="prog-fill'+(state.allDone?' done':'')+'" style="width:'+Math.round(done/total*100)+'%"></div></div>';body.appendChild(pc);
-  if(state.allDone){var cb=document.createElement('div');cb.className='complete show anim d1';cb.innerHTML='<div class="complete-ic"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div><div><div class="ct-title">All tasks complete!</div><div class="ct-sub">New tasks at midnight</div></div>';body.appendChild(cb)}
-  var lbl=document.createElement('div');lbl.className='sec-lbl anim d1';lbl.textContent="Today's Tasks";body.appendChild(lbl);
-  state.tasks.forEach(function(task,i){var pct=Math.min(100,Math.round(task.progress/task.target*100));var card=document.createElement('div');var isReady=task.done&&!task.claimed;
+
+function updateHero(state){
+  // Streak
+  document.getElementById('streak-val').textContent=state.dailyStreak||0;
+  var pips=document.getElementById('streak-pips');
+  var days=state.dailyStreak||0;
+  var pipCount=7;
+  var filled=Math.min(days%pipCount||(days>0&&days%pipCount===0?pipCount:0),pipCount);
+  pips.innerHTML='';
+  for(var p=0;p<pipCount;p++){
+    var pip=document.createElement('div');
+    pip.className='streak-pip'+(p<filled?' done':(p===filled?' active':''));
+    pips.appendChild(pip);
+  }
+  // Progress ring
+  var done=state.tasks.filter(function(t){return t.done}).length;
+  var total=state.tasks.length;
+  var pct=total>0?done/total:0;
+  var circ=94.25;
+  var ring=document.getElementById('prog-ring-fill');
+  ring.style.strokeDashoffset=circ-(circ*pct);
+  ring.classList.toggle('alldone',state.allDone);
+  document.getElementById('prog-center').textContent=done+'/'+total;
+}
+
+function render(state){
+  var body=document.getElementById('scroll-body');
+  body.innerHTML='<div class="body-inner" id="body-inner"></div>';
+  var inner=document.getElementById('body-inner');
+
+  updateHero(state);
+
+  // Complete banner
+  if(state.allDone){
+    var cb=document.createElement('div');cb.className='complete show anim';
+    cb.innerHTML='<div class="complete-ic"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div><div><div class="ct-title">All tasks complete!</div><div class="ct-sub">New tasks at midnight</div></div>';
+    inner.appendChild(cb);
+  }
+
+  var lbl=document.createElement('div');lbl.className='sec-lbl anim d1';lbl.textContent="Today's Tasks";inner.appendChild(lbl);
+
+  state.tasks.forEach(function(task,i){
+    var pct=Math.min(100,Math.round(task.progress/task.target*100));
+    var card=document.createElement('div');
+    var isReady=task.done&&!task.claimed;
     card.className='task anim d'+(i+2)+(task.claimed?' claimed':'')+(isReady?' ready':'');
     var iconSvg=ICONS[task.type]||ICONS.answered;
-    var actHtml='';if(task.claimed)actHtml='<div class="task-act"><div class="task-check"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div></div>';else if(task.done)actHtml='<div class="task-act"><button class="task-claim" data-id="'+task.id+'" data-xp="'+task.xp+'">+'+task.xp+' XP</button></div>';
-    card.innerHTML='<div class="task-ic'+(task.done?' ic-done':'')+'">'+iconSvg+'</div><div class="task-right"><div class="task-name">'+task.label+'</div><div class="task-meta"><span class="task-xp">'+task.xp+' XP</span><span class="task-ct">'+task.progress+'/'+task.target+'</span></div><div class="task-bar"><div class="task-fill'+(task.done?' tdone':'')+'" style="width:'+pct+'%"></div></div></div>'+actHtml;
-    var claimBtn=card.querySelector('.task-claim');if(claimBtn){(function(btn,uid){btn.addEventListener('click',async function(){btn.disabled=true;btn.textContent='...';var xp=await claimTask(uid,btn.dataset.id);if(xp===null){render(await loadTaskState(uid));return}awardXP(xp);spawnConfetti(18);showXpToast('+'+xp+' XP');var f=await loadTaskState(uid);if(f.allDone&&!f.streakBumped){await incrementStreakToday(uid);f=await loadTaskState(uid)}render(f)})})(claimBtn,_uid)}
-    body.appendChild(card)});
+
+    // Action row
+    var actHtml='';
+    if(task.claimed){
+      actHtml='<div class="task-action"><div class="task-check"><div class="task-check-circle"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div>Claimed</div></div>';
+    }else if(task.done){
+      actHtml='<div class="task-action"><button class="task-claim" data-id="'+task.id+'" data-xp="'+task.xp+'"><svg viewBox="0 0 24 24"><path d="M12 2v4m0 12v4m-6-10H2m20 0h-4m-1.5-6.5L15 7m-6 10l-1.5 1.5M19.5 7.5L18 9M6 15l-1.5 1.5"/></svg>Claim +'+task.xp+' XP</button></div>';
+    }
+
+    card.innerHTML=
+      '<div class="task-top">'+
+        '<div class="task-ic'+(task.done?' ic-done':'')+'">'+iconSvg+'</div>'+
+        '<div class="task-info">'+
+          '<div class="task-name">'+task.label+'</div>'+
+          '<div class="task-meta"><span class="task-xp">'+task.xp+' XP</span><span class="task-ct">'+task.progress+'/'+task.target+'</span></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="task-bar"><div class="task-fill'+(task.done?' tdone':'')+'" style="width:'+pct+'%"></div></div>'+
+      actHtml;
+
+    var claimBtn=card.querySelector('.task-claim');
+    if(claimBtn){
+      (function(btn,uid){
+        btn.addEventListener('click',async function(){
+          btn.disabled=true;btn.textContent='...';
+          var xp=await claimTask(uid,btn.dataset.id);
+          if(xp===null){render(await loadTaskState(uid));return}
+          awardXP(xp);spawnConfetti(18);showXpToast('+'+xp+' XP');
+          var f=await loadTaskState(uid);
+          if(f.allDone&&!f.streakBumped){await incrementStreakToday(uid);f=await loadTaskState(uid)}
+          render(f);
+        });
+      })(claimBtn,_uid);
+    }
+    inner.appendChild(card);
+  });
 }
+
 updateCountdown();setInterval(updateCountdown,1000);
-auth.onAuthStateChanged(async function(user){if(!user){document.getElementById('loading-state').textContent='Please log in.';return}_uid=user.uid;try{render(await loadTaskState(user.uid))}catch{document.getElementById('loading-state').textContent='Failed to load tasks.'}});
+auth.onAuthStateChanged(async function(user){
+  if(!user){document.getElementById('loading-state').textContent='Please log in.';return}
+  _uid=user.uid;
+  try{render(await loadTaskState(user.uid))}
+  catch{document.getElementById('loading-state').textContent='Failed to load tasks.'}
+});
 window.addEventListener('message',async function(e){if(e.data?.type==='tasksUpdated'&&_uid)render(await loadTaskState(_uid))});
 document.addEventListener('visibilitychange',async function(){if(!document.hidden&&_uid)render(await loadTaskState(_uid))});
 </script>
