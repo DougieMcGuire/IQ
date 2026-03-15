@@ -3,171 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About – BrainDeer</title>
+  <title>About – Cebear</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg:#3a2918;--card:#4a3625;--card2:#5a4232;
-      --cream:#f0e2cc;--tan:#c2a476;--mid:#6b4f32;--light:#8f6b4a;
-      --green:#58cc02;--greend:#46a302;
-    }
+    :root{--bg:#1b2d5b;--card:rgba(240,234,214,.06);--card2:rgba(240,234,214,.1);--cream:#F0EAD6;--tan:rgba(240,234,214,.5);--mid:rgba(240,234,214,.12);--light:rgba(240,234,214,.35);--green:#3fba4f;--greend:#2d9a3c}
     *{margin:0;padding:0;box-sizing:border-box}
     html,body{min-height:100%;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--cream)}
     body{padding:0 0 60px}
-
-    /* Nav */
-    nav{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:16px 24px;background:var(--card);
-      box-shadow:0 3px 0 rgba(0,0,0,.2);position:sticky;top:0;z-index:10;
-    }
+    nav{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:rgba(240,234,214,.04);position:sticky;top:0;z-index:10}
     .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-    .nav-logo .mascot{font-size:28px;line-height:1}
+    .nav-logo img{width:28px;height:28px;object-fit:contain}
     .nav-logo .name{font-size:20px;font-weight:900;color:var(--cream)}
     .nav-links{display:flex;gap:20px}
     .nav-links a{font-size:14px;font-weight:700;color:var(--tan);text-decoration:none;transition:color .2s}
     .nav-links a:hover{color:var(--cream)}
-
-    /* Hero */
-    .hero{
-      text-align:center;padding:52px 24px 40px;
-      background:linear-gradient(180deg,var(--card) 0%,var(--bg) 100%);
-    }
-    .hero .mascot{font-size:72px;display:block;margin-bottom:12px;
-      filter:drop-shadow(0 6px 0 rgba(0,0,0,.25));
-      animation:bob 2.5s ease-in-out infinite;
-    }
-    .hero h1{font-size:32px;font-weight:900;margin-bottom:8px;text-shadow:0 3px 0 rgba(0,0,0,.2)}
+    .hero{text-align:center;padding:52px 24px 40px;background:linear-gradient(180deg,rgba(240,234,214,.04) 0%,transparent 100%)}
+    .hero img{width:72px;height:72px;object-fit:contain;margin-bottom:12px;animation:bob 2.5s ease-in-out infinite}
+    .hero h1{font-size:32px;font-weight:900;margin-bottom:8px}
     .hero p{font-size:16px;font-weight:600;color:var(--tan);max-width:480px;margin:0 auto;line-height:1.6}
-
-    /* Content */
     .content{max-width:680px;margin:0 auto;padding:0 20px}
-
-    .section{
-      background:var(--card);border-radius:20px;padding:26px 24px;
-      margin-top:20px;box-shadow:0 5px 0 rgba(0,0,0,.15);
-      position:relative;overflow:hidden;
-    }
-    .section::before{
-      content:'';position:absolute;top:0;left:0;right:0;height:3px;
-      background:var(--green);border-radius:20px 20px 0 0;
-    }
+    .section{background:var(--card);border-radius:20px;padding:26px 24px;margin-top:20px;position:relative;overflow:hidden}
+    .section::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--green);border-radius:20px 20px 0 0}
     .section h2{font-size:18px;font-weight:900;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-    .section h2 .icon{font-size:22px}
     .section p{font-size:15px;font-weight:600;color:var(--tan);line-height:1.7}
     .section p+p{margin-top:10px}
-
-    /* Feature grid */
     .features{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
     @media(max-width:480px){.features{grid-template-columns:1fr}}
-    .feature{
-      background:var(--card2);border-radius:14px;padding:16px;
-      box-shadow:0 3px 0 rgba(0,0,0,.12);
-    }
-    .feature .f-icon{font-size:28px;margin-bottom:8px;display:block}
+    .feature{background:var(--card2);border-radius:14px;padding:16px}
+    .feature .f-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+    .feature .f-icon svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+    .fi-green{background:#3fba4f}.fi-gold{background:#e8a817}.fi-blue{background:#3a7df2}.fi-orange{background:#e87d1a}
     .feature .f-title{font-size:14px;font-weight:900;margin-bottom:4px}
     .feature .f-desc{font-size:13px;font-weight:600;color:var(--tan);line-height:1.5}
-
-    /* CTA */
     .cta{text-align:center;margin-top:28px}
-    .btn{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:14px 28px;border-radius:14px;
-      background:var(--green);color:#fff;
-      font-size:16px;font-weight:900;font-family:'Nunito',sans-serif;
-      text-decoration:none;box-shadow:0 5px 0 var(--greend);
-      transition:transform .12s,box-shadow .12s;
-    }
-    .btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--greend)}
-
-    /* Footer */
-    footer{
-      text-align:center;padding:28px 20px 0;
-      font-size:12px;font-weight:700;color:var(--light);
-      line-height:2;
-    }
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:14px;background:var(--green);color:#fff;font-size:16px;font-weight:900;font-family:'Nunito',sans-serif;text-decoration:none;box-shadow:0 3px 0 var(--greend);transition:transform .12s}
+    .btn:active{transform:translateY(3px);box-shadow:none}
+    footer{text-align:center;padding:28px 20px 0;font-size:12px;font-weight:700;color:var(--light);line-height:2}
     footer a{color:var(--tan);text-decoration:none}
-    footer a:hover{color:var(--cream)}
-
     @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+    a{color:var(--tan)}a:hover{color:var(--cream)}
   </style>
 </head>
 <body>
-
-<nav>
-  <a class="nav-logo" href="app.html">
-    <span class="mascot">🦌</span>
-    <span class="name">BrainDeer</span>
-  </a>
-  <div class="nav-links">
-    <a href="privacy.html">Privacy</a>
-    <a href="contact.html">Contact</a>
-  </div>
-</nav>
-
-<div class="hero">
-  <span class="mascot">🦌</span>
-  <h1>About BrainDeer</h1>
-  <p>A daily brain-training app designed to keep your mind sharp — one game at a time.</p>
-</div>
-
+<nav><a class="nav-logo" href="app.html"><img src="logo.png" alt="Cebear"><span class="name">Cebear</span></a><div class="nav-links"><a href="privacy.html">Privacy</a><a href="contact.html">Contact</a></div></nav>
+<div class="hero"><img src="logo.png" alt="Cebear"><h1>About Cebear</h1><p>A daily brain-training app designed to keep your mind sharp — one game at a time.</p></div>
 <div class="content">
-
-  <div class="section">
-    <h2><span class="icon">🧠</span> What is BrainDeer?</h2>
-    <p>BrainDeer is a free brain-training web app that helps you build mental fitness through short, engaging daily challenges. From word puzzles to math sprints and memory games, there's always something to sharpen your thinking.</p>
-    <p>We track your progress, adapt to your skill level, and reward consistency — just like a gym for your brain, but way more fun.</p>
-  </div>
-
+  <div class="section"><h2>What is Cebear?</h2><p>Cebear is a free brain-training web app that helps you build mental fitness through short, engaging daily challenges. From word puzzles to math sprints and memory games, there's always something to sharpen your thinking.</p><p>We track your progress, adapt to your skill level, and reward consistency — just like a gym for your brain, but way more fun.</p></div>
   <div class="features">
-    <div class="feature">
-      <span class="f-icon">🟩</span>
-      <div class="f-title">Wordle-style puzzles</div>
-      <div class="f-desc">Guess the hidden word with logic and deduction.</div>
-    </div>
-    <div class="feature">
-      <span class="f-icon">➕</span>
-      <div class="f-title">Math Rush</div>
-      <div class="f-desc">Beat the clock with rapid-fire arithmetic challenges.</div>
-    </div>
-    <div class="feature">
-      <span class="f-icon">🎨</span>
-      <div class="f-title">Color Sort</div>
-      <div class="f-desc">Sort and sequence colors to train visual logic.</div>
-    </div>
-    <div class="feature">
-      <span class="f-icon">⚡</span>
-      <div class="f-title">Reaction Training</div>
-      <div class="f-desc">Test and improve your reaction speed over time.</div>
-    </div>
+    <div class="feature"><div class="f-icon fi-green"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><div class="f-title">Wordle-style puzzles</div><div class="f-desc">Guess the hidden word with logic and deduction.</div></div>
+    <div class="feature"><div class="f-icon fi-gold"><svg viewBox="0 0 24 24"><path d="M12 2v4m0 12v4m-6-10H2m20 0h-4"/><circle cx="12" cy="12" r="4"/></svg></div><div class="f-title">Math Rush</div><div class="f-desc">Beat the clock with rapid-fire arithmetic challenges.</div></div>
+    <div class="feature"><div class="f-icon fi-blue"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div class="f-title">Color Sort</div><div class="f-desc">Sort and sequence colors to train visual logic.</div></div>
+    <div class="feature"><div class="f-icon fi-orange"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="f-title">Reaction Training</div><div class="f-desc">Test and improve your reaction speed over time.</div></div>
   </div>
-
-  <div class="section">
-    <h2><span class="icon">📈</span> How it works</h2>
-    <p>Sign up for free, complete a short calibration test, and BrainDeer will build a personalised training plan based on your strengths and weaknesses. Each session takes under 5 minutes — perfect for a daily habit.</p>
-    <p>Your IQ score adapts as you play, giving you a real-time picture of where you're improving and where to focus next.</p>
-  </div>
-
-  <div class="section">
-    <h2><span class="icon">🏆</span> Compete and grow</h2>
-    <p>Climb the global leaderboard, maintain your daily streak, and earn XP with every session. BrainDeer is built around the same engagement loops that make the world's best learning apps addictive — because consistency is what actually makes you smarter.</p>
-  </div>
-
-  <div class="section">
-    <h2><span class="icon">🔒</span> Who we are</h2>
-    <p>BrainDeer is an independent project built by a small team passionate about cognitive fitness and accessible education. We're not a big corporation — just people who believe a few minutes of focused mental exercise every day can genuinely change how you think.</p>
-    <p>Questions? We'd love to hear from you at <a href="mailto:contact@braindeer.org" style="color:var(--tan)">contact@braindeer.org</a>.</p>
-  </div>
-
-  <div class="cta">
-    <a class="btn" href="app.html">🦌 Start Training</a>
-  </div>
-
+  <div class="section"><h2>How it works</h2><p>Sign up for free, complete a short calibration test, and Cebear will build a personalised training plan based on your strengths and weaknesses. Each session takes under 5 minutes — perfect for a daily habit.</p><p>Your IQ score adapts as you play, giving you a real-time picture of where you're improving and where to focus next.</p></div>
+  <div class="section"><h2>Compete and grow</h2><p>Climb the global leaderboard, maintain your daily streak, and earn XP with every session. Cebear is built around the same engagement loops that make the world's best learning apps addictive — because consistency is what actually makes you smarter.</p></div>
+  <div class="section"><h2>Who we are</h2><p>Cebear is an independent project built by a small team passionate about cognitive fitness and accessible education. We're not a big corporation — just people who believe a few minutes of focused mental exercise every day can genuinely change how you think.</p><p>Questions? We'd love to hear from you at <a href="mailto:contact@cebear.com">contact@cebear.com</a>.</p></div>
+  <div class="cta"><a class="btn" href="app.html">Start Training</a></div>
 </div>
-
-<footer>
-  <div>© 2026 BrainDeer &nbsp;·&nbsp; <a href="privacy.html">Privacy Policy</a> &nbsp;·&nbsp; <a href="contact.html">Contact</a></div>
-</footer>
-
+<footer><div>© 2026 Cebear · <a href="privacy.html">Privacy Policy</a> · <a href="contact.html">Contact</a></div></footer>
 </body>
 </html>
