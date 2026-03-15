@@ -168,219 +168,240 @@ document.getElementById('avatar-input').onchange=e=>handleAvatarFile(e.target.fi
 document.getElementById('signout-btn').onclick=()=>{Haptics.warning();IQData.signOut()};
 document.getElementById('reset-btn').onclick=()=>{Haptics.warning();if(confirm('Reset all progress?')){Haptics.error();IQData.reset();location.reload()}};
 
-/* ══════════════════════════════════════════
-   SHARE CARD — full navy bg, tight layout,
-   no wasted space, everything packed in
-   ══════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════
+   SHARE CARD — Eye-catching, packed, zero dead space
+   Navy bg with bold gold accents, massive IQ, abilities
+   ring, profile pic front-and-center
+   ══════════════════════════════════════════════════════ */
 var shareCanvas=null,shareUrl='';
 function getShareUrl(){var u=IQData.getCurrentUser();return u?'https://cebear.com/share/'+u.uid:'https://cebear.com'}
 function rr(c,x,y,w,h,r,f){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();if(f){c.fillStyle=f;c.fill()}}
 
-function genShareCard(){
+/* Helper: load an image as a promise */
+function loadImg(src){
+  return new Promise(function(resolve){
+    if(!src){resolve(null);return}
+    var img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=function(){resolve(img)};
+    img.onerror=function(){resolve(null)};
+    img.src=src;
+  });
+}
+
+/* ── genShareCard is now async — waits for pfp + logo ── */
+async function genShareCard(){
   var d=IQData.load(),W=1200,H=630,cv=document.createElement('canvas');
   cv.width=W;cv.height=H;var c=cv.getContext('2d');
   var uname=d.username||IQData.getCurrentUser()?.displayName||'Brain';
   var acc=IQData.getAccuracy(),pic=d.pic||null;
+  var iq=d.iq||'--';
+  var pctText=d.iq?'TOP '+formatPercentile(iqToPercentile(d.iq)).toUpperCase():'';
 
-  // Full navy bg
-  c.fillStyle='#1b2d5b';c.fillRect(0,0,W,H);
+  // ── Load images FIRST, before any drawing ──
+  var [picImg,logoImg]=await Promise.all([loadImg(pic),loadImg('logo.png')]);
 
-  // Subtle grid pattern for texture
-  c.strokeStyle='rgba(240,234,214,0.02)';c.lineWidth=1;
-  for(var gx=0;gx<W;gx+=40){c.beginPath();c.moveTo(gx,0);c.lineTo(gx,H);c.stroke()}
-  for(var gy=0;gy<H;gy+=40){c.beginPath();c.moveTo(0,gy);c.lineTo(W,gy);c.stroke()}
+  // ══ BACKGROUND — deep navy with layered texture ══
+  c.fillStyle='#111d3a';c.fillRect(0,0,W,H);
 
-  // Subtle radial glow behind profile area
-  var grad=c.createRadialGradient(W*0.22,H*0.45,0,W*0.22,H*0.45,300);
-  grad.addColorStop(0,'rgba(232,168,23,0.06)');grad.addColorStop(1,'rgba(232,168,23,0)');
-  c.fillStyle=grad;c.fillRect(0,0,W,H);
+  // Large radial glow — gold behind the IQ area
+  var g1=c.createRadialGradient(W*0.5,H*0.38,0,W*0.5,H*0.38,480);
+  g1.addColorStop(0,'rgba(232,168,23,0.10)');g1.addColorStop(0.5,'rgba(232,168,23,0.03)');g1.addColorStop(1,'transparent');
+  c.fillStyle=g1;c.fillRect(0,0,W,H);
 
-  // ── Layout: Left column = profile + IQ, Right column = stats + abilities ──
-  var pad=48;
-  var leftW=W*0.38;
-  var leftCx=pad+leftW/2;
-  var rightX=pad+leftW+32;
-  var rightW=W-rightX-pad;
+  // Secondary glow — blue/purple bottom-right
+  var g2=c.createRadialGradient(W*0.85,H*0.8,0,W*0.85,H*0.8,350);
+  g2.addColorStop(0,'rgba(58,125,242,0.08)');g2.addColorStop(1,'transparent');
+  c.fillStyle=g2;c.fillRect(0,0,W,H);
 
-  // ── LEFT COLUMN ──
+  // Diagonal line pattern for texture
+  c.save();
+  c.strokeStyle='rgba(240,234,214,0.018)';c.lineWidth=1;
+  for(var i=-H;i<W+H;i+=28){c.beginPath();c.moveTo(i,0);c.lineTo(i+H,H);c.stroke()}
+  c.restore();
 
-  // Profile pic
-  var picR=58;
-  var picY=120;
-  // Ring behind avatar
-  c.strokeStyle='rgba(240,234,214,0.08)';c.lineWidth=3;
-  c.beginPath();c.arc(leftCx,picY,picR+8,0,Math.PI*2);c.stroke();
-  // Avatar circle bg
-  c.fillStyle='#243a6e';
-  c.beginPath();c.arc(leftCx,picY,picR,0,Math.PI*2);c.fill();
-  if(!pic){c.font='900 38px Nunito';c.textAlign='center';c.textBaseline='middle';c.fillStyle='rgba(240,234,214,0.3)';c.fillText('CB',leftCx,picY)}
+  // ══ TOP STRIP — gold accent bar ══
+  c.fillStyle='#e8a817';c.fillRect(0,0,W,5);
+  // Gradient fade under gold bar
+  var gBar=c.createLinearGradient(0,5,0,40);
+  gBar.addColorStop(0,'rgba(232,168,23,0.12)');gBar.addColorStop(1,'transparent');
+  c.fillStyle=gBar;c.fillRect(0,5,W,35);
 
-  // Name
-  c.font='800 24px Nunito';c.fillStyle='#F0EAD6';c.textAlign='center';c.textBaseline='top';
-  c.fillText(uname,leftCx,picY+picR+18);
+  // ══ LAYOUT: Center-dominant with IQ massive ══
+  var cx=W/2;
 
-  // Divider line
-  var divY=picY+picR+56;
-  c.strokeStyle='rgba(240,234,214,0.06)';c.lineWidth=1;
-  c.beginPath();c.moveTo(leftCx-60,divY);c.lineTo(leftCx+60,divY);c.stroke();
+  // ── Profile pic — large, top-center with gold ring ──
+  var picR=52;
+  var picY=80;
 
-  // IQ number — big and bold
-  var iqY=divY+60;
-  c.font='900 130px Nunito';c.fillStyle='#F0EAD6';c.textBaseline='middle';c.textAlign='center';
-  c.fillText(String(d.iq||'--'),leftCx,iqY);
+  // Outer gold ring
+  c.lineWidth=4;c.strokeStyle='#e8a817';
+  c.beginPath();c.arc(cx,picY,picR+6,0,Math.PI*2);c.stroke();
+  // Subtle outer glow ring
+  c.lineWidth=1;c.strokeStyle='rgba(232,168,23,0.15)';
+  c.beginPath();c.arc(cx,picY,picR+14,0,Math.PI*2);c.stroke();
 
-  // IQ label
-  c.font='900 14px Nunito';c.fillStyle='rgba(240,234,214,0.25)';
-  c.fillText('I Q',leftCx,iqY+70);
+  // Avatar bg
+  c.fillStyle='#1b2d5b';
+  c.beginPath();c.arc(cx,picY,picR,0,Math.PI*2);c.fill();
 
-  // Percentile badge — gold pill
-  if(d.iq){
-    var pctText='TOP '+formatPercentile(iqToPercentile(d.iq)).toUpperCase();
-    c.font='900 15px Nunito';var tw=c.measureText(pctText).width+36;
-    var pillY=iqY+92;
-    rr(c,leftCx-tw/2,pillY,tw,32,16,'#e8a817');
-    c.fillStyle='#1b2d5b';c.textBaseline='middle';c.textAlign='center';
-    c.fillText(pctText,leftCx,pillY+16);
+  if(picImg){
+    c.save();
+    c.beginPath();c.arc(cx,picY,picR,0,Math.PI*2);c.clip();
+    c.drawImage(picImg,cx-picR,picY-picR,picR*2,picR*2);
+    c.restore();
+  }else{
+    c.font='900 34px Nunito';c.textAlign='center';c.textBaseline='middle';
+    c.fillStyle='rgba(240,234,214,0.3)';c.fillText(uname.charAt(0).toUpperCase(),cx,picY);
   }
 
-  // ── RIGHT COLUMN ──
+  // ── Username ──
+  c.font='800 22px Nunito';c.fillStyle='rgba(240,234,214,0.7)';
+  c.textAlign='center';c.textBaseline='top';
+  c.fillText(uname,cx,picY+picR+14);
 
-  // Stats in 2×2 grid — compact cards
-  var ry=52;
-  var stats=[
-    {v:String(d.answered||0),l:'ANSWERED',color:'#3fba4f',icon:'check'},
-    {v:acc+'%',l:'ACCURACY',color:'#3a7df2',icon:'target'},
-    {v:String(d.bestStreak||0),l:'BEST STREAK',color:'#e87d1a',icon:'bolt'},
-    {v:'Lvl '+(d.level||1),l:'LEVEL',color:'#6d4aed',icon:'chart'}
+  // ══ IQ — MASSIVE center number ══
+  var iqY=280;
+
+  // "IQ" label above number
+  c.font='900 16px Nunito';c.fillStyle='rgba(240,234,214,0.2)';
+  c.textAlign='center';c.textBaseline='bottom';
+  c.letterSpacing='8px';
+  c.fillText('I Q',cx,iqY-80);
+
+  // The big number
+  c.font='900 180px Nunito';
+  // Gold gradient text effect via overlay
+  c.fillStyle='#F0EAD6';
+  c.textBaseline='middle';c.textAlign='center';
+  c.fillText(String(iq),cx,iqY);
+
+  // Gold underline accent beneath the number
+  var numW=c.measureText(String(iq)).width;
+  c.fillStyle='#e8a817';
+  rr(c,cx-numW/2-10,iqY+85,numW+20,4,2,'#e8a817');
+
+  // Percentile badge — gold pill beneath
+  if(pctText){
+    c.font='900 16px Nunito';var tw=c.measureText(pctText).width+40;
+    var pillY=iqY+100;
+    rr(c,cx-tw/2,pillY,tw,34,17,'#e8a817');
+    c.fillStyle='#111d3a';c.textBaseline='middle';c.textAlign='center';
+    c.fillText(pctText,cx,pillY+17);
+  }
+
+  // ══ STATS ROW — horizontal bar at the bottom ══
+  var statsY=H-172;
+  var statItems=[
+    {v:String(d.answered||0),l:'ANSWERED',color:'#3fba4f'},
+    {v:acc+'%',l:'ACCURACY',color:'#3a7df2'},
+    {v:String(d.bestStreak||0),l:'STREAK',color:'#e87d1a'},
+    {v:'Lvl '+(d.level||1),l:'LEVEL',color:'#6d4aed'}
   ];
-  var sgGap=10;
-  var sgW=(rightW-sgGap)/2;
-  var sgH=72;
+  var statTotalW=W-100;
+  var statW=statTotalW/statItems.length;
+  var statStartX=50;
 
-  stats.forEach(function(s,i){
-    var col=i%2, row=Math.floor(i/2);
-    var sx=rightX+col*(sgW+sgGap);
-    var sy=ry+row*(sgH+sgGap);
+  // Stats background strip
+  rr(c,30,statsY-10,W-60,76,16,'rgba(240,234,214,0.035)');
 
-    // Card bg
-    rr(c,sx,sy,sgW,sgH,14,'rgba(240,234,214,0.05)');
-    // Top highlight
-    c.save();
-    c.beginPath();
-    c.moveTo(sx+14,sy);c.lineTo(sx+sgW-14,sy);
-    c.quadraticCurveTo(sx+sgW,sy,sx+sgW,sy+14);
-    c.lineTo(sx+sgW,sy+2);c.lineTo(sx,sy+2);c.lineTo(sx,sy+14);
-    c.quadraticCurveTo(sx,sy,sx+14,sy);c.closePath();
-    c.fillStyle='rgba(240,234,214,0.03)';c.fill();
-    c.restore();
-
-    // Color accent bar on left
-    rr(c,sx,sy+16,3,sgH-32,2,s.color);
-
+  statItems.forEach(function(s,i){
+    var sx=statStartX+i*statW+statW/2;
+    // Color dot
+    c.fillStyle=s.color;
+    c.beginPath();c.arc(sx,statsY+8,4,0,Math.PI*2);c.fill();
     // Value
-    c.font='900 30px Nunito';c.fillStyle='#F0EAD6';c.textAlign='left';c.textBaseline='middle';
-    c.fillText(s.v,sx+16,sy+sgH/2-6);
+    c.font='900 28px Nunito';c.fillStyle='#F0EAD6';c.textAlign='center';c.textBaseline='top';
+    c.fillText(s.v,sx,statsY+18);
     // Label
-    c.font='800 10px Nunito';c.fillStyle='rgba(240,234,214,0.3)';
-    c.fillText(s.l,sx+16,sy+sgH/2+16);
+    c.font='800 10px Nunito';c.fillStyle='rgba(240,234,214,0.25)';
+    c.fillText(s.l,sx,statsY+50);
+    // Divider (except last)
+    if(i<statItems.length-1){
+      c.strokeStyle='rgba(240,234,214,0.06)';c.lineWidth=1;
+      c.beginPath();c.moveTo(sx+statW/2,statsY);c.lineTo(sx+statW/2,statsY+60);c.stroke();
+    }
   });
 
-  // ── Abilities section ──
-  var aby=ry+2*(sgH+sgGap)+24;
-
-  // Section header
-  c.font='900 11px Nunito';c.fillStyle='rgba(240,234,214,0.2)';c.textAlign='left';c.textBaseline='top';
-  c.fillText('ABILITIES',rightX,aby);
-  aby+=20;
-
-  // Abilities card bg
-  var abCardH=H-aby-pad-20;
-  rr(c,rightX,aby,rightW,abCardH,14,'rgba(240,234,214,0.03)');
-
-  // All 8 abilities, tightly packed
+  // ══ ABILITIES — compact row of colored bars at very bottom ══
+  var abY=H-82;
+  var abPad=50;
+  var abW=(W-abPad*2);
   var cats=AB;
-  var abPadX=16, abPadY=12;
-  var barH=6;
-  var rowH=(abCardH-abPadY*2)/cats.length;
+  var barH=8;
+  var barGap=4;
+  var totalBarH=cats.length*(barH+barGap)-barGap;
+  // Two-column layout for abilities
+  var colW=(abW-20)/2;
+  var halfCats=Math.ceil(cats.length/2);
+  var abRowH=barH+barGap+9;
 
   cats.forEach(function(a,i){
-    var y=aby+abPadY+i*rowH;
+    var col=i<halfCats?0:1;
+    var row=col===0?i:i-halfCats;
+    var bx=abPad+col*(colW+20);
+    var by=abY+row*abRowH;
     var pct=IQData.getStatPercent(a.key);
-    var barStartX=rightX+abPadX;
-    var valW=36;
-    var barW=rightW-abPadX*2-valW-8;
-
-    // Color dot
-    c.fillStyle=a.color;
-    c.beginPath();c.arc(barStartX+3,y+rowH/2,3,0,Math.PI*2);c.fill();
+    var nameW=70;
+    var valW=30;
+    var barSpace=colW-nameW-valW-8;
 
     // Name
-    c.font='800 11px Nunito';c.fillStyle='rgba(240,234,214,0.45)';c.textAlign='left';c.textBaseline='middle';
-    c.fillText(a.name,barStartX+14,y+rowH/2-9);
+    c.font='800 9px Nunito';c.fillStyle='rgba(240,234,214,0.35)';
+    c.textAlign='left';c.textBaseline='middle';
+    c.fillText(a.name.toUpperCase(),bx,by+barH/2);
 
     // Bar bg
-    var barY=y+rowH/2+3;
-    rr(c,barStartX+14,barY,barW-14,barH,3,'rgba(240,234,214,0.05)');
+    rr(c,bx+nameW,by,barSpace,barH,4,'rgba(240,234,214,0.05)');
     // Bar fill
     if(pct>0){
-      var fillW=Math.max(4,(barW-14)*(pct/100));
-      rr(c,barStartX+14,barY,fillW,barH,3,a.color);
+      var fw=Math.max(4,barSpace*(pct/100));
+      rr(c,bx+nameW,by,fw,barH,4,a.color);
+      // Shine on bar
+      c.save();
+      c.beginPath();
+      rr(c,bx+nameW,by,fw,barH/2,4);
+      c.clip&&false;
+      c.restore();
     }
 
     // Value
-    c.font='900 13px Nunito';c.fillStyle='#F0EAD6';c.textAlign='right';c.textBaseline='middle';
-    c.fillText(String(pct),rightX+rightW-abPadX,y+rowH/2);
-
-    // Separator line (except last)
-    if(i<cats.length-1){
-      c.strokeStyle='rgba(240,234,214,0.03)';c.lineWidth=1;
-      c.beginPath();c.moveTo(barStartX,y+rowH);c.lineTo(rightX+rightW-abPadX,y+rowH);c.stroke();
-    }
+    c.font='900 10px Nunito';c.fillStyle='rgba(240,234,214,0.6)';
+    c.textAlign='right';c.textBaseline='middle';
+    c.fillText(String(pct),bx+colW,by+barH/2);
   });
 
-  // ── Vertical divider between columns ──
-  var divX=rightX-16;
-  c.strokeStyle='rgba(240,234,214,0.05)';c.lineWidth=1;
-  c.beginPath();c.moveTo(divX,pad+20);c.lineTo(divX,H-pad-20);c.stroke();
+  // ══ BRANDING — big and bold, bottom-left ══
+  // Logo
+  if(logoImg){
+    c.drawImage(logoImg,40,H-38,24,24);
+  }
+  c.font='900 18px Nunito';c.fillStyle='rgba(240,234,214,0.5)';
+  c.textAlign='left';c.textBaseline='bottom';
+  c.fillText('cebear.com',logoImg?72:40,H-16);
 
-  // ── Bottom branding ──
-  c.font='800 13px Nunito';c.fillStyle='rgba(240,234,214,0.15)';c.textAlign='left';c.textBaseline='bottom';
-  c.fillText('cebear.com',pad,H-pad+10);
-
-  // Gold accent dot
+  // Gold dot after brand
+  var brandW=c.measureText('cebear.com').width;
   c.fillStyle='#e8a817';
-  c.beginPath();c.arc(pad+c.measureText('cebear.com').width+12,H-pad+4,3,0,Math.PI*2);c.fill();
+  c.beginPath();c.arc((logoImg?72:40)+brandW+10,H-24,3.5,0,Math.PI*2);c.fill();
+
+  // "Train your brain" tagline
+  c.font='700 12px Nunito';c.fillStyle='rgba(240,234,214,0.18)';
+  c.textAlign='right';c.textBaseline='bottom';
+  c.fillText('Can you beat me?',W-40,H-16);
+
+  // Corner accents — decorative gold dots
+  [[W-40,24],[W-48,24],[W-40,32]].forEach(function(p){
+    c.fillStyle='rgba(232,168,23,0.15)';
+    c.beginPath();c.arc(p[0],p[1],2,0,Math.PI*2);c.fill();
+  });
 
   shareCanvas=cv;
-
-  // Load profile pic async
-  if(pic){
-    var img=new Image();
-    img.crossOrigin='anonymous';
-    img.onload=function(){
-      c.save();
-      c.beginPath();c.arc(leftCx,picY,picR,0,Math.PI*2);c.clip();
-      c.drawImage(img,leftCx-picR,picY-picR,picR*2,picR*2);
-      c.restore();
-    };
-    img.src=pic;
-  }
-
-  // Load logo.png async
-  var logo=new Image();
-  logo.crossOrigin='anonymous';
-  logo.onload=function(){
-    var lw=30,lh=30;
-    c.drawImage(logo,pad-2,H-pad-40,lw,lh);
-  };
-  logo.src='logo.png';
-
   return cv;
 }
 
 async function uploadShareCard(){
   var user=IQData.getCurrentUser();if(!user||!shareCanvas)return;var d=IQData.load();
-  await new Promise(r=>setTimeout(r,300));
   try{
     var du=shareCanvas.toDataURL('image/png');var b64=du.split(',')[1];
     var sd=new parent.Object();sd.iq=d.iq||0;sd.username=d.username||user.displayName||'Brain';sd.answered=d.answered||0;sd.accuracy=parseInt(IQData.getAccuracy())||0;sd.bestStreak=d.bestStreak||0;sd.cardBase64=b64;sd.updatedAt=new Date().toISOString();
@@ -401,8 +422,8 @@ function handleShareAction(id){Haptics.medium();var text=getShareText();switch(i
 
 async function openShare(){
   var fab=document.getElementById('share-btn');fab.classList.add('uploading');fab.textContent='Generating...';
-  shareUrl=getShareUrl();genShareCard();
-  await new Promise(r=>setTimeout(r,500));
+  shareUrl=getShareUrl();
+  await genShareCard();
   await uploadShareCard();
   fab.classList.remove('uploading');fab.innerHTML='<svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share Your IQ';
   document.getElementById('share-url').value=shareUrl;
