@@ -17,7 +17,6 @@
     .hero-hdr{width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
     .hero-name{font-size:14px;font-weight:800;color:var(--dim)}
     .hero-out{background:rgba(27,45,91,.06);border:none;padding:7px 14px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:var(--dim);cursor:pointer}
-
     .av-wrap{position:relative;margin-bottom:10px}
     .av{width:min(100px,24vw);height:min(100px,24vw);border-radius:50%;background:var(--navy);overflow:hidden;display:flex;align-items:center;justify-content:center;cursor:pointer;border:4px solid var(--navy);box-shadow:0 4px 16px rgba(27,45,91,.2);transition:transform .15s}
     .av:active{transform:scale(.94)}
@@ -26,11 +25,9 @@
     .av-edit{position:absolute;bottom:2px;right:2px;width:28px;height:28px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid var(--cream)}
     .av-edit svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.5}
     #avatar-input{display:none}
-
     .iq-big{font-size:min(80px,20vw);font-weight:900;line-height:1;color:var(--navy)}
     .iq-lbl{font-size:14px;font-weight:900;color:var(--light);letter-spacing:5px;text-transform:uppercase;margin-bottom:6px}
     .pct{background:var(--navy);color:var(--cream);font-size:12px;font-weight:900;padding:5px 18px;border-radius:20px;margin-bottom:16px}
-
     .share-cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:400px;padding:15px;background:var(--gold);color:var(--navy);border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;text-transform:uppercase;letter-spacing:1px;position:relative;overflow:hidden;box-shadow:0 4px 0 var(--goldd);transition:transform .1s;margin-bottom:4px}
     .share-cta:active{transform:translateY(4px);box-shadow:none}
     .share-cta svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5;flex-shrink:0}
@@ -38,7 +35,6 @@
     @keyframes shimmer{0%{left:-100%}100%{left:200%}}
     .share-cta.uploading{opacity:.6;pointer-events:none}
     .share-nudge{text-align:center;font-size:11px;font-weight:700;color:var(--dim);margin-bottom:20px}
-
     .navy-section{background:var(--navy);border-radius:28px 28px 0 0;padding:24px 16px 32px}
     .navy-inner{max-width:420px;margin:0 auto}
     .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
@@ -63,7 +59,6 @@
     .ab-fill::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(255,255,255,.2) 0%,transparent 100%);border-radius:4px}
     .ab-val{font-size:16px;font-weight:900;color:var(--cream);min-width:32px;text-align:right}
     .reset-btn{margin:24px auto 0;background:none;border:none;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;color:rgba(240,234,214,.12);cursor:pointer;display:block;padding:12px;text-align:center}
-
     .modal-overlay{position:fixed;inset:0;background:rgba(27,45,91,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center;z-index:200}
     .modal-overlay.show{display:flex}
     .modal-sheet{background:var(--cream);border-radius:24px 24px 0 0;width:100%;max-width:440px;padding:10px 16px calc(16px + env(safe-area-inset-bottom,0px));animation:sheetUp .28s cubic-bezier(.32,.72,0,1)}
@@ -114,7 +109,6 @@
     <button class="reset-btn" id="reset-btn">Reset Progress</button>
   </div></div>
 </div>
-
 <div class="modal-overlay" id="share-modal"><div class="modal-sheet"><div class="sheet-handle"></div><div class="card-preview" id="card-preview"></div><div class="share-link-bar"><input class="share-link-url" id="share-url" readonly value=""><button class="share-link-copy" id="copy-link">Copy link</button></div><div class="share-label">Share to</div><div class="share-grid" id="share-grid"></div></div></div>
 <div class="toast" id="toast"></div>
 
@@ -141,18 +135,14 @@ document.getElementById('avatar-input').onchange=e=>handleAvatarFile(e.target.fi
 document.getElementById('signout-btn').onclick=()=>{Haptics.warning();IQData.signOut()};
 document.getElementById('reset-btn').onclick=()=>{Haptics.warning();if(confirm('Reset all progress?')){Haptics.error();IQData.reset();location.reload()}};
 
-/* ══════════════════════════════════════════════════════════════
-   SHARE CARD v5 — Centered, bold, readable at any size
+/* ══════════════════════════════════════════════════════════
+   SHARE CARD v6 — Spotify Wrapped / Duolingo inspired
    
-   Layout (top to bottom):
-   Row 1: [PFP]  [IQ NUMBER]  [PERCENTILE]  — horizontal
-   Row 2: [4 stats in a row]
-   Row 3: [8 colored ability dots as a spectrum bar]
-   Row 4: [HUGE BRANDING]
-   
-   Everything centered. No tiny text. No charts.
-   Designed to look good at iMessage preview size (~350×180px)
-   ══════════════════════════════════════════════════════════════ */
+   Gold bottom brand bar (solid color block)
+   Navy top with centered PFP + IQ as one unit
+   Stats as pills
+   Everything HUGE, nothing small
+   ══════════════════════════════════════════════════════════ */
 var shareCanvas=null,shareUrl='';
 function getShareUrl(){var u=IQData.getCurrentUser();return u?'https://cebear.com/share/'+u.uid:'https://cebear.com'}
 function rr(c,x,y,w,h,r,f){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();if(f){c.fillStyle=f;c.fill()}}
@@ -177,145 +167,160 @@ async function genShareCard(){
 
   var [picImg,logoImg]=await Promise.all([loadImg(pic),loadImg('logo.png')]);
 
-  // ══ BG ══
+  // ══ GOLD BRAND BAR — bottom 130px ══
+  var barH=130;
+  var barY=H-barH;
+
+  // Navy top region
   var BG='#334570';
-  c.fillStyle=BG;c.fillRect(0,0,W,H);
+  c.fillStyle=BG;c.fillRect(0,0,W,barY);
 
-  // Big warm glow center
-  var g1=c.createRadialGradient(W/2,H*0.35,0,W/2,H*0.35,500);
+  // Gold bar
+  c.fillStyle='#e8a817';c.fillRect(0,barY,W,barH);
+  // Darker gold bottom edge
+  c.fillStyle='#c48e10';c.fillRect(0,H-6,W,6);
+
+  // Navy area — subtle texture
+  c.save();c.fillStyle='rgba(240,234,214,0.012)';
+  for(var gx=0;gx<W;gx+=26)for(var gy=0;gy<barY;gy+=26){c.beginPath();c.arc(gx,gy,1,0,Math.PI*2);c.fill()}
+  c.restore();
+
+  // Central gold glow on navy
+  var g1=c.createRadialGradient(W/2,barY*0.45,0,W/2,barY*0.45,400);
   g1.addColorStop(0,'rgba(232,168,23,0.08)');g1.addColorStop(1,'transparent');
-  c.fillStyle=g1;c.fillRect(0,0,W,H);
+  c.fillStyle=g1;c.fillRect(0,0,W,barY);
 
-  // Dot grid
-  c.fillStyle='rgba(240,234,214,0.018)';
-  for(var gx=0;gx<W;gx+=28)for(var gy=0;gy<H;gy+=28){c.beginPath();c.arc(gx,gy,1,0,Math.PI*2);c.fill()}
+  var cx=W/2;
 
-  // ══ ROW 1: PFP + NAME + IQ — all on one horizontal line ══
-  var row1Y=H*0.32; // vertical center of row 1
+  /* ═══════════ NAVY ZONE — PFP + IQ + STATS ═══════════ */
 
-  // PFP — left-center, big
-  var picR=100,picCx=240;
+  // ── PFP — centered, overlapping top ──
+  var picR=80,picCy=110;
 
-  // Gold glow
-  var pg=c.createRadialGradient(picCx,row1Y,picR-20,picCx,row1Y,picR+50);
-  pg.addColorStop(0,'rgba(232,168,23,0.15)');pg.addColorStop(1,'transparent');
-  c.fillStyle=pg;c.fillRect(picCx-160,row1Y-160,320,320);
+  // Glow
+  var pg=c.createRadialGradient(cx,picCy,picR-20,cx,picCy,picR+40);
+  pg.addColorStop(0,'rgba(232,168,23,0.2)');pg.addColorStop(1,'transparent');
+  c.fillStyle=pg;c.beginPath();c.arc(cx,picCy,picR+40,0,Math.PI*2);c.fill();
 
-  // Gold ring — thick
+  // Gold ring
   c.lineWidth=7;c.strokeStyle='#e8a817';
-  c.beginPath();c.arc(picCx,row1Y,picR+9,0,Math.PI*2);c.stroke();
+  c.beginPath();c.arc(cx,picCy,picR+9,0,Math.PI*2);c.stroke();
 
   // Avatar
   c.fillStyle='#243a6e';
-  c.beginPath();c.arc(picCx,row1Y,picR,0,Math.PI*2);c.fill();
+  c.beginPath();c.arc(cx,picCy,picR,0,Math.PI*2);c.fill();
   if(picImg){
-    c.save();c.beginPath();c.arc(picCx,row1Y,picR,0,Math.PI*2);c.clip();
-    c.drawImage(picImg,picCx-picR,row1Y-picR,picR*2,picR*2);
+    c.save();c.beginPath();c.arc(cx,picCy,picR,0,Math.PI*2);c.clip();
+    c.drawImage(picImg,cx-picR,picCy-picR,picR*2,picR*2);
     c.restore();
   }else{
-    c.font='900 68px Nunito';c.textAlign='center';c.textBaseline='middle';
-    c.fillStyle='rgba(240,234,214,0.3)';c.fillText(uname.charAt(0).toUpperCase(),picCx,row1Y);
+    c.font='900 56px Nunito';c.textAlign='center';c.textBaseline='middle';
+    c.fillStyle='rgba(240,234,214,0.3)';c.fillText(uname.charAt(0).toUpperCase(),cx,picCy);
   }
 
-  // Name below PFP
-  c.font='900 32px Nunito';c.fillStyle='#F0EAD6';
+  // Name
+  c.font='900 28px Nunito';c.fillStyle='#F0EAD6';
   c.textAlign='center';c.textBaseline='top';
-  c.fillText(uname,picCx,row1Y+picR+18);
+  c.fillText(uname,cx,picCy+picR+14);
 
-  // IQ block — right side, vertically centered with PFP
-  var iqX=720;
+  // ── IQ — massive, below name ──
+  var iqCy=330;
 
-  // "IQ" label
-  c.font='900 22px Nunito';c.fillStyle='rgba(240,234,214,0.3)';
-  c.textAlign='center';c.textBaseline='bottom';
-  c.fillText('I Q',iqX,row1Y-95);
-
-  // IQ number — HUGE
-  c.font='900 240px Nunito';c.fillStyle='#F0EAD6';
+  c.font='900 180px Nunito';c.fillStyle='#F0EAD6';
   c.textBaseline='middle';c.textAlign='center';
-  c.fillText(String(iq),iqX,row1Y-10);
+  c.fillText(String(iq),cx,iqCy);
 
-  // Gold bar under IQ
+  // "IQ" to the right of the number, smaller
   var numW=c.measureText(String(iq)).width;
-  rr(c,iqX-numW/2,row1Y+100,numW,6,3,'#e8a817');
+  c.font='900 40px Nunito';c.fillStyle='rgba(240,234,214,0.3)';
+  c.textAlign='left';c.textBaseline='top';
+  c.fillText('IQ',cx+numW/2+12,iqCy-80);
 
-  // Percentile pill
+  // Percentile — pill below IQ
   if(pctText){
-    c.font='900 22px Nunito';var tw=c.measureText(pctText).width+52;
-    var pillY=row1Y+120;
-    rr(c,iqX-tw/2,pillY,tw,44,22,'#e8a817');
-    c.fillStyle=BG;c.textBaseline='middle';c.textAlign='center';
-    c.fillText(pctText,iqX,pillY+22);
+    c.font='900 20px Nunito';var tw=c.measureText(pctText).width+50;
+    var pillY=iqCy+86;
+    rr(c,cx-tw/2,pillY,tw,42,21,'rgba(232,168,23,0.2)');
+    c.strokeStyle='#e8a817';c.lineWidth=2;
+    c.beginPath();
+    c.moveTo(cx-tw/2+21,pillY);c.lineTo(cx+tw/2-21,pillY);c.quadraticCurveTo(cx+tw/2,pillY,cx+tw/2,pillY+21);
+    c.quadraticCurveTo(cx+tw/2,pillY+42,cx+tw/2-21,pillY+42);c.lineTo(cx-tw/2+21,pillY+42);
+    c.quadraticCurveTo(cx-tw/2,pillY+42,cx-tw/2,pillY+21);c.quadraticCurveTo(cx-tw/2,pillY,cx-tw/2+21,pillY);
+    c.closePath();c.stroke();
+    c.fillStyle='#e8a817';c.textBaseline='middle';c.textAlign='center';
+    c.fillText(pctText,cx,pillY+21);
   }
 
-  // Stats right of IQ — vertical stack
-  var stX=1020;
+  // ── STATS — 4 pills in a row ──
+  var statY=barY-60;
   var statItems=[
-    {v:String(d.answered||0),l:'ANSWERED',color:'#3fba4f'},
-    {v:acc+'%',l:'ACCURACY',color:'#3a7df2'},
-    {v:String(d.bestStreak||0),l:'STREAK',color:'#e87d1a'},
-    {v:'Lvl '+(d.level||1),l:'LEVEL',color:'#6d4aed'}
+    {v:String(d.answered||0),l:'answered',color:'#3fba4f'},
+    {v:acc+'%',l:'accuracy',color:'#3a7df2'},
+    {v:String(d.bestStreak||0),l:'streak',color:'#e87d1a'},
+    {v:'Lvl '+(d.level||1),l:'level',color:'#6d4aed'}
   ];
-  var stY=row1Y-110;
-  var stH=56;
+  var pillGap=14;
+  // Measure total width
+  c.font='900 22px Nunito';
+  var totalPW=0;
+  var pillWidths=statItems.map(function(s){
+    var txt=s.v+' '+s.l;
+    c.font='900 22px Nunito';
+    var vw=c.measureText(s.v).width;
+    c.font='700 16px Nunito';
+    var lw=c.measureText(s.l).width;
+    var pw=vw+lw+44;
+    totalPW+=pw;
+    return pw;
+  });
+  totalPW+=pillGap*(statItems.length-1);
+  var px=cx-totalPW/2;
 
   statItems.forEach(function(s,i){
-    var sy=stY+i*stH;
+    var pw=pillWidths[i];
+    // Pill bg
+    rr(c,px,statY,pw,40,20,'rgba(240,234,214,0.06)');
     // Color dot
-    c.fillStyle=s.color;c.beginPath();c.arc(stX,sy+12,5,0,Math.PI*2);c.fill();
+    c.fillStyle=s.color;c.beginPath();c.arc(px+18,statY+20,5,0,Math.PI*2);c.fill();
     // Value
-    c.font='900 26px Nunito';c.fillStyle='#F0EAD6';c.textAlign='left';c.textBaseline='middle';
-    c.fillText(s.v,stX+16,sy+10);
+    c.font='900 22px Nunito';c.fillStyle='#F0EAD6';c.textAlign='left';c.textBaseline='middle';
+    c.fillText(s.v,px+30,statY+20);
+    var vw=c.measureText(s.v).width;
     // Label
-    c.font='800 11px Nunito';c.fillStyle='rgba(240,234,214,0.3)';
-    c.fillText(s.l,stX+16,sy+32);
+    c.font='700 16px Nunito';c.fillStyle='rgba(240,234,214,0.35)';
+    c.fillText(s.l,px+34+vw,statY+20);
+    px+=pw+pillGap;
   });
 
-  // ══ ABILITY COLOR BAR — 8 thick colored segments ══
-  var barY=H-140;
-  var barH=16;
-  var barPad=60;
-  var barW=W-barPad*2;
-  var segW=barW/AB.length;
+  /* ═══════════ GOLD BAR — BRANDING ═══════════ */
 
-  AB.forEach(function(a,i){
-    var pct=IQData.getStatPercent(a.key);
-    var x=barPad+i*segW;
-    // Full segment bg
-    rr(c,x+1,barY,segW-2,barH,barH/2,a.color+'30');
-    // Filled portion
-    var fillW=Math.max(4,(segW-2)*(pct/100));
-    rr(c,x+1,barY,fillW,barH,barH/2,a.color);
-  });
+  // Logo — big
+  var logoSize=60;
+  var brandTotalW=0;
+  c.font='900 52px Nunito';
+  var cebW=c.measureText('cebear').width;
+  c.font='900 52px Nunito';
+  var comW=c.measureText('.com').width;
+  brandTotalW=(logoImg?logoSize+16:0)+cebW+comW;
+  var bx=cx-brandTotalW/2;
 
-  // Labels below bar
-  AB.forEach(function(a,i){
-    var x=barPad+i*segW+segW/2;
-    c.font='800 12px Nunito';c.fillStyle='rgba(240,234,214,0.35)';
-    c.textAlign='center';c.textBaseline='top';
-    c.fillText(a.name.substring(0,3).toUpperCase(),x,barY+barH+6);
-  });
+  if(logoImg){
+    c.drawImage(logoImg,bx,barY+(barH-logoSize)/2,logoSize,logoSize);
+    bx+=logoSize+16;
+  }
 
-  // ══ BRANDING — MASSIVE, bottom center ══
-  var brandY=H-52;
-
-  // Logo
-  var logoX=W/2-180;
-  if(logoImg){c.drawImage(logoImg,logoX,brandY-20,44,44)}
-
-  // "cebear.com" — huge
-  c.font='900 42px Nunito';c.fillStyle='#F0EAD6';
+  // "cebear" — navy on gold
+  c.font='900 52px Nunito';c.fillStyle='#1b2d5b';
   c.textAlign='left';c.textBaseline='middle';
-  var tx=logoImg?logoX+54:logoX;
-  c.fillText('cebear',tx,brandY);
-  var cW=c.measureText('cebear').width;
-  c.fillStyle='rgba(240,234,214,0.45)';
-  c.fillText('.com',tx+cW,brandY);
+  c.fillText('cebear',bx,barY+barH/2);
+  // ".com" — slightly lighter
+  c.fillStyle='rgba(27,45,91,0.45)';
+  c.fillText('.com',bx+cebW,barY+barH/2);
 
-  // Gold dot
-  var fullBW=cW+c.measureText('.com').width;
-  c.fillStyle='#e8a817';
-  c.beginPath();c.arc(tx+fullBW+16,brandY,7,0,Math.PI*2);c.fill();
+  // "Can you beat me?" — smaller, below brand name
+  c.font='800 18px Nunito';c.fillStyle='rgba(27,45,91,0.4)';
+  c.textAlign='center';c.textBaseline='top';
+  c.fillText('Can you beat me?  \u2022  Train your brain',cx,barY+barH/2+30);
 
   shareCanvas=cv;
   return cv;
