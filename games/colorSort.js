@@ -40,7 +40,7 @@
         '<div class="csort-placed" id="csort-placed-' + idx + '"></div>' +
         '<div class="csort-pool" id="csort-pool-' + idx + '">' + tiles + '</div>' +
         '<div class="explanation" id="exp-' + idx + '"></div>' +
-        '<div class="branding">braindeer.org</div>' +
+        '<div class="branding">cebear.com</div>' +
         '</div>';
     },
     attach: function (slideEl, q, idx, ctx) {
