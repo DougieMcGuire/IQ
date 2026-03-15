@@ -13,7 +13,6 @@
     .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
     .scroll::-webkit-scrollbar{display:none}
 
-    /* ══ CREAM TOP — avatar + IQ hero ══ */
     .hero{
       background:var(--cream);
       padding:calc(env(safe-area-inset-top,20px) + 10px) 20px 0;
@@ -37,7 +36,6 @@
     .iq-lbl{font-size:14px;font-weight:900;color:var(--light);letter-spacing:5px;text-transform:uppercase;margin-bottom:6px}
     .pct{background:var(--navy);color:var(--cream);font-size:12px;font-weight:900;padding:5px 18px;border-radius:20px;margin-bottom:16px}
 
-    /* ── Share CTA on cream ── */
     .share-cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:400px;padding:15px;background:var(--gold);color:var(--navy);border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;text-transform:uppercase;letter-spacing:1px;position:relative;overflow:hidden;box-shadow:0 4px 0 var(--goldd);transition:transform .1s;margin-bottom:4px}
     .share-cta:active{transform:translateY(4px);box-shadow:none}
     .share-cta svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5;flex-shrink:0}
@@ -46,7 +44,6 @@
     .share-cta.uploading{opacity:.6;pointer-events:none}
     .share-nudge{text-align:center;font-size:11px;font-weight:700;color:var(--dim);margin-bottom:20px}
 
-    /* ══ NAVY BOTTOM ══ */
     .navy-section{
       background:var(--navy);
       border-radius:28px 28px 0 0;
@@ -54,7 +51,6 @@
     }
     .navy-inner{max-width:420px;margin:0 auto}
 
-    /* ── Stats: 2×2 grid, glass cards ── */
     .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
     .sg{background:rgba(240,234,214,.06);border-radius:16px;padding:16px;display:flex;align-items:center;gap:12px;border:1px solid rgba(240,234,214,.06);position:relative;overflow:hidden}
     .sg::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(240,234,214,.1),transparent)}
@@ -65,7 +61,6 @@
     .sg-val{font-size:min(24px,6vw);font-weight:900;color:var(--cream);line-height:1.1}
     .sg-lbl{font-size:10px;font-weight:800;color:rgba(240,234,214,.3);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
 
-    /* ── Abilities section ── */
     .ab-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
     .ab-title{font-size:11px;font-weight:900;color:rgba(240,234,214,.3);letter-spacing:2px;text-transform:uppercase}
     .ab-card{background:rgba(240,234,214,.04);border-radius:18px;padding:4px 0;overflow:hidden;border:1px solid rgba(240,234,214,.04)}
@@ -81,7 +76,6 @@
 
     .reset-btn{margin:24px auto 0;background:none;border:none;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;color:rgba(240,234,214,.12);cursor:pointer;display:block;padding:12px;text-align:center}
 
-    /* ══ SHARE MODAL ══ */
     .modal-overlay{position:fixed;inset:0;background:rgba(27,45,91,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center;z-index:200}
     .modal-overlay.show{display:flex}
     .modal-sheet{background:var(--cream);border-radius:24px 24px 0 0;width:100%;max-width:440px;padding:10px 16px calc(16px + env(safe-area-inset-bottom,0px));animation:sheetUp .28s cubic-bezier(.32,.72,0,1)}
@@ -107,7 +101,6 @@
 </head>
 <body>
 <div class="scroll">
-  <!-- ══ CREAM TOP ══ -->
   <div class="hero">
     <div class="hero-hdr"><div class="hero-name" id="username-display"></div><button class="hero-out" id="signout-btn">Sign out</button></div>
     <div class="av-wrap">
@@ -118,12 +111,10 @@
     <div class="iq-big" id="iq-num">--</div>
     <div class="iq-lbl">I Q</div>
     <div class="pct" id="pct-badge" style="display:none"></div>
-
     <button class="share-cta" id="share-btn"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share Your IQ</button>
     <div class="share-nudge">Challenge your friends — who's smarter?</div>
   </div>
 
-  <!-- ══ NAVY BOTTOM ══ -->
   <div class="navy-section">
     <div class="navy-inner">
       <div class="stats-grid">
@@ -132,10 +123,7 @@
         <div class="sg"><div class="sg-ic i3"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="sg-info"><div class="sg-val" id="best-streak">0</div><div class="sg-lbl">Best Streak</div></div></div>
         <div class="sg"><div class="sg-ic i4"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div><div class="sg-info"><div class="sg-val" id="level-val">1</div><div class="sg-lbl">Level</div></div></div>
       </div>
-
-      <div class="ab-header">
-        <div class="ab-title">Abilities</div>
-      </div>
+      <div class="ab-header"><div class="ab-title">Abilities</div></div>
       <div class="ab-card" id="abilities"></div>
       <button class="reset-btn" id="reset-btn">Reset Progress</button>
     </div>
@@ -168,28 +156,24 @@ document.getElementById('avatar-input').onchange=e=>handleAvatarFile(e.target.fi
 document.getElementById('signout-btn').onclick=()=>{Haptics.warning();IQData.signOut()};
 document.getElementById('reset-btn').onclick=()=>{Haptics.warning();if(confirm('Reset all progress?')){Haptics.error();IQData.reset();location.reload()}};
 
-/* ══════════════════════════════════════════════════════
-   SHARE CARD — Eye-catching, packed, zero dead space
-   Navy bg with bold gold accents, massive IQ, abilities
-   ring, profile pic front-and-center
-   ══════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════
+   SHARE CARD v3 — iMessage-matching navy (#334570), packed
+   two-column layout, big branding, pfp awaited before draw
+   ══════════════════════════════════════════════════════════════ */
 var shareCanvas=null,shareUrl='';
 function getShareUrl(){var u=IQData.getCurrentUser();return u?'https://cebear.com/share/'+u.uid:'https://cebear.com'}
 function rr(c,x,y,w,h,r,f){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();if(f){c.fillStyle=f;c.fill()}}
 
-/* Helper: load an image as a promise */
 function loadImg(src){
   return new Promise(function(resolve){
     if(!src){resolve(null);return}
-    var img=new Image();
-    img.crossOrigin='anonymous';
+    var img=new Image();img.crossOrigin='anonymous';
     img.onload=function(){resolve(img)};
     img.onerror=function(){resolve(null)};
     img.src=src;
   });
 }
 
-/* ── genShareCard is now async — waits for pfp + logo ── */
 async function genShareCard(){
   var d=IQData.load(),W=1200,H=630,cv=document.createElement('canvas');
   cv.width=W;cv.height=H;var c=cv.getContext('2d');
@@ -198,203 +182,191 @@ async function genShareCard(){
   var iq=d.iq||'--';
   var pctText=d.iq?'TOP '+formatPercentile(iqToPercentile(d.iq)).toUpperCase():'';
 
-  // ── Load images FIRST, before any drawing ──
+  // ── Await ALL images before drawing anything ──
   var [picImg,logoImg]=await Promise.all([loadImg(pic),loadImg('logo.png')]);
 
-  // ══ BACKGROUND — deep navy with layered texture ══
-  c.fillStyle='#111d3a';c.fillRect(0,0,W,H);
+  // ══ BG — matches iMessage dark bubble exactly ══
+  var BG='#334570';
+  c.fillStyle=BG;c.fillRect(0,0,W,H);
 
-  // Large radial glow — gold behind the IQ area
-  var g1=c.createRadialGradient(W*0.5,H*0.38,0,W*0.5,H*0.38,480);
+  // Gold glow — left side
+  var g1=c.createRadialGradient(W*0.32,H*0.48,0,W*0.32,H*0.48,400);
   g1.addColorStop(0,'rgba(232,168,23,0.10)');g1.addColorStop(0.5,'rgba(232,168,23,0.03)');g1.addColorStop(1,'transparent');
   c.fillStyle=g1;c.fillRect(0,0,W,H);
 
-  // Secondary glow — blue/purple bottom-right
-  var g2=c.createRadialGradient(W*0.85,H*0.8,0,W*0.85,H*0.8,350);
-  g2.addColorStop(0,'rgba(58,125,242,0.08)');g2.addColorStop(1,'transparent');
+  // Blue glow — right side
+  var g2=c.createRadialGradient(W*0.78,H*0.4,0,W*0.78,H*0.4,350);
+  g2.addColorStop(0,'rgba(58,125,242,0.06)');g2.addColorStop(1,'transparent');
   c.fillStyle=g2;c.fillRect(0,0,W,H);
 
-  // Diagonal line pattern for texture
-  c.save();
-  c.strokeStyle='rgba(240,234,214,0.018)';c.lineWidth=1;
-  for(var i=-H;i<W+H;i+=28){c.beginPath();c.moveTo(i,0);c.lineTo(i+H,H);c.stroke()}
+  // Diagonal texture
+  c.save();c.strokeStyle='rgba(240,234,214,0.015)';c.lineWidth=1;
+  for(var i=-H;i<W+H;i+=30){c.beginPath();c.moveTo(i,0);c.lineTo(i+H,H);c.stroke()}
   c.restore();
 
-  // ══ TOP STRIP — gold accent bar ══
-  c.fillStyle='#e8a817';c.fillRect(0,0,W,5);
-  // Gradient fade under gold bar
-  var gBar=c.createLinearGradient(0,5,0,40);
-  gBar.addColorStop(0,'rgba(232,168,23,0.12)');gBar.addColorStop(1,'transparent');
-  c.fillStyle=gBar;c.fillRect(0,5,W,35);
+  // Gold top bar
+  c.fillStyle='#e8a817';c.fillRect(0,0,W,6);
 
-  // ══ LAYOUT: Center-dominant with IQ massive ══
-  var cx=W/2;
+  // ══ TWO-COLUMN LAYOUT ══
+  var LX=48,RX=620,RW=W-RX-48,LW=RX-LX-40;
 
-  // ── Profile pic — large, top-center with gold ring ──
-  var picR=52;
-  var picY=80;
+  // ═══════════ LEFT COLUMN ═══════════
 
-  // Outer gold ring
-  c.lineWidth=4;c.strokeStyle='#e8a817';
-  c.beginPath();c.arc(cx,picY,picR+6,0,Math.PI*2);c.stroke();
-  // Subtle outer glow ring
-  c.lineWidth=1;c.strokeStyle='rgba(232,168,23,0.15)';
-  c.beginPath();c.arc(cx,picY,picR+14,0,Math.PI*2);c.stroke();
+  // Profile pic — big with gold ring
+  var picR=62,picCx=LX+LW/2,picY=100;
+
+  // Glow
+  var pg=c.createRadialGradient(picCx,picY,picR,picCx,picY,picR+28);
+  pg.addColorStop(0,'rgba(232,168,23,0.14)');pg.addColorStop(1,'transparent');
+  c.fillStyle=pg;c.fillRect(picCx-picR-30,picY-picR-30,(picR+30)*2,(picR+30)*2);
+
+  // Gold ring
+  c.lineWidth=5;c.strokeStyle='#e8a817';
+  c.beginPath();c.arc(picCx,picY,picR+7,0,Math.PI*2);c.stroke();
 
   // Avatar bg
-  c.fillStyle='#1b2d5b';
-  c.beginPath();c.arc(cx,picY,picR,0,Math.PI*2);c.fill();
+  c.fillStyle='#243a6e';
+  c.beginPath();c.arc(picCx,picY,picR,0,Math.PI*2);c.fill();
 
+  // PFP — drawn synchronously since we awaited the load
   if(picImg){
     c.save();
-    c.beginPath();c.arc(cx,picY,picR,0,Math.PI*2);c.clip();
-    c.drawImage(picImg,cx-picR,picY-picR,picR*2,picR*2);
+    c.beginPath();c.arc(picCx,picY,picR,0,Math.PI*2);c.clip();
+    c.drawImage(picImg,picCx-picR,picY-picR,picR*2,picR*2);
     c.restore();
   }else{
-    c.font='900 34px Nunito';c.textAlign='center';c.textBaseline='middle';
-    c.fillStyle='rgba(240,234,214,0.3)';c.fillText(uname.charAt(0).toUpperCase(),cx,picY);
+    c.font='900 42px Nunito';c.textAlign='center';c.textBaseline='middle';
+    c.fillStyle='rgba(240,234,214,0.3)';c.fillText(uname.charAt(0).toUpperCase(),picCx,picY);
   }
 
-  // ── Username ──
-  c.font='800 22px Nunito';c.fillStyle='rgba(240,234,214,0.7)';
+  // Username
+  c.font='800 26px Nunito';c.fillStyle='#F0EAD6';
   c.textAlign='center';c.textBaseline='top';
-  c.fillText(uname,cx,picY+picR+14);
+  c.fillText(uname,picCx,picY+picR+16);
 
-  // ══ IQ — MASSIVE center number ══
-  var iqY=280;
-
-  // "IQ" label above number
-  c.font='900 16px Nunito';c.fillStyle='rgba(240,234,214,0.2)';
+  // IQ — massive
+  var iqY=330;
+  c.font='900 18px Nunito';c.fillStyle='rgba(240,234,214,0.25)';
   c.textAlign='center';c.textBaseline='bottom';
-  c.letterSpacing='8px';
-  c.fillText('I Q',cx,iqY-80);
+  c.fillText('I Q',picCx,iqY-92);
 
-  // The big number
-  c.font='900 180px Nunito';
-  // Gold gradient text effect via overlay
-  c.fillStyle='#F0EAD6';
+  c.font='900 200px Nunito';c.fillStyle='#F0EAD6';
   c.textBaseline='middle';c.textAlign='center';
-  c.fillText(String(iq),cx,iqY);
+  c.fillText(String(iq),picCx,iqY);
 
-  // Gold underline accent beneath the number
+  // Gold bar under number
   var numW=c.measureText(String(iq)).width;
-  c.fillStyle='#e8a817';
-  rr(c,cx-numW/2-10,iqY+85,numW+20,4,2,'#e8a817');
+  rr(c,picCx-numW/2,iqY+96,numW,5,3,'#e8a817');
 
-  // Percentile badge — gold pill beneath
+  // Percentile pill
   if(pctText){
-    c.font='900 16px Nunito';var tw=c.measureText(pctText).width+40;
-    var pillY=iqY+100;
-    rr(c,cx-tw/2,pillY,tw,34,17,'#e8a817');
-    c.fillStyle='#111d3a';c.textBaseline='middle';c.textAlign='center';
-    c.fillText(pctText,cx,pillY+17);
+    c.font='900 18px Nunito';var tw=c.measureText(pctText).width+48;
+    var pillY=iqY+116;
+    rr(c,picCx-tw/2,pillY,tw,38,19,'#e8a817');
+    c.fillStyle=BG;c.textBaseline='middle';c.textAlign='center';
+    c.fillText(pctText,picCx,pillY+19);
   }
 
-  // ══ STATS ROW — horizontal bar at the bottom ══
-  var statsY=H-172;
+  // Stats 2×2
+  var sY=iqY+178;
   var statItems=[
     {v:String(d.answered||0),l:'ANSWERED',color:'#3fba4f'},
     {v:acc+'%',l:'ACCURACY',color:'#3a7df2'},
     {v:String(d.bestStreak||0),l:'STREAK',color:'#e87d1a'},
     {v:'Lvl '+(d.level||1),l:'LEVEL',color:'#6d4aed'}
   ];
-  var statTotalW=W-100;
-  var statW=statTotalW/statItems.length;
-  var statStartX=50;
-
-  // Stats background strip
-  rr(c,30,statsY-10,W-60,76,16,'rgba(240,234,214,0.035)');
+  var sGap=10,sW=(LW-sGap)/2,sH=66;
 
   statItems.forEach(function(s,i){
-    var sx=statStartX+i*statW+statW/2;
-    // Color dot
-    c.fillStyle=s.color;
-    c.beginPath();c.arc(sx,statsY+8,4,0,Math.PI*2);c.fill();
-    // Value
-    c.font='900 28px Nunito';c.fillStyle='#F0EAD6';c.textAlign='center';c.textBaseline='top';
-    c.fillText(s.v,sx,statsY+18);
-    // Label
-    c.font='800 10px Nunito';c.fillStyle='rgba(240,234,214,0.25)';
-    c.fillText(s.l,sx,statsY+50);
-    // Divider (except last)
-    if(i<statItems.length-1){
-      c.strokeStyle='rgba(240,234,214,0.06)';c.lineWidth=1;
-      c.beginPath();c.moveTo(sx+statW/2,statsY);c.lineTo(sx+statW/2,statsY+60);c.stroke();
-    }
+    var col=i%2,row=Math.floor(i/2);
+    var sx=LX+col*(sW+sGap),sy=sY+row*(sH+sGap);
+    rr(c,sx,sy,sW,sH,12,'rgba(240,234,214,0.045)');
+    rr(c,sx+1,sy+14,3,sH-28,2,s.color);
+    c.font='900 26px Nunito';c.fillStyle='#F0EAD6';c.textAlign='left';c.textBaseline='middle';
+    c.fillText(s.v,sx+16,sy+sH/2-6);
+    c.font='800 10px Nunito';c.fillStyle='rgba(240,234,214,0.3)';
+    c.fillText(s.l,sx+16,sy+sH/2+15);
   });
 
-  // ══ ABILITIES — compact row of colored bars at very bottom ══
-  var abY=H-82;
-  var abPad=50;
-  var abW=(W-abPad*2);
-  var cats=AB;
-  var barH=8;
-  var barGap=4;
-  var totalBarH=cats.length*(barH+barGap)-barGap;
-  // Two-column layout for abilities
-  var colW=(abW-20)/2;
-  var halfCats=Math.ceil(cats.length/2);
-  var abRowH=barH+barGap+9;
+  // ═══════════ VERTICAL DIVIDER ═══════════
+  c.strokeStyle='rgba(240,234,214,0.06)';c.lineWidth=1;
+  c.beginPath();c.moveTo(RX-20,36);c.lineTo(RX-20,H-36);c.stroke();
+
+  // ═══════════ RIGHT COLUMN ═══════════
+
+  // Abilities header
+  var abY=40;
+  c.font='900 14px Nunito';c.fillStyle='rgba(240,234,214,0.3)';
+  c.textAlign='left';c.textBaseline='top';
+  c.fillText('ABILITIES',RX,abY);
+  abY+=34;
+
+  // Abilities card
+  var abCardH=H-abY-120;
+  rr(c,RX,abY,RW,abCardH,16,'rgba(240,234,214,0.03)');
+
+  var cats=AB,abPadX=20,abPadY=16;
+  var rowH=(abCardH-abPadY*2)/cats.length,barH=10;
 
   cats.forEach(function(a,i){
-    var col=i<halfCats?0:1;
-    var row=col===0?i:i-halfCats;
-    var bx=abPad+col*(colW+20);
-    var by=abY+row*abRowH;
+    var y=abY+abPadY+i*rowH;
     var pct=IQData.getStatPercent(a.key);
-    var nameW=70;
-    var valW=30;
-    var barSpace=colW-nameW-valW-8;
+    var barStartX=RX+abPadX,valW=44;
+    var barW=RW-abPadX*2-valW-12;
+
+    // Dot
+    c.fillStyle=a.color;
+    c.beginPath();c.arc(barStartX+5,y+rowH/2,5,0,Math.PI*2);c.fill();
 
     // Name
-    c.font='800 9px Nunito';c.fillStyle='rgba(240,234,214,0.35)';
+    c.font='800 14px Nunito';c.fillStyle='rgba(240,234,214,0.5)';
     c.textAlign='left';c.textBaseline='middle';
-    c.fillText(a.name.toUpperCase(),bx,by+barH/2);
+    c.fillText(a.name,barStartX+18,y+rowH/2-11);
 
-    // Bar bg
-    rr(c,bx+nameW,by,barSpace,barH,4,'rgba(240,234,214,0.05)');
-    // Bar fill
+    // Bar
+    var barY=y+rowH/2+5;
+    rr(c,barStartX+18,barY,barW-18,barH,5,'rgba(240,234,214,0.06)');
     if(pct>0){
-      var fw=Math.max(4,barSpace*(pct/100));
-      rr(c,bx+nameW,by,fw,barH,4,a.color);
-      // Shine on bar
-      c.save();
-      c.beginPath();
-      rr(c,bx+nameW,by,fw,barH/2,4);
-      c.clip&&false;
-      c.restore();
+      var fillW=Math.max(6,(barW-18)*(pct/100));
+      rr(c,barStartX+18,barY,fillW,barH,5,a.color);
     }
 
     // Value
-    c.font='900 10px Nunito';c.fillStyle='rgba(240,234,214,0.6)';
+    c.font='900 18px Nunito';c.fillStyle='#F0EAD6';
     c.textAlign='right';c.textBaseline='middle';
-    c.fillText(String(pct),bx+colW,by+barH/2);
+    c.fillText(String(pct),RX+RW-abPadX,y+rowH/2);
+
+    if(i<cats.length-1){
+      c.strokeStyle='rgba(240,234,214,0.04)';c.lineWidth=1;
+      c.beginPath();c.moveTo(barStartX,y+rowH);c.lineTo(RX+RW-abPadX,y+rowH);c.stroke();
+    }
   });
 
-  // ══ BRANDING — big and bold, bottom-left ══
-  // Logo
-  if(logoImg){
-    c.drawImage(logoImg,40,H-38,24,24);
-  }
-  c.font='900 18px Nunito';c.fillStyle='rgba(240,234,214,0.5)';
-  c.textAlign='left';c.textBaseline='bottom';
-  c.fillText('cebear.com',logoImg?72:40,H-16);
+  // ── BRANDING — big, bottom-right ──
+  var brandY=H-68;
+  if(logoImg){c.drawImage(logoImg,RX,brandY,38,38)}
+  c.font='900 30px Nunito';c.fillStyle='#F0EAD6';
+  c.textAlign='left';c.textBaseline='middle';
+  var btx=logoImg?RX+46:RX;
+  c.fillText('cebear',btx,brandY+19);
+  var cW=c.measureText('cebear').width;
+  c.fillStyle='rgba(240,234,214,0.4)';
+  c.fillText('.com',btx+cW,brandY+19);
 
-  // Gold dot after brand
-  var brandW=c.measureText('cebear.com').width;
+  // Gold dot
+  var fullW=cW+c.measureText('.com').width;
   c.fillStyle='#e8a817';
-  c.beginPath();c.arc((logoImg?72:40)+brandW+10,H-24,3.5,0,Math.PI*2);c.fill();
+  c.beginPath();c.arc(btx+fullW+14,brandY+19,5,0,Math.PI*2);c.fill();
 
-  // "Train your brain" tagline
-  c.font='700 12px Nunito';c.fillStyle='rgba(240,234,214,0.18)';
-  c.textAlign='right';c.textBaseline='bottom';
-  c.fillText('Can you beat me?',W-40,H-16);
+  // CTA
+  c.font='700 14px Nunito';c.fillStyle='rgba(240,234,214,0.25)';
+  c.textBaseline='top';c.textAlign='left';
+  c.fillText('Can you beat me?  \u2192  cebear.com',RX,brandY+42);
 
-  // Corner accents — decorative gold dots
-  [[W-40,24],[W-48,24],[W-40,32]].forEach(function(p){
-    c.fillStyle='rgba(232,168,23,0.15)';
-    c.beginPath();c.arc(p[0],p[1],2,0,Math.PI*2);c.fill();
-  });
+  // Bottom-left watermark
+  c.font='800 13px Nunito';c.fillStyle='rgba(240,234,214,0.12)';
+  c.textAlign='left';c.textBaseline='bottom';
+  c.fillText('TRAIN YOUR BRAIN',LX,H-20);
 
   shareCanvas=cv;
   return cv;
