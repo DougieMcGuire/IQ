@@ -13,12 +13,7 @@
     .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
     .scroll::-webkit-scrollbar{display:none}
 
-    .hero{
-      background:var(--cream);
-      padding:calc(env(safe-area-inset-top,20px) + 10px) 20px 0;
-      display:flex;flex-direction:column;align-items:center;
-      position:relative;
-    }
+    .hero{background:var(--cream);padding:calc(env(safe-area-inset-top,20px) + 10px) 20px 0;display:flex;flex-direction:column;align-items:center;position:relative}
     .hero-hdr{width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
     .hero-name{font-size:14px;font-weight:800;color:var(--dim)}
     .hero-out{background:rgba(27,45,91,.06);border:none;padding:7px 14px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:var(--dim);cursor:pointer}
@@ -44,11 +39,7 @@
     .share-cta.uploading{opacity:.6;pointer-events:none}
     .share-nudge{text-align:center;font-size:11px;font-weight:700;color:var(--dim);margin-bottom:20px}
 
-    .navy-section{
-      background:var(--navy);
-      border-radius:28px 28px 0 0;
-      padding:24px 16px 32px;
-    }
+    .navy-section{background:var(--navy);border-radius:28px 28px 0 0;padding:24px 16px 32px}
     .navy-inner{max-width:420px;margin:0 auto}
 
     .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
@@ -114,20 +105,17 @@
     <button class="share-cta" id="share-btn"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share Your IQ</button>
     <div class="share-nudge">Challenge your friends — who's smarter?</div>
   </div>
-
-  <div class="navy-section">
-    <div class="navy-inner">
-      <div class="stats-grid">
-        <div class="sg"><div class="sg-ic i1"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg></div><div class="sg-info"><div class="sg-val" id="answered">0</div><div class="sg-lbl">Answered</div></div></div>
-        <div class="sg"><div class="sg-ic i2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div class="sg-info"><div class="sg-val" id="accuracy">0%</div><div class="sg-lbl">Accuracy</div></div></div>
-        <div class="sg"><div class="sg-ic i3"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="sg-info"><div class="sg-val" id="best-streak">0</div><div class="sg-lbl">Best Streak</div></div></div>
-        <div class="sg"><div class="sg-ic i4"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div><div class="sg-info"><div class="sg-val" id="level-val">1</div><div class="sg-lbl">Level</div></div></div>
-      </div>
-      <div class="ab-header"><div class="ab-title">Abilities</div></div>
-      <div class="ab-card" id="abilities"></div>
-      <button class="reset-btn" id="reset-btn">Reset Progress</button>
+  <div class="navy-section"><div class="navy-inner">
+    <div class="stats-grid">
+      <div class="sg"><div class="sg-ic i1"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg></div><div class="sg-info"><div class="sg-val" id="answered">0</div><div class="sg-lbl">Answered</div></div></div>
+      <div class="sg"><div class="sg-ic i2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div class="sg-info"><div class="sg-val" id="accuracy">0%</div><div class="sg-lbl">Accuracy</div></div></div>
+      <div class="sg"><div class="sg-ic i3"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="sg-info"><div class="sg-val" id="best-streak">0</div><div class="sg-lbl">Best Streak</div></div></div>
+      <div class="sg"><div class="sg-ic i4"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div><div class="sg-info"><div class="sg-val" id="level-val">1</div><div class="sg-lbl">Level</div></div></div>
     </div>
-  </div>
+    <div class="ab-header"><div class="ab-title">Abilities</div></div>
+    <div class="ab-card" id="abilities"></div>
+    <button class="reset-btn" id="reset-btn">Reset Progress</button>
+  </div></div>
 </div>
 
 <div class="modal-overlay" id="share-modal"><div class="modal-sheet"><div class="sheet-handle"></div><div class="card-preview" id="card-preview"></div><div class="share-link-bar"><input class="share-link-url" id="share-url" readonly value=""><button class="share-link-copy" id="copy-link">Copy link</button></div><div class="share-label">Share to</div><div class="share-grid" id="share-grid"></div></div></div>
@@ -149,17 +137,18 @@ row.innerHTML='<div class="ab-dot" style="background:'+a.color+'"></div><div cla
 list.appendChild(row)});
 requestAnimationFrame(()=>setTimeout(()=>{document.querySelectorAll('.ab-fill').forEach(b=>{b.style.width=Math.max(6,parseInt(b.dataset.val))+'%'})},80))}
 
-function handleAvatarFile(f){if(!f)return;var r=new FileReader();r.onload=e=>{var img=new Image();img.onload=()=>{var c=document.createElement('canvas');c.width=c.height=200;var ctx=c.getContext('2d');var min=Math.min(img.width,img.height);ctx.drawImage(img,(img.width-min)/2,(img.height-min)/2,min,min,0,0,200,200);var url=c.toDataURL('image/jpeg',.8);IQData.setProfilePic(url);document.getElementById('avatar-img').src=url;document.getElementById('avatar-img').style.display='block';document.getElementById('avatar-icon').style.display='none';Haptics.success();toast('Photo updated!')};img.src=e.target.result};r.readAsDataURL(f)}
+function handleAvatarFile(f){if(!f)return;var r=new FileReader();r.onload=e=>{var img=new Image();img.onload=()=>{var cv=document.createElement('canvas');cv.width=cv.height=200;var ctx=cv.getContext('2d');var min=Math.min(img.width,img.height);ctx.drawImage(img,(img.width-min)/2,(img.height-min)/2,min,min,0,0,200,200);var url=cv.toDataURL('image/jpeg',.8);IQData.setProfilePic(url);document.getElementById('avatar-img').src=url;document.getElementById('avatar-img').style.display='block';document.getElementById('avatar-icon').style.display='none';Haptics.success();toast('Photo updated!')};img.src=e.target.result};r.readAsDataURL(f)}
 document.getElementById('avatar-tap').onclick=()=>{Haptics.medium();document.getElementById('avatar-input').click()};
 document.getElementById('avatar-edit-btn').onclick=()=>{Haptics.medium();document.getElementById('avatar-input').click()};
 document.getElementById('avatar-input').onchange=e=>handleAvatarFile(e.target.files[0]);
 document.getElementById('signout-btn').onclick=()=>{Haptics.warning();IQData.signOut()};
 document.getElementById('reset-btn').onclick=()=>{Haptics.warning();if(confirm('Reset all progress?')){Haptics.error();IQData.reset();location.reload()}};
 
-/* ══════════════════════════════════════════════════════════════
-   SHARE CARD v3 — iMessage-matching navy (#334570), packed
-   two-column layout, big branding, pfp awaited before draw
-   ══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════════
+   SHARE CARD v4
+   Layout: PFP hero left, IQ + radar chart right, branding bottom
+   Radar chart replaces boring bar list, way more visual
+   ══════════════════════════════════════════════════════════════════ */
 var shareCanvas=null,shareUrl='';
 function getShareUrl(){var u=IQData.getCurrentUser();return u?'https://cebear.com/share/'+u.uid:'https://cebear.com'}
 function rr(c,x,y,w,h,r,f){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();if(f){c.fillStyle=f;c.fill()}}
@@ -182,191 +171,263 @@ async function genShareCard(){
   var iq=d.iq||'--';
   var pctText=d.iq?'TOP '+formatPercentile(iqToPercentile(d.iq)).toUpperCase():'';
 
-  // ── Await ALL images before drawing anything ──
   var [picImg,logoImg]=await Promise.all([loadImg(pic),loadImg('logo.png')]);
 
-  // ══ BG — matches iMessage dark bubble exactly ══
+  // ══ BG — iMessage navy ══
   var BG='#334570';
   c.fillStyle=BG;c.fillRect(0,0,W,H);
 
-  // Gold glow — left side
-  var g1=c.createRadialGradient(W*0.32,H*0.48,0,W*0.32,H*0.48,400);
-  g1.addColorStop(0,'rgba(232,168,23,0.10)');g1.addColorStop(0.5,'rgba(232,168,23,0.03)');g1.addColorStop(1,'transparent');
+  // Gold glow — behind PFP area
+  var g1=c.createRadialGradient(240,200,0,240,200,350);
+  g1.addColorStop(0,'rgba(232,168,23,0.12)');g1.addColorStop(0.5,'rgba(232,168,23,0.03)');g1.addColorStop(1,'transparent');
   c.fillStyle=g1;c.fillRect(0,0,W,H);
 
-  // Blue glow — right side
-  var g2=c.createRadialGradient(W*0.78,H*0.4,0,W*0.78,H*0.4,350);
-  g2.addColorStop(0,'rgba(58,125,242,0.06)');g2.addColorStop(1,'transparent');
+  // Blue glow — behind radar
+  var g2=c.createRadialGradient(850,320,0,850,320,320);
+  g2.addColorStop(0,'rgba(58,125,242,0.07)');g2.addColorStop(1,'transparent');
   c.fillStyle=g2;c.fillRect(0,0,W,H);
 
-  // Diagonal texture
-  c.save();c.strokeStyle='rgba(240,234,214,0.015)';c.lineWidth=1;
-  for(var i=-H;i<W+H;i+=30){c.beginPath();c.moveTo(i,0);c.lineTo(i+H,H);c.stroke()}
-  c.restore();
+  // Subtle dot grid texture
+  c.fillStyle='rgba(240,234,214,0.02)';
+  for(var gx=20;gx<W;gx+=24)for(var gy=20;gy<H;gy+=24){c.beginPath();c.arc(gx,gy,1,0,Math.PI*2);c.fill()}
 
-  // Gold top bar
-  c.fillStyle='#e8a817';c.fillRect(0,0,W,6);
+  // Gold top accent
+  c.fillStyle='#e8a817';c.fillRect(0,0,W,5);
 
-  // ══ TWO-COLUMN LAYOUT ══
-  var LX=48,RX=620,RW=W-RX-48,LW=RX-LX-40;
+  /* ═══════════ LEFT SIDE — PFP + IQ + STATS ═══════════ */
 
-  // ═══════════ LEFT COLUMN ═══════════
+  // ── Profile pic — HUGE, with thick gold ring ──
+  var picR=90,picCx=230,picY=160;
 
-  // Profile pic — big with gold ring
-  var picR=62,picCx=LX+LW/2,picY=100;
-
-  // Glow
-  var pg=c.createRadialGradient(picCx,picY,picR,picCx,picY,picR+28);
-  pg.addColorStop(0,'rgba(232,168,23,0.14)');pg.addColorStop(1,'transparent');
-  c.fillStyle=pg;c.fillRect(picCx-picR-30,picY-picR-30,(picR+30)*2,(picR+30)*2);
+  // Glow behind
+  var pg=c.createRadialGradient(picCx,picY,picR-10,picCx,picY,picR+40);
+  pg.addColorStop(0,'rgba(232,168,23,0.18)');pg.addColorStop(1,'transparent');
+  c.fillStyle=pg;c.fillRect(picCx-picR-50,picY-picR-50,(picR+50)*2,(picR+50)*2);
 
   // Gold ring
-  c.lineWidth=5;c.strokeStyle='#e8a817';
-  c.beginPath();c.arc(picCx,picY,picR+7,0,Math.PI*2);c.stroke();
+  c.lineWidth=6;c.strokeStyle='#e8a817';
+  c.beginPath();c.arc(picCx,picY,picR+8,0,Math.PI*2);c.stroke();
+  // Thin outer ring
+  c.lineWidth=1.5;c.strokeStyle='rgba(232,168,23,0.2)';
+  c.beginPath();c.arc(picCx,picY,picR+18,0,Math.PI*2);c.stroke();
 
-  // Avatar bg
+  // Avatar
   c.fillStyle='#243a6e';
   c.beginPath();c.arc(picCx,picY,picR,0,Math.PI*2);c.fill();
-
-  // PFP — drawn synchronously since we awaited the load
   if(picImg){
-    c.save();
-    c.beginPath();c.arc(picCx,picY,picR,0,Math.PI*2);c.clip();
+    c.save();c.beginPath();c.arc(picCx,picY,picR,0,Math.PI*2);c.clip();
     c.drawImage(picImg,picCx-picR,picY-picR,picR*2,picR*2);
     c.restore();
   }else{
-    c.font='900 42px Nunito';c.textAlign='center';c.textBaseline='middle';
+    c.font='900 60px Nunito';c.textAlign='center';c.textBaseline='middle';
     c.fillStyle='rgba(240,234,214,0.3)';c.fillText(uname.charAt(0).toUpperCase(),picCx,picY);
   }
 
-  // Username
-  c.font='800 26px Nunito';c.fillStyle='#F0EAD6';
+  // Username — big bold
+  c.font='900 30px Nunito';c.fillStyle='#F0EAD6';
   c.textAlign='center';c.textBaseline='top';
-  c.fillText(uname,picCx,picY+picR+16);
+  c.fillText(uname,picCx,picY+picR+20);
 
-  // IQ — massive
-  var iqY=330;
-  c.font='900 18px Nunito';c.fillStyle='rgba(240,234,214,0.25)';
+  // ── IQ — big number + label ──
+  var iqY=380;
+  // "IQ" small label
+  c.font='900 15px Nunito';c.fillStyle='rgba(240,234,214,0.25)';
   c.textAlign='center';c.textBaseline='bottom';
-  c.fillText('I Q',picCx,iqY-92);
+  c.fillText('I Q',picCx,iqY-48);
 
-  c.font='900 200px Nunito';c.fillStyle='#F0EAD6';
+  // IQ number
+  c.font='900 120px Nunito';c.fillStyle='#F0EAD6';
   c.textBaseline='middle';c.textAlign='center';
   c.fillText(String(iq),picCx,iqY);
 
-  // Gold bar under number
+  // Gold bar
   var numW=c.measureText(String(iq)).width;
-  rr(c,picCx-numW/2,iqY+96,numW,5,3,'#e8a817');
+  rr(c,picCx-numW/2,iqY+58,numW,4,2,'#e8a817');
 
   // Percentile pill
   if(pctText){
-    c.font='900 18px Nunito';var tw=c.measureText(pctText).width+48;
-    var pillY=iqY+116;
-    rr(c,picCx-tw/2,pillY,tw,38,19,'#e8a817');
+    c.font='900 16px Nunito';var tw=c.measureText(pctText).width+40;
+    var pillY=iqY+72;
+    rr(c,picCx-tw/2,pillY,tw,34,17,'#e8a817');
     c.fillStyle=BG;c.textBaseline='middle';c.textAlign='center';
-    c.fillText(pctText,picCx,pillY+19);
+    c.fillText(pctText,picCx,pillY+17);
   }
 
-  // Stats 2×2
-  var sY=iqY+178;
+  // ── Stats row — compact horizontal at bottom-left ──
+  var sY=548;
   var statItems=[
-    {v:String(d.answered||0),l:'ANSWERED',color:'#3fba4f'},
-    {v:acc+'%',l:'ACCURACY',color:'#3a7df2'},
-    {v:String(d.bestStreak||0),l:'STREAK',color:'#e87d1a'},
-    {v:'Lvl '+(d.level||1),l:'LEVEL',color:'#6d4aed'}
+    {v:String(d.answered||0),l:'ANS',color:'#3fba4f'},
+    {v:acc+'%',l:'ACC',color:'#3a7df2'},
+    {v:String(d.bestStreak||0),l:'STK',color:'#e87d1a'},
+    {v:'L'+(d.level||1),l:'LVL',color:'#6d4aed'}
   ];
-  var sGap=10,sW=(LW-sGap)/2,sH=66;
+  var sTotal=460,sW=sTotal/4,sStart=0;
 
   statItems.forEach(function(s,i){
-    var col=i%2,row=Math.floor(i/2);
-    var sx=LX+col*(sW+sGap),sy=sY+row*(sH+sGap);
-    rr(c,sx,sy,sW,sH,12,'rgba(240,234,214,0.045)');
-    rr(c,sx+1,sy+14,3,sH-28,2,s.color);
-    c.font='900 26px Nunito';c.fillStyle='#F0EAD6';c.textAlign='left';c.textBaseline='middle';
-    c.fillText(s.v,sx+16,sy+sH/2-6);
-    c.font='800 10px Nunito';c.fillStyle='rgba(240,234,214,0.3)';
-    c.fillText(s.l,sx+16,sy+sH/2+15);
+    var sx=sStart+i*sW+sW/2;
+    // Color dot
+    c.fillStyle=s.color;c.beginPath();c.arc(sx,sY,4,0,Math.PI*2);c.fill();
+    // Value
+    c.font='900 22px Nunito';c.fillStyle='#F0EAD6';c.textAlign='center';c.textBaseline='top';
+    c.fillText(s.v,sx,sY+10);
+    // Label
+    c.font='800 9px Nunito';c.fillStyle='rgba(240,234,214,0.25)';
+    c.fillText(s.l,sx,sY+36);
+    // Divider
+    if(i<3){
+      c.strokeStyle='rgba(240,234,214,0.06)';c.lineWidth=1;
+      c.beginPath();c.moveTo(sx+sW/2,sY-2);c.lineTo(sx+sW/2,sY+42);c.stroke();
+    }
   });
 
-  // ═══════════ VERTICAL DIVIDER ═══════════
-  c.strokeStyle='rgba(240,234,214,0.06)';c.lineWidth=1;
-  c.beginPath();c.moveTo(RX-20,36);c.lineTo(RX-20,H-36);c.stroke();
+  /* ═══════════ RIGHT SIDE — RADAR CHART ═══════════ */
 
-  // ═══════════ RIGHT COLUMN ═══════════
+  var radarCx=830,radarCy=280,radarR=210;
+  var cats=AB;
+  var n=cats.length;
+  var angleStep=Math.PI*2/n;
+  var startAngle=-Math.PI/2; // top
 
-  // Abilities header
-  var abY=40;
-  c.font='900 14px Nunito';c.fillStyle='rgba(240,234,214,0.3)';
-  c.textAlign='left';c.textBaseline='top';
-  c.fillText('ABILITIES',RX,abY);
-  abY+=34;
+  // Helper: get point on radar
+  function rPoint(i,pct){
+    var a=startAngle+i*angleStep;
+    var r=radarR*(pct/100);
+    return{x:radarCx+Math.cos(a)*r,y:radarCy+Math.sin(a)*r};
+  }
 
-  // Abilities card
-  var abCardH=H-abY-120;
-  rr(c,RX,abY,RW,abCardH,16,'rgba(240,234,214,0.03)');
+  // Draw concentric grid rings
+  [0.25,0.5,0.75,1.0].forEach(function(s){
+    c.strokeStyle='rgba(240,234,214,0.04)';c.lineWidth=1;
+    c.beginPath();
+    for(var i=0;i<=n;i++){
+      var a=startAngle+i*angleStep;
+      var x=radarCx+Math.cos(a)*radarR*s;
+      var y=radarCy+Math.sin(a)*radarR*s;
+      if(i===0)c.moveTo(x,y);else c.lineTo(x,y);
+    }
+    c.stroke();
+  });
 
-  var cats=AB,abPadX=20,abPadY=16;
-  var rowH=(abCardH-abPadY*2)/cats.length,barH=10;
+  // Draw axis lines
+  for(var i=0;i<n;i++){
+    var a=startAngle+i*angleStep;
+    c.strokeStyle='rgba(240,234,214,0.04)';c.lineWidth=1;
+    c.beginPath();c.moveTo(radarCx,radarCy);
+    c.lineTo(radarCx+Math.cos(a)*radarR,radarCy+Math.sin(a)*radarR);
+    c.stroke();
+  }
 
-  cats.forEach(function(a,i){
-    var y=abY+abPadY+i*rowH;
-    var pct=IQData.getStatPercent(a.key);
-    var barStartX=RX+abPadX,valW=44;
-    var barW=RW-abPadX*2-valW-12;
+  // Draw filled radar shape — gold with gradient
+  var vals=cats.map(function(a){return Math.max(5,IQData.getStatPercent(a.key))});
 
+  // Outer glow of the shape
+  c.beginPath();
+  vals.forEach(function(v,i){
+    var p=rPoint(i,v);
+    if(i===0)c.moveTo(p.x,p.y);else c.lineTo(p.x,p.y);
+  });
+  c.closePath();
+  c.shadowColor='rgba(232,168,23,0.4)';c.shadowBlur=30;
+  c.fillStyle='rgba(232,168,23,0.12)';c.fill();
+  c.shadowBlur=0;
+
+  // Main fill
+  c.beginPath();
+  vals.forEach(function(v,i){
+    var p=rPoint(i,v);
+    if(i===0)c.moveTo(p.x,p.y);else c.lineTo(p.x,p.y);
+  });
+  c.closePath();
+  var rg=c.createRadialGradient(radarCx,radarCy,0,radarCx,radarCy,radarR);
+  rg.addColorStop(0,'rgba(232,168,23,0.25)');rg.addColorStop(1,'rgba(232,168,23,0.08)');
+  c.fillStyle=rg;c.fill();
+
+  // Stroke outline
+  c.beginPath();
+  vals.forEach(function(v,i){
+    var p=rPoint(i,v);
+    if(i===0)c.moveTo(p.x,p.y);else c.lineTo(p.x,p.y);
+  });
+  c.closePath();
+  c.strokeStyle='#e8a817';c.lineWidth=2.5;c.stroke();
+
+  // Dots at each vertex with color
+  vals.forEach(function(v,i){
+    var p=rPoint(i,v);
+    // Outer glow
+    c.fillStyle=cats[i].color+'40';
+    c.beginPath();c.arc(p.x,p.y,8,0,Math.PI*2);c.fill();
     // Dot
-    c.fillStyle=a.color;
-    c.beginPath();c.arc(barStartX+5,y+rowH/2,5,0,Math.PI*2);c.fill();
+    c.fillStyle=cats[i].color;
+    c.beginPath();c.arc(p.x,p.y,5,0,Math.PI*2);c.fill();
+    // White center
+    c.fillStyle='#fff';
+    c.beginPath();c.arc(p.x,p.y,2,0,Math.PI*2);c.fill();
+  });
+
+  // Labels around the radar — name + value
+  cats.forEach(function(a,i){
+    var angle=startAngle+i*angleStep;
+    var labelR=radarR+28;
+    var lx=radarCx+Math.cos(angle)*labelR;
+    var ly=radarCy+Math.sin(angle)*labelR;
+    var pct=IQData.getStatPercent(a.key);
+
+    // Determine text alignment based on position
+    if(Math.abs(Math.cos(angle))<0.15){c.textAlign='center'}
+    else if(Math.cos(angle)>0){c.textAlign='left'}
+    else{c.textAlign='right'}
+
+    if(Math.abs(Math.sin(angle))<0.15){c.textBaseline='middle'}
+    else if(Math.sin(angle)>0){c.textBaseline='top'}
+    else{c.textBaseline='bottom'}
 
     // Name
-    c.font='800 14px Nunito';c.fillStyle='rgba(240,234,214,0.5)';
-    c.textAlign='left';c.textBaseline='middle';
-    c.fillText(a.name,barStartX+18,y+rowH/2-11);
+    c.font='800 13px Nunito';c.fillStyle='rgba(240,234,214,0.45)';
+    c.fillText(a.name,lx,ly);
 
-    // Bar
-    var barY=y+rowH/2+5;
-    rr(c,barStartX+18,barY,barW-18,barH,5,'rgba(240,234,214,0.06)');
-    if(pct>0){
-      var fillW=Math.max(6,(barW-18)*(pct/100));
-      rr(c,barStartX+18,barY,fillW,barH,5,a.color);
-    }
+    // Value — offset slightly
+    var valOffsetX=c.textAlign==='left'?c.measureText(a.name).width+6:c.textAlign==='right'?-c.measureText(a.name).width-6:0;
+    var valOffsetY=c.textBaseline==='top'?16:c.textBaseline==='bottom'?-16:0;
 
-    // Value
-    c.font='900 18px Nunito';c.fillStyle='#F0EAD6';
-    c.textAlign='right';c.textBaseline='middle';
-    c.fillText(String(pct),RX+RW-abPadX,y+rowH/2);
-
-    if(i<cats.length-1){
-      c.strokeStyle='rgba(240,234,214,0.04)';c.lineWidth=1;
-      c.beginPath();c.moveTo(barStartX,y+rowH);c.lineTo(RX+RW-abPadX,y+rowH);c.stroke();
+    if(Math.abs(Math.cos(angle))>=0.15){
+      // Side labels: put value next to name
+      c.font='900 14px Nunito';c.fillStyle=a.color;
+      c.fillText(' '+pct,lx+(c.textAlign==='left'?c.measureText(a.name).width+2:-2),ly);
+    }else{
+      // Top/bottom: put value below/above
+      c.font='900 14px Nunito';c.fillStyle=a.color;
+      var vy=ly+valOffsetY;
+      c.fillText(String(pct),lx,vy);
     }
   });
 
-  // ── BRANDING — big, bottom-right ──
-  var brandY=H-68;
-  if(logoImg){c.drawImage(logoImg,RX,brandY,38,38)}
-  c.font='900 30px Nunito';c.fillStyle='#F0EAD6';
+  /* ═══════════ BRANDING — HUGE bottom bar ═══════════ */
+
+  // Branding strip bg
+  rr(c,460,H-72,W-460-40,56,14,'rgba(240,234,214,0.04)');
+
+  // Logo
+  var bx=480;
+  if(logoImg){c.drawImage(logoImg,bx,H-64,40,40)}
+  // "cebear" massive
+  c.font='900 34px Nunito';c.fillStyle='#F0EAD6';
   c.textAlign='left';c.textBaseline='middle';
-  var btx=logoImg?RX+46:RX;
-  c.fillText('cebear',btx,brandY+19);
+  var tx=logoImg?bx+50:bx;
+  c.fillText('cebear',tx,H-44);
   var cW=c.measureText('cebear').width;
   c.fillStyle='rgba(240,234,214,0.4)';
-  c.fillText('.com',btx+cW,brandY+19);
+  c.fillText('.com',tx+cW,H-44);
+  var dotX=tx+cW+c.measureText('.com').width+12;
 
   // Gold dot
-  var fullW=cW+c.measureText('.com').width;
   c.fillStyle='#e8a817';
-  c.beginPath();c.arc(btx+fullW+14,brandY+19,5,0,Math.PI*2);c.fill();
+  c.beginPath();c.arc(dotX,H-44,6,0,Math.PI*2);c.fill();
 
-  // CTA
-  c.font='700 14px Nunito';c.fillStyle='rgba(240,234,214,0.25)';
-  c.textBaseline='top';c.textAlign='left';
-  c.fillText('Can you beat me?  \u2192  cebear.com',RX,brandY+42);
-
-  // Bottom-left watermark
-  c.font='800 13px Nunito';c.fillStyle='rgba(240,234,214,0.12)';
-  c.textAlign='left';c.textBaseline='bottom';
-  c.fillText('TRAIN YOUR BRAIN',LX,H-20);
+  // CTA right-aligned
+  c.font='800 15px Nunito';c.fillStyle='rgba(240,234,214,0.35)';
+  c.textAlign='right';c.textBaseline='middle';
+  c.fillText('Can you beat me?',W-52,H-44);
 
   shareCanvas=cv;
   return cv;
