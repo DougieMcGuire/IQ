@@ -4,52 +4,56 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>BrainDeer</title>
+  <title>Cebear</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    :root{--bg:#3a2918;--card:#4a3625;--card2:#5a4232;--cream:#f0e2cc;--tan:#c2a476;--mid:#6b4f32;--light:#8f6b4a;--green:#58cc02;--greend:#46a302;--red:#ea2b2b;--redd:#c42020}
+    :root{--bg:#1b2d5b;--card:rgba(240,234,214,.06);--card2:rgba(240,234,214,.1);--cream:#F0EAD6;--dim:rgba(240,234,214,.45);--light:rgba(240,234,214,.3);--green:#3fba4f;--greend:#2d9a3c;--red:#e8443a;--redd:#c0362e;--gold:#e8a817}
     html,body{height:100%}
-    body{background:var(--bg);min-height:100dvh;font-family:'Nunito',sans-serif;color:var(--cream);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:env(safe-area-inset-top,20px) 20px env(safe-area-inset-bottom,20px);overflow-y:auto}
+    body{background:var(--bg);min-height:100dvh;font-family:'Nunito',sans-serif;color:var(--cream);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,20px) + 10px) 20px calc(env(safe-area-inset-bottom,20px) + 10px);overflow-y:auto}
     .logo{text-align:center;margin-bottom:20px;animation:fadeUp .45s cubic-bezier(.34,1.56,.64,1) both}
-    .mascot{font-size:60px;line-height:1;margin-bottom:2px;display:block;filter:drop-shadow(0 4px 0 rgba(0,0,0,.25))}
-    .logo-name{font-size:30px;font-weight:900;text-shadow:0 3px 0 rgba(0,0,0,.2)}
-    .logo-tag{font-size:13px;font-weight:700;color:var(--tan);margin-top:2px}
-    .card{background:var(--card);border-radius:24px;padding:22px 20px;width:100%;max-width:380px;box-shadow:0 8px 0 rgba(0,0,0,.18);animation:fadeUp .45s .07s cubic-bezier(.34,1.56,.64,1) both;position:relative;overflow:hidden}
-    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,.04)0%,transparent 100%);border-radius:24px 24px 0 0;pointer-events:none}
-    .tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--bg);border-radius:14px;padding:4px;margin-bottom:18px}
-    .tab{padding:10px;text-align:center;font-size:15px;font-weight:800;color:var(--tan);border-radius:11px;cursor:pointer;transition:all .2s;user-select:none}
-    .tab.active{background:var(--mid);color:var(--cream);box-shadow:0 3px 0 rgba(0,0,0,.15)}
+    .mascot{width:64px;height:64px;background:var(--cream);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 8px}
+    .mascot svg{width:36px;height:36px}
+    .logo-name{font-size:28px;font-weight:900;letter-spacing:-.5px}
+    .logo-tag{font-size:13px;font-weight:700;color:var(--dim);margin-top:2px}
+    .card{background:rgba(240,234,214,.05);border-radius:24px;padding:22px 20px;width:100%;max-width:380px;animation:fadeUp .45s .07s cubic-bezier(.34,1.56,.64,1) both;position:relative;overflow:hidden}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;background:rgba(240,234,214,.04);border-radius:14px;padding:4px;margin-bottom:18px}
+    .tab{padding:10px;text-align:center;font-size:15px;font-weight:800;color:var(--dim);border-radius:11px;cursor:pointer;transition:all .2s;user-select:none}
+    .tab.active{background:rgba(240,234,214,.1);color:var(--cream)}
     .banner{border-radius:12px;font-size:14px;font-weight:700;margin-bottom:14px;display:none;padding:12px 14px}
-    .banner.error{background:var(--red);color:#fff;display:block;box-shadow:0 3px 0 var(--redd)}
-    .btn-google{width:100%;padding:14px 16px;border:none;border-radius:14px;background:var(--card2);color:var(--cream);font-size:15px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 0 rgba(0,0,0,.18);transition:transform .1s,box-shadow .1s;margin-bottom:14px}
-    .btn-google:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+    .banner.error{background:var(--red);color:#fff;display:block}
+    .btn-google{width:100%;padding:14px 16px;border:none;border-radius:14px;background:var(--card2);color:var(--cream);font-size:15px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .1s;margin-bottom:14px}
+    .btn-google:active{transform:translateY(2px)}
     .btn-google:disabled{opacity:.5;pointer-events:none}
     .g-logo{width:19px;height:19px;flex-shrink:0}
     .divider{display:flex;align-items:center;gap:10px;margin:0 0 14px;color:var(--light);font-size:13px;font-weight:700}
-    .divider::before,.divider::after{content:'';flex:1;height:2px;background:var(--mid);border-radius:1px}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(240,234,214,.08)}
     .form-group{margin-bottom:12px}
-    label{display:block;font-size:12px;font-weight:800;color:var(--tan);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
-    input{width:100%;padding:13px 15px;border:2px solid transparent;border-radius:13px;background:var(--bg);font-size:16px;font-weight:700;color:var(--cream);font-family:'Nunito',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none}
-    input:focus{border-color:var(--light)}
+    label{display:block;font-size:12px;font-weight:800;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+    input{width:100%;padding:13px 15px;border:2px solid transparent;border-radius:13px;background:rgba(240,234,214,.06);font-size:16px;font-weight:700;color:var(--cream);font-family:'Nunito',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none}
+    input:focus{border-color:rgba(240,234,214,.2)}
     input::placeholder{color:var(--light);font-weight:600}
-    #str-bar{height:4px;border-radius:2px;margin-top:5px;background:var(--mid);overflow:hidden;display:none}
+    #str-bar{height:4px;border-radius:2px;margin-top:5px;background:rgba(240,234,214,.06);overflow:hidden;display:none}
     #str-fill{height:100%;border-radius:2px;width:0%;transition:width .3s,background .3s}
-    .btn-submit{width:100%;padding:15px;border:none;border-radius:14px;background:var(--green);color:#fff;font-size:16px;font-weight:900;font-family:'Nunito',sans-serif;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 5px 0 var(--greend);transition:transform .1s,box-shadow .1s;margin-top:4px}
-    .btn-submit:active{transform:translateY(4px);box-shadow:0 1px 0 var(--greend)}
+    .btn-submit{width:100%;padding:15px;border:none;border-radius:14px;background:var(--green);color:#fff;font-size:16px;font-weight:900;font-family:'Nunito',sans-serif;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 3px 0 var(--greend);transition:transform .1s;margin-top:4px}
+    .btn-submit:active{transform:translateY(3px);box-shadow:none}
     .btn-submit:disabled{opacity:.5;pointer-events:none}
     .spinner{width:20px;height:20px;border:3px solid transparent;border-top-color:currentColor;border-radius:50%;animation:spin .6s linear infinite;display:none}
     .loading .spinner{display:block}.loading .btn-text{display:none}
     .footer-links{margin-top:18px;display:flex;align-items:center;justify-content:center;gap:0;animation:fadeUp .45s .14s cubic-bezier(.34,1.56,.64,1) both}
-    .footer-links a{color:var(--tan);font-size:13px;font-weight:700;text-decoration:none;padding:8px 14px;border-radius:10px;transition:color .2s,background .2s}
-    .footer-links a:hover,.footer-links a:active{color:var(--cream);background:rgba(255,255,255,.06)}
-    .footer-dot{width:4px;height:4px;border-radius:50%;background:var(--mid);flex-shrink:0}
+    .footer-links a{color:var(--dim);font-size:13px;font-weight:700;text-decoration:none;padding:8px 14px;border-radius:10px;transition:color .2s}
+    .footer-links a:hover,.footer-links a:active{color:var(--cream)}
+    .footer-dot{width:4px;height:4px;border-radius:50%;background:rgba(240,234,214,.1);flex-shrink:0}
     @keyframes fadeUp{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
     @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
-<div class="logo"><span class="mascot">🦌</span><div class="logo-name">BrainDeer</div><div class="logo-tag">Train your brain daily</div></div>
+<div class="logo">
+  <div class="mascot"><img src="logo.png" alt="Cebear" style="width:48px;height:48px;object-fit:contain"></div>
+  <div class="logo-name">Cebear</div>
+  <div class="logo-tag">Train your brain daily</div>
+</div>
 <div class="card">
   <div class="tabs">
     <div class="tab active" id="tab-login" onclick="switchTab('login')">Sign In</div>
@@ -92,7 +96,7 @@
   function showErr(msg) { const b = document.getElementById('banner'); b.textContent = msg; b.className = 'banner error'; }
   function clr() { document.getElementById('banner').className = 'banner'; }
   function setLoading(id, on) { const b = document.getElementById(id); if (!b) return; b.classList.toggle('loading', on); b.disabled = on; }
-  window.checkStrength = function(v) { if (mode !== 'signup') return; const f = document.getElementById('str-fill'); let s = 0; if (v.length >= 8) s++; if (/[A-Z]/.test(v)) s++; if (/[0-9]/.test(v)) s++; if (/[^A-Za-z0-9]/.test(v)) s++; f.style.width = ['0%','30%','55%','80%','100%'][s]; f.style.background = ['#6b4f32','#ea2b2b','#ff9600','#ffc800','#58cc02'][s]; };
+  window.checkStrength = function(v) { if (mode !== 'signup') return; const f = document.getElementById('str-fill'); let s = 0; if (v.length >= 8) s++; if (/[A-Z]/.test(v)) s++; if (/[0-9]/.test(v)) s++; if (/[^A-Za-z0-9]/.test(v)) s++; f.style.width = ['0%','30%','55%','80%','100%'][s]; f.style.background = ['rgba(240,234,214,.1)','#e8443a','#e87d1a','#e8a817','#3fba4f'][s]; };
   async function ensure(u, extra = {}) { try { const ref = doc(db, 'users', u.uid), snap = await getDoc(ref); if (!snap.exists()) { await setDoc(ref, { uid: u.uid, email: u.email, username: extra.username || u.displayName || null, pic: u.photoURL || null, createdAt: serverTimestamp(), lastSeen: serverTimestamp() }); } else { setDoc(ref, { lastSeen: serverTimestamp() }, { merge: true }); } } catch (e) { console.warn('ensure():', e); } }
 
   window.signInWithGoogle = async function() {
