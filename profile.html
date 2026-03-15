@@ -12,7 +12,6 @@
     body{display:flex;flex-direction:column}
     .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
     .scroll::-webkit-scrollbar{display:none}
-
     .hero{background:var(--cream);padding:calc(env(safe-area-inset-top,20px) + 10px) 20px 0;display:flex;flex-direction:column;align-items:center;position:relative}
     .hero-hdr{width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
     .hero-name{font-size:14px;font-weight:800;color:var(--dim)}
@@ -117,7 +116,6 @@ import{IQData,iqToPercentile,formatPercentile}from'./data.js';import Haptics fro
 if(window.parent!==window)parent.authCheck();window.navGo=(p)=>{Haptics.light();parent.goTo(p)};
 var AB=[{key:'patternRecognition',name:'Pattern',color:'#e87d1a'},{key:'problemSolving',name:'Problem Solving',color:'#e8443a'},{key:'mentalAgility',name:'Agility',color:'#3fba4f'},{key:'workingMemory',name:'Memory',color:'#6d4aed'},{key:'verbalReasoning',name:'Verbal',color:'#3a7df2'},{key:'logicalReasoning',name:'Logic',color:'#1b2d5b'},{key:'spatialAwareness',name:'Emotional',color:'#e8557a'},{key:'numericalReasoning',name:'Spatial',color:'#e8a817'}];
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
-
 function load(){var d=IQData.load();document.getElementById('username-display').textContent=d.username||IQData.getCurrentUser()?.displayName||'';
 if(d.iq){document.getElementById('iq-num').textContent=d.iq;var b=document.getElementById('pct-badge');b.textContent='Top '+formatPercentile(iqToPercentile(d.iq));b.style.display='inline-block'}
 document.getElementById('answered').textContent=d.answered||0;document.getElementById('accuracy').textContent=IQData.getAccuracy()+'%';document.getElementById('best-streak').textContent=d.bestStreak||0;document.getElementById('level-val').textContent=d.level||1;
@@ -127,7 +125,6 @@ AB.forEach(a=>{var pct=IQData.getStatPercent(a.key);var row=document.createEleme
 row.innerHTML='<div class="ab-dot" style="background:'+a.color+'"></div><div class="ab-mid"><div class="ab-name">'+a.name+'</div><div class="ab-bar"><div class="ab-fill" style="background:'+a.color+';width:0%" data-val="'+pct+'"></div></div></div><div class="ab-val">'+pct+'</div>';
 list.appendChild(row)});
 requestAnimationFrame(()=>setTimeout(()=>{document.querySelectorAll('.ab-fill').forEach(b=>{b.style.width=Math.max(6,parseInt(b.dataset.val))+'%'})},80))}
-
 function handleAvatarFile(f){if(!f)return;var r=new FileReader();r.onload=e=>{var img=new Image();img.onload=()=>{var cv=document.createElement('canvas');cv.width=cv.height=200;var ctx=cv.getContext('2d');var min=Math.min(img.width,img.height);ctx.drawImage(img,(img.width-min)/2,(img.height-min)/2,min,min,0,0,200,200);var url=cv.toDataURL('image/jpeg',.8);IQData.setProfilePic(url);document.getElementById('avatar-img').src=url;document.getElementById('avatar-img').style.display='block';document.getElementById('avatar-icon').style.display='none';Haptics.success();toast('Photo updated!')};img.src=e.target.result};r.readAsDataURL(f)}
 document.getElementById('avatar-tap').onclick=()=>{Haptics.medium();document.getElementById('avatar-input').click()};
 document.getElementById('avatar-edit-btn').onclick=()=>{Haptics.medium();document.getElementById('avatar-input').click()};
@@ -135,192 +132,177 @@ document.getElementById('avatar-input').onchange=e=>handleAvatarFile(e.target.fi
 document.getElementById('signout-btn').onclick=()=>{Haptics.warning();IQData.signOut()};
 document.getElementById('reset-btn').onclick=()=>{Haptics.warning();if(confirm('Reset all progress?')){Haptics.error();IQData.reset();location.reload()}};
 
-/* ══════════════════════════════════════════════════════════
-   SHARE CARD v6 — Spotify Wrapped / Duolingo inspired
+/* ══════════════════════════════════════════════════
+   SHARE CARD v7
    
-   Gold bottom brand bar (solid color block)
-   Navy top with centered PFP + IQ as one unit
-   Stats as pills
-   Everything HUGE, nothing small
-   ══════════════════════════════════════════════════════════ */
+   All navy. Three tight horizontal bands:
+   BAND 1 (top 60%): PFP left | IQ+percentile right
+   BAND 2 (next):    4 stat boxes in a row
+   BAND 3 (bottom):  Logo + cebear.com + CTA
+   
+   Everything huge. Zero dead space.
+   ══════════════════════════════════════════════════ */
 var shareCanvas=null,shareUrl='';
 function getShareUrl(){var u=IQData.getCurrentUser();return u?'https://cebear.com/share/'+u.uid:'https://cebear.com'}
 function rr(c,x,y,w,h,r,f){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();if(f){c.fillStyle=f;c.fill()}}
-
-function loadImg(src){
-  return new Promise(function(resolve){
-    if(!src){resolve(null);return}
-    var img=new Image();img.crossOrigin='anonymous';
-    img.onload=function(){resolve(img)};
-    img.onerror=function(){resolve(null)};
-    img.src=src;
-  });
-}
+function rrStroke(c,x,y,w,h,r,color,lw){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();c.strokeStyle=color;c.lineWidth=lw;c.stroke()}
+function loadImg(src){return new Promise(function(resolve){if(!src){resolve(null);return}var img=new Image();img.crossOrigin='anonymous';img.onload=function(){resolve(img)};img.onerror=function(){resolve(null)};img.src=src})}
 
 async function genShareCard(){
   var d=IQData.load(),W=1200,H=630,cv=document.createElement('canvas');
   cv.width=W;cv.height=H;var c=cv.getContext('2d');
   var uname=d.username||IQData.getCurrentUser()?.displayName||'Brain';
   var acc=IQData.getAccuracy(),pic=d.pic||null;
-  var iq=d.iq||'--';
+  var iq=String(d.iq||'--');
   var pctText=d.iq?'TOP '+formatPercentile(iqToPercentile(d.iq)).toUpperCase():'';
 
   var [picImg,logoImg]=await Promise.all([loadImg(pic),loadImg('logo.png')]);
 
-  // ══ GOLD BRAND BAR — bottom 130px ══
-  var barH=130;
-  var barY=H-barH;
-
-  // Navy top region
+  // ══ FULL NAVY BG ══
   var BG='#334570';
-  c.fillStyle=BG;c.fillRect(0,0,W,barY);
+  c.fillStyle=BG;c.fillRect(0,0,W,H);
 
-  // Gold bar
-  c.fillStyle='#e8a817';c.fillRect(0,barY,W,barH);
-  // Darker gold bottom edge
-  c.fillStyle='#c48e10';c.fillRect(0,H-6,W,6);
+  // Subtle warm glow center-left
+  var g1=c.createRadialGradient(350,220,0,350,220,380);
+  g1.addColorStop(0,'rgba(232,168,23,0.07)');g1.addColorStop(1,'transparent');
+  c.fillStyle=g1;c.fillRect(0,0,W,H);
 
-  // Navy area — subtle texture
-  c.save();c.fillStyle='rgba(240,234,214,0.012)';
-  for(var gx=0;gx<W;gx+=26)for(var gy=0;gy<barY;gy+=26){c.beginPath();c.arc(gx,gy,1,0,Math.PI*2);c.fill()}
-  c.restore();
+  // Dot texture
+  c.fillStyle='rgba(240,234,214,0.014)';
+  for(var gx=0;gx<W;gx+=24)for(var gy=0;gy<H;gy+=24){c.beginPath();c.arc(gx,gy,0.8,0,Math.PI*2);c.fill()}
 
-  // Central gold glow on navy
-  var g1=c.createRadialGradient(W/2,barY*0.45,0,W/2,barY*0.45,400);
-  g1.addColorStop(0,'rgba(232,168,23,0.08)');g1.addColorStop(1,'transparent');
-  c.fillStyle=g1;c.fillRect(0,0,W,barY);
+  // ══ BAND 1: PFP + NAME left, IQ + PERCENTILE right ══
+  // This band goes from y=40 to y=380 (340px tall)
 
-  var cx=W/2;
+  var pad=56;
 
-  /* ═══════════ NAVY ZONE — PFP + IQ + STATS ═══════════ */
+  // ── PFP — left side, vertically centered in band ──
+  var picR=110;
+  var picCx=pad+picR+20;
+  var picCy=200;
 
-  // ── PFP — centered, overlapping top ──
-  var picR=80,picCy=110;
-
-  // Glow
-  var pg=c.createRadialGradient(cx,picCy,picR-20,cx,picCy,picR+40);
-  pg.addColorStop(0,'rgba(232,168,23,0.2)');pg.addColorStop(1,'transparent');
-  c.fillStyle=pg;c.beginPath();c.arc(cx,picCy,picR+40,0,Math.PI*2);c.fill();
+  // Gold glow
+  var pg=c.createRadialGradient(picCx,picCy,picR-30,picCx,picCy,picR+50);
+  pg.addColorStop(0,'rgba(232,168,23,0.18)');pg.addColorStop(1,'transparent');
+  c.fillStyle=pg;c.beginPath();c.arc(picCx,picCy,picR+50,0,Math.PI*2);c.fill();
 
   // Gold ring
-  c.lineWidth=7;c.strokeStyle='#e8a817';
-  c.beginPath();c.arc(cx,picCy,picR+9,0,Math.PI*2);c.stroke();
+  c.lineWidth=8;c.strokeStyle='#e8a817';
+  c.beginPath();c.arc(picCx,picCy,picR+10,0,Math.PI*2);c.stroke();
 
-  // Avatar
+  // Avatar bg
   c.fillStyle='#243a6e';
-  c.beginPath();c.arc(cx,picCy,picR,0,Math.PI*2);c.fill();
+  c.beginPath();c.arc(picCx,picCy,picR,0,Math.PI*2);c.fill();
   if(picImg){
-    c.save();c.beginPath();c.arc(cx,picCy,picR,0,Math.PI*2);c.clip();
-    c.drawImage(picImg,cx-picR,picCy-picR,picR*2,picR*2);
+    c.save();c.beginPath();c.arc(picCx,picCy,picR,0,Math.PI*2);c.clip();
+    c.drawImage(picImg,picCx-picR,picCy-picR,picR*2,picR*2);
     c.restore();
   }else{
-    c.font='900 56px Nunito';c.textAlign='center';c.textBaseline='middle';
-    c.fillStyle='rgba(240,234,214,0.3)';c.fillText(uname.charAt(0).toUpperCase(),cx,picCy);
+    c.font='900 72px Nunito';c.textAlign='center';c.textBaseline='middle';
+    c.fillStyle='rgba(240,234,214,0.3)';c.fillText(uname.charAt(0).toUpperCase(),picCx,picCy);
   }
 
-  // Name
-  c.font='900 28px Nunito';c.fillStyle='#F0EAD6';
+  // Name below PFP
+  c.font='900 36px Nunito';c.fillStyle='#F0EAD6';
   c.textAlign='center';c.textBaseline='top';
-  c.fillText(uname,cx,picCy+picR+14);
+  c.fillText(uname,picCx,picCy+picR+18);
 
-  // ── IQ — massive, below name ──
-  var iqCy=330;
+  // ── IQ — right side, massive ──
+  // Center the IQ block in the remaining space
+  var iqZoneLeft=picCx+picR+60;
+  var iqZoneRight=W-pad;
+  var iqCx=(iqZoneLeft+iqZoneRight)/2;
+  var iqCy=180;
 
-  c.font='900 180px Nunito';c.fillStyle='#F0EAD6';
+  // "IQ" superscript label
+  c.font='900 36px Nunito';c.fillStyle='rgba(240,234,214,0.3)';
+  c.textAlign='center';c.textBaseline='bottom';
+  c.fillText('IQ',iqCx,iqCy-100);
+
+  // Number
+  c.font='900 260px Nunito';c.fillStyle='#F0EAD6';
   c.textBaseline='middle';c.textAlign='center';
-  c.fillText(String(iq),cx,iqCy);
+  c.fillText(iq,iqCx,iqCy);
 
-  // "IQ" to the right of the number, smaller
-  var numW=c.measureText(String(iq)).width;
-  c.font='900 40px Nunito';c.fillStyle='rgba(240,234,214,0.3)';
-  c.textAlign='left';c.textBaseline='top';
-  c.fillText('IQ',cx+numW/2+12,iqCy-80);
+  // Gold underline
+  var numW=c.measureText(iq).width;
+  rr(c,iqCx-numW/2+10,iqCy+120,numW-20,6,3,'#e8a817');
 
-  // Percentile — pill below IQ
+  // Percentile pill — outlined style with gold
   if(pctText){
-    c.font='900 20px Nunito';var tw=c.measureText(pctText).width+50;
-    var pillY=iqCy+86;
-    rr(c,cx-tw/2,pillY,tw,42,21,'rgba(232,168,23,0.2)');
-    c.strokeStyle='#e8a817';c.lineWidth=2;
-    c.beginPath();
-    c.moveTo(cx-tw/2+21,pillY);c.lineTo(cx+tw/2-21,pillY);c.quadraticCurveTo(cx+tw/2,pillY,cx+tw/2,pillY+21);
-    c.quadraticCurveTo(cx+tw/2,pillY+42,cx+tw/2-21,pillY+42);c.lineTo(cx-tw/2+21,pillY+42);
-    c.quadraticCurveTo(cx-tw/2,pillY+42,cx-tw/2,pillY+21);c.quadraticCurveTo(cx-tw/2,pillY,cx-tw/2+21,pillY);
-    c.closePath();c.stroke();
+    c.font='900 24px Nunito';var tw=c.measureText(pctText).width+56;
+    var pillY=iqCy+140;
+    rr(c,iqCx-tw/2,pillY,tw,48,24,'rgba(232,168,23,0.15)');
+    rrStroke(c,iqCx-tw/2,pillY,tw,48,24,'#e8a817',3);
     c.fillStyle='#e8a817';c.textBaseline='middle';c.textAlign='center';
-    c.fillText(pctText,cx,pillY+21);
+    c.fillText(pctText,iqCx,pillY+24);
   }
 
-  // ── STATS — 4 pills in a row ──
-  var statY=barY-60;
+  // ══ BAND 2: STATS — 4 solid boxes ══
+  var band2Y=400;
+  var boxGap=14;
+  var boxW=(W-pad*2-boxGap*3)/4;
+  var boxH=90;
+
   var statItems=[
-    {v:String(d.answered||0),l:'answered',color:'#3fba4f'},
-    {v:acc+'%',l:'accuracy',color:'#3a7df2'},
-    {v:String(d.bestStreak||0),l:'streak',color:'#e87d1a'},
-    {v:'Lvl '+(d.level||1),l:'level',color:'#6d4aed'}
+    {v:String(d.answered||0),l:'ANSWERED',color:'#3fba4f'},
+    {v:acc+'%',l:'ACCURACY',color:'#3a7df2'},
+    {v:String(d.bestStreak||0),l:'STREAK',color:'#e87d1a'},
+    {v:'Lvl '+(d.level||1),l:'LEVEL',color:'#6d4aed'}
   ];
-  var pillGap=14;
-  // Measure total width
-  c.font='900 22px Nunito';
-  var totalPW=0;
-  var pillWidths=statItems.map(function(s){
-    var txt=s.v+' '+s.l;
-    c.font='900 22px Nunito';
-    var vw=c.measureText(s.v).width;
-    c.font='700 16px Nunito';
-    var lw=c.measureText(s.l).width;
-    var pw=vw+lw+44;
-    totalPW+=pw;
-    return pw;
-  });
-  totalPW+=pillGap*(statItems.length-1);
-  var px=cx-totalPW/2;
 
   statItems.forEach(function(s,i){
-    var pw=pillWidths[i];
-    // Pill bg
-    rr(c,px,statY,pw,40,20,'rgba(240,234,214,0.06)');
-    // Color dot
-    c.fillStyle=s.color;c.beginPath();c.arc(px+18,statY+20,5,0,Math.PI*2);c.fill();
-    // Value
-    c.font='900 22px Nunito';c.fillStyle='#F0EAD6';c.textAlign='left';c.textBaseline='middle';
-    c.fillText(s.v,px+30,statY+20);
-    var vw=c.measureText(s.v).width;
+    var bx=pad+i*(boxW+boxGap);
+    // Box bg
+    rr(c,bx,band2Y,boxW,boxH,16,'rgba(240,234,214,0.05)');
+    // Top color accent line
+    rr(c,bx+16,band2Y,boxW-32,3,1.5,s.color);
+    // Value — big
+    c.font='900 36px Nunito';c.fillStyle='#F0EAD6';
+    c.textAlign='center';c.textBaseline='middle';
+    c.fillText(s.v,bx+boxW/2,band2Y+38);
     // Label
-    c.font='700 16px Nunito';c.fillStyle='rgba(240,234,214,0.35)';
-    c.fillText(s.l,px+34+vw,statY+20);
-    px+=pw+pillGap;
+    c.font='800 13px Nunito';c.fillStyle='rgba(240,234,214,0.3)';
+    c.fillText(s.l,bx+boxW/2,band2Y+68);
   });
 
-  /* ═══════════ GOLD BAR — BRANDING ═══════════ */
+  // ══ BAND 3: BRANDING — full width ══
+  var brandY=band2Y+boxH+20;
+  var brandCy=brandY+((H-brandY)/2);
 
-  // Logo — big
-  var logoSize=60;
-  var brandTotalW=0;
-  c.font='900 52px Nunito';
+  // Thin separator line
+  c.strokeStyle='rgba(240,234,214,0.06)';c.lineWidth=1;
+  c.beginPath();c.moveTo(pad,brandY);c.lineTo(W-pad,brandY);c.stroke();
+
+  // Logo + brand centered
+  var logoSize=48;
+  c.font='900 48px Nunito';
   var cebW=c.measureText('cebear').width;
-  c.font='900 52px Nunito';
   var comW=c.measureText('.com').width;
-  brandTotalW=(logoImg?logoSize+16:0)+cebW+comW;
-  var bx=cx-brandTotalW/2;
+  var totalBrandW=(logoImg?logoSize+14:0)+cebW+comW+14+60; // +60 for CTA
+  var bx=W/2-totalBrandW/2;
 
   if(logoImg){
-    c.drawImage(logoImg,bx,barY+(barH-logoSize)/2,logoSize,logoSize);
-    bx+=logoSize+16;
+    c.drawImage(logoImg,bx,brandCy-logoSize/2,logoSize,logoSize);
+    bx+=logoSize+14;
   }
 
-  // "cebear" — navy on gold
-  c.font='900 52px Nunito';c.fillStyle='#1b2d5b';
+  // "cebear"
+  c.font='900 48px Nunito';c.fillStyle='#F0EAD6';
   c.textAlign='left';c.textBaseline='middle';
-  c.fillText('cebear',bx,barY+barH/2);
-  // ".com" — slightly lighter
-  c.fillStyle='rgba(27,45,91,0.45)';
-  c.fillText('.com',bx+cebW,barY+barH/2);
-
-  // "Can you beat me?" — smaller, below brand name
-  c.font='800 18px Nunito';c.fillStyle='rgba(27,45,91,0.4)';
-  c.textAlign='center';c.textBaseline='top';
-  c.fillText('Can you beat me?  \u2022  Train your brain',cx,barY+barH/2+30);
+  c.fillText('cebear',bx,brandCy);
+  bx+=cebW;
+  // ".com"
+  c.fillStyle='rgba(240,234,214,0.4)';
+  c.fillText('.com',bx,brandCy);
+  bx+=comW+14;
+  // Gold dot separator
+  c.fillStyle='#e8a817';
+  c.beginPath();c.arc(bx,brandCy,5,0,Math.PI*2);c.fill();
+  bx+=20;
+  // CTA
+  c.font='800 22px Nunito';c.fillStyle='#e8a817';
+  c.fillText('Beat me!',bx,brandCy);
 
   shareCanvas=cv;
   return cv;
@@ -334,7 +316,6 @@ async function uploadShareCard(){
     await parent.firebase.firestore().collection('shares').doc(user.uid).set(sd);toast('Share card ready!')
   }catch{toast('Share failed — try again')}
 }
-
 function buildShareGrid(){var hn=!!navigator.share,grid=document.getElementById('share-grid');grid.innerHTML='';var opts=[];
 if(hn)opts.push({id:'native',label:'Share',cls:'sd-native',icon:'<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>'});
 opts.push({id:'copylink',label:'Copy',cls:'sd-copy',icon:'<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>'});
@@ -342,22 +323,17 @@ opts.push({id:'x',label:'X',cls:'sd-x',icon:'<svg viewBox="0 0 24 24"><path d="M
 opts.push({id:'whatsapp',label:'WhatsApp',cls:'sd-wa',icon:'<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.13.556 4.13 1.532 5.87L.06 23.71l5.99-1.572A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>'});
 opts.push({id:'save',label:'Save',cls:'sd-save',icon:'<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>'});
 opts.forEach(o=>{var b=document.createElement('button');b.className='share-dest '+o.cls;b.innerHTML='<div class="sd-icon">'+o.icon+'</div>'+o.label;b.onclick=()=>handleShareAction(o.id);grid.appendChild(b)})}
-
 function getShareText(){var d=IQData.load();return d.iq?'My IQ is '+d.iq+' on Cebear! Top '+formatPercentile(iqToPercentile(d.iq))+' — can you beat me?':'Training my brain on Cebear!'}
 function handleShareAction(id){Haptics.medium();var text=getShareText();switch(id){case'native':navigator.share({title:'My Cebear IQ',text:text,url:shareUrl}).catch(()=>{});break;case'copylink':navigator.clipboard.writeText(shareUrl).then(()=>{Haptics.success();toast('Link copied!')}).catch(()=>toast('Copy failed'));break;case'x':window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(shareUrl),'_blank');break;case'whatsapp':window.open('https://wa.me/?text='+encodeURIComponent(text+' '+shareUrl),'_blank');break;case'save':if(!shareCanvas)return;Haptics.success();var a=document.createElement('a');a.download='cebear-stats.png';a.href=shareCanvas.toDataURL('image/png');a.click();toast('Image saved!');break}}
-
 async function openShare(){
   var fab=document.getElementById('share-btn');fab.classList.add('uploading');fab.textContent='Generating...';
-  shareUrl=getShareUrl();
-  await genShareCard();
-  await uploadShareCard();
+  shareUrl=getShareUrl();await genShareCard();await uploadShareCard();
   fab.classList.remove('uploading');fab.innerHTML='<svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share Your IQ';
   document.getElementById('share-url').value=shareUrl;
   var pv=document.getElementById('card-preview');pv.innerHTML='';
   var pc=document.createElement('canvas');pc.width=600;pc.height=315;pc.getContext('2d').drawImage(shareCanvas,0,0,600,315);pv.appendChild(pc);
   buildShareGrid();document.getElementById('share-modal').classList.add('show');
 }
-
 document.getElementById('share-btn').onclick=()=>{Haptics.medium();openShare()};
 document.getElementById('share-modal').onclick=e=>{if(e.target.id==='share-modal'){Haptics.light();document.getElementById('share-modal').classList.remove('show')}};
 document.getElementById('copy-link').onclick=()=>handleShareAction('copylink');
