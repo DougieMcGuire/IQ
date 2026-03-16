@@ -134,16 +134,9 @@ window.addEventListener('message',function(e){
   }
   if(t==='googleRedirect')return void(location.href='google-redirect.html');
   if(t==='googleAuthRequest'){
-    var gp=new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(gp).then(function(r){
-      _isAuthed=true;
-      var f=document.querySelector('#screen-improve iframe');
-      if(f&&f.contentWindow)f.contentWindow.postMessage({type:'authSuccess'},'*');
-    }).catch(function(err){
-      if(err.code==='auth/popup-closed-by-user'||err.code==='auth/cancelled-popup-request')return;
-      var f=document.querySelector('#screen-improve iframe');
-      if(f&&f.contentWindow)f.contentWindow.postMessage({type:'authError',msg:'Google sign-in failed. Try email instead.'},'*');
-    });
+    // Use redirect — popup causes auth/handler page issues with compat SDK in iframes
+    try{sessionStorage.setItem('bd_auth_return','improve');}catch{}
+    firebase.auth().signInWithRedirect(new firebase.auth.GoogleAuthProvider());
     return;
   }
   if(t==='savePushSub')firebase.auth().onAuthStateChanged(function(u){if(u)firebase.firestore().collection('pushSubscriptions').doc(u.uid).set({subscription:e.data.sub,uid:u.uid,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){})});
@@ -261,6 +254,18 @@ function redeemSessionToken(sid){
   localStorage.removeItem('iq_guest');
   var p=new URLSearchParams(location.search),tT=p.get('t'),sI=p.get('session');
   if(tT||sI)history.replaceState({},'',location.pathname);
+
+  // Stash shared Q params before any redirect clears them
+  var qp=new URLSearchParams(location.search);
+  var qParam=qp.get('q'),fromParam=qp.get('from');
+  if(qParam||fromParam){
+    var qs='?';
+    if(qParam)qs+='q='+encodeURIComponent(qParam);
+    if(fromParam)qs+=(qParam?'&':'')+'from='+encodeURIComponent(fromParam);
+    sessionStorage.setItem('cebear_shared_qs',qs);
+    history.replaceState({},'',location.pathname);
+  }
+
   var gT=sessionStorage.getItem('bd_gis_token');
   if(gT){
     sessionStorage.removeItem('bd_gis_token');
@@ -281,40 +286,31 @@ function redeemSessionToken(sid){
   else nb();
 
   function nb(){
-    // authReady is already wired to onAuthStateChanged above.
-    // Just handle shared Q params and navigate to improve.
-    var qp=new URLSearchParams(location.search);
-    var qParam=qp.get('q'),fromParam=qp.get('from');
-    if(qParam||fromParam){
-      var qs='?';
-      if(qParam)qs+='q='+encodeURIComponent(qParam);
-      if(fromParam)qs+=(qParam?'&':'')+'from='+encodeURIComponent(fromParam);
-      sessionStorage.setItem('cebear_shared_qs',qs);
-      history.replaceState({},'',location.pathname);
-    }
     if(isStandalone){
-      // On standalone, wait for auth before navigating
-      // The onAuthStateChanged handler above will redirect to auth if not logged in
-      // Just show splash and let auth resolve
       authReady().then(function(){
         if(_isAuthed&&!currentScreen)goTo('improve');
-        // if not authed, onAuthStateChanged already sent to auth
       });
     }else{
-      // Web: navigate immediately, guest wall in improve.html handles unauthed users
       goTo('improve');
     }
   }
 })();
 
-// Handle Google redirect result (popup may fall back to redirect on some browsers)
+// Handle Google redirect result
 firebase.auth().getRedirectResult().then(function(result){
   if(result&&result.user){
     _isAuthed=true;
     ensureUser(result.user);
-    // If improve iframe is loaded, tell it auth succeeded
-    var f=document.querySelector('#screen-improve iframe');
-    if(f&&f.contentWindow)f.contentWindow.postMessage({type:'authSuccess'},'*');
+    // Notify improve iframe once it has loaded
+    function notifyImprove(){
+      var f=document.querySelector('#screen-improve iframe');
+      if(f&&f.contentWindow){
+        f.contentWindow.postMessage({type:'authSuccess'},'*');
+      }else{
+        setTimeout(notifyImprove,200);
+      }
+    }
+    notifyImprove();
   }
 }).catch(function(){});
 
