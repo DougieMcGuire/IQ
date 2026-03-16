@@ -174,9 +174,9 @@
       var grid='';
       for(var r=0;r<6;r++){var row='';for(var c=0;c<5;c++)row+='<div class="wordle-tile" id="wt-'+idx+'-'+r+'-'+c+'"></div>';grid+='<div class="wordle-row" style="gap:3px">'+row+'</div>';}
       var kb=KB_ROWS.map(function(row){return '<div class="wordle-kb-row" style="gap:3px">'+row.map(function(k){return '<button class="wk'+(k==='ENTER'||k==='⌫'?' wide':'')+'" data-wk="'+k+'" data-wi="'+idx+'">'+k+'</button>';}).join('')+'</div>';}).join('');
-      return '<div class="qcard" style="gap:6px;padding:12px 10px">'+
+      return '<div class="qcard wordle-card">'+
         '<div class="category">🟩 Wordle</div>'+
-        '<div class="question" style="font-size:clamp(12px,3.2vw,15px)">Guess the 5-letter word</div>'+
+        '<div class="question" style="font-size:clamp(11px,2.8vw,13px);margin:0">Guess the 5-letter word</div>'+
         '<div class="wordle-grid" style="gap:3px">'+grid+'</div>'+
         '<div class="wordle-msg" id="wm-'+idx+'"></div>'+
         '<div class="wordle-kb" style="gap:3px">'+kb+'</div>'+
