@@ -128,12 +128,23 @@ window.addEventListener('message',function(e){
     return;
   }
 
-  /* Google sign-in: redirect the TOP WINDOW to google-redirect.html
-     which handles the OAuth flow and posts bd_gis_token back via sessionStorage */
-  if(t==='googleAuthRequest'||t==='googleRedirect'){
-    /* Save any shared question params so they survive the redirect */
-    var cur=sessionStorage.getItem('cebear_shared_qs')||'';
-    sessionStorage.setItem('bd_after_auth',cur||'improve');
+  /* Google sign-in from web iframe — handle popup in parent (top window), never redirect */
+  if(t==='googleAuthRequest'){
+    var gp=new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(gp)
+      .then(function(r){
+        _isAuthed=true;
+        ensureUser(r.user);
+        // onAuthStateChanged will fire and call _notifyImprove automatically
+      })
+      .catch(function(err){
+        if(err.code==='auth/popup-closed-by-user'||err.code==='auth/cancelled-popup-request')return;
+        _notifyImprove('authError',{msg:'Google sign-in failed. Try email instead.'});
+      });
+    return;
+  }
+  /* Standalone iOS uses google-redirect.html — keep this path for that */
+  if(t==='googleRedirect'){
     location.href='google-redirect.html';
     return;
   }
