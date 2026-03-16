@@ -426,8 +426,13 @@ async function gwGoogleSignIn(){
   }
 }
 function gwOnSuccess(){
-  isAuthed=true;hideGuestWall();
+  isAuthed=true;
+  hideGuestWall();
   Haptics&&Haptics.success&&Haptics.success();
+  // Reset guest slide limit so feed loads more cards
+  guestQCount=0;
+  // If wall had blocked addSlide, kick the feed to load more
+  handleScroll();
   if(inIframe)try{parent.postMessage({type:'authSuccess'},'*')}catch{}
 }
 window.addEventListener('message',function(e){
