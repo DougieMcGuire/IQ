@@ -26,10 +26,10 @@
     .xp-bar-in{height:100%;background:var(--gold);border-radius:4px;transition:width .4s}
     .xp-lbl{font-size:11px;font-weight:900;color:var(--dim);white-space:nowrap}
 
-    main{flex:1;padding-top:calc(env(safe-area-inset-top,20px) + 58px);overflow-y:auto;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+    main{flex:1;padding-top:calc(env(safe-area-inset-top,20px) + 58px);overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;scroll-behavior:auto;container-type:size}
     main::-webkit-scrollbar{display:none}
-    .slide{height:calc(100dvh - env(safe-area-inset-top,20px) - 62px);min-height:0;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 14px;overflow:hidden;flex-shrink:0;position:relative}
-    .slide-spacer{height:calc(100dvh - env(safe-area-inset-top,20px) - 62px);min-height:0;flex-shrink:0;scroll-snap-align:start;scroll-snap-stop:always;contain:strict}
+    .slide{height:100cqh;min-height:0;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 14px;overflow:hidden;flex-shrink:0;position:relative}
+    .slide-spacer{height:100cqh;min-height:0;flex-shrink:0;scroll-snap-align:start;scroll-snap-stop:always;contain:strict}
 
     .qcard{background:var(--navy);border-radius:24px;width:100%;max-width:400px;max-height:calc(100% - 24px);padding:clamp(16px,4vw,24px) clamp(14px,3.5vw,20px);display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2vw,14px);box-shadow:0 8px 32px rgba(27,45,91,.25);overflow-y:auto;overflow-x:hidden}
     .qcard::-webkit-scrollbar{display:none}
@@ -62,8 +62,8 @@
     .scroll-hint.show{opacity:.35}
     .scroll-hint svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;animation:bounce 1.5s infinite}
     @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
-    @keyframes slideEnter{0%{opacity:0;transform:translateY(18px) scale(.98)}100%{opacity:1;transform:none}}
-    .slide.entering .qcard{animation:slideEnter .28s cubic-bezier(.22,1,.36,1) both}
+    @keyframes slideEnter{0%{opacity:0}100%{opacity:1}}
+    .slide.entering .qcard{animation:slideEnter .18s ease both}
     .branding{width:100%;text-align:center;font-size:11px;font-weight:900;color:rgba(240,234,214,.3);letter-spacing:2px;text-transform:uppercase;margin-top:8px;padding-top:10px;border-top:1px solid rgba(240,234,214,.06)}
 
     .card-actions{display:flex;justify-content:flex-end;width:100%;margin-top:-4px}
@@ -241,11 +241,15 @@
 
     /* ══ ODD TILE OUT ══ */
     .oto-grid{display:grid;gap:4px;margin:4px 0}
-    .oto-tile{border:none;border-radius:6px;cursor:pointer;transition:transform .1s;padding:0}
+    .oto-tile{border:none;border-radius:6px;cursor:pointer;transition:transform .1s,opacity .15s;padding:0}
     .oto-tile:active{transform:scale(.93)}
     .oto-tile.oto-correct{outline:3px solid var(--green);outline-offset:2px;animation:pop .3s}
-    .oto-tile.oto-wrong{outline:3px solid var(--red);outline-offset:2px}
+    .oto-tile.oto-wrong{outline:3px solid var(--red);outline-offset:2px;opacity:.5}
     .oto-status{font-size:14px;font-weight:800;text-align:center;min-height:20px}
+    .oto-rounds{display:flex;gap:6px;justify-content:center;margin:2px 0}
+    .oto-dot{width:10px;height:10px;border-radius:50%;background:rgba(240,234,214,.15);transition:background .2s}
+    .oto-dot-active{background:var(--gold)}
+    .oto-dot-done{background:var(--green)}
 
     /* ══ STOP THE CLOCK ══ */
     .stc-result{font-size:15px;font-weight:800;text-align:center;min-height:22px}
@@ -537,26 +541,51 @@ let _filling=false,_fs=false,cardsSinceInstall=0;
 
 function scheduleFill(){if(_fs)return;_fs=true;const doFill=dl=>{_fs=false;if(_filling)return;_filling=true;try{let s=0;while(qQ.length<QT){if(++s>QT*4)break;if(dl?.timeRemaining?.()<2&&qQ.length>=3)break;try{const wc=IQData.getWeakestCategory(),diff=wc?IQData.getDifficulty(wc):1,q=Q.generate(diff);if(q)qQ.push(q)}catch{}}}finally{_filling=false}if(qQ.length<QT)scheduleFill()};typeof requestIdleCallback==='function'?requestIdleCallback(doFill,{timeout:300}):setTimeout(()=>doFill(null),16)}
 function nextQ(){if(!qQ.length){try{const q=Q.generate(1);scheduleFill();return q}catch{return null}}const q=qQ.shift();if(qQ.length<Math.ceil(QT/2))scheduleFill();return q}
-let _raf=false;
-function onScroll(){if(_raf)return;_raf=true;requestAnimationFrame(()=>{_raf=false;handleScroll()});}
-let _lastSlideIdx=-1,_lastAnim=-1;
-function handleScroll(){
+let _lastSlideIdx=-1,_lastAnim=-1,_scrollSettleTimer=null,_pruneTimer=null;
+
+// Use scrollend for settled state (prune + animation trigger)
+// Use scroll only for preloading upcoming slides
+function onScroll(){
   const sH=feed.clientHeight;if(!sH)return;
   const cs=Math.floor((feed.scrollTop+sH*.5)/sH),ts=cs+KA+1;
   while(slides<ts)addSlide();
-  prune(cs);
   if(qQ.length<Math.ceil(QT/2))scheduleFill();
+}
+
+function onScrollEnd(){
+  const sH=feed.clientHeight;if(!sH)return;
+  const cs=Math.round(feed.scrollTop/sH);
+  // Snap to exact position to prevent peeping
+  const target=cs*sH;
+  if(Math.abs(feed.scrollTop-target)>1)feed.scrollTop=target;
+  // Trigger enter animation on settled slide
   if(cs!==_lastAnim){
     _lastAnim=cs;
     const el=feed.querySelector(`.slide[data-slide-idx="${cs}"]`);
-    if(el){el.classList.remove('entering');void el.offsetWidth;el.classList.add('entering')}
+    if(el){el.classList.remove('entering');void el.offsetWidth;el.classList.add('entering');}
     if(cs>_lastSlideIdx&&cs>0)onGuestScroll();
     _lastSlideIdx=cs;
   }
+  // Prune old slides after scroll settles (prevents flash during scroll)
+  clearTimeout(_pruneTimer);
+  _pruneTimer=setTimeout(()=>prune(cs),400);
 }
+
+function handleScroll(){onScroll();}
 let _sen=null;
 function attachSen(){_sen?.remove();_sen=document.createElement('div');_sen.style.cssText='height:1px;width:100%;flex-shrink:0';feed.appendChild(_sen);const obs=new IntersectionObserver(e=>{if(e[0].isIntersecting){obs.disconnect();for(let i=0;i<KA;i++)addSlide();attachSen()}},{root:feed,threshold:0});obs.observe(_sen)}
-function prune(cs){const co=cs-KB;if(co<=firstSlide)return;for(let i=firstSlide;i<co;i++){const el=feed.querySelector(`.slide[data-slide-idx="${i}"]`);if(!el)continue;const sp=document.createElement('div');sp.className='slide-spacer';sp.dataset.slideIdx=i;feed.replaceChild(sp,el)}firstSlide=co}
+function prune(cs){
+  const co=cs-KB;if(co<=firstSlide)return;
+  for(let i=firstSlide;i<co;i++){
+    const el=feed.querySelector(`.slide[data-slide-idx="${i}"]`);
+    if(!el||el.classList.contains('slide-spacer'))continue;
+    // Replace with spacer only when scroll is fully settled
+    const sp=document.createElement('div');
+    sp.className='slide-spacer';sp.dataset.slideIdx=i;
+    feed.replaceChild(sp,el);
+  }
+  firstSlide=co;
+}
 function shouldInsertInstallCard(){if(!isMobile||isStandalone)return false;cardsSinceInstall++;if(cardsSinceInstall>=5){cardsSinceInstall=0;return true}return false;}
 
 /* ══ ADD SHARED SLIDE — routes to custom renderer if available ══ */
@@ -656,9 +685,16 @@ function startFeed(){
   const d=IQData.load();Q.setAge(d.age||25);IQData.startSession();updateUI(d);scheduleFill();
   for(let i=0;i<3;i++)addSlide();
   feed.addEventListener('scroll',onScroll,{passive:true});
-  feed.addEventListener('touchmove',onScroll,{passive:true});
+  // scrollend fires when snapping is fully done — use for animation + prune
+  if('onscrollend' in window){
+    feed.addEventListener('scrollend',onScrollEnd,{passive:true});
+  }else{
+    // Fallback for Safari < 16.4: debounce scroll
+    let _seTimer=null;
+    feed.addEventListener('scroll',()=>{clearTimeout(_seTimer);_seTimer=setTimeout(onScrollEnd,100);},{passive:true});
+  }
   let wl=false,wc=null;
-  feed.addEventListener('wheel',e=>{e.preventDefault();if(wl)return;wl=true;const sH=feed.clientHeight,cs=Math.round(feed.scrollTop/sH),dir=e.deltaY>0?1:-1,ts=Math.max(0,cs+dir);feed.scrollTo({top:ts*sH,behavior:'smooth'});clearTimeout(wc);wc=setTimeout(()=>{wl=false;const el=feed.querySelector(`.slide[data-slide-idx="${ts}"]`);if(el){el.classList.remove('entering');void el.offsetWidth;el.classList.add('entering');_lastAnim=ts}},380)},{passive:false});
+  feed.addEventListener('wheel',e=>{e.preventDefault();if(wl)return;wl=true;const sH=feed.clientHeight,cs=Math.round(feed.scrollTop/sH),dir=e.deltaY>0?1:-1,ts=Math.max(0,cs+dir);feed.scrollTo({top:ts*sH,behavior:'smooth'});clearTimeout(wc);wc=setTimeout(()=>{wl=false;onScrollEnd();},400)},{passive:false});
   attachSen();setTimeout(maybeShowPush,3000);scheduleFill();
 }
 
