@@ -123,7 +123,13 @@ window.addEventListener('message',function(e){
   var t=e.data.type;
   if(t==='authSuccess'){
     _isAuthed=true;
-    if(currentScreen==='auth')goTo('improve');
+    if(currentScreen==='auth'){
+      goTo('improve');
+    }else if(currentScreen==='improve'){
+      // Already on improve — the guest wall inside the iframe handled it.
+      // Just make sure parent knows user is authed (tasks/lb tabs work now)
+      // No need to reload the iframe — gwOnSuccess() in improve.html resumes the feed.
+    }
     return;
   }
   if(t==='googleRedirect')return void(location.href='google-redirect.html');
@@ -300,6 +306,17 @@ function redeemSessionToken(sid){
     }
   }
 })();
+
+// Handle Google redirect result (popup may fall back to redirect on some browsers)
+firebase.auth().getRedirectResult().then(function(result){
+  if(result&&result.user){
+    _isAuthed=true;
+    ensureUser(result.user);
+    // If improve iframe is loaded, tell it auth succeeded
+    var f=document.querySelector('#screen-improve iframe');
+    if(f&&f.contentWindow)f.contentWindow.postMessage({type:'authSuccess'},'*');
+  }
+}).catch(function(){});
 
 var deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e});
