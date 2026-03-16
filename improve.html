@@ -331,8 +331,7 @@ function getFB(){
 }
 getFB();
 
-let gwMode='login',isAuthed=isStandalone,guestScrollCount=0;
-const GUEST_SCROLL_LIMIT=3;
+let gwMode='login',isAuthed=isStandalone,guestQCount=0;
 let sharedQuestionAnswered=false;
 
 if(_fbAuth){
@@ -457,12 +456,12 @@ window.gwSubmit=async function(){
   }
 };
 
-function onGuestScroll(){
+function onGuestScroll(){} // no-op, kept for scroll handler reference
+function onGuestAnswer(){
   if(isAuthed||isStandalone)return;
   if(document.getElementById('guest-wall').classList.contains('show'))return;
-  if(sharedQ&&!sharedQuestionAnswered)return;
-  guestScrollCount++;
-  if(guestScrollCount>=GUEST_SCROLL_LIMIT){guestScrollCount=0;showGuestWall('Keep your progress!','Sign up free to save your IQ score, streaks, and compete on the leaderboard.');}
+  guestQCount++;
+  if(guestQCount>=3){showGuestWall('Keep your progress!','Sign up free to save your IQ score, streaks, and compete on the leaderboard.');}
 }
 
 function renderInstallCard(idx){
@@ -531,7 +530,7 @@ function getSessionStats(){try{const raw=localStorage.getItem(SESSION_KEY),s=raw
 function updateSessionStats(c,ms){const s=getSessionStats();s.answered++;if(c)s.correct++;if(c&&ms<3500)s.fast++;localStorage.setItem(SESSION_KEY,JSON.stringify(s));return s}
 async function updateTaskProgress(streak,correct,ms,session){if(!getFirebase())return;try{let state=_taskStateCache||await loadTaskState();if(!state||state.date!==getTodayKey())return;state.tasks.forEach(t=>{if(t.done)return;switch(t.type){case'streak':t.progress=Math.max(t.progress,streak);break;case'correct':t.progress=session.correct;break;case'answered':t.progress=session.answered;break;case'accuracy':t.progress=session.answered>0?Math.round((session.correct/session.answered)*100):0;break;case'fast':t.progress=session.fast;break}if(t.progress>=t.target)t.done=true});if(!state.allDone&&state.tasks.every(t=>t.done))state.allDone=true;saveTaskState(state);notifyTasksPage()}catch{}}
 window.notifyGamePlayed=async function(gt){if(!getFirebase())return;try{let state=_taskStateCache||await loadTaskState();if(!state||state.date!==getTodayKey())return;state.tasks.forEach(t=>{if(t.type!=='game'||t.game!==gt||t.done)return;t.progress=Math.min(t.progress+1,t.target);if(t.progress>=t.target)t.done=true});if(!state.allDone&&state.tasks.every(t=>t.done))state.allDone=true;saveTaskState(state);notifyTasksPage()}catch{}};
-window.onAnswerForTasks=function(c,ms){const r=IQData.load();const s=updateSessionStats(c,ms);updateTaskProgress(r.streak,c,ms,s)};
+window.onAnswerForTasks=function(c,ms){const r=IQData.load();const s=updateSessionStats(c,ms);updateTaskProgress(r.streak,c,ms,s);onGuestAnswer();};
 (function(){const fb=window.firebase||(inIframe&&window.parent.firebase);if(!fb)return;fb.auth().onAuthStateChanged(async u=>{if(!u)return;_tasksUid=u.uid;_tasksDb=fb.firestore();await loadTaskState()})})();
 
 const QT=8,KB=3,KA=6;
@@ -662,7 +661,7 @@ document.addEventListener('click',e=>{
   if(isC){flashEl.className='flash green show';spawnConfetti(8)}else flashEl.className='flash red show';
   setTimeout(()=>flashEl.className='flash',350);
   if(isC&&result.streak>0&&result.streak%5===0)setTimeout(()=>{streakNum.textContent=result.streak;streakPopup.classList.add('show');spawnConfetti(25);setTimeout(()=>streakPopup.classList.remove('show'),1800)},300);
-  const session=updateSessionStats(isC,ms);updateTaskProgress(result.streak,isC,ms,session);
+  const session=updateSessionStats(isC,ms);updateTaskProgress(result.streak,isC,ms,session);onGuestAnswer();
   updateUI(result);handleScroll();
   setTimeout(()=>document.getElementById(`exp-${idx}`)?.classList.add('show'),250);
   setTimeout(()=>document.getElementById(`hint-${idx}`)?.classList.add('show'),500);
