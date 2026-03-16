@@ -679,10 +679,20 @@ document.getElementById('cal-done-btn').addEventListener('click',()=>{Haptics.me
 function renderFB(){return`<div class="qcard"><div class="category">Brain Training</div><div class="question">Keep scrolling — more challenges ahead!</div><div class="branding">cebear.com</div></div>`}
 function renderDef(q,idx){let v='';if(q.visual==='sequence'||q.visual==='letterSequence'){const parts=q.sequence.map((n,i)=>{if(n==='?')return`<span class="blank">?</span>`;return`<span>${n}</span>${i<q.sequence.length-1?'<span class="arrow">→</span>':''}`});if(q.sequence[q.sequence.length-1]!=='?')parts.push('<span class="arrow">→</span><span class="blank">?</span>');v=`<div class="sequence">${parts.join('')}</div>`}else if(q.visual==='matrix'){v=`<div class="matrix">${q.grid.map(c=>`<div class="matrix-cell${c==='?'?' blank':''}">${c}</div>`).join('')}</div>`}const wide=q.options.some(o=>String(o).length>20);return`<div class="qcard"><div class="category">${q.categoryLabel}</div><div class="question">${q.question}</div>${v}<div class="options${wide?' wide':''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">${q.options.map(o=>`<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}</div><div class="feedback" id="fb-${idx}"></div><div class="explain" id="exp-${idx}">${q.explanation}</div><div class="branding">cebear.com</div></div><div class="scroll-hint" id="hint-${idx}"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>Swipe for next</div>`}
 
-function init(){const d=IQData.load();updateUI(d);if(IQData.needsOnboarding())onboard.classList.add('show');else if(IQData.needsCalibration()){Q.setAge(d.age);startCal()}else startFeed();}
+function init(){
+  const d=IQData.load();
+  // Skip age prompt and calibration — start everyone at IQ 100
+  if(IQData.needsOnboarding()||IQData.needsCalibration()){
+    IQData.setAge(25);
+    Q.setAge(25);
+    IQData.markCalibrated(100);
+  }
+  updateUI(IQData.load());
+  startFeed();
+}
 
 function startFeed(){
-  const d=IQData.load();Q.setAge(d.age||25);IQData.startSession();updateUI(d);scheduleFill();
+  const d=IQData.load();Q.setAge(25);IQData.startSession();updateUI(d);scheduleFill();
   for(let i=0;i<3;i++)addSlide();
   feed.addEventListener('scroll',onScroll,{passive:true});
   // scrollend fires when snapping is fully done — use for animation + prune
