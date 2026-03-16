@@ -38,13 +38,11 @@
     .nb.active .ni svg{stroke:#F0EAD6}
     .nbdg{position:absolute;top:4px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:#e8443a;border:2px solid #1b2d5b;display:none}
     .nbdg.show{display:block}
-
-    /* Auth-wait overlay shown inside a screen while waiting for Firebase */
     .auth-wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#1b2d5b}
+    .auth-wait-dots{display:flex;gap:7px}
     .auth-wait-dot{width:10px;height:10px;border-radius:50%;background:rgba(240,234,214,.2);animation:dp 1s ease infinite}
     .auth-wait-dot:nth-child(2){animation-delay:.15s}
     .auth-wait-dot:nth-child(3){animation-delay:.3s}
-    .auth-wait-dots{display:flex;gap:7px}
   </style>
 </head>
 <body>
@@ -66,173 +64,130 @@
 <script>
 firebase.initializeApp({apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend",storageBucket:"braindeer-backend.firebasestorage.app",messagingSenderId:"331205139765",appId:"1:331205139765:web:20cfef8194af63fc55c07c",measurementId:"G-9B6885G0X0"});
 var WORKER_URL='https://cebear.com/api/redeem-install-token';
+var isStandalone=!!('standalone' in navigator&&navigator.standalone||window.matchMedia('(display-mode: standalone)').matches);
 
-var isStandalone=!!(('standalone' in navigator&&navigator.standalone)||window.matchMedia('(display-mode: standalone)').matches);
-
+/* ── Nav helpers ── */
 function showNav(s){document.body.classList.toggle('has-nav',s)}
-function updateNavActive(p){document.querySelectorAll('#nav .nb').forEach(b=>b.classList.toggle('active',b.dataset.page===p))}
+function updateNavActive(p){document.querySelectorAll('#nav .nb').forEach(function(b){b.classList.toggle('active',b.dataset.page===p)})}
+function dismissSplash(){var sp=document.getElementById('splash');if(sp&&!sp.classList.contains('hide')){sp.classList.add('hide');setTimeout(function(){sp.parentNode&&sp.remove()},400)}}
 
-// Auth state — resolved promise so we can await it
-var _isAuthed=false;
-var _authResolved=false;
-var _authCallbacks=[];
-function _onAuthResolve(u){
-  _isAuthed=!!u;
-  _authResolved=true;
-  _authCallbacks.forEach(function(fn){try{fn(u)}catch{}});
-  _authCallbacks=[];
-}
-// Returns a promise that resolves when auth state is known
-function authReady(){
-  if(_authResolved)return Promise.resolve(_isAuthed);
-  return new Promise(function(res){_authCallbacks.push(function(){res(_isAuthed)})});
-}
-
+/* ── Auth state ── */
+var _isAuthed=false,_authResolved=false,_authWaiters=[];
 firebase.auth().onAuthStateChanged(function(u){
-  _onAuthResolve(u);
+  _isAuthed=!!u;
+  if(!_authResolved){
+    _authResolved=true;
+    _authWaiters.forEach(function(fn){fn(u)});
+    _authWaiters=[];
+  }
   if(u){
-    _isAuthed=true;
-    if(currentScreen==='auth'){
-      goTo('improve');
-    }else if(currentScreen==='improve'||!currentScreen){
-      // On improve or just navigating there — tell iframe user is authed
-      // Retry until iframe is ready (it may still be loading)
-      (function notify(attempts){
-        var f=document.querySelector('#screen-improve iframe');
-        if(f&&f.contentWindow){
-          f.contentWindow.postMessage({type:'authSuccess'},'*');
-        }else if(attempts>0){
-          setTimeout(function(){notify(attempts-1);},150);
-        }
-      })(20);
-    }
+    /* Signed in — make sure we're on improve */
+    if(!currentScreen||currentScreen==='auth')goTo('improve');
+    /* Tell the improve iframe if it's already loaded */
+    _notifyImprove('authSuccess');
   }else if(isStandalone){
-    currentScreen=null;
-    screensLoaded={};
+    /* Standalone + signed out → force auth page */
+    currentScreen=null;screensLoaded={};
     document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
     goTo('auth');
   }
 });
-
-/* ══ GUEST WALL NAV INTERCEPTION ══ */
-function tryGuestWall(page){
-  if(isStandalone)return false;
-  if(_isAuthed)return false;
-  if(page!=='profile'&&page!=='tasks'&&page!=='leaderboard')return false;
-  try{
-    var improveFrame=document.querySelector('#screen-improve iframe');
-    if(improveFrame&&improveFrame.contentWindow&&typeof improveFrame.contentWindow.showGuestWallForNav==='function'){
-      return improveFrame.contentWindow.showGuestWallForNav(page);
-    }
-  }catch(err){}
-  goTo('auth');
-  return true;
+function authReady(){
+  if(_authResolved)return Promise.resolve(_isAuthed);
+  return new Promise(function(r){_authWaiters.push(function(){r(_isAuthed)})});
+}
+function _notifyImprove(type,extra){
+  /* Retry posting a message to the improve iframe until it's ready */
+  (function attempt(n){
+    var f=document.querySelector('#screen-improve iframe');
+    if(f&&f.contentWindow){f.contentWindow.postMessage(Object.assign({type:type},extra||{}),'*');}
+    else if(n>0){setTimeout(function(){attempt(n-1)},100);}
+  })(30);
 }
 
+/* ── Guest wall interception for nav tabs ── */
+function tryGuestWall(page){
+  if(isStandalone||_isAuthed)return false;
+  if(page!=='profile'&&page!=='tasks'&&page!=='leaderboard')return false;
+  try{
+    var f=document.querySelector('#screen-improve iframe');
+    if(f&&f.contentWindow&&typeof f.contentWindow.showGuestWallForNav==='function')
+      return f.contentWindow.showGuestWallForNav(page);
+  }catch{}
+  goTo('auth');return true;
+}
+
+/* ── Messages from iframes ── */
 window.addEventListener('message',function(e){
-  if(!e.data?.type)return;
+  if(!e.data||!e.data.type)return;
   var t=e.data.type;
+
   if(t==='authSuccess'){
     _isAuthed=true;
-    if(currentScreen==='auth'){
-      goTo('improve');
-    }else if(currentScreen==='improve'){
-      // Already on improve — the guest wall inside the iframe handled it.
-      // Just make sure parent knows user is authed (tasks/lb tabs work now)
-      // No need to reload the iframe — gwOnSuccess() in improve.html resumes the feed.
-    }
+    if(currentScreen==='auth')goTo('improve');
     return;
   }
-  if(t==='googleRedirect')return void(location.href='google-redirect.html');
-  if(t==='googleAuthRequest'){
-    // Use redirect — popup causes auth/handler page issues with compat SDK in iframes
-    try{sessionStorage.setItem('bd_auth_return','improve');}catch{}
-    firebase.auth().signInWithRedirect(new firebase.auth.GoogleAuthProvider());
+
+  /* Google sign-in: redirect the TOP WINDOW to google-redirect.html
+     which handles the OAuth flow and posts bd_gis_token back via sessionStorage */
+  if(t==='googleAuthRequest'||t==='googleRedirect'){
+    /* Save any shared question params so they survive the redirect */
+    var cur=sessionStorage.getItem('cebear_shared_qs')||'';
+    sessionStorage.setItem('bd_after_auth',cur||'improve');
+    location.href='google-redirect.html';
     return;
   }
-  if(t==='savePushSub')firebase.auth().onAuthStateChanged(function(u){if(u)firebase.firestore().collection('pushSubscriptions').doc(u.uid).set({subscription:e.data.sub,uid:u.uid,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){})});
+
+  if(t==='savePushSub')firebase.auth().onAuthStateChanged(function(u){
+    if(u)firebase.firestore().collection('pushSubscriptions').doc(u.uid)
+      .set({subscription:e.data.sub,uid:u.uid,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){});
+  });
   if(t==='tasksUpdated'){var f=document.querySelector('#screen-tasks iframe');f&&f.contentWindow&&f.contentWindow.postMessage({type:'tasksUpdated'},'*')}
   if(t==='xpAwarded'){var f2=document.querySelector('#screen-improve iframe');f2&&f2.contentWindow&&f2.contentWindow.postMessage({type:'xpAwarded',xp:e.data.xp},'*')}
 });
 
+/* ── Screen management ── */
 var currentScreen=null,screensLoaded={};
-
-// Auth-required pages — on standalone we wait for Firebase before loading the iframe
-// so the page doesn't render with a null user
-var AUTH_REQUIRED_PAGES=['profile','tasks','leaderboard'];
-
-function showAuthWait(screenEl){
-  var w=document.createElement('div');
-  w.className='auth-wait';
-  w.id='auth-wait-'+screenEl.id;
-  w.innerHTML='<div class="auth-wait-dots"><div class="auth-wait-dot"></div><div class="auth-wait-dot"></div><div class="auth-wait-dot"></div></div>';
-  screenEl.appendChild(w);
-}
-function removeAuthWait(screenEl){
-  var w=screenEl.querySelector('.auth-wait');
-  if(w)w.remove();
-}
+var AUTH_PAGES=['profile','tasks','leaderboard'];
 
 window.goTo=function(page){
   if(tryGuestWall(page))return;
-
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
-
-  // Always reload profile + leaderboard (live data)
+  /* Always reload profile + leaderboard (live data) */
   if((page==='profile'||page==='leaderboard')&&screensLoaded[page]){
     var old=document.querySelector('#screen-'+page+' iframe');
     if(old)old.remove();
     screensLoaded[page]=false;
   }
-
   var sc=document.getElementById('screen-'+page);
   if(sc)sc.classList.add('active');
   currentScreen=page;
   showNav(page!=='auth');
   updateNavActive(page);
   dismissSplash();
-
   if(screensLoaded[page])return;
-
   var c=document.getElementById('screen-'+page);
   if(!c)return;
-
-  // For auth-required pages on standalone: wait until Firebase auth is resolved
-  // before creating the iframe, so the page loads with a known user state
-  if(AUTH_REQUIRED_PAGES.indexOf(page)!==-1&&isStandalone&&!_authResolved){
-    showAuthWait(c);
-    authReady().then(function(){
-      removeAuthWait(c);
-      // If still on this page, load the iframe
-      if(currentScreen===page)_loadIframe(page,c);
-    });
+  /* On standalone, wait for auth before loading auth-required pages */
+  if(AUTH_PAGES.indexOf(page)!==-1&&isStandalone&&!_authResolved){
+    var w=document.createElement('div');w.className='auth-wait';
+    w.innerHTML='<div class="auth-wait-dots"><div class="auth-wait-dot"></div><div class="auth-wait-dot"></div><div class="auth-wait-dot"></div></div>';
+    c.appendChild(w);
+    authReady().then(function(){var aw=c.querySelector('.auth-wait');if(aw)aw.remove();if(currentScreen===page)_loadIframe(page,c)});
     return;
   }
-
   _loadIframe(page,c);
 };
 
 function _loadIframe(page,c){
   if(screensLoaded[page])return;
-  var f=document.createElement('iframe');
-  var src=page+'.html';
-  if(page==='improve'){
-    var sharedQs=sessionStorage.getItem('cebear_shared_qs');
-    if(sharedQs){src=page+'.html'+sharedQs;sessionStorage.removeItem('cebear_shared_qs')}
-  }
-  f.src=src;
-  f.allow='web-share';
-  c.appendChild(f);
-  screensLoaded[page]=true;
+  var f=document.createElement('iframe'),src=page+'.html';
+  if(page==='improve'){var qs=sessionStorage.getItem('cebear_shared_qs');if(qs){src+=qs;sessionStorage.removeItem('cebear_shared_qs')}}
+  f.src=src;f.allow='web-share';c.appendChild(f);screensLoaded[page]=true;
 }
 
-function dismissSplash(){
-  var sp=document.getElementById('splash');
-  if(sp&&!sp.classList.contains('hide')){sp.classList.add('hide');setTimeout(function(){sp.parentNode&&sp.remove()},400)}
-}
-
+/* ── Firestore helpers ── */
 window.authCheck=function(){};
-
 function ensureUser(u){
   var r=firebase.firestore().collection('users').doc(u.uid);
   return r.get().then(function(s){
@@ -241,89 +196,63 @@ function ensureUser(u){
       :r.set({uid:u.uid,email:u.email,username:u.displayName||null,pic:u.photoURL||null,createdAt:firebase.firestore.FieldValue.serverTimestamp(),lastSeen:firebase.firestore.FieldValue.serverTimestamp()});
   });
 }
-
-function generateInstallToken(){
-  var u=firebase.auth().currentUser;
-  if(!u)return Promise.resolve(null);
-  var t=Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2)+Date.now().toString(36);
-  return firebase.firestore().collection('installTokens').doc(t).set({uid:u.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp(),expiresAt:new Date(Date.now()+600000),used:false}).then(function(){return t}).catch(function(){return null});
-}
-
 function redeemSessionToken(sid){
   return firebase.firestore().collection('authSessions').doc(sid).get().then(function(s){
     if(!s.exists)throw'nf';
-    var d=s.data();
-    if(d.used)throw'u';
-    var exp=d.expiresAt?.toDate?d.expiresAt.toDate():new Date(d.expiresAt);
+    var d=s.data();if(d.used)throw'u';
+    var exp=d.expiresAt&&d.expiresAt.toDate?d.expiresAt.toDate():new Date(d.expiresAt);
     if(new Date()>exp)throw'e';
     s.ref.update({used:true});
     return firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(d.idToken));
   });
 }
 
+/* ── Startup ── */
 (function(){
   localStorage.removeItem('iq_guest');
   var p=new URLSearchParams(location.search),tT=p.get('t'),sI=p.get('session');
   if(tT||sI)history.replaceState({},'',location.pathname);
 
-  // Stash shared Q params before any redirect clears them
-  var qp=new URLSearchParams(location.search);
-  var qParam=qp.get('q'),fromParam=qp.get('from');
+  /* Stash shared Q params — survive any redirect */
+  var qParam=p.get('q'),fromParam=p.get('from');
   if(qParam||fromParam){
     var qs='?';
     if(qParam)qs+='q='+encodeURIComponent(qParam);
-    if(fromParam)qs+=(qParam?'&':'')+'from='+encodeURIComponent(fromParam);
+    if(fromParam)qs+=(qParam?'&':'')+ 'from='+encodeURIComponent(fromParam);
     sessionStorage.setItem('cebear_shared_qs',qs);
     history.replaceState({},'',location.pathname);
   }
 
+  /* Check for GIS token from google-redirect.html (iOS standalone flow) */
   var gT=sessionStorage.getItem('bd_gis_token');
   if(gT){
     sessionStorage.removeItem('bd_gis_token');
     firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(gT))
-      .then(function(r){return ensureUser(r.user)})
+      .then(function(r){ensureUser(r.user)})
       .then(function(){goTo('improve')})
-      .catch(function(){nb()});
+      .catch(function(){start()});
     return;
   }
-  if(sI)redeemSessionToken(sI).then(function(){nb()}).catch(function(){nb()});
-  else if(tT)fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tT})})
-    .then(function(r){return r.ok?r.json():null})
-    .then(function(b){
-      if(b?.customToken)return firebase.auth().signInWithCustomToken(b.customToken).then(function(){location.reload()});
-      nb();
-    })
-    .catch(function(){nb()});
-  else nb();
+  if(sI){redeemSessionToken(sI).then(start).catch(start);return;}
+  if(tT){
+    fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tT})})
+      .then(function(r){return r.ok?r.json():null})
+      .then(function(b){b&&b.customToken?firebase.auth().signInWithCustomToken(b.customToken).then(function(){location.reload()}):start()})
+      .catch(start);
+    return;
+  }
+  start();
 
-  function nb(){
+  function start(){
     if(isStandalone){
-      authReady().then(function(){
-        if(_isAuthed&&!currentScreen)goTo('improve');
-      });
+      /* Standalone: wait for Firebase auth before showing anything */
+      authReady().then(function(){if(!currentScreen)goTo(_isAuthed?'improve':'auth')});
     }else{
+      /* Web: load improve immediately — guest wall handles unauthed users */
       goTo('improve');
     }
   }
 })();
-
-// Handle Google redirect result
-firebase.auth().getRedirectResult().then(function(result){
-  if(result&&result.user){
-    _isAuthed=true;
-    ensureUser(result.user);
-    // Notify improve iframe once it has loaded
-    function notifyImprove(){
-      var f=document.querySelector('#screen-improve iframe');
-      if(f&&f.contentWindow){
-        f.contentWindow.postMessage({type:'authSuccess'},'*');
-      }else{
-        setTimeout(notifyImprove,200);
-      }
-    }
-    notifyImprove();
-  }
-}).catch(function(){});
 
 var deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e});
