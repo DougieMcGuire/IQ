@@ -672,8 +672,8 @@ function handleScroll(){
     _lastAnim=cs;
     const el=feed.querySelector(`.slide[data-slide-idx="${cs}"]`);
     if(el){el.classList.remove('entering');void el.offsetWidth;el.classList.add('entering')}
-    // Count guest scrolls only when moving to a new slide
-    if(cs>_lastSlideIdx&&_lastSlideIdx>=0){onGuestScroll()}
+    // Only count as a guest scroll when moving forward past the first slide
+    if(cs>_lastSlideIdx&&cs>0){onGuestScroll()}
     _lastSlideIdx=cs;
   }
 }
@@ -714,7 +714,7 @@ function addSlide(){
     if(cr){
       div.innerHTML=cr.render(q,idx);
       (_sen?.parentNode===feed)?feed.insertBefore(div,_sen):feed.appendChild(div);
-      try{cr.attach(div,q,idx,{feed,flashEl,confettiEl,IQData,getEncouragement,updateUI,checkMore:handleScroll,spawnConfetti,answerStartRef:{get:()=>answerStart,set:v=>{answerStart=v}},Haptics,notifyGamePlayed:window.notifyGamePlayed,onAnswer:window.onAnswerForTasks})}catch{}
+      try{cr.attach(div,q,idx,{feed,flashEl,confettiEl,IQData,getEncouragement,updateUI,checkMore:handleScroll,spawnConfetti,answerStartRef:{get:()=>answerStart,set:v=>{answerStart=v}},Haptics,notifyGamePlayed:window.notifyGamePlayed,onAnswer:window.onAnswerForTasks,addShareBtn})}catch{}
     }else{
       div.innerHTML=renderDef(q,idx);
       (_sen?.parentNode===feed)?feed.insertBefore(div,_sen):feed.appendChild(div);
