@@ -38,6 +38,13 @@
     .nb.active .ni svg{stroke:#F0EAD6}
     .nbdg{position:absolute;top:4px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:#e8443a;border:2px solid #1b2d5b;display:none}
     .nbdg.show{display:block}
+
+    /* Auth-wait overlay shown inside a screen while waiting for Firebase */
+    .auth-wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#1b2d5b}
+    .auth-wait-dot{width:10px;height:10px;border-radius:50%;background:rgba(240,234,214,.2);animation:dp 1s ease infinite}
+    .auth-wait-dot:nth-child(2){animation-delay:.15s}
+    .auth-wait-dot:nth-child(3){animation-delay:.3s}
+    .auth-wait-dots{display:flex;gap:7px}
   </style>
 </head>
 <body>
@@ -60,33 +67,43 @@
 firebase.initializeApp({apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend",storageBucket:"braindeer-backend.firebasestorage.app",messagingSenderId:"331205139765",appId:"1:331205139765:web:20cfef8194af63fc55c07c",measurementId:"G-9B6885G0X0"});
 var WORKER_URL='https://cebear.com/api/redeem-install-token';
 
+var isStandalone=!!(('standalone' in navigator&&navigator.standalone)||window.matchMedia('(display-mode: standalone)').matches);
+
 function showNav(s){document.body.classList.toggle('has-nav',s)}
 function updateNavActive(p){document.querySelectorAll('#nav .nb').forEach(b=>b.classList.toggle('active',b.dataset.page===p))}
 
-/* ══ GUEST WALL NAV INTERCEPTION ══
-   For pages that should show the guest wall instead of navigating,
-   we ask the improve iframe first. If it handles it, we bail.
-   Only applies when user is NOT authed and NOT standalone.        */
+// Auth state — resolved promise so we can await it
 var _isAuthed=false;
-firebase.auth().onAuthStateChanged(function(u){_isAuthed=!!u});
+var _authResolved=false;
+var _authCallbacks=[];
+function _onAuthResolve(u){
+  _isAuthed=!!u;
+  _authResolved=true;
+  _authCallbacks.forEach(function(fn){try{fn(u)}catch{}});
+  _authCallbacks=[];
+}
+// Returns a promise that resolves when auth state is known
+function authReady(){
+  if(_authResolved)return Promise.resolve(_isAuthed);
+  return new Promise(function(res){_authCallbacks.push(function(){res(_isAuthed)})});
+}
 
-var isStandalone=!!(('standalone' in navigator&&navigator.standalone)||window.matchMedia('(display-mode: standalone)').matches);
+firebase.auth().onAuthStateChanged(function(u){
+  _onAuthResolve(u);
+  if(u&&currentScreen==='auth')goTo('improve');
+});
 
+/* ══ GUEST WALL NAV INTERCEPTION ══ */
 function tryGuestWall(page){
-  // Standalone always navigates normally
   if(isStandalone)return false;
-  // If authed, navigate normally
   if(_isAuthed)return false;
-  // Only intercept these three pages
   if(page!=='profile'&&page!=='tasks'&&page!=='leaderboard')return false;
-  // Ask the improve iframe to show its guest wall
   try{
     var improveFrame=document.querySelector('#screen-improve iframe');
     if(improveFrame&&improveFrame.contentWindow&&typeof improveFrame.contentWindow.showGuestWallForNav==='function'){
       return improveFrame.contentWindow.showGuestWallForNav(page);
     }
   }catch(err){}
-  // Improve iframe not ready yet — fall back to navigating to auth
   goTo('auth');
   return true;
 }
@@ -100,17 +117,14 @@ window.addEventListener('message',function(e){
     return;
   }
   if(t==='googleRedirect')return void(location.href='google-redirect.html');
-  // Improve iframe asking parent to handle Google auth (avoids invalid action in iframe)
   if(t==='googleAuthRequest'){
     var gp=new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(gp).then(function(r){
       _isAuthed=true;
-      // Notify improve iframe that auth succeeded
       var f=document.querySelector('#screen-improve iframe');
       if(f&&f.contentWindow)f.contentWindow.postMessage({type:'authSuccess'},'*');
     }).catch(function(err){
       if(err.code==='auth/popup-closed-by-user'||err.code==='auth/cancelled-popup-request')return;
-      // Tell iframe to show error
       var f=document.querySelector('#screen-improve iframe');
       if(f&&f.contentWindow)f.contentWindow.postMessage({type:'authError',msg:'Google sign-in failed. Try email instead.'},'*');
     });
@@ -123,33 +137,32 @@ window.addEventListener('message',function(e){
 
 var currentScreen=null,screensLoaded={};
 
+// Auth-required pages — on standalone we wait for Firebase before loading the iframe
+// so the page doesn't render with a null user
+var AUTH_REQUIRED_PAGES=['profile','tasks','leaderboard'];
+
+function showAuthWait(screenEl){
+  var w=document.createElement('div');
+  w.className='auth-wait';
+  w.id='auth-wait-'+screenEl.id;
+  w.innerHTML='<div class="auth-wait-dots"><div class="auth-wait-dot"></div><div class="auth-wait-dot"></div><div class="auth-wait-dot"></div></div>';
+  screenEl.appendChild(w);
+}
+function removeAuthWait(screenEl){
+  var w=screenEl.querySelector('.auth-wait');
+  if(w)w.remove();
+}
+
 window.goTo=function(page){
-  // Intercept guest nav attempts before doing anything
   if(tryGuestWall(page))return;
 
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
 
-  // Always reload profile + leaderboard (they pull live data)
+  // Always reload profile + leaderboard (live data)
   if((page==='profile'||page==='leaderboard')&&screensLoaded[page]){
     var old=document.querySelector('#screen-'+page+' iframe');
     if(old)old.remove();
     screensLoaded[page]=false;
-  }
-
-  if(!screensLoaded[page]){
-    var c=document.getElementById('screen-'+page);
-    if(!c)return;
-    var f=document.createElement('iframe');
-    // Pass shared question params to improve iframe on first load
-    var src=page+'.html';
-    if(page==='improve'){
-      var sharedQs=sessionStorage.getItem('cebear_shared_qs');
-      if(sharedQs){src=page+'.html'+sharedQs;sessionStorage.removeItem('cebear_shared_qs')}
-    }
-    f.src=src;
-    f.allow='web-share';
-    c.appendChild(f);
-    screensLoaded[page]=true;
   }
 
   var sc=document.getElementById('screen-'+page);
@@ -157,11 +170,46 @@ window.goTo=function(page){
   currentScreen=page;
   showNav(page!=='auth');
   updateNavActive(page);
+  dismissSplash();
 
-  // Dismiss splash on first navigation
+  if(screensLoaded[page])return;
+
+  var c=document.getElementById('screen-'+page);
+  if(!c)return;
+
+  // For auth-required pages on standalone: wait until Firebase auth is resolved
+  // before creating the iframe, so the page loads with a known user state
+  if(AUTH_REQUIRED_PAGES.indexOf(page)!==-1&&isStandalone&&!_authResolved){
+    showAuthWait(c);
+    authReady().then(function(){
+      removeAuthWait(c);
+      // If still on this page, load the iframe
+      if(currentScreen===page)_loadIframe(page,c);
+    });
+    return;
+  }
+
+  _loadIframe(page,c);
+};
+
+function _loadIframe(page,c){
+  if(screensLoaded[page])return;
+  var f=document.createElement('iframe');
+  var src=page+'.html';
+  if(page==='improve'){
+    var sharedQs=sessionStorage.getItem('cebear_shared_qs');
+    if(sharedQs){src=page+'.html'+sharedQs;sessionStorage.removeItem('cebear_shared_qs')}
+  }
+  f.src=src;
+  f.allow='web-share';
+  c.appendChild(f);
+  screensLoaded[page]=true;
+}
+
+function dismissSplash(){
   var sp=document.getElementById('splash');
   if(sp&&!sp.classList.contains('hide')){sp.classList.add('hide');setTimeout(function(){sp.parentNode&&sp.remove()},400)}
-};
+}
 
 window.authCheck=function(){};
 
@@ -217,23 +265,19 @@ function redeemSessionToken(sid){
   else nb();
 
   function nb(){
-    var unsub=firebase.auth().onAuthStateChanged(function(u){
-      unsub();
-      _isAuthed=!!u;
-      // Preserve ?q= and ?from= params when loading improve
-      var qp=new URLSearchParams(location.search);
-      var qParam=qp.get('q');
-      var fromParam=qp.get('from');
-      if(qParam||fromParam){
-        // Store for improve iframe to pick up
-        var qs='?';
-        if(qParam)qs+='q='+encodeURIComponent(qParam);
-        if(fromParam)qs+=(qParam?'&':'')+'from='+encodeURIComponent(fromParam);
-        sessionStorage.setItem('cebear_shared_qs',qs);
-        history.replaceState({},'',location.pathname);
-      }
-      goTo('improve');
-    });
+    // authReady is already wired to onAuthStateChanged above.
+    // Just handle shared Q params and navigate to improve.
+    var qp=new URLSearchParams(location.search);
+    var qParam=qp.get('q'),fromParam=qp.get('from');
+    if(qParam||fromParam){
+      var qs='?';
+      if(qParam)qs+='q='+encodeURIComponent(qParam);
+      if(fromParam)qs+=(qParam?'&':'')+'from='+encodeURIComponent(fromParam);
+      sessionStorage.setItem('cebear_shared_qs',qs);
+      history.replaceState({},'',location.pathname);
+    }
+    // Navigate immediately — don't wait for auth for the improve feed
+    goTo('improve');
   }
 })();
 
