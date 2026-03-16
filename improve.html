@@ -28,12 +28,11 @@
 
     main{flex:1;padding-top:calc(env(safe-area-inset-top,20px) + 58px);overflow-y:auto;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
     main::-webkit-scrollbar{display:none}
-    .slide{height:calc(100dvh - env(safe-area-inset-top,20px) - 62px);min-height:0;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;align-items:center;justify-content:safe center;padding:6px 14px;overflow:hidden;flex-shrink:0}
+    .slide{height:calc(100dvh - env(safe-area-inset-top,20px) - 62px);min-height:0;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 14px;overflow:hidden;flex-shrink:0;position:relative}
     .slide-spacer{height:calc(100dvh - env(safe-area-inset-top,20px) - 62px);min-height:0;flex-shrink:0;scroll-snap-align:start;scroll-snap-stop:always;contain:strict}
 
     .qcard{background:var(--navy);border-radius:24px;width:100%;max-width:400px;max-height:calc(100% - 24px);padding:clamp(16px,4vw,24px) clamp(14px,3.5vw,20px);display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2vw,14px);box-shadow:0 8px 32px rgba(27,45,91,.25);overflow-y:auto;overflow-x:hidden}
     .qcard::-webkit-scrollbar{display:none}
-    .qcard.wordle-card{overflow:visible;max-height:none;padding:6px 8px;gap:3px}
     .category{font-size:10px;font-weight:900;letter-spacing:1.8px;text-transform:uppercase;color:var(--navy);background:var(--cream);padding:4px 16px;border-radius:20px}
     .question{font-size:clamp(15px,4vw,18px);font-weight:800;text-align:center;line-height:1.45;color:var(--cream);padding:0 4px}
     .sequence{display:flex;align-items:center;justify-content:center;gap:clamp(4px,1.5vw,8px);flex-wrap:wrap;font-size:clamp(20px,5.5vw,28px);font-weight:900;color:var(--cream)}
@@ -59,7 +58,7 @@
     .explanation{background:rgba(240,234,214,.08);border-radius:12px;padding:10px 14px;font-size:12px;font-weight:600;color:rgba(240,234,214,.55);line-height:1.5;text-align:center;display:none;width:100%}
     .explanation.show{display:block;animation:su .3s}
     @keyframes su{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-    .scroll-hint{margin-top:8px;font-size:12px;font-weight:800;color:var(--dim);opacity:0;display:flex;flex-direction:column;align-items:center;gap:2px;transition:opacity .3s}
+    .scroll-hint{position:absolute;bottom:10px;left:0;right:0;font-size:12px;font-weight:800;color:var(--dim);opacity:0;display:flex;flex-direction:column;align-items:center;gap:2px;transition:opacity .3s;pointer-events:none}
     .scroll-hint.show{opacity:.35}
     .scroll-hint svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;animation:bounce 1.5s infinite}
     @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
