@@ -238,6 +238,17 @@
     #push-prompt .pp-btns{display:flex;gap:8px}
     #push-prompt .pp-yes{flex:1;background:var(--green);color:#fff;border:none;border-radius:12px;padding:10px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 2px 0 var(--gd)}
     #push-prompt .pp-no{background:rgba(27,45,91,.06);color:var(--dim);border:none;border-radius:12px;padding:10px 16px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;cursor:pointer}
+
+    /* ══ ODD TILE OUT ══ */
+    .oto-grid{display:grid;gap:4px;margin:4px 0}
+    .oto-tile{border:none;border-radius:6px;cursor:pointer;transition:transform .1s;padding:0}
+    .oto-tile:active{transform:scale(.93)}
+    .oto-tile.oto-correct{outline:3px solid var(--green);outline-offset:2px;animation:pop .3s}
+    .oto-tile.oto-wrong{outline:3px solid var(--red);outline-offset:2px}
+    .oto-status{font-size:14px;font-weight:800;text-align:center;min-height:20px}
+
+    /* ══ STOP THE CLOCK ══ */
+    .stc-result{font-size:15px;font-weight:800;text-align:center;min-height:22px}
   </style>
 </head>
 <body>
