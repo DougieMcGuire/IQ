@@ -414,12 +414,17 @@ async function gwEnsure(u,extra={}){
 async function gwGoogleSignIn(){
   if(!_fbAuth)return;
   gwClear();gwSetLoad('gw-google-btn',true);
-  if(inIframe){try{parent.postMessage({type:'googleAuthRequest'},'*');}catch{}gwSetLoad('gw-google-btn',false);return;}
+  if(inIframe){
+    // Tell parent to redirect to google-redirect.html — cleanest cross-browser approach
+    try{parent.postMessage({type:'googleAuthRequest'},'*');}catch{}
+    // Button stays loading — page will redirect
+    return;
+  }
+  // Direct visit (no iframe) — use popup
   try{
-    let user;
-    if(_fbAuth.signInWithPopup){const gp=new firebase.auth.GoogleAuthProvider();const result=await _fbAuth.signInWithPopup(gp);user=result.user;}
-    else{const gp=new GoogleAuthProvider();const result=await signInWithPopup(_fbAuth,gp);user=result.user;}
-    await gwEnsure(user);gwOnSuccess();
+    const gp=new GoogleAuthProvider();
+    const result=await signInWithPopup(_fbAuth,gp);
+    await gwEnsure(result.user);gwOnSuccess();
   }catch(e){
     if(e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request'){gwSetLoad('gw-google-btn',false);return}
     gwSetLoad('gw-google-btn',false);gwErr('Google sign-in failed. Try email instead.');
@@ -429,15 +434,17 @@ function gwOnSuccess(){
   isAuthed=true;
   hideGuestWall();
   Haptics&&Haptics.success&&Haptics.success();
-  // Reset guest slide limit so feed loads more cards
   guestQCount=0;
-  // If wall had blocked addSlide, kick the feed to load more
   handleScroll();
   if(inIframe)try{parent.postMessage({type:'authSuccess'},'*')}catch{}
 }
 window.addEventListener('message',function(e){
   if(!e.data)return;
-  if(e.data.type==='authSuccess'){gwOnSuccess();return}
+  if(e.data.type==='authSuccess'){
+    // Parent confirmed auth — hide wall and resume feed
+    if(!isAuthed)gwOnSuccess();
+    return;
+  }
   if(e.data.type==='authError'){gwSetLoad('gw-google-btn',false);gwErr(e.data.msg||'Sign-in failed. Try email instead.');return;}
   if(e.data.type==='xpAwarded'){
     const xp=e.data.xp;if(!xp)return;
