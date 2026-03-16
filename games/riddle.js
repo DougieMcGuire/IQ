@@ -1,39 +1,10 @@
-// games/riddle.js — Riddles (crowd pleasers only)
+// games/riddle.js — Riddles
 (function () {
-
   Q.register('riddle', function () {
-    var items = [
-      { q:'I have hands but cannot clap. What am I?', a:'A clock', w:['A person','A robot','A tree'], why:'Clock hands tell time.', d:0.6 },
-      { q:'What has keys but no locks?', a:'A piano', w:['A door','A car','A safe'], why:'Piano has musical keys.', d:0.6 },
-      { q:'What gets wetter the more it dries?', a:'A towel', w:['A sponge','Paper','The sun'], why:'Towels absorb water as they dry things.', d:0.7 },
-      { q:'What has a head and tail but no body?', a:'A coin', w:['A snake','A fish','A ghost'], why:'Coins have heads and tails.', d:0.7 },
-      { q:'What can you catch but not throw?', a:'A cold', w:['A ball','A fish','A wave'], why:'You catch a cold.', d:0.7 },
-      { q:'What has teeth but cannot bite?', a:'A comb', w:['A shark','A dog','A saw'], why:'A comb has teeth for hair.', d:0.6 },
-      { q:'What goes up but never comes down?', a:'Your age', w:['A balloon','A bird','Smoke'], why:'Age only increases.', d:0.7 },
-      { q:'What has one eye but cannot see?', a:'A needle', w:['A pirate','A cyclops','A camera'], why:'Needle eye holds thread.', d:0.7 },
-      { q:'What has words but never speaks?', a:'A book', w:['A parrot','A phone','A radio'], why:'Books have words but cannot talk.', d:0.6 },
-      { q:'What runs but never walks?', a:'Water', w:['A dog','A car','Time'], why:'Water runs and flows.', d:0.7 },
-      { q:'The more you take, the more you leave behind. What?', a:'Footsteps', w:['Money','Time','Breath'], why:'Walking leaves footsteps.', d:1.0 },
-      { q:'What can fill a room but takes no space?', a:'Light', w:['Air','Water','Sound'], why:'Light fills space with no mass.', d:1.0 },
-      { q:'What can travel the world while staying in a corner?', a:'A stamp', w:['A compass','The internet','A satellite'], why:'Stamps stay in envelope corners.', d:1.0 },
-      { q:'I have cities but no houses, mountains but no trees. What am I?', a:'A map', w:['A planet','A dream','A story'], why:'Maps show geography without real objects.', d:1.0 },
-      { q:'The more there is, the less you see. What am I?', a:'Darkness', w:['Light','Fog','Space'], why:'More darkness = less visibility.', d:1.0 },
-      { q:'I speak without a mouth and hear without ears. What am I?', a:'An echo', w:['A ghost','Music','The wind'], why:'Echoes are sound reflections.', d:1.1 },
-      { q:'The more you remove from me, the bigger I get. What am I?', a:'A hole', w:['A balloon','A shadow','A debt'], why:'Removing material makes a hole bigger.', d:1.1 },
-      { q:'What is so fragile that saying its name breaks it?', a:'Silence', w:['Glass','A dream','A secret'], why:'Speaking breaks silence.', d:1.3 },
-      { q:'I have no life but I can die. What am I?', a:'A battery', w:['A robot','A flame','A ghost'], why:'Batteries die when drained.', d:1.3 },
-      { q:'What gets sharper the more you use it?', a:'Your mind', w:['A knife','A pencil','A saw'], why:'Mental ability sharpens with practice.', d:1.2 },
-      { q:"I'm light as a feather but the strongest man can't hold me for 5 minutes.", a:'Your breath', w:['Air','A thought','A cloud'], why:'Nobody can hold their breath that long.', d:1.2 },
-      { q:'What has 13 hearts but no other organs?', a:'A deck of cards', w:['A hospital','A town','A garden'], why:'13 hearts in the suit.', d:1.4 },
-      { q:'What tastes better than it smells?', a:'Your tongue', w:['Coffee','Perfume','Bacon'], why:'Your tongue tastes but cannot smell.', d:1.5 },
-      { q:"The person who makes it doesn't need it. The buyer doesn't use it. The user doesn't know it.", a:'A coffin', w:['A pill','A gift','A trap'], why:'Coffins: made, bought, and used this way.', d:1.5 },
+    var items=[
+      {q:'I have hands but cannot clap. What am I?',a:'A clock',w:['A person','A robot','A tree'],why:'Clock hands tell time.',d:0.6},{q:'What has keys but no locks?',a:'A piano',w:['A door','A car','A safe'],why:'Piano has musical keys.',d:0.6},{q:'What gets wetter the more it dries?',a:'A towel',w:['A sponge','Paper','The sun'],why:'Towels absorb water as they dry things.',d:0.7},{q:'What has a head and tail but no body?',a:'A coin',w:['A snake','A fish','A ghost'],why:'Coins have heads and tails.',d:0.7},{q:'What can you catch but not throw?',a:'A cold',w:['A ball','A fish','A wave'],why:'You catch a cold.',d:0.7},{q:'What has teeth but cannot bite?',a:'A comb',w:['A shark','A dog','A saw'],why:'A comb has teeth for hair.',d:0.6},{q:'What goes up but never comes down?',a:'Your age',w:['A balloon','A bird','Smoke'],why:'Age only increases.',d:0.7},{q:'What has one eye but cannot see?',a:'A needle',w:['A pirate','A cyclops','A camera'],why:'Needle eye holds thread.',d:0.7},{q:'What has words but never speaks?',a:'A book',w:['A parrot','A phone','A radio'],why:'Books have words but cannot talk.',d:0.6},{q:'What runs but never walks?',a:'Water',w:['A dog','A car','Time'],why:'Water runs and flows.',d:0.7},{q:'The more you take, the more you leave behind. What?',a:'Footsteps',w:['Money','Time','Breath'],why:'Walking leaves footsteps.',d:1.0},{q:'What can fill a room but takes no space?',a:'Light',w:['Air','Water','Sound'],why:'Light fills space with no mass.',d:1.0},{q:'What can travel the world while staying in a corner?',a:'A stamp',w:['A compass','The internet','A satellite'],why:'Stamps stay in envelope corners.',d:1.0},{q:'I have cities but no houses, mountains but no trees. What am I?',a:'A map',w:['A planet','A dream','A story'],why:'Maps show geography without real objects.',d:1.0},{q:'The more there is, the less you see. What am I?',a:'Darkness',w:['Light','Fog','Space'],why:'More darkness = less visibility.',d:1.0},{q:'I speak without a mouth and hear without ears. What am I?',a:'An echo',w:['A ghost','Music','The wind'],why:'Echoes are sound reflections.',d:1.1},{q:'The more you remove from me, the bigger I get. What am I?',a:'A hole',w:['A balloon','A shadow','A debt'],why:'Removing material makes a hole bigger.',d:1.1},{q:'What is so fragile that saying its name breaks it?',a:'Silence',w:['Glass','A dream','A secret'],why:'Speaking breaks silence.',d:1.3},{q:'I have no life but I can die. What am I?',a:'A battery',w:['A robot','A flame','A ghost'],why:'Batteries die when drained.',d:1.3},{q:'What gets sharper the more you use it?',a:'Your mind',w:['A knife','A pencil','A saw'],why:'Mental ability sharpens with practice.',d:1.2},{q:"I'm light as a feather but the strongest man can't hold me for 5 minutes.",a:'Your breath',w:['Air','A thought','A cloud'],why:"Nobody can hold their breath that long.",d:1.2},{q:'What has 13 hearts but no other organs?',a:'A deck of cards',w:['A hospital','A town','A garden'],why:'13 hearts in the suit.',d:1.4},{q:'What tastes better than it smells?',a:'Your tongue',w:['Coffee','Perfume','Bacon'],why:'Your tongue tastes but cannot smell.',d:1.5},{q:"The person who makes it doesn't need it. The buyer doesn't use it. The user doesn't know it.",a:'A coffin',w:['A pill','A gift','A trap'],why:'Coffins: made, bought, and used this way.',d:1.5},
     ];
-    var i = Q.pick(items);
-    return {
-      type:'riddle', category:'problemSolving', categoryLabel:'Riddle',
-      difficulty:i.d||1.1, question:i.q, answer:i.a,
-      options:Q.shuffle([i.a].concat(i.w)), explanation:i.why, visual:'text'
-    };
+    var i=Q.pick(items);
+    return {type:'riddle',category:'problemSolving',categoryLabel:'Riddle',difficulty:i.d||1.1,question:i.q,answer:i.a,options:Q.shuffle([i.a].concat(i.w)),explanation:i.why,visual:'text'};
   }, 4);
-
 })();
