@@ -43,10 +43,13 @@
     .auth-wait-dot{width:10px;height:10px;border-radius:50%;background:rgba(240,234,214,.2);animation:dp 1s ease infinite}
     .auth-wait-dot:nth-child(2){animation-delay:.15s}
     .auth-wait-dot:nth-child(3){animation-delay:.3s}
+    #offline-toast{position:fixed;top:calc(env(safe-area-inset-top,20px) + 12px);left:50%;transform:translateX(-50%);background:#1b2d5b;border:1px solid rgba(240,234,214,.15);color:rgba(240,234,214,.7);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;padding:10px 18px;border-radius:14px;z-index:9999;opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap}
+    #offline-toast.show{opacity:1}
   </style>
 </head>
 <body>
 <div id="splash"><div class="sb"><img src="logo.png" alt="Cebear" style="width:48px;height:48px;object-fit:contain"></div><div class="sn">Cebear</div><div class="sd"><span></span><span></span><span></span></div></div>
+<div id="offline-toast">No connection — come back online for this</div>
 <div class="screen" id="screen-auth"></div>
 <div class="screen" id="screen-improve"></div>
 <div class="screen" id="screen-profile"></div>
@@ -160,9 +163,25 @@ window.addEventListener('message',function(e){
 /* ── Screen management ── */
 var currentScreen=null,screensLoaded={};
 var AUTH_PAGES=['profile','tasks','leaderboard'];
+var NETWORK_PAGES=['profile','tasks','leaderboard']; // pages that need network
+
+function isOffline(){return!navigator.onLine;}
+var _offlineTimer=null;
+function showOfflineToast(){
+  var t=document.getElementById('offline-toast');
+  if(!t)return;
+  t.classList.add('show');
+  clearTimeout(_offlineTimer);
+  _offlineTimer=setTimeout(function(){t.classList.remove('show');},2500);
+}
 
 window.goTo=function(page){
   if(tryGuestWall(page))return;
+  // If offline and this page needs network, show toast and stay put
+  if(isOffline()&&NETWORK_PAGES.indexOf(page)!==-1){
+    showOfflineToast();
+    return;
+  }
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
   /* Always reload profile + leaderboard (live data) */
   if((page==='profile'||page==='leaderboard')&&screensLoaded[page]){
