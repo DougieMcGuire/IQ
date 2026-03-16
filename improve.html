@@ -133,7 +133,7 @@
     /* ══ INSTALL HOOK CARD ══ */
     .install-card{background:var(--navy);border-radius:24px;width:100%;max-width:400px;padding:28px 24px;display:flex;flex-direction:column;align-items:center;gap:16px;box-shadow:0 8px 32px rgba(27,45,91,.25);text-align:center;position:relative;overflow:hidden}
     .install-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--orange));border-radius:24px 24px 0 0}
-    .install-bear{width:56px;height:56px;background:var(--gold);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 var(--goldd)}
+    .install-bear{width:56px;height:56px;background:var(--gold);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 var(--goldd);overflow:hidden}
     .install-bear svg{width:32px;height:32px}
     .install-title{font-size:18px;font-weight:900;color:var(--cream);line-height:1.2}
     .install-sub{font-size:13px;font-weight:700;color:rgba(240,234,214,.5);line-height:1.5}
@@ -153,7 +153,14 @@
     @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
     .gw-handle{width:36px;height:4px;background:rgba(240,234,214,.15);border-radius:2px;margin:0 auto 20px}
     .gw-bear{width:52px;height:52px;background:var(--gold);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 4px 0 var(--goldd)}
-    .gw-bear svg{width:30px;height:30px}
+    .gw-bear img{width:34px;height:34px;object-fit:contain}
+    /* Sender profile card */
+    .gw-sender{display:flex;align-items:center;gap:12px;background:rgba(240,234,214,.06);border-radius:16px;padding:12px 14px;margin-bottom:16px;border:1px solid rgba(240,234,214,.08)}
+    .gw-sender-av{width:44px;height:44px;border-radius:50%;background:rgba(240,234,214,.1);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:rgba(240,234,214,.5)}
+    .gw-sender-av img{width:100%;height:100%;object-fit:cover}
+    .gw-sender-info{flex:1;min-width:0}
+    .gw-sender-name{font-size:15px;font-weight:900;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .gw-sender-label{font-size:11px;font-weight:700;color:rgba(240,234,214,.35);margin-top:2px}
     .gw-title{font-size:22px;font-weight:900;color:var(--cream);text-align:center;margin-bottom:6px}
     .gw-sub{font-size:14px;font-weight:700;color:rgba(240,234,214,.45);text-align:center;margin-bottom:20px;line-height:1.4}
     .gw-tabs{display:grid;grid-template-columns:1fr 1fr;background:rgba(240,234,214,.04);border-radius:14px;padding:4px;margin-bottom:18px}
@@ -249,7 +256,14 @@
 <div class="guest-wall" id="guest-wall">
   <div class="gw-sheet">
     <div class="gw-handle"></div>
-    <div class="gw-bear"><svg viewBox="0 0 48 48" fill="none"><circle cx="14" cy="12" r="7" fill="#F0EAD6"/><circle cx="34" cy="12" r="7" fill="#F0EAD6"/><circle cx="24" cy="26" r="16" fill="#F0EAD6"/><circle cx="14" cy="12" r="4.5" fill="rgba(240,234,214,.6)"/><circle cx="34" cy="12" r="4.5" fill="rgba(240,234,214,.6)"/><ellipse cx="24" cy="30" rx="6" ry="4.5" fill="rgba(240,234,214,.6)"/><circle cx="20" cy="24" r="2.2" fill="#1b2d5b"/><circle cx="28" cy="24" r="2.2" fill="#1b2d5b"/><ellipse cx="24" cy="29" rx="2.5" ry="1.5" fill="#F0EAD6"/></svg></div>
+    <div class="gw-bear"><img src="logo.png" alt="Cebear"></div>
+    <div id="gw-sender" class="gw-sender" style="display:none">
+      <div class="gw-sender-av" id="gw-sender-av"></div>
+      <div class="gw-sender-info">
+        <div class="gw-sender-name" id="gw-sender-name"></div>
+        <div class="gw-sender-label">challenged you</div>
+      </div>
+    </div>
     <div class="gw-title" id="gw-title">Keep your progress!</div>
     <div class="gw-sub" id="gw-sub">Sign up free to save your IQ score, streaks, and compete on the leaderboard.</div>
     <div class="gw-tabs">
@@ -290,13 +304,17 @@ const inIframe=window.parent!==window;
 if(inIframe)parent.authCheck();
 window.navGo=function(p){Haptics.light();parent.goTo(p)};
 
-/* ══ FIREBASE (reuse parent's instance if in iframe, else init own) ══ */
+/* ══ FIREBASE — always use parent compat when in iframe ══ */
 let _fbAuth=null,_fbDb=null;
 function getFB(){
-  try{
-    const fb=window.firebase||(inIframe&&window.parent.firebase);
-    if(fb){_fbAuth=fb.auth();_fbDb=fb.firestore();return true}
-  }catch{}
+  // In iframe: use parent's compat Firebase (avoids dual-app auth conflict)
+  if(inIframe){
+    try{
+      const fb=window.parent.firebase;
+      if(fb){_fbAuth=fb.auth();_fbDb=fb.firestore();return true}
+    }catch{}
+  }
+  // Direct visit or parent firebase unavailable: init own modular instance
   try{
     const cfg={apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend",storageBucket:"braindeer-backend.firebasestorage.app",messagingSenderId:"331205139765",appId:"1:331205139765:web:20cfef8194af63fc55c07c"};
     const app=getApps().length?getApps()[0]:initializeApp(cfg);
@@ -320,23 +338,53 @@ if(_fbAuth){
   });
 }
 
-/* ══ SHARED QUESTION PARAM ══ */
+/* ══ SHARED QUESTION + SENDER PARAMS ══ */
 const urlParams=new URLSearchParams(location.search);
 const sharedQParam=urlParams.get('q');
-let sharedQ=null;
+const senderParam=urlParams.get('from');
+let sharedQ=null,senderInfo=null;
 if(sharedQParam){
-  try{sharedQ=JSON.parse(atob(sharedQParam))}catch{}
+  try{sharedQ=JSON.parse(decodeURIComponent(escape(atob(sharedQParam))))}catch{}
 }
+if(senderParam){
+  try{senderInfo=JSON.parse(decodeURIComponent(escape(atob(senderParam))))}catch{}
+}
+
+// If we have sender info, populate the guest wall sender card
+function initSenderUI(){
+  if(!senderInfo)return;
+  const card=document.getElementById('gw-sender');
+  const av=document.getElementById('gw-sender-av');
+  const name=document.getElementById('gw-sender-name');
+  if(!card)return;
+  name.textContent=senderInfo.username||'Someone';
+  if(senderInfo.pic){
+    av.innerHTML=`<img src="${senderInfo.pic}" alt="" onerror="this.parentElement.textContent='${(senderInfo.username||'?')[0].toUpperCase()}'">`;
+  }else{
+    av.textContent=(senderInfo.username||'?')[0].toUpperCase();
+  }
+  card.style.display='flex';
+  // Update title to use their name
+  const title=document.getElementById('gw-title');
+  const sub=document.getElementById('gw-sub');
+  if(title)title.textContent=`Join ${senderInfo.username||'them'} on Cebear!`;
+  if(sub)sub.textContent='Sign up free to save your IQ score and see how you compare.';
+}
+initSenderUI();
 
 /* ══ GUEST WALL FUNCTIONS ══ */
 function showGuestWall(title,sub){
   if(isAuthed||isStandalone)return;
   wallShown=true;
   const wall=document.getElementById('guest-wall');
+  // If we have sender info, override title/sub with their name
+  if(senderInfo&&title==='Keep your progress!'){
+    title=`Join ${senderInfo.username||'them'} on Cebear!`;
+    sub='Sign up free to save your IQ score and see how you compare.';
+  }
   if(title)document.getElementById('gw-title').textContent=title;
   if(sub)document.getElementById('gw-sub').textContent=sub;
   wall.classList.add('show');
-  // Prevent feed scroll while wall is open
   document.getElementById('feed').style.overflow='hidden';
 }
 function hideGuestWall(){
@@ -368,11 +416,44 @@ function gwSetLoad(id,on){const b=document.getElementById(id);if(!b)return;b.cla
 
 async function gwEnsure(u,extra={}){
   try{
-    if(!_fbDb)return;
-    const ref=doc(_fbDb,'users',u.uid),snap=await getDoc(ref);
-    if(!snap.exists()){await setDoc(ref,{uid:u.uid,email:u.email,username:extra.username||u.displayName||null,pic:u.photoURL||null,createdAt:serverTimestamp(),lastSeen:serverTimestamp()})}
-    else{setDoc(ref,{lastSeen:serverTimestamp()},{merge:true})}
+    // Works with both compat (firestore()) and modular (getFirestore())
+    if(_fbDb.collection){
+      // compat
+      const ref=_fbDb.collection('users').doc(u.uid);
+      const snap=await ref.get();
+      if(!snap.exists)await ref.set({uid:u.uid,email:u.email,username:extra.username||u.displayName||null,pic:u.photoURL||null,createdAt:new Date(),lastSeen:new Date()});
+      else ref.set({lastSeen:new Date()},{merge:true});
+    }else{
+      // modular
+      const ref=doc(_fbDb,'users',u.uid),snap=await getDoc(ref);
+      if(!snap.exists())await setDoc(ref,{uid:u.uid,email:u.email,username:extra.username||u.displayName||null,pic:u.photoURL||null,createdAt:serverTimestamp(),lastSeen:serverTimestamp()});
+      else setDoc(ref,{lastSeen:serverTimestamp()},{merge:true});
+    }
   }catch{}
+}
+
+async function gwGoogleSignIn(){
+  if(!_fbAuth)return;
+  gwClear();gwSetLoad('gw-google-btn',true);
+  try{
+    let user;
+    if(_fbAuth.signInWithPopup){
+      // compat
+      const gp=new window.parent.firebase.auth.GoogleAuthProvider();
+      const result=await _fbAuth.signInWithPopup(gp);
+      user=result.user;
+    }else{
+      // modular
+      const gp=new GoogleAuthProvider();
+      const result=await signInWithPopup(_fbAuth,gp);
+      user=result.user;
+    }
+    await gwEnsure(user);
+    gwOnSuccess();
+  }catch(e){
+    if(e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request'){gwSetLoad('gw-google-btn',false);return}
+    gwSetLoad('gw-google-btn',false);gwErr('Google sign-in failed. Try email instead.');
+  }
 }
 
 function gwOnSuccess(){
@@ -383,19 +464,7 @@ function gwOnSuccess(){
   if(inIframe)try{parent.postMessage({type:'authSuccess'},'*')}catch{}
 }
 
-document.getElementById('gw-google-btn').addEventListener('click',async()=>{
-  if(!_fbAuth)return;
-  gwClear();gwSetLoad('gw-google-btn',true);
-  try{
-    const gp=new GoogleAuthProvider();
-    const result=await signInWithPopup(_fbAuth,gp);
-    await gwEnsure(result.user);
-    gwOnSuccess();
-  }catch(e){
-    if(e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request'){gwSetLoad('gw-google-btn',false);return}
-    gwSetLoad('gw-google-btn',false);gwErr('Google sign-in failed. Try email instead.');
-  }
-});
+document.getElementById('gw-google-btn').addEventListener('click',gwGoogleSignIn);
 
 window.gwSubmit=async function(){
   if(!_fbAuth)return;
@@ -407,14 +476,29 @@ window.gwSubmit=async function(){
   if(gwMode==='signup'&&pw.length<6){gwErr('Password needs at least 6 characters.');return}
   gwSetLoad('gw-submit',true);
   try{
-    if(gwMode==='login'){
-      const c=await signInWithEmailAndPassword(_fbAuth,email,pw);
-      await gwEnsure(c.user);
+    let user;
+    if(_fbAuth.signInWithEmailAndPassword){
+      // compat
+      if(gwMode==='login'){
+        const c=await _fbAuth.signInWithEmailAndPassword(email,pw);
+        user=c.user;
+      }else{
+        const c=await _fbAuth.createUserWithEmailAndPassword(email,pw);
+        if(un)await c.user.updateProfile({displayName:un});
+        user=c.user;
+      }
     }else{
-      const c=await createUserWithEmailAndPassword(_fbAuth,email,pw);
-      if(un)await updateProfile(c.user,{displayName:un});
-      await gwEnsure(c.user,{username:un});
+      // modular
+      if(gwMode==='login'){
+        const c=await signInWithEmailAndPassword(_fbAuth,email,pw);
+        user=c.user;
+      }else{
+        const c=await createUserWithEmailAndPassword(_fbAuth,email,pw);
+        if(un)await updateProfile(c.user,{displayName:un});
+        user=c.user;
+      }
     }
+    await gwEnsure(user,{username:un});
     gwOnSuccess();
   }catch(e){
     gwSetLoad('gw-submit',false);
@@ -448,9 +532,7 @@ function renderInstallCard(idx){
       {n:'3',t:'Open <strong>Cebear</strong> from your home screen',s:'Full-screen experience, instant load'}];
   div.innerHTML=`
     <div class="install-card">
-      <div class="install-bear">
-        <svg viewBox="0 0 48 48" fill="none"><circle cx="14" cy="12" r="7" fill="#1b2d5b"/><circle cx="34" cy="12" r="7" fill="#1b2d5b"/><circle cx="24" cy="26" r="16" fill="#1b2d5b"/><circle cx="14" cy="12" r="4.5" fill="#243a6e"/><circle cx="34" cy="12" r="4.5" fill="#243a6e"/><ellipse cx="24" cy="30" rx="6" ry="4.5" fill="#243a6e"/><circle cx="20" cy="24" r="2.2" fill="#F0EAD6"/><circle cx="28" cy="24" r="2.2" fill="#F0EAD6"/><ellipse cx="24" cy="29" rx="2.5" ry="1.5" fill="#1b2d5b"/></svg>
-      </div>
+      <div class="install-bear"><img src="logo.png" alt="Cebear" style="width:38px;height:38px;object-fit:contain"></div>
       <div class="install-title">Train smarter — add to your home screen</div>
       <div class="install-sub">No app store needed. Plays full-screen, loads instantly, keeps your streak alive.</div>
       <div class="install-steps">
@@ -463,6 +545,18 @@ function renderInstallCard(idx){
 }
 
 /* ══ QUESTION SHARE BUTTON ══ */
+function getSenderParam(){
+  // Get current user info to embed as sender
+  try{
+    const fb=inIframe?window.parent.firebase:null;
+    const u=fb?fb.auth().currentUser:null;
+    if(!u)return '';
+    const d=IQData.load();
+    const info={uid:u.uid,username:d.username||u.displayName||'Someone',pic:u.photoURL||d.pic||''};
+    return '&from='+btoa(unescape(encodeURIComponent(JSON.stringify(info))));
+  }catch{return ''}
+}
+
 function addShareBtn(cardEl,q){
   const actions=document.createElement('div');
   actions.className='card-actions';
@@ -473,12 +567,15 @@ function addShareBtn(cardEl,q){
     e.stopPropagation();
     Haptics&&Haptics.light&&Haptics.light();
     try{
-      // Encode question as base64 — only safe fields
       const qData={type:q.type,question:q.question,options:q.options,answer:q.answer,category:q.category,categoryLabel:q.categoryLabel,difficulty:q.difficulty,explanation:q.explanation||'',visual:q.visual||null,sequence:q.sequence||null,grid:q.grid||null};
       const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(qData))));
-      const shareUrl=`${location.origin}${location.pathname}?q=${encoded}`;
+      // Always link to app.html so receiver gets the full app experience
+      const base=location.origin+'/app.html';
+      const shareUrl=base+'?q='+encoded+getSenderParam();
+      const senderName=senderInfo?.username;
+      const shareText=senderName?`${senderName} challenged you — can you answer this brain teaser?`:'Can you answer this? — Cebear';
       if(navigator.share){
-        navigator.share({title:'Can you answer this? — Cebear',text:'I found a brain teaser. Can you beat me?',url:shareUrl}).catch(()=>{});
+        navigator.share({title:'Brain teaser — Cebear',text:shareText,url:shareUrl}).catch(()=>{});
       }else{
         navigator.clipboard.writeText(shareUrl).then(()=>{
           btn.classList.add('copied');
@@ -606,7 +703,9 @@ function addSharedSlide(idx){
   if(qcard){
     const banner=document.createElement('div');
     banner.className='shared-q-banner';
-    banner.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span>Someone shared this question with you — answer it!</span>`;
+    const senderName=senderInfo?.username;
+    const bannerText=senderName?`<strong style="color:var(--gold)">${senderName}</strong> challenged you — can you answer this?`:`Someone shared this question with you — answer it!`;
+    banner.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span>${bannerText}</span>`;
     qcard.insertBefore(banner,qcard.firstChild);
     addShareBtn(qcard,q);
   }
