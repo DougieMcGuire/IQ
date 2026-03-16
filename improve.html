@@ -55,6 +55,8 @@
     .feedback.show{opacity:1}.feedback.correct{color:var(--green)}.feedback.wrong{color:var(--red)}
     .explain{background:rgba(240,234,214,.08);border-radius:12px;padding:10px 14px;font-size:12px;font-weight:600;color:rgba(240,234,214,.55);line-height:1.5;text-align:center;display:none;width:100%}
     .explain.show{display:block;animation:su .3s}
+    .explanation{background:rgba(240,234,214,.08);border-radius:12px;padding:10px 14px;font-size:12px;font-weight:600;color:rgba(240,234,214,.55);line-height:1.5;text-align:center;display:none;width:100%}
+    .explanation.show{display:block;animation:su .3s}
     @keyframes su{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
     .scroll-hint{margin-top:8px;font-size:12px;font-weight:800;color:var(--dim);opacity:0;display:flex;flex-direction:column;align-items:center;gap:2px;transition:opacity .3s}
     .scroll-hint.show{opacity:.35}
@@ -64,7 +66,6 @@
     .slide.entering .qcard{animation:slideEnter .28s cubic-bezier(.22,1,.36,1) both}
     .branding{width:100%;text-align:center;font-size:11px;font-weight:900;color:rgba(240,234,214,.3);letter-spacing:2px;text-transform:uppercase;margin-top:8px;padding-top:10px;border-top:1px solid rgba(240,234,214,.06)}
 
-    /* ── Share button on question cards ── */
     .card-actions{display:flex;justify-content:flex-end;width:100%;margin-top:-4px}
     .share-q-btn{background:rgba(240,234,214,.08);border:none;border-radius:10px;padding:6px 12px;display:flex;align-items:center;gap:5px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;color:rgba(240,234,214,.4);cursor:pointer;transition:all .15s}
     .share-q-btn:active{transform:scale(.94);background:rgba(240,234,214,.14)}
@@ -136,7 +137,6 @@
     .install-card{background:var(--navy);border-radius:24px;width:100%;max-width:400px;padding:28px 24px;display:flex;flex-direction:column;align-items:center;gap:16px;box-shadow:0 8px 32px rgba(27,45,91,.25);text-align:center;position:relative;overflow:hidden}
     .install-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--orange));border-radius:24px 24px 0 0}
     .install-bear{width:56px;height:56px;background:var(--gold);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 var(--goldd);overflow:hidden}
-    .install-bear svg{width:32px;height:32px}
     .install-title{font-size:18px;font-weight:900;color:var(--cream);line-height:1.2}
     .install-sub{font-size:13px;font-weight:700;color:rgba(240,234,214,.5);line-height:1.5}
     .install-steps{width:100%;display:flex;flex-direction:column;gap:10px}
@@ -144,8 +144,6 @@
     .install-step-num{width:28px;height:28px;border-radius:8px;background:var(--gold);color:var(--navy);font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .install-step-text{font-size:13px;font-weight:700;color:rgba(240,234,214,.7);line-height:1.4}
     .install-step-text strong{color:var(--cream)}
-    .install-btn{background:var(--green);color:#fff;border:none;border-radius:14px;padding:14px 28px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 4px 0 var(--gd);transition:transform .1s;width:100%}
-    .install-btn:active{transform:translateY(4px);box-shadow:none}
     .install-skip{font-size:11px;font-weight:700;color:rgba(240,234,214,.25);cursor:pointer;padding:4px}
 
     /* ══ GUEST WALL MODAL ══ */
@@ -156,7 +154,6 @@
     .gw-handle{width:36px;height:4px;background:rgba(240,234,214,.15);border-radius:2px;margin:0 auto 20px}
     .gw-bear{width:52px;height:52px;background:var(--gold);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 4px 0 var(--goldd)}
     .gw-bear img{width:34px;height:34px;object-fit:contain}
-    /* Sender profile card */
     .gw-sender{display:flex;align-items:center;gap:12px;background:rgba(240,234,214,.06);border-radius:16px;padding:12px 14px;margin-bottom:16px;border:1px solid rgba(240,234,214,.08)}
     .gw-sender-av{width:44px;height:44px;border-radius:50%;background:rgba(240,234,214,.1);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:rgba(240,234,214,.5)}
     .gw-sender-av img{width:100%;height:100%;object-fit:cover}
@@ -190,7 +187,7 @@
     .gw-footer{text-align:center;margin-top:14px;font-size:11px;font-weight:700;color:rgba(240,234,214,.2)}
     .gw-field-un{display:none}
 
-    /* ══ SHARED Q CARD ══ */
+    /* ══ SHARED Q BANNER ══ */
     .shared-q-banner{background:rgba(232,168,23,.1);border:1px solid rgba(232,168,23,.2);border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:10px;width:100%}
     .shared-q-banner svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:2;flex-shrink:0}
     .shared-q-banner span{font-size:12px;font-weight:700;color:rgba(240,234,214,.5);line-height:1.4}
@@ -250,7 +247,7 @@
 <div class="flash" id="flash"></div><div class="confetti" id="confetti"></div>
 <div id="push-prompt"><div class="pp-title">Stay sharp daily?</div><div class="pp-text">One nudge a day to keep your streak alive. No spam.</div><div class="pp-btns"><button class="pp-yes" id="pp-yes">Sure!</button><button class="pp-no" id="pp-no">Not now</button></div></div>
 
-<!-- ══ ONBOARD + CALIBRATION (unchanged) ══ -->
+<!-- ══ ONBOARD + CALIBRATION ══ -->
 <div class="modal" id="onboard"><div class="modal-box"><div class="modal-mascot"><svg viewBox="0 0 48 48" fill="none"><circle cx="14" cy="12" r="7" fill="#1b2d5b"/><circle cx="34" cy="12" r="7" fill="#1b2d5b"/><circle cx="24" cy="26" r="16" fill="#1b2d5b"/><circle cx="14" cy="12" r="4.5" fill="#243a6e"/><circle cx="34" cy="12" r="4.5" fill="#243a6e"/><ellipse cx="24" cy="30" rx="6" ry="4.5" fill="#243a6e"/><circle cx="20" cy="24" r="2.2" fill="#F0EAD6"/><circle cx="28" cy="24" r="2.2" fill="#F0EAD6"/><ellipse cx="24" cy="29" rx="2.5" ry="1.5" fill="#1b2d5b"/></svg></div><div class="modal-title">Welcome to Cebear!</div><div class="modal-text">Train your brain with personalized challenges.<br>First, how old are you?</div><div class="age-num" id="age-display">25</div><input type="range" class="age-slider" id="age-slider" min="8" max="80" value="25"><button class="btn-go" id="start-btn">Next</button></div></div>
 <div class="modal" id="calibration"><div class="modal-box"><div id="cal-quiz"><div class="modal-mascot"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" fill="#1b2d5b"/><path d="M20 18a4 4 0 018 0c0 2-2 3-4 4v2" stroke="#F0EAD6" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="32" r="1.5" fill="#F0EAD6"/></svg></div><div class="modal-title">Quick Brain Check</div><div class="modal-text">5 questions to find your starting IQ</div><div class="cal-progress" id="cal-dots"></div><div class="cal-question" id="cal-q"></div><div class="cal-opts" id="cal-opts"></div></div><div id="cal-result"><div class="modal-mascot"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" fill="#3fba4f"/><path d="M16 24l5 5 11-11" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="modal-title">Your Starting IQ</div><div class="result-iq" id="cal-iq">100</div><div class="result-label">I Q</div><div class="result-text">Your baseline — keep training to improve!</div><button class="btn-go" id="cal-done-btn">Start Training</button></div></div></div>
 
@@ -290,14 +287,15 @@
   </div>
 </div>
 
-<script src="questions.js"></script><script src="games/wordle.js"></script><script src="games/ticTacToe.js"></script><script src="games/numSeq.js"></script><script src="games/letterSeq.js"></script><script src="games/matrix.js"></script><script src="games/math.js"></script><script src="games/analogy.js"></script><script src="games/oddOut.js"></script><script src="games/riddle.js"></script><script src="games/codeBreak.js"></script><script src="games/logic.js"></script><script src="games/memory.js"></script><script src="games/simon.js"></script><script src="games/reaction.js"></script><script src="games/wordScramble.js"></script><script src="games/slidePuzzle.js"></script><script src="games/colorSort.js"></script><script src="games/mathRush.js"></script>
+<script src="questions.js"></script>
+<script src="games/games.js"></script>
+<script src="games/logic.js"></script>
 <script type="module">
 import{IQData,getEncouragement}from'./data.js';import Haptics from'./haptics.js';
 import{initializeApp,getApps}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,createUserWithEmailAndPassword,signInWithEmailAndPassword,updateProfile}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import{getFirestore,doc,setDoc,getDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* ══ STANDALONE DETECTION — skip all guest logic if standalone ══ */
 const isStandalone=!!(('standalone' in navigator&&navigator.standalone)||window.matchMedia('(display-mode: standalone)').matches);
 const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -305,20 +303,11 @@ const inIframe=window.parent!==window;
 
 if(inIframe)parent.authCheck();
 window.navGo=function(p){Haptics.light();parent.goTo(p)};
-// Hide top-bar when viewed directly in Safari (not inside app.html iframe)
 if(!inIframe)document.body.classList.add('no-header');
 
-/* ══ FIREBASE — always use parent compat when in iframe ══ */
 let _fbAuth=null,_fbDb=null;
 function getFB(){
-  // In iframe: use parent's compat Firebase (avoids dual-app auth conflict)
-  if(inIframe){
-    try{
-      const fb=window.parent.firebase;
-      if(fb){_fbAuth=fb.auth();_fbDb=fb.firestore();return true}
-    }catch{}
-  }
-  // Direct visit or parent firebase unavailable: init own modular instance
+  if(inIframe){try{const fb=window.parent.firebase;if(fb){_fbAuth=fb.auth();_fbDb=fb.firestore();return true}}catch{}}
   try{
     const cfg={apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend",storageBucket:"braindeer-backend.firebasestorage.app",messagingSenderId:"331205139765",appId:"1:331205139765:web:20cfef8194af63fc55c07c"};
     const app=getApps().length?getApps()[0]:initializeApp(cfg);
@@ -327,78 +316,44 @@ function getFB(){
 }
 getFB();
 
-/* ══ GUEST WALL STATE ══ */
-let gwMode='login';
-let isAuthed=isStandalone;
-let guestScrollCount=0;
+let gwMode='login',isAuthed=isStandalone,guestScrollCount=0;
 const GUEST_SCROLL_LIMIT=3;
-let wallShown=false;
 let sharedQuestionAnswered=false;
 
-// Use compat onAuthStateChanged when available, modular otherwise
 if(_fbAuth){
-  if(_fbAuth.onAuthStateChanged){
-    // compat
-    _fbAuth.onAuthStateChanged(u=>{if(u){isAuthed=true;hideGuestWall()}});
-  }else{
-    // modular
-    onAuthStateChanged(_fbAuth,u=>{if(u){isAuthed=true;hideGuestWall()}});
-  }
+  if(_fbAuth.onAuthStateChanged){_fbAuth.onAuthStateChanged(u=>{if(u){isAuthed=true;hideGuestWall()}});}
+  else{onAuthStateChanged(_fbAuth,u=>{if(u){isAuthed=true;hideGuestWall()}});}
 }
 
-/* ══ SHARED QUESTION + SENDER PARAMS ══ */
 const urlParams=new URLSearchParams(location.search);
-const sharedQParam=urlParams.get('q');
-const senderParam=urlParams.get('from');
+const sharedQParam=urlParams.get('q'),senderParam=urlParams.get('from');
 let sharedQ=null,senderInfo=null;
-if(sharedQParam){
-  try{sharedQ=JSON.parse(decodeURIComponent(escape(atob(sharedQParam))))}catch{}
-}
-if(senderParam){
-  try{senderInfo=JSON.parse(decodeURIComponent(escape(atob(senderParam))))}catch{}
-}
+if(sharedQParam){try{sharedQ=JSON.parse(decodeURIComponent(escape(atob(sharedQParam))))}catch{}}
+if(senderParam){try{senderInfo=JSON.parse(decodeURIComponent(escape(atob(senderParam))))}catch{}}
 
-// If we have sender info, populate the guest wall sender card
-const CEBEAR_USER_COUNT='1,200+'; // update this as you grow
+const CEBEAR_USER_COUNT='1,200+';
 function initSenderUI(){
   if(!senderInfo)return;
-  const card=document.getElementById('gw-sender');
-  const av=document.getElementById('gw-sender-av');
-  const nameEl=document.getElementById('gw-sender-name');
+  const card=document.getElementById('gw-sender'),av=document.getElementById('gw-sender-av'),nameEl=document.getElementById('gw-sender-name');
   if(!card)return;
   nameEl.textContent=senderInfo.username||'Someone';
-  if(senderInfo.pic){
-    const img=document.createElement('img');
-    img.src=senderInfo.pic;
-    img.onerror=()=>{av.textContent=(senderInfo.username||'?')[0].toUpperCase()};
-    av.appendChild(img);
-  }else{
-    av.textContent=(senderInfo.username||'?')[0].toUpperCase();
-  }
+  if(senderInfo.pic){const img=document.createElement('img');img.src=senderInfo.pic;img.onerror=()=>{av.textContent=(senderInfo.username||'?')[0].toUpperCase()};av.appendChild(img);}
+  else av.textContent=(senderInfo.username||'?')[0].toUpperCase();
   card.style.display='flex';
-  const title=document.getElementById('gw-title');
-  const sub=document.getElementById('gw-sub');
+  const title=document.getElementById('gw-title'),sub=document.getElementById('gw-sub');
   if(title)title.textContent=`Join ${senderInfo.username||'them'} and ${CEBEAR_USER_COUNT} others on Cebear!`;
   if(sub)sub.textContent='Sign up free to save your IQ score and see how you stack up.';
 }
 initSenderUI();
 
-/* ══ GUEST WALL FUNCTIONS ══ */
 function showGuestWall(title,sub){
   if(isAuthed||isStandalone)return;
   const wall=document.getElementById('guest-wall');
-  // Don't override titles if sender info is already set by initSenderUI
-  if(!senderInfo){
-    if(title)document.getElementById('gw-title').textContent=title;
-    if(sub)document.getElementById('gw-sub').textContent=sub;
-  }
+  if(!senderInfo){if(title)document.getElementById('gw-title').textContent=title;if(sub)document.getElementById('gw-sub').textContent=sub;}
   wall.classList.add('show');
   document.getElementById('feed').style.overflow='hidden';
 }
-function hideGuestWall(){
-  document.getElementById('guest-wall').classList.remove('show');
-  document.getElementById('feed').style.overflow='';
-}
+function hideGuestWall(){document.getElementById('guest-wall').classList.remove('show');document.getElementById('feed').style.overflow='';}
 window.showGuestWallForNav=function(section){
   if(isAuthed||isStandalone)return false;
   const titles={profile:'See your full profile',tasks:'Daily tasks await',leaderboard:'Climb the leaderboard'};
@@ -407,7 +362,6 @@ window.showGuestWallForNav=function(section){
   return true;
 };
 
-/* ══ GUEST WALL AUTH ══ */
 window.gwSwitch=function(m){
   gwMode=m;
   document.getElementById('gw-tab-in').classList.toggle('active',m==='login');
@@ -417,121 +371,61 @@ window.gwSwitch=function(m){
   document.getElementById('gw-password').autocomplete=m==='signup'?'new-password':'current-password';
   document.getElementById('gw-banner').className='gw-banner';
 };
-
 function gwErr(msg){const b=document.getElementById('gw-banner');b.textContent=msg;b.className='gw-banner error'}
 function gwClear(){document.getElementById('gw-banner').className='gw-banner'}
 function gwSetLoad(id,on){const b=document.getElementById(id);if(!b)return;b.classList.toggle('gw-loading',on);b.disabled=on}
-
 async function gwEnsure(u,extra={}){
   try{
-    // Works with both compat (firestore()) and modular (getFirestore())
-    if(_fbDb.collection){
-      // compat
-      const ref=_fbDb.collection('users').doc(u.uid);
-      const snap=await ref.get();
-      if(!snap.exists)await ref.set({uid:u.uid,email:u.email,username:extra.username||u.displayName||null,pic:u.photoURL||null,createdAt:new Date(),lastSeen:new Date()});
-      else ref.set({lastSeen:new Date()},{merge:true});
-    }else{
-      // modular
-      const ref=doc(_fbDb,'users',u.uid),snap=await getDoc(ref);
-      if(!snap.exists())await setDoc(ref,{uid:u.uid,email:u.email,username:extra.username||u.displayName||null,pic:u.photoURL||null,createdAt:serverTimestamp(),lastSeen:serverTimestamp()});
-      else setDoc(ref,{lastSeen:serverTimestamp()},{merge:true});
-    }
+    if(_fbDb.collection){const ref=_fbDb.collection('users').doc(u.uid),snap=await ref.get();if(!snap.exists)await ref.set({uid:u.uid,email:u.email,username:extra.username||u.displayName||null,pic:u.photoURL||null,createdAt:new Date(),lastSeen:new Date()});else ref.set({lastSeen:new Date()},{merge:true});}
+    else{const ref=doc(_fbDb,'users',u.uid),snap=await getDoc(ref);if(!snap.exists())await setDoc(ref,{uid:u.uid,email:u.email,username:extra.username||u.displayName||null,pic:u.photoURL||null,createdAt:serverTimestamp(),lastSeen:serverTimestamp()});else setDoc(ref,{lastSeen:serverTimestamp()},{merge:true});}
   }catch{}
 }
-
 async function gwGoogleSignIn(){
   if(!_fbAuth)return;
   gwClear();gwSetLoad('gw-google-btn',true);
-  // When inside app.html iframe, tell parent to handle Google auth
-  // (popup inside iframe fails with "invalid action" due to authDomain mismatch)
-  if(inIframe){
-    try{
-      parent.postMessage({type:'googleAuthRequest'},'*');
-    }catch{}
-    gwSetLoad('gw-google-btn',false);
-    return;
-  }
+  if(inIframe){try{parent.postMessage({type:'googleAuthRequest'},'*');}catch{}gwSetLoad('gw-google-btn',false);return;}
   try{
     let user;
-    if(_fbAuth.signInWithPopup){
-      // compat
-      const gp=new firebase.auth.GoogleAuthProvider();
-      const result=await _fbAuth.signInWithPopup(gp);
-      user=result.user;
-    }else{
-      // modular
-      const gp=new GoogleAuthProvider();
-      const result=await signInWithPopup(_fbAuth,gp);
-      user=result.user;
-    }
-    await gwEnsure(user);
-    gwOnSuccess();
+    if(_fbAuth.signInWithPopup){const gp=new firebase.auth.GoogleAuthProvider();const result=await _fbAuth.signInWithPopup(gp);user=result.user;}
+    else{const gp=new GoogleAuthProvider();const result=await signInWithPopup(_fbAuth,gp);user=result.user;}
+    await gwEnsure(user);gwOnSuccess();
   }catch(e){
     if(e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request'){gwSetLoad('gw-google-btn',false);return}
     gwSetLoad('gw-google-btn',false);gwErr('Google sign-in failed. Try email instead.');
   }
 }
-
 function gwOnSuccess(){
-  isAuthed=true;
-  hideGuestWall();
-  wallShown=false; // reset so wall can show again if needed
+  isAuthed=true;hideGuestWall();
   Haptics&&Haptics.success&&Haptics.success();
   if(inIframe)try{parent.postMessage({type:'authSuccess'},'*')}catch{}
 }
-
-// Handle auth results coming back from parent (Google auth routed through parent)
 window.addEventListener('message',function(e){
   if(!e.data)return;
   if(e.data.type==='authSuccess'){gwOnSuccess();return}
-  if(e.data.type==='authError'){
-    gwSetLoad('gw-google-btn',false);
-    gwErr(e.data.msg||'Sign-in failed. Try email instead.');
-    return;
-  }
+  if(e.data.type==='authError'){gwSetLoad('gw-google-btn',false);gwErr(e.data.msg||'Sign-in failed. Try email instead.');return;}
   if(e.data.type==='xpAwarded'){
     const xp=e.data.xp;if(!xp)return;
     try{const d=IQData.load();d.xp+=xp;d.level=Math.floor(d.xp/150)+1;IQData.save(d);IQData._maybeSync?.();updateUI({xp:d.xp,level:d.level,streak:d.streak,iq:d.iq})}catch{}
   }
 });
-
 document.getElementById('gw-google-btn').addEventListener('click',gwGoogleSignIn);
-
 window.gwSubmit=async function(){
   if(!_fbAuth)return;
   gwClear();
-  const email=document.getElementById('gw-email').value.trim();
-  const pw=document.getElementById('gw-password').value;
-  const un=document.getElementById('gw-username').value.trim();
+  const email=document.getElementById('gw-email').value.trim(),pw=document.getElementById('gw-password').value,un=document.getElementById('gw-username').value.trim();
   if(!email||!pw){gwErr('Please fill in all fields.');return}
   if(gwMode==='signup'&&pw.length<6){gwErr('Password needs at least 6 characters.');return}
   gwSetLoad('gw-submit',true);
   try{
     let user;
     if(_fbAuth.signInWithEmailAndPassword){
-      // compat
-      if(gwMode==='login'){
-        const c=await _fbAuth.signInWithEmailAndPassword(email,pw);
-        user=c.user;
-      }else{
-        const c=await _fbAuth.createUserWithEmailAndPassword(email,pw);
-        if(un)await c.user.updateProfile({displayName:un});
-        user=c.user;
-      }
+      if(gwMode==='login'){const c=await _fbAuth.signInWithEmailAndPassword(email,pw);user=c.user;}
+      else{const c=await _fbAuth.createUserWithEmailAndPassword(email,pw);if(un)await c.user.updateProfile({displayName:un});user=c.user;}
     }else{
-      // modular
-      if(gwMode==='login'){
-        const c=await signInWithEmailAndPassword(_fbAuth,email,pw);
-        user=c.user;
-      }else{
-        const c=await createUserWithEmailAndPassword(_fbAuth,email,pw);
-        if(un)await updateProfile(c.user,{displayName:un});
-        user=c.user;
-      }
+      if(gwMode==='login'){const c=await signInWithEmailAndPassword(_fbAuth,email,pw);user=c.user;}
+      else{const c=await createUserWithEmailAndPassword(_fbAuth,email,pw);if(un)await updateProfile(c.user,{displayName:un});user=c.user;}
     }
-    await gwEnsure(user,{username:un});
-    gwOnSuccess();
+    await gwEnsure(user,{username:un});gwOnSuccess();
   }catch(e){
     gwSetLoad('gw-submit',false);
     const msgs={'auth/user-not-found':'No account with that email.','auth/wrong-password':'Incorrect password.','auth/email-already-in-use':'Already registered — try signing in.','auth/invalid-email':'Invalid email address.','auth/weak-password':'Password too weak.','auth/too-many-requests':'Too many attempts. Please wait.','auth/invalid-credential':'Email or password is incorrect.'};
@@ -539,92 +433,63 @@ window.gwSubmit=async function(){
   }
 };
 
-/* ══ SCROLL TRACKING FOR GUEST WALL ══ */
 function onGuestScroll(){
   if(isAuthed||isStandalone)return;
-  // If wall is already visible, don't re-trigger
   if(document.getElementById('guest-wall').classList.contains('show'))return;
-  // For shared question visitors: don't count scrolls until they've answered
   if(sharedQ&&!sharedQuestionAnswered)return;
   guestScrollCount++;
-  if(guestScrollCount>=GUEST_SCROLL_LIMIT){
-    guestScrollCount=0; // reset so if they dismiss and keep scrolling it re-triggers
-    showGuestWall('Keep your progress!','Sign up free to save your IQ score, streaks, and compete on the leaderboard.');
-  }
+  if(guestScrollCount>=GUEST_SCROLL_LIMIT){guestScrollCount=0;showGuestWall('Keep your progress!','Sign up free to save your IQ score, streaks, and compete on the leaderboard.');}
 }
 
-/* ══ INSTALL HOOK CARD RENDERER ══ */
 function renderInstallCard(idx){
-  const div=document.createElement('div');
-  div.className='slide';
-  div.dataset.slideIdx=idx;
+  const div=document.createElement('div');div.className='slide';div.dataset.slideIdx=idx;
   const steps=isIOS
-    ?[{n:'1',t:'Tap the <strong>Share</strong> button',s:'The box with an arrow at the bottom of Safari'},
-      {n:'2',t:'Scroll and tap <strong>Add to Home Screen</strong>',s:'It adds a Cebear icon to your home screen'},
-      {n:'3',t:'Open <strong>Cebear</strong> from your home screen',s:'Full-screen, no browser bar, faster'}]
-    :[{n:'1',t:'Tap the <strong>menu</strong> (three dots)',s:'Top right corner of Chrome'},
-      {n:'2',t:'Tap <strong>Add to Home Screen</strong>',s:'Or "Install App" depending on your browser'},
-      {n:'3',t:'Open <strong>Cebear</strong> from your home screen',s:'Full-screen experience, instant load'}];
-  div.innerHTML=`
-    <div class="install-card">
-      <div class="install-bear"><img src="logo.png" alt="Cebear" style="width:38px;height:38px;object-fit:contain"></div>
-      <div class="install-title">Train smarter — add to your home screen</div>
-      <div class="install-sub">No app store needed. Plays full-screen, loads instantly, keeps your streak alive.</div>
-      <div class="install-steps">
-        ${steps.map(s=>`<div class="install-step"><div class="install-step-num">${s.n}</div><div class="install-step-text">${s.t}<br><span style="font-size:11px;color:rgba(240,234,214,.35)">${s.s}</span></div></div>`).join('')}
-      </div>
-      <div class="install-skip" onclick="this.closest('.slide').style.display='none';handleScroll()">Maybe later</div>
-      <div class="branding">cebear.com</div>
-    </div>`;
+    ?[{n:'1',t:'Tap the <strong>Share</strong> button',s:'The box with an arrow at the bottom of Safari'},{n:'2',t:'Scroll and tap <strong>Add to Home Screen</strong>',s:'It adds a Cebear icon to your home screen'},{n:'3',t:'Open <strong>Cebear</strong> from your home screen',s:'Full-screen, no browser bar, faster'}]
+    :[{n:'1',t:'Tap the <strong>menu</strong> (three dots)',s:'Top right corner of Chrome'},{n:'2',t:'Tap <strong>Add to Home Screen</strong>',s:'Or "Install App" depending on your browser'},{n:'3',t:'Open <strong>Cebear</strong> from your home screen',s:'Full-screen experience, instant load'}];
+  div.innerHTML=`<div class="install-card"><div class="install-bear"><img src="logo.png" alt="Cebear" style="width:38px;height:38px;object-fit:contain"></div><div class="install-title">Train smarter — add to your home screen</div><div class="install-sub">No app store needed. Plays full-screen, loads instantly, keeps your streak alive.</div><div class="install-steps">${steps.map(s=>`<div class="install-step"><div class="install-step-num">${s.n}</div><div class="install-step-text">${s.t}<br><span style="font-size:11px;color:rgba(240,234,214,.35)">${s.s}</span></div></div>`).join('')}</div><div class="install-skip" onclick="this.closest('.slide').style.display='none';handleScroll()">Maybe later</div><div class="branding">cebear.com</div></div>`;
   return div;
 }
 
-/* ══ QUESTION SHARE BUTTON ══ */
 function getSenderParam(){
-  // Get current user info to embed as sender
   try{
-    const fb=inIframe?window.parent.firebase:null;
-    const u=fb?fb.auth().currentUser:null;
+    const fb=inIframe?window.parent.firebase:null,u=fb?fb.auth().currentUser:null;
     if(!u)return '';
-    const d=IQData.load();
-    const info={uid:u.uid,username:d.username||u.displayName||'Someone',pic:u.photoURL||d.pic||''};
+    const d=IQData.load(),info={uid:u.uid,username:d.username||u.displayName||'Someone',pic:u.photoURL||d.pic||''};
     return '&from='+btoa(unescape(encodeURIComponent(JSON.stringify(info))));
   }catch{return ''}
 }
 
 function addShareBtn(cardEl,q){
-  const actions=document.createElement('div');
-  actions.className='card-actions';
-  const btn=document.createElement('button');
-  btn.className='share-q-btn';
+  const actions=document.createElement('div');actions.className='card-actions';
+  const btn=document.createElement('button');btn.className='share-q-btn';
   btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share`;
   btn.addEventListener('click',e=>{
-    e.stopPropagation();
-    Haptics&&Haptics.light&&Haptics.light();
+    e.stopPropagation();Haptics&&Haptics.light&&Haptics.light();
     try{
-      const qData={type:q.type,question:q.question,options:q.options,answer:q.answer,category:q.category,categoryLabel:q.categoryLabel,difficulty:q.difficulty,explanation:q.explanation||'',visual:q.visual||null,sequence:q.sequence||null,grid:q.grid||null};
+      const qData={type:q.type,question:q.question,options:q.options||[],answer:q.answer,category:q.category,categoryLabel:q.categoryLabel,difficulty:q.difficulty,explanation:q.explanation||'',visual:q.visual||null,
+        sequence:q.sequence||null,grid:q.grid||null,
+        cards:q.cards||null,pairs:q.pairs||null,
+        board:q.board||null,
+        scrambled:q.scrambled||null,word:q.word||null,hint:q.hint||null,
+        equations:q.equations||null,
+        correctOrder:q.correctOrder||null,
+        botLevel:q.botLevel!=null?q.botLevel:null,
+        maxGuesses:q.maxGuesses||null};
+      Object.keys(qData).forEach(k=>{if(qData[k]===null)delete qData[k]});
       const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(qData))));
-      // Always link to app.html so receiver gets the full app experience
       const base=location.origin+'/app.html';
       const shareUrl=base+'?q='+encoded+getSenderParam();
       const senderName=senderInfo?.username;
       const shareText=senderName?`${senderName} challenged you — can you answer this brain teaser?`:'Can you answer this? — Cebear';
-      if(navigator.share){
-        navigator.share({title:'Brain teaser — Cebear',text:shareText,url:shareUrl}).catch(()=>{});
-      }else{
-        navigator.clipboard.writeText(shareUrl).then(()=>{
-          btn.classList.add('copied');
-          btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Copied!`;
-          setTimeout(()=>{btn.classList.remove('copied');btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share`},2000);
-        }).catch(()=>{});
-      }
+      if(navigator.share){navigator.share({title:'Brain teaser — Cebear',text:shareText,url:shareUrl}).catch(()=>{});}
+      else{navigator.clipboard.writeText(shareUrl).then(()=>{btn.classList.add('copied');btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Copied!`;setTimeout(()=>{btn.classList.remove('copied');btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share`},2000);}).catch(()=>{});}
     }catch{}
   });
   actions.appendChild(btn);
   cardEl.insertBefore(actions,cardEl.querySelector('.branding'));
 }
 
-/* ══ CORE FEED LOGIC (identical to original with additions) ══ */
+/* ══ CORE FEED ══ */
 const feed=document.getElementById('feed'),iqVal=document.getElementById('iq-val'),streakVal=document.getElementById('streak-val'),streakPill=document.getElementById('streak-pill'),streakPopup=document.getElementById('streak-popup'),streakNum=document.getElementById('streak-num'),onboard=document.getElementById('onboard'),ageSlider=document.getElementById('age-slider'),ageDisplay=document.getElementById('age-display'),flashEl=document.getElementById('flash'),confettiEl=document.getElementById('confetti'),xpBar=document.getElementById('xp-bar'),levelLabel=document.getElementById('level-label'),xpLabel=document.getElementById('xp-label');
 const SESSION_KEY='bd_session_today';
 let _tasksUid=null,_tasksDb=null;
@@ -648,20 +513,13 @@ window.onAnswerForTasks=function(c,ms){const r=IQData.load();const s=updateSessi
 const QT=8,KB=3,KA=6;
 let slides=0,firstSlide=0,answerStart=0;
 const qQ=[];
-let _filling=false,_fs=false;
-let installCardCount=0; // track how many install cards shown
-let cardsSinceInstall=0; // count cards between install cards
+let _filling=false,_fs=false,cardsSinceInstall=0;
 
 function scheduleFill(){if(_fs)return;_fs=true;const doFill=dl=>{_fs=false;if(_filling)return;_filling=true;try{let s=0;while(qQ.length<QT){if(++s>QT*4)break;if(dl?.timeRemaining?.()<2&&qQ.length>=3)break;try{const wc=IQData.getWeakestCategory(),diff=wc?IQData.getDifficulty(wc):1,q=Q.generate(diff);if(q)qQ.push(q)}catch{}}}finally{_filling=false}if(qQ.length<QT)scheduleFill()};typeof requestIdleCallback==='function'?requestIdleCallback(doFill,{timeout:300}):setTimeout(()=>doFill(null),16)}
 function nextQ(){if(!qQ.length){try{const q=Q.generate(1);scheduleFill();return q}catch{return null}}const q=qQ.shift();if(qQ.length<Math.ceil(QT/2))scheduleFill();return q}
 let _raf=false;
-function onScroll(){
-  if(_raf)return;_raf=true;
-  requestAnimationFrame(()=>{_raf=false;handleScroll()});
-  // Guest scroll count — only fires when actually scrolling to a new slide
-}
-let _lastSlideIdx=-1;
-let _lastAnim=-1;
+function onScroll(){if(_raf)return;_raf=true;requestAnimationFrame(()=>{_raf=false;handleScroll()});}
+let _lastSlideIdx=-1,_lastAnim=-1;
 function handleScroll(){
   const sH=feed.clientHeight;if(!sH)return;
   const cs=Math.floor((feed.scrollTop+sH*.5)/sH),ts=cs+KA+1;
@@ -672,42 +530,53 @@ function handleScroll(){
     _lastAnim=cs;
     const el=feed.querySelector(`.slide[data-slide-idx="${cs}"]`);
     if(el){el.classList.remove('entering');void el.offsetWidth;el.classList.add('entering')}
-    // Only count as a guest scroll when moving forward past the first slide
-    if(cs>_lastSlideIdx&&cs>0){onGuestScroll()}
+    if(cs>_lastSlideIdx&&cs>0)onGuestScroll();
     _lastSlideIdx=cs;
   }
 }
 let _sen=null;
 function attachSen(){_sen?.remove();_sen=document.createElement('div');_sen.style.cssText='height:1px;width:100%;flex-shrink:0';feed.appendChild(_sen);const obs=new IntersectionObserver(e=>{if(e[0].isIntersecting){obs.disconnect();for(let i=0;i<KA;i++)addSlide();attachSen()}},{root:feed,threshold:0});obs.observe(_sen)}
 function prune(cs){const co=cs-KB;if(co<=firstSlide)return;for(let i=firstSlide;i<co;i++){const el=feed.querySelector(`.slide[data-slide-idx="${i}"]`);if(!el)continue;const sp=document.createElement('div');sp.className='slide-spacer';sp.dataset.slideIdx=i;feed.replaceChild(sp,el)}firstSlide=co}
+function shouldInsertInstallCard(){if(!isMobile||isStandalone)return false;cardsSinceInstall++;if(cardsSinceInstall>=5){cardsSinceInstall=0;return true}return false;}
 
-function shouldInsertInstallCard(){
-  // Mobile, non-standalone, every 5th regular card
-  if(!isMobile||isStandalone)return false;
-  cardsSinceInstall++;
-  if(cardsSinceInstall>=5){cardsSinceInstall=0;return true}
-  return false;
+/* ══ ADD SHARED SLIDE — routes to custom renderer if available ══ */
+function addSharedSlide(idx){
+  const q=sharedQ;
+  const div=document.createElement('div');div.className='slide';div.dataset.slideIdx=idx;
+
+  function makeBanner(){
+    const banner=document.createElement('div');banner.className='shared-q-banner';
+    const sn=senderInfo&&senderInfo.username;
+    const bt=sn?'<strong style="color:var(--gold)">'+sn+'</strong> sent you this — can you get it right?':'Someone sent you this question — can you answer it?';
+    banner.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span>'+bt+'</span>';
+    return banner;
+  }
+
+  const cr=Q._renderers&&Q._renderers[q.type];
+  if(cr){
+    div.innerHTML=cr.render(q,idx);
+    feed.appendChild(div);
+    const qcard=div.querySelector('.qcard');
+    if(qcard)qcard.insertBefore(makeBanner(),qcard.firstChild);
+    try{cr.attach(div,q,idx,{feed,flashEl,confettiEl,IQData,getEncouragement,updateUI,checkMore:handleScroll,spawnConfetti,answerStartRef:{get:()=>answerStart,set:v=>{answerStart=v}},Haptics,notifyGamePlayed:window.notifyGamePlayed,onAnswer:window.onAnswerForTasks,addShareBtn});}catch{}
+    setTimeout(()=>{sharedQuestionAnswered=true;},2000);
+    return;
+  }
+
+  // Standard MC fallback
+  div.innerHTML=renderDef(q,idx);
+  feed.appendChild(div);
+  const qcard=div.querySelector('.qcard');
+  if(qcard){qcard.insertBefore(makeBanner(),qcard.firstChild);addShareBtn(qcard,q);}
+  div.querySelectorAll('.opt').forEach(o=>o.addEventListener('click',()=>{sharedQuestionAnswered=true;},{once:true}));
 }
 
 function addSlide(){
   const idx=slides++;
-  // Shared question goes first (index 0)
-  if(idx===0&&sharedQ){
-    addSharedSlide(idx);
-    return;
-  }
-  // Install hook card every 5th card on mobile non-standalone
-  if(shouldInsertInstallCard()){
-    const ic=renderInstallCard(idx);
-    ic.dataset.slideIdx=idx;
-    ;(_sen?.parentNode===feed)?feed.insertBefore(ic,_sen):feed.appendChild(ic);
-    return;
-  }
-  const div=document.createElement('div');
-  div.className='slide';
-  div.dataset.slideIdx=idx;
-  let q=null;
-  try{q=nextQ()}catch{}
+  if(idx===0&&sharedQ){addSharedSlide(idx);return;}
+  if(shouldInsertInstallCard()){const ic=renderInstallCard(idx);ic.dataset.slideIdx=idx;(_sen?.parentNode===feed)?feed.insertBefore(ic,_sen):feed.appendChild(ic);return;}
+  const div=document.createElement('div');div.className='slide';div.dataset.slideIdx=idx;
+  let q=null;try{q=nextQ()}catch{}
   if(!q){div.innerHTML=renderFB();feed.appendChild(div);return}
   try{
     const cr=Q._renderers?.[q.type];
@@ -718,37 +587,10 @@ function addSlide(){
     }else{
       div.innerHTML=renderDef(q,idx);
       (_sen?.parentNode===feed)?feed.insertBefore(div,_sen):feed.appendChild(div);
-      // Add share button to question cards
-      const qcard=div.querySelector('.qcard');
-      if(qcard)addShareBtn(qcard,q);
+      const qcard=div.querySelector('.qcard');if(qcard)addShareBtn(qcard,q);
     }
   }catch{div.innerHTML=renderFB();(_sen?.parentNode===feed)?feed.insertBefore(div,_sen):feed.appendChild(div)}
   answerStart=Date.now();
-}
-
-function addSharedSlide(idx){
-  const q=sharedQ;
-  const div=document.createElement('div');
-  div.className='slide';
-  div.dataset.slideIdx=idx;
-  div.innerHTML=renderDef(q,idx);
-  // Inject the shared banner above the question
-  const qcard=div.querySelector('.qcard');
-  if(qcard){
-    const banner=document.createElement('div');
-    banner.className='shared-q-banner';
-    const senderName=senderInfo?.username;
-    const bannerText=senderName
-      ?`<strong style="color:var(--gold)">${senderName}</strong> sent you this — can you get it right?`
-      :`Someone sent you this question — can you answer it?`;
-    banner.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span>${bannerText}</span>`;
-    qcard.insertBefore(banner,qcard.firstChild);
-    addShareBtn(qcard,q);
-  }
-  feed.appendChild(div);
-  // Mark answered when any option is tapped on the shared question
-  const opts=div.querySelectorAll('.opt');
-  opts.forEach(o=>o.addEventListener('click',()=>{sharedQuestionAnswered=true},{once:true}));
 }
 
 document.addEventListener('click',e=>{
@@ -762,15 +604,12 @@ document.addEventListener('click',e=>{
   if(isC){result.streak>0&&result.streak%5===0?Haptics.streak():Haptics.success()}else Haptics.error();
   if(result.leveledUp)setTimeout(()=>Haptics.levelUp(),300);
   const fb=document.getElementById(`fb-${idx}`);
-  fb.textContent=getEncouragement(result.streak,isC);
-  fb.className=`feedback show ${isC?'correct':'wrong'}`;
+  fb.textContent=getEncouragement(result.streak,isC);fb.className=`feedback show ${isC?'correct':'wrong'}`;
   if(isC){flashEl.className='flash green show';spawnConfetti(8)}else flashEl.className='flash red show';
   setTimeout(()=>flashEl.className='flash',350);
   if(isC&&result.streak>0&&result.streak%5===0)setTimeout(()=>{streakNum.textContent=result.streak;streakPopup.classList.add('show');spawnConfetti(25);setTimeout(()=>streakPopup.classList.remove('show'),1800)},300);
-  const session=updateSessionStats(isC,ms);
-  updateTaskProgress(result.streak,isC,ms,session);
-  updateUI(result);
-  handleScroll();
+  const session=updateSessionStats(isC,ms);updateTaskProgress(result.streak,isC,ms,session);
+  updateUI(result);handleScroll();
   setTimeout(()=>document.getElementById(`exp-${idx}`)?.classList.add('show'),250);
   setTimeout(()=>document.getElementById(`hint-${idx}`)?.classList.add('show'),500);
   answerStart=Date.now();
@@ -791,25 +630,16 @@ document.getElementById('cal-done-btn').addEventListener('click',()=>{Haptics.me
 function renderFB(){return`<div class="qcard"><div class="category">Brain Training</div><div class="question">Keep scrolling — more challenges ahead!</div><div class="branding">cebear.com</div></div>`}
 function renderDef(q,idx){let v='';if(q.visual==='sequence'||q.visual==='letterSequence'){const parts=q.sequence.map((n,i)=>{if(n==='?')return`<span class="blank">?</span>`;return`<span>${n}</span>${i<q.sequence.length-1?'<span class="arrow">→</span>':''}`});if(q.sequence[q.sequence.length-1]!=='?')parts.push('<span class="arrow">→</span><span class="blank">?</span>');v=`<div class="sequence">${parts.join('')}</div>`}else if(q.visual==='matrix'){v=`<div class="matrix">${q.grid.map(c=>`<div class="matrix-cell${c==='?'?' blank':''}">${c}</div>`).join('')}</div>`}const wide=q.options.some(o=>String(o).length>20);return`<div class="qcard"><div class="category">${q.categoryLabel}</div><div class="question">${q.question}</div>${v}<div class="options${wide?' wide':''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">${q.options.map(o=>`<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}</div><div class="feedback" id="fb-${idx}"></div><div class="explain" id="exp-${idx}">${q.explanation}</div><div class="branding">cebear.com</div></div><div class="scroll-hint" id="hint-${idx}"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>Swipe for next</div>`}
 
-function init(){
-  const d=IQData.load();updateUI(d);
-  if(IQData.needsOnboarding())onboard.classList.add('show');
-  else if(IQData.needsCalibration()){Q.setAge(d.age);startCal()}
-  else startFeed();
-}
+function init(){const d=IQData.load();updateUI(d);if(IQData.needsOnboarding())onboard.classList.add('show');else if(IQData.needsCalibration()){Q.setAge(d.age);startCal()}else startFeed();}
 
 function startFeed(){
   const d=IQData.load();Q.setAge(d.age||25);IQData.startSession();updateUI(d);scheduleFill();
-  // If there's a shared question, inject it first (slide 0)
-  // then add regular cards
   for(let i=0;i<3;i++)addSlide();
   feed.addEventListener('scroll',onScroll,{passive:true});
   feed.addEventListener('touchmove',onScroll,{passive:true});
   let wl=false,wc=null;
   feed.addEventListener('wheel',e=>{e.preventDefault();if(wl)return;wl=true;const sH=feed.clientHeight,cs=Math.round(feed.scrollTop/sH),dir=e.deltaY>0?1:-1,ts=Math.max(0,cs+dir);feed.scrollTo({top:ts*sH,behavior:'smooth'});clearTimeout(wc);wc=setTimeout(()=>{wl=false;const el=feed.querySelector(`.slide[data-slide-idx="${ts}"]`);if(el){el.classList.remove('entering');void el.offsetWidth;el.classList.add('entering');_lastAnim=ts}},380)},{passive:false});
-  attachSen();
-  setTimeout(maybeShowPush,3000);
-  scheduleFill();
+  attachSen();setTimeout(maybeShowPush,3000);scheduleFill();
 }
 
 function spawnConfetti(n){const colors=['#3fba4f','#e8a817','#e8443a','#3a7df2','#6d4aed','#e87d1a','#F0EAD6'];const frag=document.createDocumentFragment();for(let i=0;i<n;i++){const p=document.createElement('i');p.style.left=Math.random()*100+'%';p.style.top='-10px';p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDelay=Math.random()*.2+'s';frag.appendChild(p);setTimeout(()=>p.classList.add('fall'),10);setTimeout(()=>p.remove(),1400)}confettiEl.appendChild(frag)}
