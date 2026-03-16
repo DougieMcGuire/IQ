@@ -1,4 +1,5 @@
 {
+  "id": "/app.html",
   "name": "Cebear - Train Your Brain",
   "short_name": "Cebear",
   "start_url": "/app.html",
@@ -11,7 +12,23 @@
       "src": "applogo.png",
       "sizes": "1024x1024",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "applogo.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Cebear brain training"
+    },
+    {
+      "src": "applogo.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Cebear brain training"
     }
   ]
 }
