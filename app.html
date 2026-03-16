@@ -96,11 +96,26 @@ window.addEventListener('message',function(e){
   var t=e.data.type;
   if(t==='authSuccess'){
     _isAuthed=true;
-    // If we're currently sitting on auth screen, go to improve
     if(currentScreen==='auth')goTo('improve');
     return;
   }
   if(t==='googleRedirect')return void(location.href='google-redirect.html');
+  // Improve iframe asking parent to handle Google auth (avoids invalid action in iframe)
+  if(t==='googleAuthRequest'){
+    var gp=new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(gp).then(function(r){
+      _isAuthed=true;
+      // Notify improve iframe that auth succeeded
+      var f=document.querySelector('#screen-improve iframe');
+      if(f&&f.contentWindow)f.contentWindow.postMessage({type:'authSuccess'},'*');
+    }).catch(function(err){
+      if(err.code==='auth/popup-closed-by-user'||err.code==='auth/cancelled-popup-request')return;
+      // Tell iframe to show error
+      var f=document.querySelector('#screen-improve iframe');
+      if(f&&f.contentWindow)f.contentWindow.postMessage({type:'authError',msg:'Google sign-in failed. Try email instead.'},'*');
+    });
+    return;
+  }
   if(t==='savePushSub')firebase.auth().onAuthStateChanged(function(u){if(u)firebase.firestore().collection('pushSubscriptions').doc(u.uid).set({subscription:e.data.sub,uid:u.uid,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){})});
   if(t==='tasksUpdated'){var f=document.querySelector('#screen-tasks iframe');f&&f.contentWindow&&f.contentWindow.postMessage({type:'tasksUpdated'},'*')}
   if(t==='xpAwarded'){var f2=document.querySelector('#screen-improve iframe');f2&&f2.contentWindow&&f2.contentWindow.postMessage({type:'xpAwarded',xp:e.data.xp},'*')}
