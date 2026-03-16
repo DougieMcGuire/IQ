@@ -1,42 +1,10 @@
 // games/oddOut.js — Odd One Out
 (function () {
-
   Q.register('oddOut', function () {
-    var sets = [
-      { items:['Apple','Banana','Carrot','Orange'], odd:'Carrot', why:'Vegetable among fruits.', d:0.5 },
-      { items:['Red','Blue','Square','Green'], odd:'Square', why:'Shape, not a color.', d:0.5 },
-      { items:['January','Monday','March','December'], odd:'Monday', why:'Day of week, not a month.', d:0.5 },
-      { items:['Coffee','Tea','Juice','Bread'], odd:'Bread', why:'Solid food among drinks.', d:0.5 },
-      { items:['Hammer','Screwdriver','Banana','Wrench'], odd:'Banana', why:'Food, not a tool.', d:0.5 },
-      { items:['Bike','Car','Boat','Truck'], odd:'Boat', why:'Travels on water.', d:0.6 },
-      { items:['Eagle','Penguin','Sparrow','Hawk'], odd:'Penguin', why:'Cannot fly.', d:0.7 },
-      { items:['Dog','Cat','Goldfish','Hamster'], odd:'Goldfish', why:'Fish among mammals.', d:0.6 },
-      { items:['Piano','Guitar','Violin','Drums'], odd:'Drums', why:'Percussion; others are melodic.', d:0.9 },
-      { items:['Mars','Venus','Moon','Jupiter'], odd:'Moon', why:'Orbits Earth, not the Sun.', d:0.9 },
-      { items:['Dolphin','Shark','Whale','Seal'], odd:'Shark', why:'Fish; others are mammals.', d:0.9 },
-      { items:['Python','Java','French','Ruby'], odd:'French', why:'Human language among programming languages.', d:0.9 },
-      { items:['Gold','Silver','Diamond','Copper'], odd:'Diamond', why:'Gemstone; others are metals.', d:1.0 },
-      { items:['Tennis','Chess','Basketball','Soccer'], odd:'Chess', why:'Board game; others are physical sports.', d:0.9 },
-      { items:['Rain','Snow','Hail','Wind'], odd:'Wind', why:'Air movement; others are precipitation.', d:1.0 },
-      { items:['Cello','Flute','Violin','Harp'], odd:'Flute', why:'Wind instrument; others are stringed.', d:1.0 },
-      { items:['Heart','Lungs','Brain','Femur'], odd:'Femur', why:'Bone; others are organs.', d:1.0 },
-      { items:['Atlantic','Pacific','Arctic','Sahara'], odd:'Sahara', why:'Desert; others are oceans.', d:0.9 },
-      { items:['Oxygen','Iron','Copper','Gold'], odd:'Oxygen', why:'Gas at room temp; others are solid metals.', d:1.1 },
-      { items:['Beethoven','Mozart','Picasso','Bach'], odd:'Picasso', why:'Painter; others were composers.', d:1.2 },
-      { items:['Democracy','Monarchy','Republic','Capitalism'], odd:'Capitalism', why:'Economic system; others are government types.', d:1.3 },
-      { items:['Meter','Kilogram','Second','Dollar'], odd:'Dollar', why:'Currency; others are SI units.', d:1.2 },
-      { items:['Broccoli','Spinach','Strawberry','Kale'], odd:'Strawberry', why:'Fruit; others are leafy greens.', d:1.0 },
-      { items:['Sonnet','Haiku','Limerick','Novel'], odd:'Novel', why:'Prose; others are poetry forms.', d:1.3 },
-      { items:['Plato','Aristotle','Socrates','Caesar'], odd:'Caesar', why:'Military leader; others were philosophers.', d:1.3 },
-      { items:['Simile','Metaphor','Hyperbole','Haiku'], odd:'Haiku', why:'Poetry form; others are figures of speech.', d:1.4 },
+    var sets=[
+      {items:['Apple','Banana','Carrot','Orange'],odd:'Carrot',why:'Vegetable among fruits.',d:0.5},{items:['Red','Blue','Square','Green'],odd:'Square',why:'Shape, not a color.',d:0.5},{items:['January','Monday','March','December'],odd:'Monday',why:'Day of week, not a month.',d:0.5},{items:['Coffee','Tea','Juice','Bread'],odd:'Bread',why:'Solid food among drinks.',d:0.5},{items:['Hammer','Screwdriver','Banana','Wrench'],odd:'Banana',why:'Food, not a tool.',d:0.5},{items:['Bike','Car','Boat','Truck'],odd:'Boat',why:'Travels on water.',d:0.6},{items:['Eagle','Penguin','Sparrow','Hawk'],odd:'Penguin',why:'Cannot fly.',d:0.7},{items:['Dog','Cat','Goldfish','Hamster'],odd:'Goldfish',why:'Fish among mammals.',d:0.6},{items:['Piano','Guitar','Violin','Drums'],odd:'Drums',why:'Percussion; others are melodic.',d:0.9},{items:['Mars','Venus','Moon','Jupiter'],odd:'Moon',why:'Orbits Earth, not the Sun.',d:0.9},{items:['Dolphin','Shark','Whale','Seal'],odd:'Shark',why:'Fish; others are mammals.',d:0.9},{items:['Python','Java','French','Ruby'],odd:'French',why:'Human language among programming languages.',d:0.9},{items:['Gold','Silver','Diamond','Copper'],odd:'Diamond',why:'Gemstone; others are metals.',d:1.0},{items:['Tennis','Chess','Basketball','Soccer'],odd:'Chess',why:'Board game; others are physical sports.',d:0.9},{items:['Rain','Snow','Hail','Wind'],odd:'Wind',why:'Air movement; others are precipitation.',d:1.0},{items:['Cello','Flute','Violin','Harp'],odd:'Flute',why:'Wind instrument; others are stringed.',d:1.0},{items:['Heart','Lungs','Brain','Femur'],odd:'Femur',why:'Bone; others are organs.',d:1.0},{items:['Atlantic','Pacific','Arctic','Sahara'],odd:'Sahara',why:'Desert; others are oceans.',d:0.9},{items:['Oxygen','Iron','Copper','Gold'],odd:'Oxygen',why:'Gas at room temp; others are solid metals.',d:1.1},{items:['Beethoven','Mozart','Picasso','Bach'],odd:'Picasso',why:'Painter; others were composers.',d:1.2},{items:['Democracy','Monarchy','Republic','Capitalism'],odd:'Capitalism',why:'Economic system; others are government types.',d:1.3},{items:['Meter','Kilogram','Second','Dollar'],odd:'Dollar',why:'Currency; others are SI units.',d:1.2},{items:['Broccoli','Spinach','Strawberry','Kale'],odd:'Strawberry',why:'Fruit; others are leafy greens.',d:1.0},{items:['Sonnet','Haiku','Limerick','Novel'],odd:'Novel',why:'Prose; others are poetry forms.',d:1.3},{items:['Plato','Aristotle','Socrates','Caesar'],odd:'Caesar',why:'Military leader; others were philosophers.',d:1.3},{items:['Simile','Metaphor','Hyperbole','Haiku'],odd:'Haiku',why:'Poetry form; others are figures of speech.',d:1.4},
     ];
-    var s = Q.pick(sets);
-    return {
-      type:'oddOut', category:'logicalReasoning', categoryLabel:'Odd One Out',
-      difficulty:s.d||1.0, question:"Which one doesn't belong?",
-      answer:s.odd, options:Q.shuffle(s.items),
-      explanation:s.why, visual:'text'
-    };
+    var s=Q.pick(sets);
+    return {type:'oddOut',category:'logicalReasoning',categoryLabel:'Odd One Out',difficulty:s.d||1.0,question:"Which one doesn't belong?",answer:s.odd,options:Q.shuffle(s.items),explanation:s.why,visual:'text'};
   }, 4);
-
 })();
