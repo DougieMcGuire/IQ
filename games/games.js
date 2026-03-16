@@ -572,3 +572,243 @@
     }
   });
 })();
+
+// ── Odd Tile Out ──────────────────────────────────────────────────────────────
+(function () {
+  function hslToStr(h,s,l){return'hsl('+h+','+s+'%,'+l+'%)';}
+  function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+
+  var LEVELS=[
+    // [gridSize, hueDiff, satDiff, lightDiff, difficulty]
+    {g:3,hd:40,sd:0,ld:0,d:0.5},
+    {g:3,hd:25,sd:0,ld:0,d:0.7},
+    {g:4,hd:20,sd:0,ld:0,d:0.9},
+    {g:4,hd:12,sd:0,ld:0,d:1.1},
+    {g:4,hd:0,sd:0,ld:14,d:1.2},
+    {g:5,hd:10,sd:0,ld:0,d:1.3},
+    {g:5,hd:0,sd:0,ld:10,d:1.4},
+    {g:5,hd:7,sd:0,ld:0,d:1.6},
+    {g:5,hd:0,sd:0,ld:7,d:1.7},
+    {g:6,hd:6,sd:0,ld:0,d:1.9},
+  ];
+
+  Q.register('oddTileOut', function () {
+    var lv=LEVELS[randInt(0,LEVELS.length-1)];
+    var g=lv.g, total=g*g;
+    var baseH=randInt(0,359), baseS=randInt(55,80), baseL=randInt(40,65);
+    // odd tile gets a shifted hue/lightness
+    var oddH=(baseH+(lv.hd||0)+360)%360;
+    var oddL=baseL+(lv.ld||0);
+    var oddIdx=randInt(0,total-1);
+    var tiles=[];
+    for(var i=0;i<total;i++){
+      tiles.push(i===oddIdx?hslToStr(oddH,baseS,oddL):hslToStr(baseH,baseS,baseL));
+    }
+    return {
+      type:'oddTileOut',category:'patternRecognition',categoryLabel:'Odd Tile Out',
+      difficulty:lv.d,question:'Find the different tile!',
+      tiles:tiles,oddIdx:oddIdx,gridSize:g,
+      answer:'complete',options:[],explanation:'Color perception & visual attention.',visual:'custom'
+    };
+  }, 4);
+
+  Q.registerRenderer('oddTileOut', {
+    render: function(q, idx) {
+      var size='clamp('+Math.floor(240/q.gridSize)+'px,'+Math.floor(58/q.gridSize)+'vw,'+Math.floor(300/q.gridSize)+'px)';
+      var cells='';
+      for(var i=0;i<q.tiles.length;i++){
+        cells+='<button class="oto-tile" data-oi="'+idx+'" data-oc="'+i+'" style="background:'+q.tiles[i]+';width:'+size+';height:'+size+'"></button>';
+      }
+      return '<div class="qcard" style="gap:10px">'+
+        '<div class="category">🎨 Odd Tile Out</div>'+
+        '<div class="question">'+q.question+'</div>'+
+        '<div class="oto-grid" id="oto-grid-'+idx+'" style="grid-template-columns:repeat('+q.gridSize+',1fr)">'+cells+'</div>'+
+        '<div class="oto-status" id="oto-status-'+idx+'"></div>'+
+        '<div id="wa-'+idx+'"></div>'+
+        '<div class="explanation" id="exp-'+idx+'"></div>'+
+        '<div class="branding">cebear.com</div>'+
+        '</div>';
+    },
+    attach: function(slideEl, q, idx, ctx) {
+      var grid=slideEl.querySelector('#oto-grid-'+idx),statusEl=slideEl.querySelector('#oto-status-'+idx),H=ctx.Haptics||{};
+      var actEl=slideEl.querySelector('#wa-'+idx);if(actEl&&ctx.addShareBtn)ctx.addShareBtn(actEl,q);
+      if(!grid)return;
+      var done=false;
+      grid.addEventListener('click',function(e){
+        var btn=e.target.closest('.oto-tile');if(!btn||done)return;
+        done=true;
+        var tapped=parseInt(btn.dataset.oc),won=tapped===q.oddIdx;
+        var ms=Date.now()-ctx.answerStartRef.get();
+        var data=ctx.IQData.recordAnswer(q.category,won,q.difficulty,ms);
+        if(ctx.onAnswer)ctx.onAnswer(won,ms);
+        // highlight correct tile
+        var tiles=grid.querySelectorAll('.oto-tile');
+        tiles[q.oddIdx].classList.add('oto-correct');
+        if(!won){H.error&&H.error();btn.classList.add('oto-wrong');ctx.flashEl.className='flash red show';}
+        else{H.success&&H.success();ctx.flashEl.className='flash green show';ctx.spawnConfetti(12);}
+        setTimeout(function(){ctx.flashEl.className='flash';},350);
+        statusEl.textContent=won?'Nice eye! 🎯':'Wrong one!';
+        statusEl.style.color=won?'var(--green)':'var(--red)';
+        var expEl=slideEl.querySelector('#exp-'+idx);
+        if(expEl){expEl.textContent=won?'You spotted the difference!':'The highlighted tile was different.';expEl.classList.add('show');}
+        ctx.updateUI(data);ctx.checkMore();ctx.answerStartRef.set(Date.now());
+      });
+    }
+  });
+})();
+
+// ── Stop the Clock ────────────────────────────────────────────────────────────
+(function () {
+  var TARGETS=[
+    {label:'12 o\'clock',angle:0,d:0.6},
+    {label:'3 o\'clock',angle:90,d:0.6},
+    {label:'6 o\'clock',angle:180,d:0.6},
+    {label:'9 o\'clock',angle:270,d:0.6},
+    {label:'the red zone',angle:null,d:0.8},
+    {label:'the red zone',angle:null,d:1.0},
+    {label:'the red zone',angle:null,d:1.2},
+    {label:'the red zone',angle:null,d:1.5},
+  ];
+
+  Q.register('stopClock', function () {
+    var useZone=Q.rand(0,1)===1;
+    var targetAngle=useZone?Q.rand(0,359):TARGETS[Q.rand(0,3)].angle;
+    var zoneSize=useZone?[30,22,16,12][Q.rand(0,3)]:null;
+    var speed=[1.5,2,2.5,3][Q.rand(0,3)]; // seconds per revolution
+    var d=useZone?(zoneSize<=16?1.5:zoneSize<=22?1.2:0.9):0.6;
+    return {
+      type:'stopClock',category:'mentalAgility',categoryLabel:'Stop the Clock',
+      difficulty:d,question:'Tap to stop the needle '+(useZone?'in the red zone!':'at '+TARGETS[Q.rand(0,3)].label+'!'),
+      targetAngle:targetAngle,zoneSize:zoneSize,speed:speed,useZone:useZone,
+      answer:'complete',options:[],explanation:'Timing and precision.',visual:'custom'
+    };
+  }, 3);
+
+  Q.registerRenderer('stopClock', {
+    render: function(q, idx) {
+      return '<div class="qcard" style="gap:10px">'+
+        '<div class="category">⏱ Stop the Clock</div>'+
+        '<div class="question">'+q.question+'</div>'+
+        '<div id="stc-ready-wrap-'+idx+'" style="display:flex;justify-content:center;margin:4px 0">'+
+          '<button id="stc-ready-'+idx+'" style="background:var(--gold);color:#2a1800;border:none;border-radius:14px;padding:12px 32px;font-family:Nunito,sans-serif;font-size:17px;font-weight:900;cursor:pointer;box-shadow:0 4px 0 var(--goldd);">Tap to Start!</button>'+
+        '</div>'+
+        '<canvas id="stc-canvas-'+idx+'" width="220" height="220" style="display:none;border-radius:50%;cursor:pointer;touch-action:manipulation"></canvas>'+
+        '<div class="stc-result" id="stc-result-'+idx+'" style="font-size:15px;font-weight:800;text-align:center;min-height:22px;color:var(--cream)"></div>'+
+        '<div id="wa-'+idx+'"></div>'+
+        '<div class="explanation" id="exp-'+idx+'"></div>'+
+        '<div class="branding">cebear.com</div>'+
+        '</div>';
+    },
+    attach: function(slideEl, q, idx, ctx) {
+      var readyWrap=slideEl.querySelector('#stc-ready-wrap-'+idx);
+      var readyBtn=slideEl.querySelector('#stc-ready-'+idx);
+      var canvas=slideEl.querySelector('#stc-canvas-'+idx);
+      var resultEl=slideEl.querySelector('#stc-result-'+idx);
+      var H=ctx.Haptics||{};
+      var actEl=slideEl.querySelector('#wa-'+idx);if(actEl&&ctx.addShareBtn)ctx.addShareBtn(actEl,q);
+      if(!canvas)return;
+
+      var cx=canvas.getContext('2d');
+      var angle=0, raf=null, done=false, running=false;
+      var degreesPerMs=360/(q.speed*1000);
+      var lastTime=null;
+
+      // target zone setup
+      var targetAngle=q.targetAngle!=null?q.targetAngle:Q.rand(0,359);
+      var zoneSize=q.zoneSize||25;
+      var zoneStart=(targetAngle-zoneSize/2+360)%360;
+      var zoneEnd=(targetAngle+zoneSize/2)%360;
+
+      function drawClock(a){
+        var W=220,R=100,cx2=W/2,cy2=W/2;
+        cx.clearRect(0,0,W,W);
+        // face
+        cx.beginPath();cx.arc(cx2,cy2,R,0,Math.PI*2);
+        cx.fillStyle='rgba(240,234,214,0.08)';cx.fill();
+        cx.strokeStyle='rgba(240,234,214,0.2)';cx.lineWidth=2;cx.stroke();
+        // red zone if useZone
+        if(q.useZone){
+          var s2=(zoneStart-90)*Math.PI/180,e2=(zoneEnd-90)*Math.PI/180;
+          // handle wrap-around
+          if(zoneEnd<zoneStart)e2+=(Math.PI*2);
+          cx.beginPath();cx.moveTo(cx2,cy2);
+          cx.arc(cx2,cy2,R,s2,e2);cx.closePath();
+          cx.fillStyle='rgba(232,68,58,0.35)';cx.fill();
+          cx.strokeStyle='rgba(232,68,58,0.7)';cx.lineWidth=1.5;cx.stroke();
+        }else{
+          // tick marks at target
+          var ta=(targetAngle-90)*Math.PI/180;
+          cx.beginPath();
+          cx.moveTo(cx2+Math.cos(ta)*85,cy2+Math.sin(ta)*85);
+          cx.lineTo(cx2+Math.cos(ta)*100,cy2+Math.sin(ta)*100);
+          cx.strokeStyle='var(--green)';cx.lineWidth=3;cx.stroke();
+        }
+        // hour ticks
+        for(var i=0;i<12;i++){
+          var ta2=(i*30-90)*Math.PI/180;
+          cx.beginPath();
+          cx.moveTo(cx2+Math.cos(ta2)*88,cy2+Math.sin(ta2)*88);
+          cx.lineTo(cx2+Math.cos(ta2)*98,cy2+Math.sin(ta2)*98);
+          cx.strokeStyle='rgba(240,234,214,0.3)';cx.lineWidth=1.5;cx.stroke();
+        }
+        // needle
+        var ra=(a-90)*Math.PI/180;
+        cx.beginPath();cx.moveTo(cx2,cy2);
+        cx.lineTo(cx2+Math.cos(ra)*78,cy2+Math.sin(ra)*78);
+        cx.strokeStyle='var(--cream)';cx.lineWidth=3;cx.lineCap='round';cx.stroke();
+        // center dot
+        cx.beginPath();cx.arc(cx2,cy2,5,0,Math.PI*2);cx.fillStyle='var(--gold)';cx.fill();
+      }
+
+      function loop(ts){
+        if(!running||done)return;
+        if(lastTime)angle=(angle+degreesPerMs*(ts-lastTime))%360;
+        lastTime=ts;
+        drawClock(angle);
+        raf=requestAnimationFrame(loop);
+      }
+
+      readyBtn.addEventListener('click',function(){
+        H.medium&&H.medium();
+        readyWrap.style.display='none';
+        canvas.style.display='block';
+        running=true;lastTime=null;
+        ctx.answerStartRef.set(Date.now());
+        raf=requestAnimationFrame(loop);
+      });
+
+      canvas.addEventListener('click',function(){
+        if(!running||done)return;
+        done=true;running=false;
+        cancelAnimationFrame(raf);
+        drawClock(angle);
+        // score: how far from target
+        var diff=Math.abs(angle-targetAngle);
+        if(diff>180)diff=360-diff;
+        var won,msg;
+        if(q.useZone){
+          // check if angle is in zone
+          var inZone=false;
+          if(zoneEnd>zoneStart){inZone=angle>=zoneStart&&angle<=zoneEnd;}
+          else{inZone=angle>=zoneStart||angle<=zoneEnd;}
+          won=inZone;
+          msg=won?'In the zone! ✅':'Missed by '+(diff.toFixed(0))+'°';
+        }else{
+          won=diff<=15;
+          msg=won?'Nailed it! ✅':'Off by '+(diff.toFixed(0))+'°';
+        }
+        var ms=Date.now()-ctx.answerStartRef.get();
+        var data=ctx.IQData.recordAnswer(q.category,won,q.difficulty,ms);
+        if(ctx.onAnswer)ctx.onAnswer(won,ms);
+        if(won){H.success&&H.success();ctx.flashEl.className='flash green show';ctx.spawnConfetti(14);}
+        else{H.error&&H.error();ctx.flashEl.className='flash red show';}
+        setTimeout(function(){ctx.flashEl.className='flash';},350);
+        resultEl.textContent=msg;
+        resultEl.style.color=won?'var(--green)':'var(--red)';
+        var expEl=slideEl.querySelector('#exp-'+idx);
+        if(expEl){expEl.textContent=won?'Perfect timing!':'Off by '+diff.toFixed(0)+'°. Target was '+(q.useZone?'the red zone':targetAngle+'°')+'.';expEl.classList.add('show');}
+        ctx.updateUI(data);ctx.checkMore();ctx.answerStartRef.set(Date.now());
+      });
+    }
+  });
+})();
