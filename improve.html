@@ -13,7 +13,7 @@
 
     .top-bar{position:fixed;top:0;left:0;right:0;padding:calc(env(safe-area-inset-top,20px) + 6px) 16px 6px;z-index:50;background:var(--bg)}
     body.no-header .top-bar{display:none}
-    body.no-header main{padding-top:calc(env(safe-area-inset-top,20px) + 8px)}
+    body.no-header .slide{padding-top:calc(env(safe-area-inset-top,20px) + 8px)}
     .stats-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
     .chip{background:var(--navy);border-radius:28px;padding:5px 14px 5px 6px;display:inline-flex;align-items:center;gap:6px}
     .chip .ci{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -26,10 +26,10 @@
     .xp-bar-in{height:100%;background:var(--gold);border-radius:4px;transition:width .4s}
     .xp-lbl{font-size:11px;font-weight:900;color:var(--dim);white-space:nowrap}
 
-    main{flex:1;padding-top:calc(env(safe-area-inset-top,20px) + 58px);overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;scroll-behavior:auto;container-type:size}
+    main{position:fixed;top:0;left:0;right:0;bottom:0;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;scroll-behavior:auto}
     main::-webkit-scrollbar{display:none}
-    .slide{height:100cqh;min-height:0;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 14px;overflow:hidden;flex-shrink:0;position:relative}
-    .slide-spacer{height:100cqh;min-height:0;flex-shrink:0;scroll-snap-align:start;scroll-snap-stop:always;contain:strict}
+    .slide{height:100dvh;min-height:0;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,20px) + 64px) 14px calc(env(safe-area-inset-bottom,0px) + 64px);overflow:hidden;flex-shrink:0;position:relative}
+    .slide-spacer{height:100dvh;min-height:0;flex-shrink:0;scroll-snap-align:start;scroll-snap-stop:always;contain:strict}
 
     .qcard{background:var(--navy);border-radius:24px;width:100%;max-width:400px;max-height:calc(100% - 24px);padding:clamp(16px,4vw,24px) clamp(14px,3.5vw,20px);display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2vw,14px);box-shadow:0 8px 32px rgba(27,45,91,.25);overflow-y:auto;overflow-x:hidden}
     .qcard::-webkit-scrollbar{display:none}
@@ -339,12 +339,12 @@ if(_fbAuth){
   if(_fbAuth.onAuthStateChanged){
     _fbAuth.onAuthStateChanged(u=>{
       if(u){isAuthed=true;hideGuestWall();}
-      else if(!isStandalone&&!sharedQ){showGuestWall('Keep your progress!','Sign up free to save your IQ score, streaks, and compete on the leaderboard.');}
+      // Non-standalone non-authed: wall shown after 3 scrolls (onGuestScroll handles it)
+      // Standalone non-authed: handled by app.html forcing to auth page
     });
   }else{
     onAuthStateChanged(_fbAuth,u=>{
       if(u){isAuthed=true;hideGuestWall();}
-      else if(!isStandalone&&!sharedQ){showGuestWall('Keep your progress!','Sign up free to save your IQ score, streaks, and compete on the leaderboard.');}
     });
   }
 }
@@ -541,24 +541,26 @@ let _filling=false,_fs=false,cardsSinceInstall=0;
 
 function scheduleFill(){if(_fs)return;_fs=true;const doFill=dl=>{_fs=false;if(_filling)return;_filling=true;try{let s=0;while(qQ.length<QT){if(++s>QT*4)break;if(dl?.timeRemaining?.()<2&&qQ.length>=3)break;try{const wc=IQData.getWeakestCategory(),diff=wc?IQData.getDifficulty(wc):1,q=Q.generate(diff);if(q)qQ.push(q)}catch{}}}finally{_filling=false}if(qQ.length<QT)scheduleFill()};typeof requestIdleCallback==='function'?requestIdleCallback(doFill,{timeout:300}):setTimeout(()=>doFill(null),16)}
 function nextQ(){if(!qQ.length){try{const q=Q.generate(1);scheduleFill();return q}catch{return null}}const q=qQ.shift();if(qQ.length<Math.ceil(QT/2))scheduleFill();return q}
-let _lastSlideIdx=-1,_lastAnim=-1,_scrollSettleTimer=null,_pruneTimer=null;
+let _lastSlideIdx=-1,_lastAnim=-1,_pruneTimer=null;
 
-// Use scrollend for settled state (prune + animation trigger)
-// Use scroll only for preloading upcoming slides
+// slides are exactly 100dvh — scrollTop is always a clean multiple of window.innerHeight
+function slideHeight(){return window.innerHeight;}
+
 function onScroll(){
-  const sH=feed.clientHeight;if(!sH)return;
-  const cs=Math.floor((feed.scrollTop+sH*.5)/sH),ts=cs+KA+1;
+  const sH=slideHeight();if(!sH)return;
+  // Preload upcoming slides while scrolling
+  const cs=Math.floor((feed.scrollTop+sH*.5)/sH);
+  const ts=cs+KA+1;
   while(slides<ts)addSlide();
   if(qQ.length<Math.ceil(QT/2))scheduleFill();
 }
 
 function onScrollEnd(){
-  const sH=feed.clientHeight;if(!sH)return;
+  const sH=slideHeight();if(!sH)return;
+  // Use innerHeight not clientHeight — slides are 100dvh not 100% of main
   const cs=Math.round(feed.scrollTop/sH);
-  // Snap to exact position to prevent peeping
-  const target=cs*sH;
-  if(Math.abs(feed.scrollTop-target)>1)feed.scrollTop=target;
-  // Trigger enter animation on settled slide
+  // DO NOT manually set scrollTop here — it fights the native snap and causes bounce-back
+  // Just fire animation and prune
   if(cs!==_lastAnim){
     _lastAnim=cs;
     const el=feed.querySelector(`.slide[data-slide-idx="${cs}"]`);
@@ -566,9 +568,9 @@ function onScrollEnd(){
     if(cs>_lastSlideIdx&&cs>0)onGuestScroll();
     _lastSlideIdx=cs;
   }
-  // Prune old slides after scroll settles (prevents flash during scroll)
+  // Prune well after scroll settles
   clearTimeout(_pruneTimer);
-  _pruneTimer=setTimeout(()=>prune(cs),400);
+  _pruneTimer=setTimeout(()=>prune(cs),600);
 }
 
 function handleScroll(){onScroll();}
@@ -576,10 +578,13 @@ let _sen=null;
 function attachSen(){_sen?.remove();_sen=document.createElement('div');_sen.style.cssText='height:1px;width:100%;flex-shrink:0';feed.appendChild(_sen);const obs=new IntersectionObserver(e=>{if(e[0].isIntersecting){obs.disconnect();for(let i=0;i<KA;i++)addSlide();attachSen()}},{root:feed,threshold:0});obs.observe(_sen)}
 function prune(cs){
   const co=cs-KB;if(co<=firstSlide)return;
+  // Double-check we're still snapped before pruning to avoid position jump
+  const sH=slideHeight();
+  const actualCs=Math.round(feed.scrollTop/sH);
+  if(actualCs!==cs)return; // scrolled since timer fired — skip
   for(let i=firstSlide;i<co;i++){
     const el=feed.querySelector(`.slide[data-slide-idx="${i}"]`);
     if(!el||el.classList.contains('slide-spacer'))continue;
-    // Replace with spacer only when scroll is fully settled
     const sp=document.createElement('div');
     sp.className='slide-spacer';sp.dataset.slideIdx=i;
     feed.replaceChild(sp,el);
@@ -695,16 +700,25 @@ function startFeed(){
   const d=IQData.load();Q.setAge(25);IQData.startSession();updateUI(d);scheduleFill();
   for(let i=0;i<3;i++)addSlide();
   feed.addEventListener('scroll',onScroll,{passive:true});
-  // scrollend fires when snapping is fully done — use for animation + prune
+  // scrollend: fires once snap animation is fully complete — perfect for iOS
   if('onscrollend' in window){
     feed.addEventListener('scrollend',onScrollEnd,{passive:true});
   }else{
-    // Fallback for Safari < 16.4: debounce scroll
+    // Fallback for older Safari: debounce, longer delay to let snap finish
     let _seTimer=null;
-    feed.addEventListener('scroll',()=>{clearTimeout(_seTimer);_seTimer=setTimeout(onScrollEnd,100);},{passive:true});
+    feed.addEventListener('scroll',()=>{
+      clearTimeout(_seTimer);
+      _seTimer=setTimeout(onScrollEnd,150);
+    },{passive:true});
   }
+  // Desktop mouse wheel: one slide at a time
   let wl=false,wc=null;
-  feed.addEventListener('wheel',e=>{e.preventDefault();if(wl)return;wl=true;const sH=feed.clientHeight,cs=Math.round(feed.scrollTop/sH),dir=e.deltaY>0?1:-1,ts=Math.max(0,cs+dir);feed.scrollTo({top:ts*sH,behavior:'smooth'});clearTimeout(wc);wc=setTimeout(()=>{wl=false;onScrollEnd();},400)},{passive:false});
+  feed.addEventListener('wheel',e=>{
+    e.preventDefault();if(wl)return;wl=true;
+    const sH=slideHeight(),cs=Math.round(feed.scrollTop/sH),dir=e.deltaY>0?1:-1,ts=Math.max(0,cs+dir);
+    feed.scrollTo({top:ts*sH,behavior:'smooth'});
+    clearTimeout(wc);wc=setTimeout(()=>{wl=false;onScrollEnd();},420);
+  },{passive:false});
   attachSen();setTimeout(maybeShowPush,3000);scheduleFill();
 }
 
