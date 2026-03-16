@@ -28,11 +28,12 @@
 
     main{flex:1;padding-top:calc(env(safe-area-inset-top,20px) + 58px);overflow-y:auto;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
     main::-webkit-scrollbar{display:none}
-    .slide{height:calc(100dvh - env(safe-area-inset-top,20px) - 62px);min-height:0;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 14px;overflow:hidden;flex-shrink:0}
+    .slide{height:calc(100dvh - env(safe-area-inset-top,20px) - 62px);min-height:0;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;align-items:center;justify-content:safe center;padding:6px 14px;overflow:hidden;flex-shrink:0}
     .slide-spacer{height:calc(100dvh - env(safe-area-inset-top,20px) - 62px);min-height:0;flex-shrink:0;scroll-snap-align:start;scroll-snap-stop:always;contain:strict}
 
     .qcard{background:var(--navy);border-radius:24px;width:100%;max-width:400px;max-height:calc(100% - 24px);padding:clamp(16px,4vw,24px) clamp(14px,3.5vw,20px);display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2vw,14px);box-shadow:0 8px 32px rgba(27,45,91,.25);overflow-y:auto;overflow-x:hidden}
     .qcard::-webkit-scrollbar{display:none}
+    .qcard.wordle-card{overflow:visible;max-height:none;padding:6px 8px;gap:3px}
     .category{font-size:10px;font-weight:900;letter-spacing:1.8px;text-transform:uppercase;color:var(--navy);background:var(--cream);padding:4px 16px;border-radius:20px}
     .question{font-size:clamp(15px,4vw,18px);font-weight:800;text-align:center;line-height:1.45;color:var(--cream);padding:0 4px}
     .sequence{display:flex;align-items:center;justify-content:center;gap:clamp(4px,1.5vw,8px);flex-wrap:wrap;font-size:clamp(20px,5.5vw,28px);font-weight:900;color:var(--cream)}
