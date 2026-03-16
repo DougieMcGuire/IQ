@@ -125,7 +125,13 @@ window.goTo=function(page){
     var c=document.getElementById('screen-'+page);
     if(!c)return;
     var f=document.createElement('iframe');
-    f.src=page+'.html';
+    // Pass shared question params to improve iframe on first load
+    var src=page+'.html';
+    if(page==='improve'){
+      var sharedQs=sessionStorage.getItem('cebear_shared_qs');
+      if(sharedQs){src=page+'.html'+sharedQs;sessionStorage.removeItem('cebear_shared_qs')}
+    }
+    f.src=src;
     f.allow='web-share';
     c.appendChild(f);
     screensLoaded[page]=true;
@@ -199,7 +205,19 @@ function redeemSessionToken(sid){
     var unsub=firebase.auth().onAuthStateChanged(function(u){
       unsub();
       _isAuthed=!!u;
-      goTo(u?'improve':'improve'); // always start on improve — guest wall handles auth prompts
+      // Preserve ?q= and ?from= params when loading improve
+      var qp=new URLSearchParams(location.search);
+      var qParam=qp.get('q');
+      var fromParam=qp.get('from');
+      if(qParam||fromParam){
+        // Store for improve iframe to pick up
+        var qs='?';
+        if(qParam)qs+='q='+encodeURIComponent(qParam);
+        if(fromParam)qs+=(qParam?'&':'')+'from='+encodeURIComponent(fromParam);
+        sessionStorage.setItem('cebear_shared_qs',qs);
+        history.replaceState({},'',location.pathname);
+      }
+      goTo('improve');
     });
   }
 })();
