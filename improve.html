@@ -73,8 +73,8 @@
     .share-q-btn.copied{color:var(--green);background:rgba(63,186,79,.12)}
 
     /* ══ GAME STYLES ══ */
-    .wordle-grid{display:flex;flex-direction:column;gap:5px;margin:2px 0}.wordle-row{display:flex;gap:5px}
-    .wordle-tile{width:clamp(42px,11vw,52px);height:clamp(42px,11vw,52px);border-radius:10px;background:rgba(240,234,214,.1);border:2px solid rgba(240,234,214,.15);display:flex;align-items:center;justify-content:center;font-size:clamp(18px,5vw,22px);font-weight:900;color:var(--cream);transition:border-color .08s}
+    .wordle-grid{display:flex;flex-direction:column;gap:3px;margin:0}.wordle-row{display:flex;gap:3px}
+    .wordle-tile{width:clamp(34px,9vw,44px);height:clamp(34px,9vw,44px);border-radius:7px;background:rgba(240,234,214,.1);border:2px solid rgba(240,234,214,.15);display:flex;align-items:center;justify-content:center;font-size:clamp(14px,3.8vw,18px);font-weight:900;color:var(--cream);transition:border-color .08s}
     .wordle-tile.has-letter{border-color:rgba(240,234,214,.5);animation:wtP .08s}
     .wordle-tile.reveal-correct{background:var(--green);border-color:var(--green);color:#fff}
     .wordle-tile.reveal-present{background:var(--gold);border-color:var(--gold);color:#1a1a2e}
@@ -82,10 +82,10 @@
     .wordle-tile.shake{animation:wtS .4s}
     @keyframes wtP{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
     @keyframes wtS{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
-    .wordle-msg{font-size:13px;font-weight:800;color:rgba(240,234,214,.45);min-height:18px;text-align:center}
+    .wordle-msg{font-size:12px;font-weight:800;color:rgba(240,234,214,.45);min-height:14px;text-align:center}
     .wordle-msg.error{color:var(--red);animation:wtS .3s}.wordle-msg.success{color:var(--green)}
-    .wordle-kb{display:flex;flex-direction:column;gap:5px;width:100%;max-width:340px}.wordle-kb-row{display:flex;gap:4px;justify-content:center}
-    .wk{height:42px;flex:1;min-width:0;max-width:34px;border:none;border-radius:8px;background:rgba(240,234,214,.15);color:var(--cream);font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;user-select:none}
+    .wordle-kb{display:flex;flex-direction:column;gap:3px;width:100%;max-width:340px}.wordle-kb-row{display:flex;gap:3px;justify-content:center}
+    .wk{height:36px;flex:1;min-width:0;max-width:34px;border:none;border-radius:7px;background:rgba(240,234,214,.15);color:var(--cream);font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;user-select:none}
     .wk:active{transform:translateY(2px)}.wk.wide{max-width:50px;font-size:11px}
     .wk.st-correct{background:var(--green);color:#fff}.wk.st-present{background:var(--gold);color:#1a1a2e}.wk.st-absent{background:rgba(240,234,214,.04);color:rgba(240,234,214,.2)}
     .ttt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:clamp(180px,48vw,240px);margin:4px 0}
