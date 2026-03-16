@@ -374,9 +374,17 @@ function showGuestWall(title,sub){
   const wall=document.getElementById('guest-wall');
   if(!senderInfo){if(title)document.getElementById('gw-title').textContent=title;if(sub)document.getElementById('gw-sub').textContent=sub;}
   wall.classList.add('show');
-  document.getElementById('feed').style.overflow='hidden';
+  // Block all interaction with the feed (main is position:fixed so overflow trick doesn't work)
+  const feed=document.getElementById('feed');
+  feed.style.pointerEvents='none';
+  feed.style.userSelect='none';
 }
-function hideGuestWall(){document.getElementById('guest-wall').classList.remove('show');document.getElementById('feed').style.overflow='';}
+function hideGuestWall(){
+  document.getElementById('guest-wall').classList.remove('show');
+  const feed=document.getElementById('feed');
+  feed.style.pointerEvents='';
+  feed.style.userSelect='';
+}
 window.showGuestWallForNav=function(section){
   if(isAuthed||isStandalone)return false;
   const titles={profile:'See your full profile',tasks:'Daily tasks await',leaderboard:'Climb the leaderboard'};
@@ -457,9 +465,10 @@ window.gwSubmit=async function(){
 };
 
 function onGuestScroll(){} // no-op, kept for scroll handler reference
+function guestWallIsUp(){return!isAuthed&&!isStandalone&&document.getElementById('guest-wall').classList.contains('show');}
 function onGuestAnswer(){
   if(isAuthed||isStandalone)return;
-  if(document.getElementById('guest-wall').classList.contains('show'))return;
+  if(guestWallIsUp())return;
   guestQCount++;
   if(guestQCount>=3){showGuestWall('Keep your progress!','Sign up free to save your IQ score, streaks, and compete on the leaderboard.');}
 }
@@ -625,6 +634,8 @@ function addSharedSlide(idx){
 }
 
 function addSlide(){
+  // Don't add slides past the wall for guest users
+  if(guestWallIsUp&&guestWallIsUp())return;
   const idx=slides++;
   if(idx===0&&sharedQ){addSharedSlide(idx);return;}
   if(shouldInsertInstallCard()){const ic=renderInstallCard(idx);ic.dataset.slideIdx=idx;(_sen?.parentNode===feed)?feed.insertBefore(ic,_sen):feed.appendChild(ic);return;}
