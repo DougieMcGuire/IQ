@@ -1,16 +1,23 @@
 {
-  "name": "Cebear - Improve your IQ",
+  "name": "Cebear - Train Your Brain",
   "short_name": "Cebear",
-  "start_url": "app.html",
+  "start_url": "/app.html",
   "display": "standalone",
-  "background_color": "#4a3625",
-  "theme_color": "#4a3625",
+  "background_color": "#1b2d5b",
+  "theme_color": "#1b2d5b",
   "gcm_sender_id": "331205139765",
   "icons": [
     {
       "src": "applogo.png",
       "sizes": "192x192",
-      "type": "image/jpeg"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "applogo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
