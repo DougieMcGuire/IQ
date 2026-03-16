@@ -321,8 +321,17 @@ const GUEST_SCROLL_LIMIT=3;
 let sharedQuestionAnswered=false;
 
 if(_fbAuth){
-  if(_fbAuth.onAuthStateChanged){_fbAuth.onAuthStateChanged(u=>{if(u){isAuthed=true;hideGuestWall()}});}
-  else{onAuthStateChanged(_fbAuth,u=>{if(u){isAuthed=true;hideGuestWall()}});}
+  if(_fbAuth.onAuthStateChanged){
+    _fbAuth.onAuthStateChanged(u=>{
+      if(u){isAuthed=true;hideGuestWall();}
+      else if(!isStandalone&&!sharedQ){showGuestWall('Keep your progress!','Sign up free to save your IQ score, streaks, and compete on the leaderboard.');}
+    });
+  }else{
+    onAuthStateChanged(_fbAuth,u=>{
+      if(u){isAuthed=true;hideGuestWall();}
+      else if(!isStandalone&&!sharedQ){showGuestWall('Keep your progress!','Sign up free to save your IQ score, streaks, and compete on the leaderboard.');}
+    });
+  }
 }
 
 const urlParams=new URLSearchParams(location.search);
