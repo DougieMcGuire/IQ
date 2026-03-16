@@ -12,6 +12,8 @@
     body{display:flex;flex-direction:column}
 
     .top-bar{position:fixed;top:0;left:0;right:0;padding:calc(env(safe-area-inset-top,20px) + 6px) 16px 6px;z-index:50;background:var(--bg)}
+    body.no-header .top-bar{display:none}
+    body.no-header main{padding-top:calc(env(safe-area-inset-top,20px) + 8px)}
     .stats-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
     .chip{background:var(--navy);border-radius:28px;padding:5px 14px 5px 6px;display:inline-flex;align-items:center;gap:6px}
     .chip .ci{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -303,6 +305,8 @@ const inIframe=window.parent!==window;
 
 if(inIframe)parent.authCheck();
 window.navGo=function(p){Haptics.light();parent.goTo(p)};
+// Hide top-bar when viewed directly in Safari (not inside app.html iframe)
+if(!inIframe)document.body.classList.add('no-header');
 
 /* ══ FIREBASE — always use parent compat when in iframe ══ */
 let _fbAuth=null,_fbDb=null;
@@ -325,17 +329,21 @@ getFB();
 
 /* ══ GUEST WALL STATE ══ */
 let gwMode='login';
-let isAuthed=isStandalone; // standalone = always treat as authed (skip wall)
+let isAuthed=isStandalone;
 let guestScrollCount=0;
 const GUEST_SCROLL_LIMIT=3;
 let wallShown=false;
 let sharedQuestionAnswered=false;
 
-// Check auth state
+// Use compat onAuthStateChanged when available, modular otherwise
 if(_fbAuth){
-  onAuthStateChanged(_fbAuth,u=>{
-    if(u){isAuthed=true;hideGuestWall()}
-  });
+  if(_fbAuth.onAuthStateChanged){
+    // compat
+    _fbAuth.onAuthStateChanged(u=>{if(u){isAuthed=true;hideGuestWall()}});
+  }else{
+    // modular
+    onAuthStateChanged(_fbAuth,u=>{if(u){isAuthed=true;hideGuestWall()}});
+  }
 }
 
 /* ══ SHARED QUESTION + SENDER PARAMS ══ */
@@ -351,39 +359,39 @@ if(senderParam){
 }
 
 // If we have sender info, populate the guest wall sender card
+const CEBEAR_USER_COUNT='1,200+'; // update this as you grow
 function initSenderUI(){
   if(!senderInfo)return;
   const card=document.getElementById('gw-sender');
   const av=document.getElementById('gw-sender-av');
-  const name=document.getElementById('gw-sender-name');
+  const nameEl=document.getElementById('gw-sender-name');
   if(!card)return;
-  name.textContent=senderInfo.username||'Someone';
+  nameEl.textContent=senderInfo.username||'Someone';
   if(senderInfo.pic){
-    av.innerHTML=`<img src="${senderInfo.pic}" alt="" onerror="this.parentElement.textContent='${(senderInfo.username||'?')[0].toUpperCase()}'">`;
+    const img=document.createElement('img');
+    img.src=senderInfo.pic;
+    img.onerror=()=>{av.textContent=(senderInfo.username||'?')[0].toUpperCase()};
+    av.appendChild(img);
   }else{
     av.textContent=(senderInfo.username||'?')[0].toUpperCase();
   }
   card.style.display='flex';
-  // Update title to use their name
   const title=document.getElementById('gw-title');
   const sub=document.getElementById('gw-sub');
-  if(title)title.textContent=`Join ${senderInfo.username||'them'} on Cebear!`;
-  if(sub)sub.textContent='Sign up free to save your IQ score and see how you compare.';
+  if(title)title.textContent=`Join ${senderInfo.username||'them'} and ${CEBEAR_USER_COUNT} others on Cebear!`;
+  if(sub)sub.textContent='Sign up free to save your IQ score and see how you stack up.';
 }
 initSenderUI();
 
 /* ══ GUEST WALL FUNCTIONS ══ */
 function showGuestWall(title,sub){
   if(isAuthed||isStandalone)return;
-  wallShown=true;
   const wall=document.getElementById('guest-wall');
-  // If we have sender info, override title/sub with their name
-  if(senderInfo&&title==='Keep your progress!'){
-    title=`Join ${senderInfo.username||'them'} on Cebear!`;
-    sub='Sign up free to save your IQ score and see how you compare.';
+  // Don't override titles if sender info is already set by initSenderUI
+  if(!senderInfo){
+    if(title)document.getElementById('gw-title').textContent=title;
+    if(sub)document.getElementById('gw-sub').textContent=sub;
   }
-  if(title)document.getElementById('gw-title').textContent=title;
-  if(sub)document.getElementById('gw-sub').textContent=sub;
   wall.classList.add('show');
   document.getElementById('feed').style.overflow='hidden';
 }
@@ -435,11 +443,20 @@ async function gwEnsure(u,extra={}){
 async function gwGoogleSignIn(){
   if(!_fbAuth)return;
   gwClear();gwSetLoad('gw-google-btn',true);
+  // When inside app.html iframe, tell parent to handle Google auth
+  // (popup inside iframe fails with "invalid action" due to authDomain mismatch)
+  if(inIframe){
+    try{
+      parent.postMessage({type:'googleAuthRequest'},'*');
+    }catch{}
+    gwSetLoad('gw-google-btn',false);
+    return;
+  }
   try{
     let user;
     if(_fbAuth.signInWithPopup){
       // compat
-      const gp=new window.parent.firebase.auth.GoogleAuthProvider();
+      const gp=new firebase.auth.GoogleAuthProvider();
       const result=await _fbAuth.signInWithPopup(gp);
       user=result.user;
     }else{
@@ -459,10 +476,25 @@ async function gwGoogleSignIn(){
 function gwOnSuccess(){
   isAuthed=true;
   hideGuestWall();
+  wallShown=false; // reset so wall can show again if needed
   Haptics&&Haptics.success&&Haptics.success();
-  // If in app.html iframe context, notify parent
   if(inIframe)try{parent.postMessage({type:'authSuccess'},'*')}catch{}
 }
+
+// Handle auth results coming back from parent (Google auth routed through parent)
+window.addEventListener('message',function(e){
+  if(!e.data)return;
+  if(e.data.type==='authSuccess'){gwOnSuccess();return}
+  if(e.data.type==='authError'){
+    gwSetLoad('gw-google-btn',false);
+    gwErr(e.data.msg||'Sign-in failed. Try email instead.');
+    return;
+  }
+  if(e.data.type==='xpAwarded'){
+    const xp=e.data.xp;if(!xp)return;
+    try{const d=IQData.load();d.xp+=xp;d.level=Math.floor(d.xp/150)+1;IQData.save(d);IQData._maybeSync?.();updateUI({xp:d.xp,level:d.level,streak:d.streak,iq:d.iq})}catch{}
+  }
+});
 
 document.getElementById('gw-google-btn').addEventListener('click',gwGoogleSignIn);
 
@@ -509,11 +541,14 @@ window.gwSubmit=async function(){
 
 /* ══ SCROLL TRACKING FOR GUEST WALL ══ */
 function onGuestScroll(){
-  if(isAuthed||isStandalone||wallShown)return;
-  // If there's a shared question, give one free scroll after answering it
+  if(isAuthed||isStandalone)return;
+  // If wall is already visible, don't re-trigger
+  if(document.getElementById('guest-wall').classList.contains('show'))return;
+  // For shared question visitors: don't count scrolls until they've answered
   if(sharedQ&&!sharedQuestionAnswered)return;
   guestScrollCount++;
   if(guestScrollCount>=GUEST_SCROLL_LIMIT){
+    guestScrollCount=0; // reset so if they dismiss and keep scrolling it re-triggers
     showGuestWall('Keep your progress!','Sign up free to save your IQ score, streaks, and compete on the leaderboard.');
   }
 }
@@ -609,7 +644,6 @@ async function updateTaskProgress(streak,correct,ms,session){if(!getFirebase())r
 window.notifyGamePlayed=async function(gt){if(!getFirebase())return;try{let state=_taskStateCache||await loadTaskState();if(!state||state.date!==getTodayKey())return;state.tasks.forEach(t=>{if(t.type!=='game'||t.game!==gt||t.done)return;t.progress=Math.min(t.progress+1,t.target);if(t.progress>=t.target)t.done=true});if(!state.allDone&&state.tasks.every(t=>t.done))state.allDone=true;saveTaskState(state);notifyTasksPage()}catch{}};
 window.onAnswerForTasks=function(c,ms){const r=IQData.load();const s=updateSessionStats(c,ms);updateTaskProgress(r.streak,c,ms,s)};
 (function(){const fb=window.firebase||(inIframe&&window.parent.firebase);if(!fb)return;fb.auth().onAuthStateChanged(async u=>{if(!u)return;_tasksUid=u.uid;_tasksDb=fb.firestore();await loadTaskState()})})();
-window.addEventListener('message',function(e){if(!e.data||e.data.type!=='xpAwarded')return;const xp=e.data.xp;if(!xp)return;try{const d=IQData.load();d.xp+=xp;d.level=Math.floor(d.xp/150)+1;IQData.save(d);IQData._maybeSync?.();updateUI({xp:d.xp,level:d.level,streak:d.streak,iq:d.iq})}catch{}});
 
 const QT=8,KB=3,KA=6;
 let slides=0,firstSlide=0,answerStart=0;
@@ -704,20 +738,17 @@ function addSharedSlide(idx){
     const banner=document.createElement('div');
     banner.className='shared-q-banner';
     const senderName=senderInfo?.username;
-    const bannerText=senderName?`<strong style="color:var(--gold)">${senderName}</strong> challenged you — can you answer this?`:`Someone shared this question with you — answer it!`;
+    const bannerText=senderName
+      ?`<strong style="color:var(--gold)">${senderName}</strong> sent you this — can you get it right?`
+      :`Someone sent you this question — can you answer it?`;
     banner.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span>${bannerText}</span>`;
     qcard.insertBefore(banner,qcard.firstChild);
     addShareBtn(qcard,q);
   }
   feed.appendChild(div);
-  // After answering the shared Q, note it and allow 3 more scrolls before wall
-  const opts=div.querySelector('.options');
-  if(opts){
-    const observer=new MutationObserver(()=>{
-      if(opts.dataset.done){sharedQuestionAnswered=true;observer.disconnect()}
-    });
-    observer.observe(opts,{attributes:true,attributeFilter:['data-done']});
-  }
+  // Mark answered when any option is tapped on the shared question
+  const opts=div.querySelectorAll('.opt');
+  opts.forEach(o=>o.addEventListener('click',()=>{sharedQuestionAnswered=true},{once:true}));
 }
 
 document.addEventListener('click',e=>{
