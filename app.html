@@ -90,7 +90,17 @@ function authReady(){
 
 firebase.auth().onAuthStateChanged(function(u){
   _onAuthResolve(u);
-  if(u&&currentScreen==='auth')goTo('improve');
+  if(u){
+    // Logged in — if sitting on auth screen, go to train
+    if(currentScreen==='auth')goTo('improve');
+  }else if(isStandalone){
+    // Standalone + not logged in → force to auth page only
+    // Don't let them access the feed or any other page
+    currentScreen=null; // reset so goTo('auth') works
+    screensLoaded={};
+    document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+    goTo('auth');
+  }
 });
 
 /* ══ GUEST WALL NAV INTERCEPTION ══ */
@@ -276,8 +286,18 @@ function redeemSessionToken(sid){
       sessionStorage.setItem('cebear_shared_qs',qs);
       history.replaceState({},'',location.pathname);
     }
-    // Navigate immediately — don't wait for auth for the improve feed
-    goTo('improve');
+    if(isStandalone){
+      // On standalone, wait for auth before navigating
+      // The onAuthStateChanged handler above will redirect to auth if not logged in
+      // Just show splash and let auth resolve
+      authReady().then(function(){
+        if(_isAuthed&&!currentScreen)goTo('improve');
+        // if not authed, onAuthStateChanged already sent to auth
+      });
+    }else{
+      // Web: navigate immediately, guest wall in improve.html handles unauthed users
+      goTo('improve');
+    }
   }
 })();
 
