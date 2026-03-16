@@ -565,18 +565,17 @@ function onScroll(){
 
 function onScrollEnd(){
   const sH=slideHeight();if(!sH)return;
-  // Use innerHeight not clientHeight — slides are 100dvh not 100% of main
   const cs=Math.round(feed.scrollTop/sH);
-  // DO NOT manually set scrollTop here — it fights the native snap and causes bounce-back
-  // Just fire animation and prune
   if(cs!==_lastAnim){
     _lastAnim=cs;
     const el=feed.querySelector(`.slide[data-slide-idx="${cs}"]`);
     if(el){el.classList.remove('entering');void el.offsetWidth;el.classList.add('entering');}
-    if(cs>_lastSlideIdx&&cs>0)onGuestScroll();
+    // Guest wall: show after scrolling past 3 slides (index 3 = 4th card)
+    if(!isAuthed&&!isStandalone&&!guestWallIsUp()&&cs>=3){
+      showGuestWall('Keep your progress!','Sign up free to save your IQ score, streaks, and compete on the leaderboard.');
+    }
     _lastSlideIdx=cs;
   }
-  // Prune well after scroll settles
   clearTimeout(_pruneTimer);
   _pruneTimer=setTimeout(()=>prune(cs),600);
 }
