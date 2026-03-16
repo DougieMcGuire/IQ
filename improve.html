@@ -437,6 +437,35 @@ function gwOnSuccess(){
   guestQCount=0;
   handleScroll();
   if(inIframe)try{parent.postMessage({type:'authSuccess'},'*')}catch{}
+  // Pull user's saved progress from Firestore and refresh the UI
+  _syncUserProgress();
+}
+
+async function _syncUserProgress(){
+  try{
+    let uid=null;
+    if(_fbAuth&&_fbAuth.currentUser)uid=_fbAuth.currentUser.uid;
+    else if(inIframe){try{uid=window.parent.firebase?.auth().currentUser?.uid}catch{}}
+    if(!uid)return;
+    let snap=null;
+    if(_fbDb&&_fbDb.collection){
+      // compat
+      snap=await _fbDb.collection('users').doc(uid).get();
+      if(!snap.exists)return;
+      const cd=snap.data();
+      const d=IQData.load();
+      // Only overwrite if cloud value is higher (don't regress local progress)
+      if(cd.iq>d.iq)d.iq=cd.iq;
+      if(cd.level>d.level)d.level=cd.level;
+      if(cd.xp>d.xp)d.xp=cd.xp;
+      if(cd.bestStreak>d.bestStreak)d.bestStreak=cd.bestStreak;
+      if(cd.streak>d.streak)d.streak=cd.streak;
+      if(cd.username)d.username=cd.username;
+      if(cd.pic)d.pic=cd.pic;
+      IQData.save(d);
+      updateUI(d);
+    }
+  }catch{}
 }
 window.addEventListener('message',function(e){
   if(!e.data)return;
