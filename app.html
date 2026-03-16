@@ -91,12 +91,23 @@ function authReady(){
 firebase.auth().onAuthStateChanged(function(u){
   _onAuthResolve(u);
   if(u){
-    // Logged in — if sitting on auth screen, go to train
-    if(currentScreen==='auth')goTo('improve');
+    _isAuthed=true;
+    if(currentScreen==='auth'){
+      goTo('improve');
+    }else if(currentScreen==='improve'||!currentScreen){
+      // On improve or just navigating there — tell iframe user is authed
+      // Retry until iframe is ready (it may still be loading)
+      (function notify(attempts){
+        var f=document.querySelector('#screen-improve iframe');
+        if(f&&f.contentWindow){
+          f.contentWindow.postMessage({type:'authSuccess'},'*');
+        }else if(attempts>0){
+          setTimeout(function(){notify(attempts-1);},150);
+        }
+      })(20);
+    }
   }else if(isStandalone){
-    // Standalone + not logged in → force to auth page only
-    // Don't let them access the feed or any other page
-    currentScreen=null; // reset so goTo('auth') works
+    currentScreen=null;
     screensLoaded={};
     document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
     goTo('auth');
