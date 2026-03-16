@@ -614,15 +614,15 @@
 
   Q.registerRenderer('oddTileOut', {
     render: function(q, idx) {
-      var size='clamp('+Math.floor(240/q.gridSize)+'px,'+Math.floor(58/q.gridSize)+'vw,'+Math.floor(300/q.gridSize)+'px)';
-      var cells='';
-      for(var i=0;i<q.tiles.length;i++){
-        cells+='<button class="oto-tile" data-oi="'+idx+'" data-oc="'+i+'" style="background:'+q.tiles[i]+';width:'+size+';height:'+size+'"></button>';
-      }
-      return '<div class="qcard" style="gap:10px">'+
+      return '<div class="qcard" style="gap:8px">'+
         '<div class="category">🎨 Odd Tile Out</div>'+
         '<div class="question">'+q.question+'</div>'+
-        '<div class="oto-grid" id="oto-grid-'+idx+'" style="grid-template-columns:repeat('+q.gridSize+',1fr)">'+cells+'</div>'+
+        '<div class="oto-rounds" id="oto-rounds-'+idx+'">'+
+          '<span class="oto-dot oto-dot-active"></span>'+
+          '<span class="oto-dot"></span>'+
+          '<span class="oto-dot"></span>'+
+        '</div>'+
+        '<div id="oto-grid-wrap-'+idx+'"></div>'+
         '<div class="oto-status" id="oto-status-'+idx+'"></div>'+
         '<div id="wa-'+idx+'"></div>'+
         '<div class="explanation" id="exp-'+idx+'"></div>'+
@@ -630,29 +630,74 @@
         '</div>';
     },
     attach: function(slideEl, q, idx, ctx) {
-      var grid=slideEl.querySelector('#oto-grid-'+idx),statusEl=slideEl.querySelector('#oto-status-'+idx),H=ctx.Haptics||{};
+      var wrap=slideEl.querySelector('#oto-grid-wrap-'+idx),statusEl=slideEl.querySelector('#oto-status-'+idx),H=ctx.Haptics||{};
       var actEl=slideEl.querySelector('#wa-'+idx);if(actEl&&ctx.addShareBtn)ctx.addShareBtn(actEl,q);
-      if(!grid)return;
-      var done=false;
-      grid.addEventListener('click',function(e){
-        var btn=e.target.closest('.oto-tile');if(!btn||done)return;
+      if(!wrap)return;
+
+      var TOTAL_ROUNDS=3,round=0,score=0,done=false;
+
+      function makePuzzle(){
+        var lv=LEVELS[randInt(0,LEVELS.length-1)];
+        var g=lv.g,total=g*g;
+        var baseH=randInt(0,359),baseS=randInt(55,80),baseL=randInt(40,65);
+        var oddH=(baseH+(lv.hd||0)+360)%360,oddL=baseL+(lv.ld||0);
+        var oddIdx=randInt(0,total-1),tiles=[];
+        for(var i=0;i<total;i++)tiles.push(i===oddIdx?hslToStr(oddH,baseS,oddL):hslToStr(baseH,baseS,baseL));
+        return{g:g,tiles:tiles,oddIdx:oddIdx,d:lv.d};
+      }
+
+      function updateDots(){
+        var dots=slideEl.querySelectorAll('.oto-dot');
+        dots.forEach(function(d,i){
+          d.className='oto-dot'+(i<round?' oto-dot-done':i===round?' oto-dot-active':'');
+        });
+      }
+
+      function showRound(){
+        var p=makePuzzle();
+        var size='clamp('+Math.floor(240/p.g)+'px,'+Math.floor(56/p.g)+'vw,'+Math.floor(290/p.g)+'px)';
+        var cells='';
+        for(var i=0;i<p.tiles.length;i++)
+          cells+='<button class="oto-tile" data-oi="'+idx+'" data-oc="'+i+'" data-odd="'+p.oddIdx+'" style="background:'+p.tiles[i]+';width:'+size+';height:'+size+'"></button>';
+        wrap.innerHTML='<div class="oto-grid" style="grid-template-columns:repeat('+p.g+',1fr)">'+cells+'</div>';
+        statusEl.textContent='';statusEl.style.color='';
+        updateDots();
+
+        wrap.querySelector('.oto-grid').addEventListener('click',function(e){
+          var btn=e.target.closest('.oto-tile');if(!btn||done)return;
+          var tapped=parseInt(btn.dataset.oc),oddI=parseInt(btn.dataset.odd),won=tapped===oddI;
+          var tiles=wrap.querySelectorAll('.oto-tile');
+          tiles[oddI].classList.add('oto-correct');
+          if(!won){H.error&&H.error();btn.classList.add('oto-wrong');}
+          else{H.medium&&H.medium();score++;}
+          statusEl.textContent=won?'✓ Got it!':'✗ Missed';
+          statusEl.style.color=won?'var(--green)':'var(--red)';
+          round++;
+          if(round>=TOTAL_ROUNDS){
+            setTimeout(function(){finish();},600);
+          }else{
+            setTimeout(function(){showRound();},700);
+          }
+        },{once:true});
+      }
+
+      function finish(){
         done=true;
-        var tapped=parseInt(btn.dataset.oc),won=tapped===q.oddIdx;
+        var won=score>=2,perfect=score===TOTAL_ROUNDS;
         var ms=Date.now()-ctx.answerStartRef.get();
         var data=ctx.IQData.recordAnswer(q.category,won,q.difficulty,ms);
         if(ctx.onAnswer)ctx.onAnswer(won,ms);
-        // highlight correct tile
-        var tiles=grid.querySelectorAll('.oto-tile');
-        tiles[q.oddIdx].classList.add('oto-correct');
-        if(!won){H.error&&H.error();btn.classList.add('oto-wrong');ctx.flashEl.className='flash red show';}
-        else{H.success&&H.success();ctx.flashEl.className='flash green show';ctx.spawnConfetti(12);}
+        if(won){perfect?(H.streak&&H.streak()):(H.success&&H.success());ctx.flashEl.className='flash green show';ctx.spawnConfetti(perfect?20:10);}
+        else{H.error&&H.error();ctx.flashEl.className='flash red show';}
         setTimeout(function(){ctx.flashEl.className='flash';},350);
-        statusEl.textContent=won?'Nice eye! 🎯':'Wrong one!';
+        statusEl.textContent=perfect?'Perfect! 3/3 🎯':won?score+'/3 — Nice!':score+'/3 — Keep training!';
         statusEl.style.color=won?'var(--green)':'var(--red)';
         var expEl=slideEl.querySelector('#exp-'+idx);
-        if(expEl){expEl.textContent=won?'You spotted the difference!':'The highlighted tile was different.';expEl.classList.add('show');}
+        if(expEl){expEl.textContent=perfect?'Flawless color vision!':'Spotted '+score+' of 3 odd tiles.';expEl.classList.add('show');}
         ctx.updateUI(data);ctx.checkMore();ctx.answerStartRef.set(Date.now());
-      });
+      }
+
+      showRound();
     }
   });
 })();
