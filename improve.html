@@ -6,7 +6,7 @@
   <title>Cebear</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#F0EAD6;--navy:#1b2d5b;--navyM:#243a6e;--navyL:#2f4a88;--cream:#F0EAD6;--card:#1b2d5b;--text:#1b2d5b;--dim:#7b8aa6;--light:#a8b5cc;--green:#3fba4f;--gd:#2d9a3c;--red:#e8443a;--rd:#c0362e;--gold:#e8a817;--goldd:#c48e10;--blue:#3a7df2;--purple:#6d4aed;--orange:#e87d1a;--pink:#e8557a}
+    :root{--bg:#F0EAD6;--navy:#0047CC;--navyM:#0055ee;--navyL:#1a6fff;--cream:#F0EAD6;--card:#0047CC;--text:#0047CC;--dim:#4a7fd4;--light:#7aaaf0;--green:#3fba4f;--gd:#2d9a3c;--red:#e8443a;--rd:#c0362e;--gold:#e8a817;--goldd:#c48e10;--blue:#3a7df2;--purple:#6d4aed;--orange:#e87d1a;--pink:#e8557a}
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     html,body{width:100%;height:100dvh;overflow:hidden;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text)}
     body{display:flex;flex-direction:column}
@@ -22,7 +22,7 @@
     .chip .cv{font-size:16px;font-weight:900;color:var(--cream)}
     .chip .cl{font-size:10px;font-weight:800;color:rgba(240,234,214,.45)}
     .xp-wrap{display:flex;align-items:center;gap:8px}
-    .xp-bar-out{flex:1;height:8px;background:rgba(27,45,91,.1);border-radius:4px;overflow:hidden}
+    .xp-bar-out{flex:1;height:8px;background:rgba(0,71,204,.1);border-radius:4px;overflow:hidden}
     .xp-bar-in{height:100%;background:var(--gold);border-radius:4px;transition:width .4s}
     .xp-lbl{font-size:11px;font-weight:900;color:var(--dim);white-space:nowrap}
 
@@ -31,7 +31,7 @@
     .slide{height:100dvh;min-height:0;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,20px) + 64px) 14px calc(env(safe-area-inset-bottom,0px) + 64px);overflow:hidden;flex-shrink:0;position:relative}
     .slide-spacer{height:100dvh;min-height:0;flex-shrink:0;scroll-snap-align:start;scroll-snap-stop:always;contain:strict}
 
-    .qcard{background:var(--navy);border-radius:24px;width:100%;max-width:400px;max-height:calc(100% - 24px);padding:clamp(16px,4vw,24px) clamp(14px,3.5vw,20px);display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2vw,14px);box-shadow:0 8px 32px rgba(27,45,91,.25);overflow-y:auto;overflow-x:hidden}
+    .qcard{background:var(--navy);border-radius:24px;width:100%;max-width:400px;max-height:calc(100% - 24px);padding:clamp(16px,4vw,24px) clamp(14px,3.5vw,20px);display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2vw,14px);box-shadow:0 8px 32px rgba(0,71,204,.3);overflow-y:auto;overflow-x:hidden}
     .qcard::-webkit-scrollbar{display:none}
     .category{font-size:10px;font-weight:900;letter-spacing:1.8px;text-transform:uppercase;color:var(--navy);background:var(--cream);padding:4px 16px;border-radius:20px}
     .question{font-size:clamp(15px,4vw,18px);font-weight:800;text-align:center;line-height:1.45;color:var(--cream);padding:0 4px}
@@ -134,7 +134,7 @@
     .mr-dot{width:10px;height:10px;border-radius:50%;background:rgba(240,234,214,.1)}.mr-dot-active{background:var(--gold)}.mr-dot-done{background:var(--green)}
 
     /* ══ INSTALL HOOK CARD ══ */
-    .install-card{background:var(--navy);border-radius:24px;width:100%;max-width:400px;padding:28px 24px;display:flex;flex-direction:column;align-items:center;gap:16px;box-shadow:0 8px 32px rgba(27,45,91,.25);text-align:center;position:relative;overflow:hidden}
+    .install-card{background:var(--navy);border-radius:24px;width:100%;max-width:400px;padding:28px 24px;display:flex;flex-direction:column;align-items:center;gap:16px;box-shadow:0 8px 32px rgba(0,71,204,.3);text-align:center;position:relative;overflow:hidden}
     .install-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--orange));border-radius:24px 24px 0 0}
     .install-bear{width:56px;height:56px;background:var(--gold);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 var(--goldd);overflow:hidden}
     .install-title{font-size:18px;font-weight:900;color:var(--cream);line-height:1.2}
@@ -147,7 +147,7 @@
     .install-skip{font-size:11px;font-weight:700;color:rgba(240,234,214,.25);cursor:pointer;padding:4px}
 
     /* ══ GUEST WALL MODAL ══ */
-    .guest-wall{position:fixed;inset:0;background:rgba(15,22,44,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0;opacity:0;pointer-events:none;transition:opacity .3s}
+    .guest-wall{position:fixed;inset:0;background:rgba(0,50,160,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0;opacity:0;pointer-events:none;transition:opacity .3s}
     .guest-wall.show{opacity:1;pointer-events:all}
     .gw-sheet{background:var(--navy);border-radius:28px 28px 0 0;width:100%;max-width:480px;padding:20px 20px calc(28px + env(safe-area-inset-bottom,0px));animation:sheetUp .32s cubic-bezier(.32,.72,0,1) both}
     @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -192,7 +192,7 @@
     .shared-q-banner svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:2;flex-shrink:0}
     .shared-q-banner span{font-size:12px;font-weight:700;color:rgba(240,234,214,.5);line-height:1.4}
 
-    .streak-popup{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(27,45,91,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
+    .streak-popup{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,50,160,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
     .streak-popup.show{opacity:1}
     .streak-popup .si{width:60px;height:60px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
     .streak-popup .si svg{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
@@ -209,7 +209,7 @@
     .confetti i.fall{animation:cf 1.2s ease-out forwards}
     @keyframes cf{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(100vh) rotate(720deg)}}
 
-    .modal{position:fixed;inset:0;background:rgba(27,45,91,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;z-index:300;padding:20px}
+    .modal{position:fixed;inset:0;background:rgba(0,50,160,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;z-index:300;padding:20px}
     .modal.show{display:flex}
     .modal-box{background:var(--cream);border-radius:28px;padding:32px 24px;width:100%;max-width:360px;text-align:center}
     .modal-mascot{width:64px;height:64px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;overflow:hidden}
@@ -217,27 +217,27 @@
     .modal-title{font-size:22px;font-weight:900;margin-bottom:6px;color:var(--navy)}
     .modal-text{font-size:14px;color:var(--dim);line-height:1.5;margin-bottom:18px;font-weight:600}
     .age-num{font-size:48px;font-weight:900;margin:10px 0;color:var(--navy)}
-    .age-slider{width:100%;height:10px;-webkit-appearance:none;background:rgba(27,45,91,.1);border-radius:5px;margin-bottom:22px}
+    .age-slider{width:100%;height:10px;-webkit-appearance:none;background:rgba(0,71,204,.1);border-radius:5px;margin-bottom:22px}
     .age-slider::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;background:var(--navy);border-radius:50%;cursor:pointer}
     .btn-go{background:var(--green);color:#fff;border:none;border-radius:14px;padding:14px 40px;font-family:'Nunito',sans-serif;font-size:17px;font-weight:900;cursor:pointer;text-transform:uppercase;box-shadow:0 3px 0 var(--gd);transition:transform .1s}
     .btn-go:active{transform:translateY(3px);box-shadow:none}
     #calibration .cal-progress{display:flex;gap:6px;margin-bottom:16px;justify-content:center}
-    #calibration .cal-dot{width:12px;height:12px;border-radius:50%;background:rgba(27,45,91,.12);transition:background .3s}
+    #calibration .cal-dot{width:12px;height:12px;border-radius:50%;background:rgba(0,71,204,.12);transition:background .3s}
     #calibration .cal-dot.done{background:var(--green)}#calibration .cal-dot.active{background:var(--navy)}#calibration .cal-dot.wrong-dot{background:var(--red)}
     #calibration .cal-question{font-size:16px;font-weight:800;color:var(--navy);margin-bottom:14px;line-height:1.4;min-height:48px}
     #calibration .cal-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    #calibration .cal-opt{background:rgba(27,45,91,.06);border:none;border-radius:14px;padding:12px 10px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:var(--navy);cursor:pointer;text-align:center;box-shadow:0 2px 0 rgba(27,45,91,.08);transition:transform .1s}
+    #calibration .cal-opt{background:rgba(0,71,204,.06);border:none;border-radius:14px;padding:12px 10px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:var(--navy);cursor:pointer;text-align:center;box-shadow:0 2px 0 rgba(0,71,204,.08);transition:transform .1s}
     #calibration .cal-opt:active{transform:translateY(2px);box-shadow:none}
     #calibration .cal-opt.correct{background:var(--green);color:#fff;box-shadow:0 2px 0 var(--gd)}#calibration .cal-opt.wrong{background:var(--red);color:#fff;box-shadow:0 2px 0 var(--rd)}#calibration .cal-opt.dim{opacity:.12;pointer-events:none}
     #cal-result{display:none}#cal-result .result-iq{font-size:64px;font-weight:900;color:var(--navy);margin:8px 0}#cal-result .result-label{font-size:14px;font-weight:900;color:var(--dim);letter-spacing:4px;margin-bottom:12px}#cal-result .result-text{font-size:14px;color:var(--dim);font-weight:600;margin-bottom:18px;line-height:1.5}
 
-    #push-prompt{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:var(--cream);border-radius:20px;padding:16px 18px;width:calc(100% - 32px);max-width:360px;box-shadow:0 8px 32px rgba(27,45,91,.25);z-index:250;display:none;animation:su .3s}
+    #push-prompt{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:var(--cream);border-radius:20px;padding:16px 18px;width:calc(100% - 32px);max-width:360px;box-shadow:0 8px 32px rgba(0,71,204,.25);z-index:250;display:none;animation:su .3s}
     #push-prompt.show{display:block}
     #push-prompt .pp-title{font-size:15px;font-weight:900;color:var(--navy);margin-bottom:4px}
     #push-prompt .pp-text{font-size:12px;font-weight:600;color:var(--dim);margin-bottom:12px;line-height:1.4}
     #push-prompt .pp-btns{display:flex;gap:8px}
     #push-prompt .pp-yes{flex:1;background:var(--green);color:#fff;border:none;border-radius:12px;padding:10px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 2px 0 var(--gd)}
-    #push-prompt .pp-no{background:rgba(27,45,91,.06);color:var(--dim);border:none;border-radius:12px;padding:10px 16px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;cursor:pointer}
+    #push-prompt .pp-no{background:rgba(0,71,204,.06);color:var(--dim);border:none;border-radius:12px;padding:10px 16px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;cursor:pointer}
 
     /* ══ ODD TILE OUT ══ */
     .oto-grid{display:grid;gap:4px;margin:4px 0}
@@ -263,8 +263,8 @@
 <div id="push-prompt"><div class="pp-title">Stay sharp daily?</div><div class="pp-text">One nudge a day to keep your streak alive. No spam.</div><div class="pp-btns"><button class="pp-yes" id="pp-yes">Sure!</button><button class="pp-no" id="pp-no">Not now</button></div></div>
 
 <!-- ══ ONBOARD + CALIBRATION ══ -->
-<div class="modal" id="onboard"><div class="modal-box"><div class="modal-mascot"><svg viewBox="0 0 48 48" fill="none"><circle cx="14" cy="12" r="7" fill="#1b2d5b"/><circle cx="34" cy="12" r="7" fill="#1b2d5b"/><circle cx="24" cy="26" r="16" fill="#1b2d5b"/><circle cx="14" cy="12" r="4.5" fill="#243a6e"/><circle cx="34" cy="12" r="4.5" fill="#243a6e"/><ellipse cx="24" cy="30" rx="6" ry="4.5" fill="#243a6e"/><circle cx="20" cy="24" r="2.2" fill="#F0EAD6"/><circle cx="28" cy="24" r="2.2" fill="#F0EAD6"/><ellipse cx="24" cy="29" rx="2.5" ry="1.5" fill="#1b2d5b"/></svg></div><div class="modal-title">Welcome to Cebear!</div><div class="modal-text">Train your brain with personalized challenges.<br>First, how old are you?</div><div class="age-num" id="age-display">25</div><input type="range" class="age-slider" id="age-slider" min="8" max="80" value="25"><button class="btn-go" id="start-btn">Next</button></div></div>
-<div class="modal" id="calibration"><div class="modal-box"><div id="cal-quiz"><div class="modal-mascot"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" fill="#1b2d5b"/><path d="M20 18a4 4 0 018 0c0 2-2 3-4 4v2" stroke="#F0EAD6" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="32" r="1.5" fill="#F0EAD6"/></svg></div><div class="modal-title">Quick Brain Check</div><div class="modal-text">5 questions to find your starting IQ</div><div class="cal-progress" id="cal-dots"></div><div class="cal-question" id="cal-q"></div><div class="cal-opts" id="cal-opts"></div></div><div id="cal-result"><div class="modal-mascot"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" fill="#3fba4f"/><path d="M16 24l5 5 11-11" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="modal-title">Your Starting IQ</div><div class="result-iq" id="cal-iq">100</div><div class="result-label">I Q</div><div class="result-text">Your baseline — keep training to improve!</div><button class="btn-go" id="cal-done-btn">Start Training</button></div></div></div>
+<div class="modal" id="onboard"><div class="modal-box"><div class="modal-mascot"><svg viewBox="0 0 48 48" fill="none"><circle cx="14" cy="12" r="7" fill="#0047CC"/><circle cx="34" cy="12" r="7" fill="#0047CC"/><circle cx="24" cy="26" r="16" fill="#0047CC"/><circle cx="14" cy="12" r="4.5" fill="#0055ee"/><circle cx="34" cy="12" r="4.5" fill="#0055ee"/><ellipse cx="24" cy="30" rx="6" ry="4.5" fill="#0055ee"/><circle cx="20" cy="24" r="2.2" fill="#F0EAD6"/><circle cx="28" cy="24" r="2.2" fill="#F0EAD6"/><ellipse cx="24" cy="29" rx="2.5" ry="1.5" fill="#0047CC"/></svg></div><div class="modal-title">Welcome to Cebear!</div><div class="modal-text">Train your brain with personalized challenges.<br>First, how old are you?</div><div class="age-num" id="age-display">25</div><input type="range" class="age-slider" id="age-slider" min="8" max="80" value="25"><button class="btn-go" id="start-btn">Next</button></div></div>
+<div class="modal" id="calibration"><div class="modal-box"><div id="cal-quiz"><div class="modal-mascot"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" fill="#0047CC"/><path d="M20 18a4 4 0 018 0c0 2-2 3-4 4v2" stroke="#F0EAD6" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="32" r="1.5" fill="#F0EAD6"/></svg></div><div class="modal-title">Quick Brain Check</div><div class="modal-text">5 questions to find your starting IQ</div><div class="cal-progress" id="cal-dots"></div><div class="cal-question" id="cal-q"></div><div class="cal-opts" id="cal-opts"></div></div><div id="cal-result"><div class="modal-mascot"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" fill="#3fba4f"/><path d="M16 24l5 5 11-11" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="modal-title">Your Starting IQ</div><div class="result-iq" id="cal-iq">100</div><div class="result-label">I Q</div><div class="result-text">Your baseline — keep training to improve!</div><button class="btn-go" id="cal-done-btn">Start Training</button></div></div></div>
 
 <!-- ══ GUEST WALL ══ -->
 <div class="guest-wall" id="guest-wall">
@@ -338,8 +338,6 @@ if(_fbAuth){
   if(_fbAuth.onAuthStateChanged){
     _fbAuth.onAuthStateChanged(u=>{
       if(u){isAuthed=true;hideGuestWall();}
-      // Non-standalone non-authed: wall shown after 3 scrolls (onGuestScroll handles it)
-      // Standalone non-authed: handled by app.html forcing to auth page
     });
   }else{
     onAuthStateChanged(_fbAuth,u=>{
@@ -374,7 +372,6 @@ function showGuestWall(title,sub){
   const wall=document.getElementById('guest-wall');
   if(!senderInfo){if(title)document.getElementById('gw-title').textContent=title;if(sub)document.getElementById('gw-sub').textContent=sub;}
   wall.classList.add('show');
-  // Block all interaction with the feed (main is position:fixed so overflow trick doesn't work)
   const feed=document.getElementById('feed');
   feed.style.pointerEvents='none';
   feed.style.userSelect='none';
@@ -415,12 +412,9 @@ async function gwGoogleSignIn(){
   if(!_fbAuth)return;
   gwClear();gwSetLoad('gw-google-btn',true);
   if(inIframe){
-    // Tell parent to redirect to google-redirect.html — cleanest cross-browser approach
     try{parent.postMessage({type:'googleAuthRequest'},'*');}catch{}
-    // Button stays loading — page will redirect
     return;
   }
-  // Direct visit (no iframe) — use popup
   try{
     const gp=new GoogleAuthProvider();
     const result=await signInWithPopup(_fbAuth,gp);
@@ -437,7 +431,6 @@ function gwOnSuccess(){
   guestQCount=0;
   handleScroll();
   if(inIframe)try{parent.postMessage({type:'authSuccess'},'*')}catch{}
-  // Pull user's saved progress from Firestore and refresh the UI
   _syncUserProgress();
 }
 
@@ -449,12 +442,10 @@ async function _syncUserProgress(){
     if(!uid)return;
     let snap=null;
     if(_fbDb&&_fbDb.collection){
-      // compat
       snap=await _fbDb.collection('users').doc(uid).get();
       if(!snap.exists)return;
       const cd=snap.data();
       const d=IQData.load();
-      // Only overwrite if cloud value is higher (don't regress local progress)
       if(cd.iq>d.iq)d.iq=cd.iq;
       if(cd.level>d.level)d.level=cd.level;
       if(cd.xp>d.xp)d.xp=cd.xp;
@@ -470,7 +461,6 @@ async function _syncUserProgress(){
 window.addEventListener('message',function(e){
   if(!e.data)return;
   if(e.data.type==='authSuccess'){
-    // Parent confirmed auth — hide wall and resume feed
     if(!isAuthed)gwOnSuccess();
     return;
   }
@@ -505,7 +495,7 @@ window.gwSubmit=async function(){
   }
 };
 
-function onGuestScroll(){} // no-op, kept for scroll handler reference
+function onGuestScroll(){}
 function guestWallIsUp(){return!isAuthed&&!isStandalone&&document.getElementById('guest-wall').classList.contains('show');}
 function onGuestAnswer(){
   if(isAuthed||isStandalone)return;
@@ -592,12 +582,10 @@ function scheduleFill(){if(_fs)return;_fs=true;const doFill=dl=>{_fs=false;if(_f
 function nextQ(){if(!qQ.length){try{const q=Q.generate(1);scheduleFill();return q}catch{return null}}const q=qQ.shift();if(qQ.length<Math.ceil(QT/2))scheduleFill();return q}
 let _lastSlideIdx=-1,_lastAnim=-1,_pruneTimer=null;
 
-// slides are exactly 100dvh — scrollTop is always a clean multiple of window.innerHeight
 function slideHeight(){return window.innerHeight;}
 
 function onScroll(){
   const sH=slideHeight();if(!sH)return;
-  // Preload upcoming slides while scrolling
   const cs=Math.floor((feed.scrollTop+sH*.5)/sH);
   const ts=cs+KA+1;
   while(slides<ts)addSlide();
@@ -611,7 +599,6 @@ function onScrollEnd(){
     _lastAnim=cs;
     const el=feed.querySelector(`.slide[data-slide-idx="${cs}"]`);
     if(el){el.classList.remove('entering');void el.offsetWidth;el.classList.add('entering');}
-    // Guest wall: show after scrolling past 3 slides (index 3 = 4th card)
     if(!isAuthed&&!isStandalone&&!guestWallIsUp()&&cs>=3){
       showGuestWall('Keep your progress!','Sign up free to save your IQ score, streaks, and compete on the leaderboard.');
     }
@@ -626,10 +613,9 @@ let _sen=null;
 function attachSen(){_sen?.remove();_sen=document.createElement('div');_sen.style.cssText='height:1px;width:100%;flex-shrink:0';feed.appendChild(_sen);const obs=new IntersectionObserver(e=>{if(e[0].isIntersecting){obs.disconnect();for(let i=0;i<KA;i++)addSlide();attachSen()}},{root:feed,threshold:0});obs.observe(_sen)}
 function prune(cs){
   const co=cs-KB;if(co<=firstSlide)return;
-  // Double-check we're still snapped before pruning to avoid position jump
   const sH=slideHeight();
   const actualCs=Math.round(feed.scrollTop/sH);
-  if(actualCs!==cs)return; // scrolled since timer fired — skip
+  if(actualCs!==cs)return;
   for(let i=firstSlide;i<co;i++){
     const el=feed.querySelector(`.slide[data-slide-idx="${i}"]`);
     if(!el||el.classList.contains('slide-spacer'))continue;
@@ -641,7 +627,6 @@ function prune(cs){
 }
 function shouldInsertInstallCard(){if(!isMobile||isStandalone)return false;cardsSinceInstall++;if(cardsSinceInstall>=5){cardsSinceInstall=0;return true}return false;}
 
-/* ══ ADD SHARED SLIDE — routes to custom renderer if available ══ */
 function addSharedSlide(idx){
   const q=sharedQ;
   const div=document.createElement('div');div.className='slide';div.dataset.slideIdx=idx;
@@ -665,7 +650,6 @@ function addSharedSlide(idx){
     return;
   }
 
-  // Standard MC fallback
   div.innerHTML=renderDef(q,idx);
   feed.appendChild(div);
   const qcard=div.querySelector('.qcard');
@@ -674,7 +658,6 @@ function addSharedSlide(idx){
 }
 
 function addSlide(){
-  // Don't add slides past the wall for guest users
   if(guestWallIsUp&&guestWallIsUp())return;
   const idx=slides++;
   if(idx===0&&sharedQ){addSharedSlide(idx);return;}
@@ -736,7 +719,6 @@ function renderDef(q,idx){let v='';if(q.visual==='sequence'||q.visual==='letterS
 
 function init(){
   const d=IQData.load();
-  // Skip age prompt and calibration — start everyone at IQ 100
   if(IQData.needsOnboarding()||IQData.needsCalibration()){
     IQData.setAge(25);
     Q.setAge(25);
@@ -750,18 +732,15 @@ function startFeed(){
   const d=IQData.load();Q.setAge(25);IQData.startSession();updateUI(d);scheduleFill();
   for(let i=0;i<3;i++)addSlide();
   feed.addEventListener('scroll',onScroll,{passive:true});
-  // scrollend: fires once snap animation is fully complete — perfect for iOS
   if('onscrollend' in window){
     feed.addEventListener('scrollend',onScrollEnd,{passive:true});
   }else{
-    // Fallback for older Safari: debounce, longer delay to let snap finish
     let _seTimer=null;
     feed.addEventListener('scroll',()=>{
       clearTimeout(_seTimer);
       _seTimer=setTimeout(onScrollEnd,150);
     },{passive:true});
   }
-  // Desktop mouse wheel: one slide at a time
   let wl=false,wc=null;
   feed.addEventListener('wheel',e=>{
     e.preventDefault();if(wl)return;wl=true;
