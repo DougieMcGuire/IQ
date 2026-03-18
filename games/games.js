@@ -1124,8 +1124,8 @@ function _scrollHint(idx){
       var selected = [], lives = 4, solvedCats = 0, done = false;
 
       function getSelected() {
-        return Array.from(grid.querySelectorAll('.conn-word.conn-sel'));
-      }
+  return Array.from(grid.querySelectorAll('.conn-word.conn-sel:not(.conn-done)'));
+}
 
       function updateSub() {
         var sel = getSelected();
