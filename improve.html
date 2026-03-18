@@ -315,6 +315,20 @@
   </div>
 </div>
 
+<script>
+// If opened directly (not in iframe) AND has a ?q= param, redirect into app.html
+// so the recipient gets the full app shell (nav, profile, etc.) with the shared question.
+// app.html will load improve.html in its iframe; improve.html reads window.parent.location.search.
+(function(){
+  var inFrame=window.parent!==window;
+  if(inFrame)return; // already inside app.html, do nothing
+  if(!location.search)return; // no params, normal standalone load
+  var p=new URLSearchParams(location.search);
+  if(!p.get('q'))return; // no shared question param
+  // Redirect to app.html preserving the full query string
+  location.replace(location.origin+'/app.html'+location.search);
+})();
+</script>
 <script src="questions.js"></script>
 <script src="games/games.js"></script>
 <script src="games/logic.js"></script>
