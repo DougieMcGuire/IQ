@@ -72,7 +72,8 @@
     .game-branding{width:100%;display:flex;justify-content:center;margin-top:8px;padding-top:10px;border-top:1px solid rgba(240,234,214,.06)}
     .game-branding a{display:inline-flex;align-items:center;gap:6px;background:rgba(240,234,214,.07);border:1px solid rgba(240,234,214,.13);border-radius:20px;padding:5px 14px 5px 7px;text-decoration:none;transition:all .15s}
     .game-branding a:active{transform:scale(.95)}
-    .game-branding-bear{width:20px;height:20px;border-radius:6px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;box-shadow:0 1px 0 var(--goldd)}
+    .game-branding-bear{width:20px;height:20px;border-radius:6px;background:var(--gold);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;box-shadow:0 1px 0 var(--goldd)}
+    .game-branding-bear img{width:14px;height:14px;object-fit:contain}
     .game-branding-text{font-size:11px;font-weight:900;color:rgba(240,234,214,.55);letter-spacing:1.5px;text-transform:uppercase}
 
     @keyframes slideEnter{0%{opacity:0}100%{opacity:1}}
@@ -354,7 +355,9 @@ if(_fbAuth){
   }
 }
 
-const urlParams=new URLSearchParams(location.search);
+// When loaded in iframe, app.html has the ?q= params — read from parent
+const _qs=(()=>{try{return inIframe?window.parent.location.search:location.search;}catch{return location.search;}})();
+const urlParams=new URLSearchParams(_qs);
 const sharedQParam=urlParams.get('q'),senderParam=urlParams.get('from');
 let sharedQ=null,senderInfo=null;
 if(sharedQParam){try{sharedQ=JSON.parse(decodeURIComponent(escape(atob(sharedQParam))))}catch{}}
@@ -756,7 +759,7 @@ function renderDef(q,idx){
   if(q.visual==='sequence'||q.visual==='letterSequence'){const parts=q.sequence.map((n,i)=>{if(n==='?')return`<span class="blank">?</span>`;return`<span>${n}</span>${i<q.sequence.length-1?'<span class="arrow">→</span>':''}`});if(q.sequence[q.sequence.length-1]!=='?')parts.push('<span class="arrow">→</span><span class="blank">?</span>');v=`<div class="sequence">${parts.join('')}</div>`}
   else if(q.visual==='matrix'){v=`<div class="matrix">${q.grid.map(c=>`<div class="matrix-cell${c==='?'?' blank':''}">${c}</div>`).join('')}</div>`}
   const wide=q.options.some(o=>String(o).length>20);
-  return `<div class="qcard"><div class="category">${q.categoryLabel}</div><div class="question">${q.question}</div>${v}<div class="options${wide?' wide':''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">${q.options.map(o=>`<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}</div><div class="feedback" id="fb-${idx}"></div><div class="explain" id="exp-${idx}">${q.explanation}</div><div class="game-branding"><a href="https://cebear.com" target="_blank" rel="noopener"><div class="game-branding-bear">🐻</div><span class="game-branding-text">cebear.com</span></a></div></div><div class="scroll-hint" id="hint-${idx}"><div class="scroll-hint-inner"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><span>Swipe for next</span></div></div>`;
+  return `<div class="qcard"><div class="category">${q.categoryLabel}</div><div class="question">${q.question}</div>${v}<div class="options${wide?' wide':''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">${q.options.map(o=>`<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}</div><div class="feedback" id="fb-${idx}"></div><div class="explain" id="exp-${idx}">${q.explanation}</div><div class="game-branding"><a href="https://cebear.com" target="_blank" rel="noopener"><div class="game-branding-bear"><img src="logo.png" alt=""></div><span class="game-branding-text">cebear.com</span></a></div></div><div class="scroll-hint" id="hint-${idx}"><div class="scroll-hint-inner"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><span>Swipe for next</span></div></div>`;
 }
 
 function init(){
