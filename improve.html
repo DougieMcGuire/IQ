@@ -355,26 +355,23 @@ if(_fbAuth){
   }
 }
 
-// ── URL-safe base64 helpers ───────────────────────────────────────────────────
-// Encode: standard base64 → replace +→- /→_ strip =  (no encodeURIComponent needed in URL)
-function _b64e(str){
-  return btoa(unescape(encodeURIComponent(str)))
-    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+// ── Param reading — try own location.search first, then parent ───────────────
+// Share URLs point directly to improve.html so location.search is always set.
+// Parent fallback kept for any legacy app.html?q= links.
+function _getSearch(){
+  // 1. Own params (share URL points directly to improve.html)
+  if(location.search)return location.search;
+  // 2. Parent params (fallback for app.html?q= style links)
+  try{if(inIframe&&window.parent.location.search)return window.parent.location.search;}catch{}
+  return '';
 }
-// Decode: restore -→+ _→/ add padding → atob → decodeURIComponent
-function _b64d(s){
-  s=(s||'').replace(/-/g,'+').replace(/_/g,'/');
-  while(s.length%4)s+='=';
-  return decodeURIComponent(escape(atob(s)));
-}
-
-// When loaded in iframe, app.html has the ?q= params — read from parent
-const _qs=(()=>{try{return inIframe?window.parent.location.search:location.search;}catch{return location.search;}})();
+const _qs=_getSearch();
 const urlParams=new URLSearchParams(_qs);
 const sharedQParam=urlParams.get('q'),senderParam=urlParams.get('from');
 let sharedQ=null,senderInfo=null;
-if(sharedQParam){try{sharedQ=JSON.parse(_b64d(sharedQParam))}catch(e){console.warn('sharedQ parse failed:',e)}}
-if(senderParam){try{senderInfo=JSON.parse(_b64d(senderParam))}catch(e){console.warn('senderInfo parse failed:',e)}}
+// Decode: URLSearchParams.get() already percent-decodes, so just JSON.parse
+if(sharedQParam){try{sharedQ=JSON.parse(sharedQParam)}catch(e){console.warn('sharedQ parse failed:',e)}}
+if(senderParam){try{senderInfo=JSON.parse(senderParam)}catch(e){console.warn('senderInfo parse failed:',e)}}
 
 const CEBEAR_USER_COUNT='1,200+';
 function initSenderUI(){
@@ -519,13 +516,13 @@ function renderInstallCard(idx){
   return div;
 }
 
-// ── getSenderParam — URL-safe base64, no encodeURIComponent needed ────────────
+// ── getSenderParam — plain JSON, percent-encoded ──────────────────────────────
 function getSenderParam(){
   try{
     const fb=inIframe?window.parent.firebase:null,u=fb?fb.auth().currentUser:null;
     if(!u)return '';
     const d=IQData.load(),info={uid:u.uid,username:d.username||u.displayName||'Someone',pic:u.photoURL||d.pic||''};
-    return '&from='+_b64e(JSON.stringify(info));
+    return '&from='+encodeURIComponent(JSON.stringify(info));
   }catch{return ''}
 }
 
@@ -576,10 +573,9 @@ function addShareBtn(cardEl,q){
         useZone:q.useZone!=null?q.useZone:null,
       };
       Object.keys(qData).forEach(k=>{if(qData[k]===null||qData[k]===undefined)delete qData[k]});
-      // FIX: use URL-safe base64 — no encodeURIComponent needed, no +/= in output
-      const encoded=_b64e(JSON.stringify(qData));
-      const base=location.origin+'/app.html';
-      const shareUrl=base+'?q='+encoded+getSenderParam();
+      // Encode: encodeURIComponent(JSON) — URLSearchParams.get() decodes it back automatically
+      // Share URL points directly to improve.html so params land on the page that reads them
+      const shareUrl=location.origin+'/improve.html?q='+encodeURIComponent(JSON.stringify(qData))+getSenderParam();
       const senderName=senderInfo?.username;
       const shareText=senderName?`${senderName} challenged you — can you answer this brain teaser?`:'Can you answer this? — Cebear';
       if(navigator.share){navigator.share({url:shareUrl,title:'Cebear Brain Challenge',text:shareText}).catch(()=>{});}
