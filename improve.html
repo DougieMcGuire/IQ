@@ -316,16 +316,14 @@
 </div>
 
 <script>
-// If opened directly (not in iframe) AND has a ?q= param, redirect into app.html
-// so the recipient gets the full app shell (nav, profile, etc.) with the shared question.
-// app.html will load improve.html in its iframe; improve.html reads window.parent.location.search.
+// If opened directly (not in iframe) AND has a share param, redirect into app.html
+// so the recipient gets the full app shell with the shared question.
 (function(){
   var inFrame=window.parent!==window;
-  if(inFrame)return; // already inside app.html, do nothing
-  if(!location.search)return; // no params, normal standalone load
+  if(inFrame)return;
+  if(!location.search)return;
   var p=new URLSearchParams(location.search);
-  if(!p.get('q'))return; // no shared question param
-  // Redirect to app.html preserving the full query string
+  if(!p.get('q')&&!p.get('s'))return; // no share param
   location.replace(location.origin+'/app.html'+location.search);
 })();
 </script>
@@ -336,7 +334,7 @@
 import{IQData,getEncouragement}from'./data.js';import Haptics from'./haptics.js';
 import{initializeApp,getApps}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,createUserWithEmailAndPassword,signInWithEmailAndPassword,updateProfile}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,setDoc,getDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,setDoc,getDoc,addDoc,collection,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const isStandalone=!!(('standalone' in navigator&&navigator.standalone)||window.matchMedia('(display-mode: standalone)').matches);
 const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -369,23 +367,69 @@ if(_fbAuth){
   }
 }
 
-// ── Param reading — try own location.search first, then parent ───────────────
-// Share URLs point directly to improve.html so location.search is always set.
-// Parent fallback kept for any legacy app.html?q= links.
+// ── Param reading — ?s=shortId (new) or ?q=json (legacy) ────────────────────
 function _getSearch(){
-  // 1. Own params (share URL points directly to improve.html)
   if(location.search)return location.search;
-  // 2. Parent params (fallback for app.html?q= style links)
   try{if(inIframe&&window.parent.location.search)return window.parent.location.search;}catch{}
   return '';
 }
 const _qs=_getSearch();
 const urlParams=new URLSearchParams(_qs);
-const sharedQParam=urlParams.get('q'),senderParam=urlParams.get('from');
+const sharedShortId=urlParams.get('s');   // new short ID system
+const sharedQParam=urlParams.get('q');    // legacy long URL fallback
+const senderParam=urlParams.get('from');
 let sharedQ=null,senderInfo=null;
-// Decode: URLSearchParams.get() already percent-decodes, so just JSON.parse
-if(sharedQParam){try{sharedQ=JSON.parse(sharedQParam)}catch(e){console.warn('sharedQ parse failed:',e)}}
+// Legacy ?q= decode (still works for any old links)
+if(sharedQParam&&!sharedShortId){try{sharedQ=JSON.parse(sharedQParam)}catch(e){console.warn('sharedQ parse failed:',e)}}
 if(senderParam){try{senderInfo=JSON.parse(senderParam)}catch(e){console.warn('senderInfo parse failed:',e)}}
+
+// ── Short ID lookup — fetch question from Firestore shares/{shortId} ─────────
+async function _loadSharedQuestion(){
+  if(!sharedShortId)return;
+  try{
+    await new Promise(r=>setTimeout(r,400)); // let Firebase init
+    let db=_fbDb;
+    if(!db){
+      const{initializeApp,getApps}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+      const{getFirestore}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+      const cfg={apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend"};
+      const app=getApps().length?getApps()[0]:initializeApp(cfg);
+      db=getFirestore(app);
+    }
+    const snap=await getDoc(doc(db,'shares',sharedShortId));
+    if(!snap.exists()){
+      console.warn('share not found:',sharedShortId);
+      const ph=feed.querySelector('.slide[data-slide-idx="0"]');
+      if(ph)ph.innerHTML=`<div class="qcard"><div class="question" style="color:rgba(240,234,214,.5)">Challenge not found — it may have expired.</div></div>`;
+      return;
+    }
+    const data=snap.data();
+    sharedQ=data.q||null;
+    if(data.from){senderInfo=data.from;initSenderUI();}
+    if(!sharedQ)return;
+    // Replace the loading placeholder (slide 0) with the real shared slide
+    const placeholder=feed.querySelector('.slide[data-slide-idx="0"]');
+    const realDiv=document.createElement('div');realDiv.className='slide';realDiv.dataset.slideIdx=0;
+    const cr=Q._renderers&&Q._renderers[sharedQ.type];
+    if(cr){
+      realDiv.innerHTML=cr.render(sharedQ,0);
+      if(placeholder)feed.replaceChild(realDiv,placeholder);else feed.prepend(realDiv);
+      const qcard=realDiv.querySelector('.qcard');
+      if(qcard){
+        const banner=document.createElement('div');banner.className='shared-q-banner';
+        const sn=senderInfo&&senderInfo.username;
+        banner.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span>'+(sn?'<strong style="color:var(--gold)">'+sn+'</strong> sent you this — can you get it right?':'Someone sent you this question — can you answer it?')+'</span>';
+        qcard.insertBefore(banner,qcard.firstChild);
+      }
+      try{cr.attach(realDiv,sharedQ,0,{feed,flashEl,confettiEl,IQData,getEncouragement,updateUI,checkMore:handleScroll,spawnConfetti,answerStartRef:{get:()=>answerStart,set:v=>{answerStart=v}},Haptics,notifyGamePlayed:window.notifyGamePlayed,onAnswer:window.onAnswerForTasks,addShareBtn});}catch(e){console.warn('shared game attach error:',e)}
+    }else{
+      realDiv.innerHTML=renderDef(sharedQ,0);
+      if(placeholder)feed.replaceChild(realDiv,placeholder);else feed.prepend(realDiv);
+      const qcard=realDiv.querySelector('.qcard');if(qcard)addShareBtn(qcard,sharedQ);
+    }
+    answerStart=Date.now();
+  }catch(e){console.warn('loadSharedQuestion failed:',e);}
+}
 
 const CEBEAR_USER_COUNT='1,200+';
 function initSenderUI(){
@@ -530,71 +574,96 @@ function renderInstallCard(idx){
   return div;
 }
 
-// ── getSenderParam — plain JSON, percent-encoded ──────────────────────────────
-function getSenderParam(){
-  try{
-    const fb=inIframe?window.parent.firebase:null,u=fb?fb.auth().currentUser:null;
-    if(!u)return '';
-    const d=IQData.load(),info={uid:u.uid,username:d.username||u.displayName||'Someone',pic:u.photoURL||d.pic||''};
-    return '&from='+encodeURIComponent(JSON.stringify(info));
-  }catch{return ''}
+// ── Short ID generator — 7 chars, unambiguous alphanumeric ───────────────────
+function _genShortId(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  let id='';
+  const arr=new Uint8Array(7);
+  crypto.getRandomValues(arr);
+  arr.forEach(b=>id+=chars[b%chars.length]);
+  return id;
 }
 
-// ── addShareBtn — URL-safe base64 encode, no encodeURIComponent on param ──────
+// ── createShareLink — writes to Firestore, returns short URL ─────────────────
+async function createShareLink(qData,btn){
+  // Show loading state on button
+  btn.innerHTML=`<svg viewBox="0 0 24 24" style="animation:spin .6s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>`;
+  try{
+    // Get sender info
+    let fromData=null;
+    try{
+      const fb=inIframe?window.parent.firebase:null,u=fb?fb.auth().currentUser:null;
+      if(u){const d=IQData.load();fromData={uid:u.uid,username:d.username||u.displayName||'Someone',pic:u.photoURL||d.pic||''};}
+    }catch{}
+
+    // Get or init Firestore
+    let db=_fbDb;
+    if(!db){
+      const{initializeApp,getApps}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+      const{getFirestore}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+      const cfg={apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend"};
+      const app=getApps().length?getApps()[0]:initializeApp(cfg);
+      db=getFirestore(app);
+    }
+
+    // Write to Firestore shares/{shortId}
+    const shortId=_genShortId();
+    const payload={q:qData,created:serverTimestamp()};
+    if(fromData)payload.from=fromData;
+    await setDoc(doc(db,'shares',shortId),payload);
+
+    return location.origin+'/improve.html?s='+shortId;
+  }catch(err){
+    console.warn('createShareLink failed, falling back to long URL:',err);
+    // Fallback: long URL (still works, just ugly)
+    return location.origin+'/improve.html?q='+encodeURIComponent(JSON.stringify(qData));
+  }
+}
+
+// ── addShareBtn ───────────────────────────────────────────────────────────────
 function addShareBtn(cardEl,q){
   const actions=document.createElement('div');actions.className='card-actions';
   const btn=document.createElement('button');btn.className='share-q-btn';
   btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share`;
-  btn.addEventListener('click',e=>{
-    e.stopPropagation();Haptics&&Haptics.light&&Haptics.light();
+  btn.addEventListener('click',async e=>{
+    e.stopPropagation();
+    if(btn.dataset.busy==='1')return;
+    btn.dataset.busy='1';
+    Haptics&&Haptics.light&&Haptics.light();
     try{
       const qData={
-        type:q.type,
-        question:q.question,
-        options:q.options||[],
-        answer:q.answer,
-        category:q.category,
-        categoryLabel:q.categoryLabel,
-        difficulty:q.difficulty,
-        explanation:q.explanation||'',
-        visual:q.visual||null,
-        sequence:q.sequence||null,
-        grid:q.grid||null,
-        cards:q.cards||null,
-        pairs:q.pairs||null,
-        board:q.board||null,
-        scrambled:q.scrambled||null,
-        word:q.word||null,
-        hint:q.hint||null,
-        equations:q.equations||null,
-        correctOrder:q.correctOrder||null,
-        botLevel:q.botLevel!=null?q.botLevel:null,
-        maxGuesses:q.maxGuesses||null,
-        words:q.words||null,
-        categories:q.categories||null,
-        start:q.start||null,
-        end:q.end||null,
-        steps:q.steps||null,
-        tubes:q.tubes||null,
-        numColors:q.numColors||null,
-        size:q.size||null,
-        cells:q.cells||null,
-        src:q.src!=null?q.src:null,
-        snk:q.snk!=null?q.snk:null,
-        targetAngle:q.targetAngle!=null?q.targetAngle:null,
-        zoneSize:q.zoneSize||null,
-        speed:q.speed||null,
-        useZone:q.useZone!=null?q.useZone:null,
+        type:q.type,question:q.question,options:q.options||[],answer:q.answer,
+        category:q.category,categoryLabel:q.categoryLabel,difficulty:q.difficulty,
+        explanation:q.explanation||'',visual:q.visual||null,
+        sequence:q.sequence||null,grid:q.grid||null,cards:q.cards||null,
+        pairs:q.pairs||null,board:q.board||null,scrambled:q.scrambled||null,
+        word:q.word||null,hint:q.hint||null,equations:q.equations||null,
+        correctOrder:q.correctOrder||null,botLevel:q.botLevel!=null?q.botLevel:null,
+        maxGuesses:q.maxGuesses||null,words:q.words||null,categories:q.categories||null,
+        start:q.start||null,end:q.end||null,steps:q.steps||null,tubes:q.tubes||null,
+        numColors:q.numColors||null,size:q.size||null,cells:q.cells||null,
+        src:q.src!=null?q.src:null,snk:q.snk!=null?q.snk:null,
+        targetAngle:q.targetAngle!=null?q.targetAngle:null,zoneSize:q.zoneSize||null,
+        speed:q.speed||null,useZone:q.useZone!=null?q.useZone:null,
       };
       Object.keys(qData).forEach(k=>{if(qData[k]===null||qData[k]===undefined)delete qData[k]});
-      // Encode: encodeURIComponent(JSON) — URLSearchParams.get() decodes it back automatically
-      // Share URL points directly to improve.html so params land on the page that reads them
-      const shareUrl=location.origin+'/improve.html?q='+encodeURIComponent(JSON.stringify(qData))+getSenderParam();
+      const shareUrl=await createShareLink(qData,btn);
       const senderName=senderInfo?.username;
-      const shareText=senderName?`${senderName} challenged you — can you answer this brain teaser?`:'Can you answer this? — Cebear';
-      if(navigator.share){navigator.share({url:shareUrl,title:'Cebear Brain Challenge',text:shareText}).catch(()=>{});}
-      else{navigator.clipboard.writeText(shareUrl).then(()=>{btn.classList.add('copied');btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Copied!`;setTimeout(()=>{btn.classList.remove('copied');btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share`},2000);}).catch(()=>{});}
-    }catch(err){console.warn('share failed:',err);}
+      const shareText=senderName?`${senderName} challenged you — can you answer this on Cebear?`:'Can you answer this brain teaser? — Cebear';
+      if(navigator.share){
+        navigator.share({url:shareUrl,title:'Cebear Brain Challenge',text:shareText}).catch(()=>{});
+        btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Shared!`;
+      }else{
+        await navigator.clipboard.writeText(shareUrl);
+        btn.classList.add('copied');
+        btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Copied!`;
+      }
+      setTimeout(()=>{btn.classList.remove('copied');btn.dataset.busy='';btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share`},2500);
+    }catch(err){
+      console.warn('share failed:',err);
+      btn.dataset.busy='';
+      btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share`;
+    }
   });
   actions.appendChild(btn);
   cardEl.insertBefore(actions,cardEl.querySelector('.game-branding')||cardEl.querySelector('.branding'));
@@ -709,6 +778,13 @@ function addSlide(){
   if(guestWallIsUp&&guestWallIsUp())return;
   const idx=slides++;
   if(idx===0&&sharedQ){addSharedSlide(idx);return;}
+  // If short ID present but question not loaded yet, show a loading placeholder for slot 0
+  if(idx===0&&sharedShortId){
+    const div=document.createElement('div');div.className='slide';div.dataset.slideIdx=0;
+    div.innerHTML=`<div class="qcard" style="gap:16px;align-items:center;justify-content:center"><div style="width:40px;height:40px;border:3px solid rgba(240,234,214,.15);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite"></div><div style="color:rgba(240,234,214,.4);font-size:14px;font-weight:700">Loading challenge...</div></div>`;
+    (_sen?.parentNode===feed)?feed.insertBefore(div,_sen):feed.appendChild(div);
+    return;
+  }
   if(shouldInsertInstallCard()){const ic=renderInstallCard(idx);ic.dataset.slideIdx=idx;(_sen?.parentNode===feed)?feed.insertBefore(ic,_sen):feed.appendChild(ic);return;}
   const div=document.createElement('div');div.className='slide';div.dataset.slideIdx=idx;
   let q=null;try{q=nextQ()}catch{}
@@ -776,6 +852,8 @@ function init(){
   const d=IQData.load();
   if(IQData.needsOnboarding()||IQData.needsCalibration()){IQData.setAge(25);Q.setAge(25);IQData.markCalibrated(100);}
   updateUI(IQData.load());startFeed();
+  // If we have a short share ID, fetch the question from Firestore async
+  if(sharedShortId)_loadSharedQuestion();
 }
 
 function startFeed(){
