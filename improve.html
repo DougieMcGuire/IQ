@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -59,13 +58,25 @@
     .explanation{background:rgba(240,234,214,.08);border-radius:12px;padding:10px 14px;font-size:12px;font-weight:600;color:rgba(240,234,214,.55);line-height:1.5;text-align:center;display:none;width:100%}
     .explanation.show{display:block;animation:su .3s}
     @keyframes su{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-    .scroll-hint{position:absolute;bottom:10px;left:0;right:0;font-size:12px;font-weight:800;color:var(--dim);opacity:0;display:flex;flex-direction:column;align-items:center;gap:2px;transition:opacity .3s;pointer-events:none}
-    .scroll-hint.show{opacity:.35}
-    .scroll-hint svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;animation:bounce 1.5s infinite}
+
+    /* ── SCROLL HINT — pill style, much more visible ── */
+    .scroll-hint{position:absolute;bottom:14px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:opacity .4s;pointer-events:none;opacity:0}
+    .scroll-hint.show{opacity:1}
+    .scroll-hint-inner{display:flex;align-items:center;gap:7px;background:rgba(240,234,214,.12);border:1px solid rgba(240,234,214,.2);border-radius:20px;padding:8px 18px;backdrop-filter:blur(4px)}
+    .scroll-hint-inner svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:2.8;animation:bounce 1.2s infinite;flex-shrink:0}
+    .scroll-hint-inner span{font-size:12px;font-weight:900;color:rgba(240,234,214,.75);letter-spacing:.3px;white-space:nowrap}
     @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+
+    /* ── BRANDING — pill with bear ── */
+    .branding{width:100%;text-align:center;font-size:11px;font-weight:900;color:rgba(240,234,214,.3);letter-spacing:2px;text-transform:uppercase;margin-top:8px;padding-top:10px;border-top:1px solid rgba(240,234,214,.06)}
+    .game-branding{width:100%;display:flex;justify-content:center;margin-top:8px;padding-top:10px;border-top:1px solid rgba(240,234,214,.06)}
+    .game-branding a{display:inline-flex;align-items:center;gap:6px;background:rgba(240,234,214,.07);border:1px solid rgba(240,234,214,.13);border-radius:20px;padding:5px 14px 5px 7px;text-decoration:none;transition:all .15s}
+    .game-branding a:active{transform:scale(.95)}
+    .game-branding-bear{width:20px;height:20px;border-radius:6px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;box-shadow:0 1px 0 var(--goldd)}
+    .game-branding-text{font-size:11px;font-weight:900;color:rgba(240,234,214,.55);letter-spacing:1.5px;text-transform:uppercase}
+
     @keyframes slideEnter{0%{opacity:0}100%{opacity:1}}
     .slide.entering .qcard{animation:slideEnter .18s ease both}
-    .branding{width:100%;text-align:center;font-size:11px;font-weight:900;color:rgba(240,234,214,.3);letter-spacing:2px;text-transform:uppercase;margin-top:8px;padding-top:10px;border-top:1px solid rgba(240,234,214,.06)}
 
     .card-actions{display:flex;justify-content:flex-end;width:100%;margin-top:-4px}
     .share-q-btn{background:rgba(240,234,214,.08);border:none;border-radius:10px;padding:6px 12px;display:flex;align-items:center;gap:5px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;color:rgba(240,234,214,.4);cursor:pointer;transition:all .15s}
@@ -337,15 +348,9 @@ let sharedQuestionAnswered=false;
 
 if(_fbAuth){
   if(_fbAuth.onAuthStateChanged){
-    _fbAuth.onAuthStateChanged(u=>{
-      if(u){isAuthed=true;hideGuestWall();}
-      // Non-standalone non-authed: wall shown after 3 scrolls (onGuestScroll handles it)
-      // Standalone non-authed: handled by app.html forcing to auth page
-    });
+    _fbAuth.onAuthStateChanged(u=>{if(u){isAuthed=true;hideGuestWall();}});
   }else{
-    onAuthStateChanged(_fbAuth,u=>{
-      if(u){isAuthed=true;hideGuestWall();}
-    });
+    onAuthStateChanged(_fbAuth,u=>{if(u){isAuthed=true;hideGuestWall();}});
   }
 }
 
@@ -375,16 +380,13 @@ function showGuestWall(title,sub){
   const wall=document.getElementById('guest-wall');
   if(!senderInfo){if(title)document.getElementById('gw-title').textContent=title;if(sub)document.getElementById('gw-sub').textContent=sub;}
   wall.classList.add('show');
-  // Block all interaction with the feed (main is position:fixed so overflow trick doesn't work)
   const feed=document.getElementById('feed');
-  feed.style.pointerEvents='none';
-  feed.style.userSelect='none';
+  feed.style.pointerEvents='none';feed.style.userSelect='none';
 }
 function hideGuestWall(){
   document.getElementById('guest-wall').classList.remove('show');
   const feed=document.getElementById('feed');
-  feed.style.pointerEvents='';
-  feed.style.userSelect='';
+  feed.style.pointerEvents='';feed.style.userSelect='';
 }
 window.showGuestWallForNav=function(section){
   if(isAuthed||isStandalone)return false;
@@ -415,13 +417,7 @@ async function gwEnsure(u,extra={}){
 async function gwGoogleSignIn(){
   if(!_fbAuth)return;
   gwClear();gwSetLoad('gw-google-btn',true);
-  if(inIframe){
-    // Tell parent to redirect to google-redirect.html — cleanest cross-browser approach
-    try{parent.postMessage({type:'googleAuthRequest'},'*');}catch{}
-    // Button stays loading — page will redirect
-    return;
-  }
-  // Direct visit (no iframe) — use popup
+  if(inIframe){try{parent.postMessage({type:'googleAuthRequest'},'*');}catch{}return;}
   try{
     const gp=new GoogleAuthProvider();
     const result=await signInWithPopup(_fbAuth,gp);
@@ -432,16 +428,12 @@ async function gwGoogleSignIn(){
   }
 }
 function gwOnSuccess(){
-  isAuthed=true;
-  hideGuestWall();
+  isAuthed=true;hideGuestWall();
   Haptics&&Haptics.success&&Haptics.success();
-  guestQCount=0;
-  handleScroll();
+  guestQCount=0;handleScroll();
   if(inIframe)try{parent.postMessage({type:'authSuccess'},'*')}catch{}
-  // Pull user's saved progress from Firestore and refresh the UI
   _syncUserProgress();
 }
-
 async function _syncUserProgress(){
   try{
     let uid=null;
@@ -450,31 +442,19 @@ async function _syncUserProgress(){
     if(!uid)return;
     let snap=null;
     if(_fbDb&&_fbDb.collection){
-      // compat
       snap=await _fbDb.collection('users').doc(uid).get();
       if(!snap.exists)return;
-      const cd=snap.data();
-      const d=IQData.load();
-      // Only overwrite if cloud value is higher (don't regress local progress)
-      if(cd.iq>d.iq)d.iq=cd.iq;
-      if(cd.level>d.level)d.level=cd.level;
-      if(cd.xp>d.xp)d.xp=cd.xp;
-      if(cd.bestStreak>d.bestStreak)d.bestStreak=cd.bestStreak;
-      if(cd.streak>d.streak)d.streak=cd.streak;
-      if(cd.username)d.username=cd.username;
-      if(cd.pic)d.pic=cd.pic;
-      IQData.save(d);
-      updateUI(d);
+      const cd=snap.data(),d=IQData.load();
+      if(cd.iq>d.iq)d.iq=cd.iq;if(cd.level>d.level)d.level=cd.level;if(cd.xp>d.xp)d.xp=cd.xp;
+      if(cd.bestStreak>d.bestStreak)d.bestStreak=cd.bestStreak;if(cd.streak>d.streak)d.streak=cd.streak;
+      if(cd.username)d.username=cd.username;if(cd.pic)d.pic=cd.pic;
+      IQData.save(d);updateUI(d);
     }
   }catch{}
 }
 window.addEventListener('message',function(e){
   if(!e.data)return;
-  if(e.data.type==='authSuccess'){
-    // Parent confirmed auth — hide wall and resume feed
-    if(!isAuthed)gwOnSuccess();
-    return;
-  }
+  if(e.data.type==='authSuccess'){if(!isAuthed)gwOnSuccess();return;}
   if(e.data.type==='authError'){gwSetLoad('gw-google-btn',false);gwErr(e.data.msg||'Sign-in failed. Try email instead.');return;}
   if(e.data.type==='xpAwarded'){
     const xp=e.data.xp;if(!xp)return;
@@ -506,7 +486,6 @@ window.gwSubmit=async function(){
   }
 };
 
-function onGuestScroll(){} // no-op, kept for scroll handler reference
 function guestWallIsUp(){return!isAuthed&&!isStandalone&&document.getElementById('guest-wall').classList.contains('show');}
 function onGuestAnswer(){
   if(isAuthed||isStandalone)return;
@@ -533,6 +512,7 @@ function getSenderParam(){
   }catch{return ''}
 }
 
+// ── addShareBtn — FIXED: includes ALL game-specific fields ────────────────────
 function addShareBtn(cardEl,q){
   const actions=document.createElement('div');actions.className='card-actions';
   const btn=document.createElement('button');btn.className='share-q-btn';
@@ -540,16 +520,59 @@ function addShareBtn(cardEl,q){
   btn.addEventListener('click',e=>{
     e.stopPropagation();Haptics&&Haptics.light&&Haptics.light();
     try{
-      const qData={type:q.type,question:q.question,options:q.options||[],answer:q.answer,category:q.category,categoryLabel:q.categoryLabel,difficulty:q.difficulty,explanation:q.explanation||'',visual:q.visual||null,
-        sequence:q.sequence||null,grid:q.grid||null,
-        cards:q.cards||null,pairs:q.pairs||null,
+      // Include ALL possible game-specific fields so shared links work for every game type
+      const qData={
+        type:q.type,
+        question:q.question,
+        options:q.options||[],
+        answer:q.answer,
+        category:q.category,
+        categoryLabel:q.categoryLabel,
+        difficulty:q.difficulty,
+        explanation:q.explanation||'',
+        visual:q.visual||null,
+        // Sequence/matrix questions
+        sequence:q.sequence||null,
+        grid:q.grid||null,
+        // Memory Match
+        cards:q.cards||null,
+        pairs:q.pairs||null,
+        // Slide Puzzle
         board:q.board||null,
-        scrambled:q.scrambled||null,word:q.word||null,hint:q.hint||null,
+        // Word Scramble
+        scrambled:q.scrambled||null,
+        word:q.word||null,
+        hint:q.hint||null,
+        // Math Rush
         equations:q.equations||null,
+        // Color Sort
         correctOrder:q.correctOrder||null,
+        // Tic Tac Toe
         botLevel:q.botLevel!=null?q.botLevel:null,
-        maxGuesses:q.maxGuesses||null};
-      Object.keys(qData).forEach(k=>{if(qData[k]===null)delete qData[k]});
+        // Wordle
+        maxGuesses:q.maxGuesses||null,
+        // Connections ← key fix
+        words:q.words||null,
+        categories:q.categories||null,
+        // Word Ladder ← key fix
+        start:q.start||null,
+        end:q.end||null,
+        steps:q.steps||null,
+        // Water Sort ← key fix
+        tubes:q.tubes||null,
+        numColors:q.numColors||null,
+        // Pipe Connect ← key fix
+        size:q.size||null,
+        cells:q.cells||null,
+        src:q.src!=null?q.src:null,
+        snk:q.snk!=null?q.snk:null,
+        // Stop the Clock
+        targetAngle:q.targetAngle!=null?q.targetAngle:null,
+        zoneSize:q.zoneSize||null,
+        speed:q.speed||null,
+        useZone:q.useZone!=null?q.useZone:null,
+      };
+      Object.keys(qData).forEach(k=>{if(qData[k]===null||qData[k]===undefined)delete qData[k]});
       const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(qData))));
       const base=location.origin+'/app.html';
       const shareUrl=base+'?q='+encoded+getSenderParam();
@@ -560,7 +583,7 @@ function addShareBtn(cardEl,q){
     }catch{}
   });
   actions.appendChild(btn);
-  cardEl.insertBefore(actions,cardEl.querySelector('.branding'));
+  cardEl.insertBefore(actions,cardEl.querySelector('.game-branding')||cardEl.querySelector('.branding'));
 }
 
 /* ══ CORE FEED ══ */
@@ -593,12 +616,10 @@ function scheduleFill(){if(_fs)return;_fs=true;const doFill=dl=>{_fs=false;if(_f
 function nextQ(){if(!qQ.length){try{const q=Q.generate(1);scheduleFill();return q}catch{return null}}const q=qQ.shift();if(qQ.length<Math.ceil(QT/2))scheduleFill();return q}
 let _lastSlideIdx=-1,_lastAnim=-1,_pruneTimer=null;
 
-// slides are exactly 100dvh — scrollTop is always a clean multiple of window.innerHeight
 function slideHeight(){return window.innerHeight;}
 
 function onScroll(){
   const sH=slideHeight();if(!sH)return;
-  // Preload upcoming slides while scrolling
   const cs=Math.floor((feed.scrollTop+sH*.5)/sH);
   const ts=cs+KA+1;
   while(slides<ts)addSlide();
@@ -612,7 +633,6 @@ function onScrollEnd(){
     _lastAnim=cs;
     const el=feed.querySelector(`.slide[data-slide-idx="${cs}"]`);
     if(el){el.classList.remove('entering');void el.offsetWidth;el.classList.add('entering');}
-    // Guest wall: show after scrolling past 3 slides (index 3 = 4th card)
     if(!isAuthed&&!isStandalone&&!guestWallIsUp()&&cs>=3){
       showGuestWall('Keep your progress!','Sign up free to save your IQ score, streaks, and compete on the leaderboard.');
     }
@@ -627,10 +647,9 @@ let _sen=null;
 function attachSen(){_sen?.remove();_sen=document.createElement('div');_sen.style.cssText='height:1px;width:100%;flex-shrink:0';feed.appendChild(_sen);const obs=new IntersectionObserver(e=>{if(e[0].isIntersecting){obs.disconnect();for(let i=0;i<KA;i++)addSlide();attachSen()}},{root:feed,threshold:0});obs.observe(_sen)}
 function prune(cs){
   const co=cs-KB;if(co<=firstSlide)return;
-  // Double-check we're still snapped before pruning to avoid position jump
   const sH=slideHeight();
   const actualCs=Math.round(feed.scrollTop/sH);
-  if(actualCs!==cs)return; // scrolled since timer fired — skip
+  if(actualCs!==cs)return;
   for(let i=firstSlide;i<co;i++){
     const el=feed.querySelector(`.slide[data-slide-idx="${i}"]`);
     if(!el||el.classList.contains('slide-spacer'))continue;
@@ -642,7 +661,6 @@ function prune(cs){
 }
 function shouldInsertInstallCard(){if(!isMobile||isStandalone)return false;cardsSinceInstall++;if(cardsSinceInstall>=5){cardsSinceInstall=0;return true}return false;}
 
-/* ══ ADD SHARED SLIDE — routes to custom renderer if available ══ */
 function addSharedSlide(idx){
   const q=sharedQ;
   const div=document.createElement('div');div.className='slide';div.dataset.slideIdx=idx;
@@ -666,7 +684,6 @@ function addSharedSlide(idx){
     return;
   }
 
-  // Standard MC fallback
   div.innerHTML=renderDef(q,idx);
   feed.appendChild(div);
   const qcard=div.querySelector('.qcard');
@@ -675,7 +692,6 @@ function addSharedSlide(idx){
 }
 
 function addSlide(){
-  // Don't add slides past the wall for guest users
   if(guestWallIsUp&&guestWallIsUp())return;
   const idx=slides++;
   if(idx===0&&sharedQ){addSharedSlide(idx);return;}
@@ -733,36 +749,32 @@ function showCalR(){const d=IQData.load(),iq=IQData.calcIQ(d)||100;IQData.markCa
 document.getElementById('cal-done-btn').addEventListener('click',()=>{Haptics.medium();document.getElementById('calibration').classList.remove('show');startFeed()});
 
 function renderFB(){return`<div class="qcard"><div class="category">Brain Training</div><div class="question">Keep scrolling — more challenges ahead!</div><div class="branding">cebear.com</div></div>`}
-function renderDef(q,idx){let v='';if(q.visual==='sequence'||q.visual==='letterSequence'){const parts=q.sequence.map((n,i)=>{if(n==='?')return`<span class="blank">?</span>`;return`<span>${n}</span>${i<q.sequence.length-1?'<span class="arrow">→</span>':''}`});if(q.sequence[q.sequence.length-1]!=='?')parts.push('<span class="arrow">→</span><span class="blank">?</span>');v=`<div class="sequence">${parts.join('')}</div>`}else if(q.visual==='matrix'){v=`<div class="matrix">${q.grid.map(c=>`<div class="matrix-cell${c==='?'?' blank':''}">${c}</div>`).join('')}</div>`}const wide=q.options.some(o=>String(o).length>20);return`<div class="qcard"><div class="category">${q.categoryLabel}</div><div class="question">${q.question}</div>${v}<div class="options${wide?' wide':''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">${q.options.map(o=>`<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}</div><div class="feedback" id="fb-${idx}"></div><div class="explain" id="exp-${idx}">${q.explanation}</div><div class="branding">cebear.com</div></div><div class="scroll-hint" id="hint-${idx}"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>Swipe for next</div>`}
+
+// ── renderDef — updated scroll hint to use pill style ────────────────────────
+function renderDef(q,idx){
+  let v='';
+  if(q.visual==='sequence'||q.visual==='letterSequence'){const parts=q.sequence.map((n,i)=>{if(n==='?')return`<span class="blank">?</span>`;return`<span>${n}</span>${i<q.sequence.length-1?'<span class="arrow">→</span>':''}`});if(q.sequence[q.sequence.length-1]!=='?')parts.push('<span class="arrow">→</span><span class="blank">?</span>');v=`<div class="sequence">${parts.join('')}</div>`}
+  else if(q.visual==='matrix'){v=`<div class="matrix">${q.grid.map(c=>`<div class="matrix-cell${c==='?'?' blank':''}">${c}</div>`).join('')}</div>`}
+  const wide=q.options.some(o=>String(o).length>20);
+  return `<div class="qcard"><div class="category">${q.categoryLabel}</div><div class="question">${q.question}</div>${v}<div class="options${wide?' wide':''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">${q.options.map(o=>`<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}</div><div class="feedback" id="fb-${idx}"></div><div class="explain" id="exp-${idx}">${q.explanation}</div><div class="game-branding"><a href="https://cebear.com" target="_blank" rel="noopener"><div class="game-branding-bear">🐻</div><span class="game-branding-text">cebear.com</span></a></div></div><div class="scroll-hint" id="hint-${idx}"><div class="scroll-hint-inner"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><span>Swipe for next</span></div></div>`;
+}
 
 function init(){
   const d=IQData.load();
-  // Skip age prompt and calibration — start everyone at IQ 100
-  if(IQData.needsOnboarding()||IQData.needsCalibration()){
-    IQData.setAge(25);
-    Q.setAge(25);
-    IQData.markCalibrated(100);
-  }
-  updateUI(IQData.load());
-  startFeed();
+  if(IQData.needsOnboarding()||IQData.needsCalibration()){IQData.setAge(25);Q.setAge(25);IQData.markCalibrated(100);}
+  updateUI(IQData.load());startFeed();
 }
 
 function startFeed(){
   const d=IQData.load();Q.setAge(25);IQData.startSession();updateUI(d);scheduleFill();
   for(let i=0;i<3;i++)addSlide();
   feed.addEventListener('scroll',onScroll,{passive:true});
-  // scrollend: fires once snap animation is fully complete — perfect for iOS
   if('onscrollend' in window){
     feed.addEventListener('scrollend',onScrollEnd,{passive:true});
   }else{
-    // Fallback for older Safari: debounce, longer delay to let snap finish
     let _seTimer=null;
-    feed.addEventListener('scroll',()=>{
-      clearTimeout(_seTimer);
-      _seTimer=setTimeout(onScrollEnd,150);
-    },{passive:true});
+    feed.addEventListener('scroll',()=>{clearTimeout(_seTimer);_seTimer=setTimeout(onScrollEnd,150);},{passive:true});
   }
-  // Desktop mouse wheel: one slide at a time
   let wl=false,wc=null;
   feed.addEventListener('wheel',e=>{
     e.preventDefault();if(wl)return;wl=true;
