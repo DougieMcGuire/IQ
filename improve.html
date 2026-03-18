@@ -360,7 +360,7 @@ const _qs=(()=>{try{return inIframe?window.parent.location.search:location.searc
 const urlParams=new URLSearchParams(_qs);
 const sharedQParam=urlParams.get('q'),senderParam=urlParams.get('from');
 let sharedQ=null,senderInfo=null;
-if(sharedQParam){try{sharedQ=JSON.parse(decodeURIComponent(escape(atob(sharedQParam))))}catch{}}
+if(sharedQParam){try{sharedQ=JSON.parse(decodeURIComponent(escape(atob(sharedQParam))))}catch(e){console.warn('sharedQ parse failed:',e)}}
 if(senderParam){try{senderInfo=JSON.parse(decodeURIComponent(escape(atob(senderParam))))}catch{}}
 
 const CEBEAR_USER_COUNT='1,200+';
@@ -506,16 +506,18 @@ function renderInstallCard(idx){
   return div;
 }
 
+// ── getSenderParam — FIX: encodeURIComponent the btoa output ─────────────────
 function getSenderParam(){
   try{
     const fb=inIframe?window.parent.firebase:null,u=fb?fb.auth().currentUser:null;
     if(!u)return '';
     const d=IQData.load(),info={uid:u.uid,username:d.username||u.displayName||'Someone',pic:u.photoURL||d.pic||''};
-    return '&from='+btoa(unescape(encodeURIComponent(JSON.stringify(info))));
+    // FIX: encodeURIComponent prevents + and / in base64 from corrupting the URL
+    return '&from='+encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(info)))));
   }catch{return ''}
 }
 
-// ── addShareBtn — FIXED: includes ALL game-specific fields ────────────────────
+// ── addShareBtn — includes ALL game-specific fields ───────────────────────────
 function addShareBtn(cardEl,q){
   const actions=document.createElement('div');actions.className='card-actions';
   const btn=document.createElement('button');btn.className='share-q-btn';
@@ -523,7 +525,6 @@ function addShareBtn(cardEl,q){
   btn.addEventListener('click',e=>{
     e.stopPropagation();Haptics&&Haptics.light&&Haptics.light();
     try{
-      // Include ALL possible game-specific fields so shared links work for every game type
       const qData={
         type:q.type,
         question:q.question,
@@ -534,42 +535,29 @@ function addShareBtn(cardEl,q){
         difficulty:q.difficulty,
         explanation:q.explanation||'',
         visual:q.visual||null,
-        // Sequence/matrix questions
         sequence:q.sequence||null,
         grid:q.grid||null,
-        // Memory Match
         cards:q.cards||null,
         pairs:q.pairs||null,
-        // Slide Puzzle
         board:q.board||null,
-        // Word Scramble
         scrambled:q.scrambled||null,
         word:q.word||null,
         hint:q.hint||null,
-        // Math Rush
         equations:q.equations||null,
-        // Color Sort
         correctOrder:q.correctOrder||null,
-        // Tic Tac Toe
         botLevel:q.botLevel!=null?q.botLevel:null,
-        // Wordle
         maxGuesses:q.maxGuesses||null,
-        // Connections ← key fix
         words:q.words||null,
         categories:q.categories||null,
-        // Word Ladder ← key fix
         start:q.start||null,
         end:q.end||null,
         steps:q.steps||null,
-        // Water Sort ← key fix
         tubes:q.tubes||null,
         numColors:q.numColors||null,
-        // Pipe Connect ← key fix
         size:q.size||null,
         cells:q.cells||null,
         src:q.src!=null?q.src:null,
         snk:q.snk!=null?q.snk:null,
-        // Stop the Clock
         targetAngle:q.targetAngle!=null?q.targetAngle:null,
         zoneSize:q.zoneSize||null,
         speed:q.speed||null,
@@ -578,7 +566,10 @@ function addShareBtn(cardEl,q){
       Object.keys(qData).forEach(k=>{if(qData[k]===null||qData[k]===undefined)delete qData[k]});
       const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(qData))));
       const base=location.origin+'/app.html';
-      const shareUrl=base+'?q='+encoded+getSenderParam();
+      // FIX: encodeURIComponent(encoded) prevents + and / in base64 from being
+      // misinterpreted by URLSearchParams on the receiving end (+ decodes as space,
+      // corrupting the base64 and causing atob() to throw, leaving sharedQ null).
+      const shareUrl=base+'?q='+encodeURIComponent(encoded)+getSenderParam();
       const senderName=senderInfo?.username;
       const shareText=senderName?`${senderName} challenged you — can you answer this brain teaser?`:'Can you answer this? — Cebear';
       if(navigator.share){navigator.share({url:shareUrl}).catch(()=>{});}
@@ -682,7 +673,7 @@ function addSharedSlide(idx){
     feed.appendChild(div);
     const qcard=div.querySelector('.qcard');
     if(qcard)qcard.insertBefore(makeBanner(),qcard.firstChild);
-    try{cr.attach(div,q,idx,{feed,flashEl,confettiEl,IQData,getEncouragement,updateUI,checkMore:handleScroll,spawnConfetti,answerStartRef:{get:()=>answerStart,set:v=>{answerStart=v}},Haptics,notifyGamePlayed:window.notifyGamePlayed,onAnswer:window.onAnswerForTasks,addShareBtn});}catch{}
+    try{cr.attach(div,q,idx,{feed,flashEl,confettiEl,IQData,getEncouragement,updateUI,checkMore:handleScroll,spawnConfetti,answerStartRef:{get:()=>answerStart,set:v=>{answerStart=v}},Haptics,notifyGamePlayed:window.notifyGamePlayed,onAnswer:window.onAnswerForTasks,addShareBtn});}catch(e){console.warn('shared game attach error:',e)}
     setTimeout(()=>{sharedQuestionAnswered=true;},2000);
     return;
   }
@@ -753,7 +744,6 @@ document.getElementById('cal-done-btn').addEventListener('click',()=>{Haptics.me
 
 function renderFB(){return`<div class="qcard"><div class="category">Brain Training</div><div class="question">Keep scrolling — more challenges ahead!</div><div class="branding">cebear.com</div></div>`}
 
-// ── renderDef — updated scroll hint to use pill style ────────────────────────
 function renderDef(q,idx){
   let v='';
   if(q.visual==='sequence'||q.visual==='letterSequence'){const parts=q.sequence.map((n,i)=>{if(n==='?')return`<span class="blank">?</span>`;return`<span>${n}</span>${i<q.sequence.length-1?'<span class="arrow">→</span>':''}`});if(q.sequence[q.sequence.length-1]!=='?')parts.push('<span class="arrow">→</span><span class="blank">?</span>');v=`<div class="sequence">${parts.join('')}</div>`}
