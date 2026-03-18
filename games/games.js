@@ -94,8 +94,8 @@
   .game-branding{width:100%;display:flex;justify-content:center;margin-top:8px;padding-top:10px;border-top:1px solid rgba(240,234,214,.06)}
   .game-branding a{display:inline-flex;align-items:center;gap:5px;background:rgba(240,234,214,.07);border:1px solid rgba(240,234,214,.12);border-radius:20px;padding:5px 12px 5px 8px;text-decoration:none;transition:all .15s}
   .game-branding a:active{transform:scale(.96)}
-  .game-branding-bear{width:20px;height:20px;border-radius:6px;background:var(--gold);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;box-shadow:0 1px 0 var(--goldd)}
-  .game-branding-bear img{width:14px;height:14px;object-fit:contain}
+  .game-branding-bear{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+  .game-branding-bear img{width:20px;height:20px;object-fit:contain}
   .game-branding-text{font-size:11px;font-weight:900;color:rgba(240,234,214,.5);letter-spacing:1.5px;text-transform:uppercase}
 
   /* ── Scroll hint ── */
