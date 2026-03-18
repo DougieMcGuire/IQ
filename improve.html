@@ -72,8 +72,8 @@
     .game-branding{width:100%;display:flex;justify-content:center;margin-top:8px;padding-top:10px;border-top:1px solid rgba(240,234,214,.06)}
     .game-branding a{display:inline-flex;align-items:center;gap:6px;background:rgba(240,234,214,.07);border:1px solid rgba(240,234,214,.13);border-radius:20px;padding:5px 14px 5px 7px;text-decoration:none;transition:all .15s}
     .game-branding a:active{transform:scale(.95)}
-    .game-branding-bear{width:20px;height:20px;border-radius:6px;background:var(--gold);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;box-shadow:0 1px 0 var(--goldd)}
-    .game-branding-bear img{width:14px;height:14px;object-fit:contain}
+    .game-branding-bear{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+    .game-branding-bear img{width:20px;height:20px;object-fit:contain}
     .game-branding-text{font-size:11px;font-weight:900;color:rgba(240,234,214,.55);letter-spacing:1.5px;text-transform:uppercase}
 
     @keyframes slideEnter{0%{opacity:0}100%{opacity:1}}
@@ -581,7 +581,7 @@ function addShareBtn(cardEl,q){
       const shareUrl=base+'?q='+encoded+getSenderParam();
       const senderName=senderInfo?.username;
       const shareText=senderName?`${senderName} challenged you — can you answer this brain teaser?`:'Can you answer this? — Cebear';
-      if(navigator.share){navigator.share({title:'Brain teaser — Cebear',text:shareText,url:shareUrl}).catch(()=>{});}
+      if(navigator.share){navigator.share({url:shareUrl}).catch(()=>{});}
       else{navigator.clipboard.writeText(shareUrl).then(()=>{btn.classList.add('copied');btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Copied!`;setTimeout(()=>{btn.classList.remove('copied');btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share`},2000);}).catch(()=>{});}
     }catch{}
   });
