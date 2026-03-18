@@ -387,15 +387,7 @@ if(senderParam){try{senderInfo=JSON.parse(senderParam)}catch(e){console.warn('se
 async function _loadSharedQuestion(){
   if(!sharedShortId)return;
   try{
-    await new Promise(r=>setTimeout(r,400)); // let Firebase init
-    let db=_fbDb;
-    if(!db){
-      const{initializeApp,getApps}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-      const{getFirestore}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-      const cfg={apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend"};
-      const app=getApps().length?getApps()[0]:initializeApp(cfg);
-      db=getFirestore(app);
-    }
+    const db=await _getSharesDb();
     const snap=await getDoc(doc(db,'shares',sharedShortId));
     if(!snap.exists()){
       console.warn('share not found:',sharedShortId);
@@ -584,9 +576,22 @@ function _genShortId(){
   return id;
 }
 
+// ── Modular Firestore instance for shares (never the compat _fbDb) ────────────
+let _sharesDb=null;
+async function _getSharesDb(){
+  if(_sharesDb)return _sharesDb;
+  // Always use the modular SDK — _fbDb may be a compat instance from parent.firebase
+  // which is incompatible with modular doc()/setDoc() functions
+  const{initializeApp,getApps}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+  const{getFirestore:gFS}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+  const cfg={apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend"};
+  const app=getApps().length?getApps()[0]:initializeApp(cfg);
+  _sharesDb=gFS(app);
+  return _sharesDb;
+}
+
 // ── createShareLink — writes to Firestore, returns short URL ─────────────────
 async function createShareLink(qData,btn){
-  // Show loading state on button
   btn.innerHTML=`<svg viewBox="0 0 24 24" style="animation:spin .6s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>`;
   try{
     // Get sender info
@@ -596,17 +601,7 @@ async function createShareLink(qData,btn){
       if(u){const d=IQData.load();fromData={uid:u.uid,username:d.username||u.displayName||'Someone',pic:u.photoURL||d.pic||''};}
     }catch{}
 
-    // Get or init Firestore
-    let db=_fbDb;
-    if(!db){
-      const{initializeApp,getApps}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-      const{getFirestore}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-      const cfg={apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend"};
-      const app=getApps().length?getApps()[0]:initializeApp(cfg);
-      db=getFirestore(app);
-    }
-
-    // Write to Firestore shares/{shortId}
+    const db=await _getSharesDb();
     const shortId=_genShortId();
     const payload={q:qData,created:serverTimestamp()};
     if(fromData)payload.from=fromData;
@@ -614,8 +609,7 @@ async function createShareLink(qData,btn){
 
     return location.origin+'/improve.html?s='+shortId;
   }catch(err){
-    console.warn('createShareLink failed, falling back to long URL:',err);
-    // Fallback: long URL (still works, just ugly)
+    console.warn('createShareLink failed:',err);
     return location.origin+'/improve.html?q='+encodeURIComponent(JSON.stringify(qData));
   }
 }
