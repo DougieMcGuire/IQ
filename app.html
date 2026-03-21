@@ -36,7 +36,7 @@
       user-select: none;
       -webkit-touch-callout: none;
       /* fade out */
-      transition: opacity 0.35s;
+      transition: opacity 0.5s ease;
     }
     #splash.hide { opacity: 0; pointer-events: none; }
 
@@ -56,7 +56,7 @@
 
     /* .logo from testintro */
     #splash .logo {
-      width: 170px;
+      width: min(170px, 38vw, 38vh);
       display: block;
       margin: 0 auto;
       opacity: 0;
@@ -67,11 +67,12 @@
     /* .text from testintro */
     #splash .text {
       font-family: 'Chewy', cursive;
-      font-size: 92px;
+      font-size: clamp(48px, 20vw, 92px);
       margin-top: 6px;
       white-space: nowrap;
       padding: 0 8px;
       overflow: visible;
+      line-height: 1;
     }
 
     /* .letter from testintro */
@@ -172,7 +173,7 @@ function dismissSplash(){
   sp.classList.add('hide');
   setTimeout(function(){if(sp.parentNode)sp.parentNode.removeChild(sp);},400);
 }
-setTimeout(dismissSplash,1000);
+setTimeout(dismissSplash,2200);
 
 function showNav(s){document.body.classList.toggle('has-nav',s)}
 function updateNavActive(p){document.querySelectorAll('#nav .nb').forEach(function(b){b.classList.toggle('active',b.dataset.page===p)})}
