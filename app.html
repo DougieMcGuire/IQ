@@ -163,7 +163,11 @@ firebase.initializeApp({apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDom
 var WORKER_URL='https://cebear.com/api/redeem-install-token';
 var isStandalone=!!('standalone' in navigator&&navigator.standalone||window.matchMedia('(display-mode: standalone)').matches);
 
-/* Splash: dismiss after animations finish (last letter done at 0.8s) */
+/* Splash timing guarantee:
+   - Last letter: delay 0.35s + duration 0.45s = finishes at exactly 0.80s
+   - Hold 1.5s after animation completes = 0.80s + 1500ms = 2300ms
+   - Then fade out over 500ms
+   goTo() can also trigger dismiss early once user navigates */
 var _splashDone=false;
 function dismissSplash(){
   if(_splashDone)return;
@@ -171,9 +175,10 @@ function dismissSplash(){
   var sp=document.getElementById('splash');
   if(!sp)return;
   sp.classList.add('hide');
-  setTimeout(function(){if(sp.parentNode)sp.parentNode.removeChild(sp);},400);
+  setTimeout(function(){if(sp&&sp.parentNode)sp.parentNode.removeChild(sp);},500);
 }
-setTimeout(dismissSplash,2200);
+// 800ms (animation) + 1500ms (hold) = 2300ms guaranteed
+setTimeout(dismissSplash,2300);
 
 function showNav(s){document.body.classList.toggle('has-nav',s)}
 function updateNavActive(p){document.querySelectorAll('#nav .nb').forEach(function(b){b.classList.toggle('active',b.dataset.page===p)})}
