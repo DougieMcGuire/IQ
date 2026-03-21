@@ -136,7 +136,7 @@ var isStandalone=!!('standalone' in navigator&&navigator.standalone||window.matc
   SPLASH TIMING — guaranteed sequence:
     0ms    : page loads, animations begin
     800ms  : last letter finishes (delay 0.35s + duration 0.45s = 0.8s)
-    800ms  : animationend fires on last letter → starts 1500ms hold timer
+    800ms  : animationend fires on last letter → starts 800ms hold timer
     2300ms : hold done → add .hide class (fade starts)
     2700ms : fade done → remove element from DOM
 
@@ -158,7 +158,7 @@ function _doHide() {
 
 // Primary: use animationend on the last letter (letter 6 = nth-child(6))
 // It finishes at delay(0.35s) + duration(0.45s) = 0.8s
-// After it fires, hold 1500ms then hide
+// After it fires, hold 800ms then hide
 (function() {
   var sp = document.getElementById('splash');
   if (!sp) return;
@@ -168,17 +168,17 @@ function _doHide() {
 
   var holdTimer = null;
   lastLetter.addEventListener('animationend', function() {
-    holdTimer = setTimeout(_doHide, 1500);
+    holdTimer = setTimeout(_doHide, 800);
   });
 
   // Fallback: if animationend never fires (font not loaded etc),
-  // hard cutoff at 800ms + 1500ms + 200ms buffer = 2500ms
+  // hard cutoff at 800ms + 800ms + 200ms buffer = 1800ms
   setTimeout(function() {
     if (!_splashDone) {
       clearTimeout(holdTimer);
       _doHide();
     }
-  }, 2500);
+  }, 1800);
 })();
 
 // goTo() calls this but _splashDone guard means it only works AFTER the hold
