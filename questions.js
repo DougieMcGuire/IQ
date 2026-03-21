@@ -1,70 +1,71 @@
 // ═══════════════════════════════════════════════════
 // QUESTIONS.JS — Core registry + shared utilities
 // ═══════════════════════════════════════════════════
+//
+// Question types self-register via:
+//   Q.register(name, generatorFn, weight)
+//
+// Types with custom card UI (like Wordle) also call:
+//   Q.registerRenderer(name, { render(q, idx), attach(slideEl, q, idx, ctx) })
+//
+// Default multiple-choice rendering is handled by improve.html
+// for any type that doesn't register a custom renderer.
+//
+// ═══════════════════════════════════════════════════
 
 var Q = {
   age: 25,
   used: new Set(),
-  _lastType: null,
-  _recentTypes: [], // rolling window for balance
 
-  _types: {},
-  _weights: [],
-  _renderers: {},
+  // ─── Registry internals ──────────────────────────
+  _types: {},       // name → generator function
+  _weights: [],     // weighted array of type names for random selection
+  _renderers: {},   // name → { render(q,idx), attach(slideEl,q,idx,ctx) }
 
+  // ─── Public: register a question type ────────────
+  // weight controls how often this type appears relative to others
   register(name, fn, weight) {
     if (typeof weight !== 'number' || weight < 1) weight = 1;
     this._types[name] = fn;
     for (let i = 0; i < weight; i++) this._weights.push(name);
   },
 
+  // ─── Public: register a custom renderer ──────────
+  // render(q, idx) → HTML string for the slide
+  // attach(slideEl, q, idx, ctx) → called after DOM insert for event binding
+  //   ctx provides: { feed, flashEl, confettiEl, IQData, getEncouragement,
+  //                   updateUI, checkMore, spawnConfetti, answerStartRef }
   registerRenderer(name, renderer) {
     this._renderers[name] = renderer;
   },
 
+  // ─── Public API ──────────────────────────────────
   setAge(a) { this.age = a || 25; },
 
   generate(targetDifficulty) {
     if (targetDifficulty === undefined) targetDifficulty = 1.0;
     const tolerance = 0.45;
-    if (!this._weights.length) return null;
-
     let q, tries = 0;
     do {
-      // Build candidate pool: exclude last type on first few tries for variety
-      // but ALWAYS fall back to full pool so we never get stuck
-      let pool = this._weights;
-      if (tries < 10 && this._lastType) {
-        const filtered = this._weights.filter(t => t !== this._lastType);
-        if (filtered.length) pool = filtered;
-      }
-
-      const typeName = pool[Math.floor(Math.random() * pool.length)];
+      const typeName = this.pick(this._weights);
       const fn = this._types[typeName];
-      if (!fn) { tries++; continue; }
-
-      try { q = fn.call(this); } catch(e) { tries++; continue; }
+      if (!fn) continue;
+      q = fn.call(this);
       tries++;
-      if (tries > 40) break;
+      if (tries > 30) break;
     } while (
-      !q ||
       this.used.has(this.hash(q)) ||
       Math.abs(q.difficulty - targetDifficulty) > tolerance
     );
-
-    if (!q) return null;
-
-    this._lastType = q.type;
-    this._recentTypes.push(q.type);
-    if (this._recentTypes.length > 20) this._recentTypes.shift();
 
     this.used.add(this.hash(q));
     if (this.used.size > 1500) this.used = new Set([...this.used].slice(-750));
     return q;
   },
 
+  // ─── Shared Utilities (available to all game types via `this`) ───
   rand(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; },
-  pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; },
+  pick(arr) { return arr[this.rand(0, arr.length - 1)]; },
 
   shuffle(arr) {
     const a = [...arr];
@@ -91,6 +92,7 @@ var Q = {
 
   hash(q) { return q.type + ':' + q.question.slice(0, 50) + (q.sequence || []).join(''); },
 
+  // ─── Difficulty helpers ──────────────────────────
   getTargetDifficulty(iq) {
     if (iq < 85)  return 0.6;
     if (iq < 95)  return 0.8;
