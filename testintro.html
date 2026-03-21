@@ -24,27 +24,33 @@
     color: white;
   }
 
+  /* Bear logo */
   .logo {
     width: 170px;
+    display: block;
+    margin: 0 auto;
     opacity: 0;
     transform: scale(0.6);
-    animation: popIn 0.65s cubic-bezier(.34,1.56,.64,1) forwards;
+    animation: pop 0.7s cubic-bezier(.34,1.56,.64,1) forwards;
   }
 
+  /* Text container */
   .text {
     font-family: 'Chewy', cursive;
-    font-size: 88px;
-    margin-top: 8px;
-    display: inline-flex; /* prevents spacing gaps */
+    font-size: 92px;
+    margin-top: 6px;
+    white-space: nowrap;
   }
 
+  /* Individual letters */
   .letter {
+    display: inline-block;
     opacity: 0;
-    transform: translateY(25px) scale(0.85);
-    animation: popIn 0.65s cubic-bezier(.34,1.56,.64,1) forwards;
+    transform: translateY(28px) scale(0.6);
+    animation: pop 0.7s cubic-bezier(.34,1.56,.64,1) forwards;
   }
 
-  /* Tight subtle stagger */
+  /* Very subtle stagger */
   .letter:nth-child(1) { animation-delay: 0.12s; }
   .letter:nth-child(2) { animation-delay: 0.16s; }
   .letter:nth-child(3) { animation-delay: 0.20s; }
@@ -52,14 +58,15 @@
   .letter:nth-child(5) { animation-delay: 0.28s; }
   .letter:nth-child(6) { animation-delay: 0.32s; }
 
-  @keyframes popIn {
+  /* Shared animation for PERFECT sync */
+  @keyframes pop {
     0% {
       opacity: 0;
-      transform: translateY(25px) scale(0.6);
+      transform: translateY(28px) scale(0.6);
     }
-    70% {
+    65% {
       opacity: 1;
-      transform: translateY(-5px) scale(1.08);
+      transform: translateY(-6px) scale(1.08);
     }
     100% {
       opacity: 1;
@@ -73,12 +80,7 @@
 <div class="container">
   <img src="logo.png" class="logo">
   <div class="text">
-    <span class="letter">c</span>
-    <span class="letter">e</span>
-    <span class="letter">b</span>
-    <span class="letter">e</span>
-    <span class="letter">a</span>
-    <span class="letter">r</span>
+    <span class="letter">c</span><span class="letter">e</span><span class="letter">b</span><span class="letter">e</span><span class="letter">a</span><span class="letter">r</span>
   </div>
 </div>
 
