@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <title>Cebear</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{--cream:#F0EAD6;--navy:#1b2d5b;--navyM:#243a6e;--navyL:#2f4a88;--green:#3fba4f;--gd:#2d9a3c;--red:#e8443a;--gold:#e8a817;--goldd:#c48e10;--blue:#3a7df2;--purple:#6d4aed;--orange:#e87d1a;--dim:#7b8aa6}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{width:100%;min-height:100dvh;font-family:'Nunito',sans-serif;background:var(--navy);color:var(--cream);overflow-x:hidden}
+
+    /* ── Loading state ── */
+    #loading{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:100;transition:opacity .3s}
+    #loading.hide{opacity:0;pointer-events:none}
+    .ld-bear{width:56px;height:56px;display:flex;align-items:center;justify-content:center;animation:bob 1.2s ease-in-out infinite}
+    .ld-bear img{width:100%;height:100%;object-fit:contain}
+    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+    /* ── 404 page ── */
+    #not-found{display:none;min-height:100dvh;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;gap:16px}
+    #not-found.show{display:flex}
+    .nf-code{font-size:clamp(80px,22vw,120px);font-weight:900;line-height:1;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .nf-title{font-size:clamp(20px,5vw,28px);font-weight:900;color:var(--cream)}
+    .nf-sub{font-size:15px;font-weight:700;color:rgba(240,234,214,.45);max-width:320px;line-height:1.5}
+    .nf-btn{margin-top:8px;background:var(--gold);color:var(--navy);border:none;border-radius:16px;padding:14px 36px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;cursor:pointer;text-decoration:none;display:inline-block;box-shadow:0 4px 0 var(--goldd);transition:transform .1s}
+    .nf-btn:active{transform:translateY(4px);box-shadow:none}
+
+    /* ── User not found ── */
+    #user-not-found{display:none;min-height:100dvh;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;gap:14px}
+    #user-not-found.show{display:flex}
+    .unf-avatar{width:80px;height:80px;border-radius:50%;background:rgba(240,234,214,.08);border:3px solid rgba(240,234,214,.12);display:flex;align-items:center;justify-content:center}
+    .unf-avatar svg{width:36px;height:36px;stroke:rgba(240,234,214,.25);fill:none;stroke-width:1.5}
+    .unf-handle{font-size:22px;font-weight:900;color:rgba(240,234,214,.5)}
+    .unf-title{font-size:18px;font-weight:900;color:var(--cream)}
+    .unf-sub{font-size:14px;font-weight:700;color:rgba(240,234,214,.4);max-width:280px;line-height:1.5}
+
+    /* ── Profile page ── */
+    #profile-page{display:none;min-height:100dvh;flex-direction:column}
+    #profile-page.show{display:flex}
+
+    /* Hero — cream */
+    .prof-hero{background:var(--cream);padding:calc(env(safe-area-inset-top,20px) + 16px) 20px 24px;display:flex;flex-direction:column;align-items:center;position:relative}
+    .prof-back{position:absolute;top:calc(env(safe-area-inset-top,20px) + 10px);left:16px;background:rgba(27,45,91,.08);border:none;border-radius:10px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:var(--navy);cursor:pointer;display:flex;align-items:center;gap:5px;text-decoration:none;transition:opacity .15s}
+    .prof-back:active{opacity:.7}
+    .prof-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+    /* Challenge button */
+    .prof-challenge{position:absolute;top:calc(env(safe-area-inset-top,20px) + 10px);right:16px;background:var(--gold);border:none;border-radius:10px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;color:var(--navy);cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 2px 0 var(--goldd);transition:transform .1s}
+    .prof-challenge:active{transform:translateY(2px);box-shadow:none}
+    .prof-challenge svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5}
+
+    .prof-av{width:min(100px,24vw);height:min(100px,24vw);border-radius:50%;background:var(--navy);overflow:hidden;display:flex;align-items:center;justify-content:center;border:4px solid var(--navy);box-shadow:0 4px 16px rgba(27,45,91,.2);margin-bottom:10px}
+    .prof-av img{width:100%;height:100%;object-fit:cover;display:none}
+    .prof-av.has-pic img{display:block}
+    .prof-av svg{width:40%;height:40%;stroke:rgba(240,234,214,.35);fill:none;stroke-width:1.5}
+    .prof-username{font-size:13px;font-weight:900;color:var(--dim);margin-bottom:2px}
+    .prof-iq{font-size:min(78px,20vw);font-weight:900;line-height:1;color:var(--navy)}
+    .prof-iq-lbl{font-size:13px;font-weight:900;color:#a0acc4;letter-spacing:5px;text-transform:uppercase;margin-bottom:8px}
+    .prof-pct{background:var(--navy);color:var(--cream);font-size:12px;font-weight:900;padding:5px 18px;border-radius:20px;margin-bottom:4px}
+
+    /* Navy section */
+    .prof-body{flex:1;background:var(--navy);border-radius:28px 28px 0 0;padding:24px 16px 40px;margin-top:-2px}
+    .prof-inner{max-width:420px;margin:0 auto}
+    .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+    .sg{background:rgba(240,234,214,.06);border-radius:16px;padding:16px;display:flex;align-items:center;gap:12px;border:1px solid rgba(240,234,214,.06)}
+    .sg-ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 0 rgba(0,0,0,.15)}
+    .sg-ic svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+    .sg-ic.i1{background:var(--green)}.sg-ic.i2{background:var(--blue)}.sg-ic.i3{background:var(--orange)}.sg-ic.i4{background:var(--purple)}
+    .sg-val{font-size:min(24px,6vw);font-weight:900;color:var(--cream);line-height:1.1}
+    .sg-lbl{font-size:10px;font-weight:800;color:rgba(240,234,214,.3);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+
+    .ab-title{font-size:11px;font-weight:900;color:rgba(240,234,214,.25);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+    .ab-card{background:rgba(240,234,214,.04);border-radius:18px;padding:4px 0;overflow:hidden;border:1px solid rgba(240,234,214,.04)}
+    .ab-row{display:flex;align-items:center;gap:12px;padding:11px 16px}
+    .ab-row+.ab-row{border-top:1px solid rgba(240,234,214,.03)}
+    .ab-dot{width:4px;height:28px;border-radius:2px;flex-shrink:0}
+    .ab-mid{flex:1;min-width:0}
+    .ab-name{font-size:12px;font-weight:800;color:rgba(240,234,214,.5);margin-bottom:5px}
+    .ab-bar{height:7px;background:rgba(240,234,214,.06);border-radius:4px;overflow:hidden}
+    .ab-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
+    .ab-val{font-size:16px;font-weight:900;color:var(--cream);min-width:32px;text-align:right}
+
+    /* Play on Cebear CTA */
+    .prof-cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:var(--gold);color:var(--navy);border:none;border-radius:16px;padding:15px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;text-transform:uppercase;letter-spacing:1px;box-shadow:0 4px 0 var(--goldd);transition:transform .1s;text-decoration:none;margin-top:20px;position:relative;overflow:hidden}
+    .prof-cta:active{transform:translateY(4px);box-shadow:none}
+    .prof-cta::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);animation:shimmer 3s infinite}
+    @keyframes shimmer{0%{left:-100%}100%{left:200%}}
+    .prof-cta svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5;flex-shrink:0}
+
+    .prof-branding{text-align:center;margin-top:20px;font-size:12px;font-weight:800;color:rgba(240,234,214,.2);letter-spacing:1px}
+
+    @keyframes su{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .anim{animation:su .35s ease both}
+    .d1{animation-delay:.05s}.d2{animation-delay:.1s}.d3{animation-delay:.15s}.d4{animation-delay:.2s}
+
+    /* Toast */
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--green);color:#fff;padding:10px 22px;border-radius:14px;font-size:14px;font-weight:800;opacity:0;pointer-events:none;transition:all .3s;z-index:500;white-space:nowrap}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  </style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loading">
+  <div class="ld-bear"><img src="logo.png" alt="Cebear"></div>
+</div>
+
+<!-- Generic 404 -->
+<div id="not-found">
+  <div class="nf-code">404</div>
+  <div class="nf-title">Page not found</div>
+  <div class="nf-sub">This page doesn't exist — but your brain potential does.</div>
+  <a href="/" class="nf-btn">Back to Cebear</a>
+</div>
+
+<!-- User not found -->
+<div id="user-not-found">
+  <div class="unf-avatar">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg>
+  </div>
+  <div class="unf-handle" id="unf-handle">@unknown</div>
+  <div class="unf-title">User not found</div>
+  <div class="unf-sub">This profile doesn't exist or may have been removed.</div>
+  <a href="/" class="nf-btn" style="margin-top:8px">Back to Cebear</a>
+</div>
+
+<!-- Profile page -->
+<div id="profile-page">
+  <div class="prof-hero">
+    <a href="/" class="prof-back">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Cebear
+    </a>
+    <button class="prof-challenge" id="challenge-btn" style="display:none">
+      <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      Challenge
+    </button>
+
+    <div class="prof-av" id="prof-av">
+      <img id="prof-av-img" src="" alt="">
+      <svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="12"/><path d="M8 58C8 44 18 36 32 36C46 36 56 44 56 58"/></svg>
+    </div>
+    <div class="prof-username" id="prof-username">@username</div>
+    <div class="prof-iq" id="prof-iq">--</div>
+    <div class="prof-iq-lbl">I Q</div>
+    <div class="prof-pct" id="prof-pct" style="display:none"></div>
+  </div>
+
+  <div class="prof-body">
+    <div class="prof-inner">
+      <div class="stats-grid anim d1">
+        <div class="sg">
+          <div class="sg-ic i1"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg></div>
+          <div><div class="sg-val" id="prof-answered">0</div><div class="sg-lbl">Answered</div></div>
+        </div>
+        <div class="sg">
+          <div class="sg-ic i2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+          <div><div class="sg-val" id="prof-accuracy">0%</div><div class="sg-lbl">Accuracy</div></div>
+        </div>
+        <div class="sg">
+          <div class="sg-ic i3"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+          <div><div class="sg-val" id="prof-streak">0</div><div class="sg-lbl">Best Streak</div></div>
+        </div>
+        <div class="sg">
+          <div class="sg-ic i4"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div>
+          <div><div class="sg-val" id="prof-level">1</div><div class="sg-lbl">Level</div></div>
+        </div>
+      </div>
+
+      <div class="ab-title anim d2">Abilities</div>
+      <div class="ab-card anim d3" id="prof-abilities"></div>
+
+      <a href="/" class="prof-cta anim d4">
+        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        Train on Cebear — it's free
+      </a>
+      <div class="prof-branding anim">cebear.com</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
+  authDomain:"braindeer-backend.firebaseapp.com",
+  projectId:"braindeer-backend",
+  storageBucket:"braindeer-backend.firebasestorage.app",
+  messagingSenderId:"331205139765",
+  appId:"1:331205139765:web:20cfef8194af63fc55c07c"
+});
+var db = firebase.firestore();
+
+// ── IQ percentile helpers ─────────────────────────────────────────────────────
+function iqToPercentile(iq) {
+  if (!iq) return 50;
+  var table = [[55,0.1],[70,2],[85,16],[100,50],[115,84],[130,98],[145,99.9]];
+  for (var i = 0; i < table.length - 1; i++) {
+    if (iq >= table[i][0] && iq <= table[i+1][0]) {
+      var t = (iq - table[i][0]) / (table[i+1][0] - table[i][0]);
+      return Math.round(table[i][1] + t * (table[i+1][1] - table[i][1]));
+    }
+  }
+  return iq < 55 ? 0.1 : 99.9;
+}
+function formatPercentile(p) {
+  if (p >= 99) return '1%';
+  if (p >= 95) return '5%';
+  if (p >= 90) return '10%';
+  return Math.round(100 - p) + '%';
+}
+
+var AB = [
+  {key:'patternRecognition', name:'Pattern',        color:'#e87d1a'},
+  {key:'problemSolving',     name:'Problem Solving', color:'#e8443a'},
+  {key:'mentalAgility',      name:'Agility',         color:'#3fba4f'},
+  {key:'memory',             name:'Memory',          color:'#6d4aed'},
+  {key:'verbalReasoning',    name:'Verbal',          color:'#3a7df2'},
+  {key:'logicalReasoning',   name:'Logic',           color:'#1b2d5b'},
+  {key:'spatialAwareness',   name:'Spatial',         color:'#e8557a'},
+  {key:'numericalReasoning', name:'Numerical',       color:'#e8a817'}
+];
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
+
+function hide(id) { document.getElementById(id).classList.remove('show'); }
+function show(id) {
+  ['loading','not-found','user-not-found','profile-page'].forEach(function(i){
+    var el = document.getElementById(i);
+    if (i === 'loading') el.classList.add('hide');
+    else el.classList.remove('show');
+  });
+  document.getElementById(id).classList.add('show');
+}
+
+// ── Detect path ───────────────────────────────────────────────────────────────
+var path = window.location.pathname; // e.g. "/@dougie" or "/some/random/404"
+
+// Match /@username — the @ must immediately follow the leading slash
+var atMatch = path.match(/^\/@([a-zA-Z0-9_.-]+)$/);
+// Also handle plain /@ with nothing after it
+var bareAt  = path.match(/^\/@\s*$/);
+
+if (!atMatch && !bareAt) {
+  // Not a profile URL — just show 404
+  show('not-found');
+} else if (bareAt || !atMatch[1]) {
+  // Has @ but no username
+  show('user-not-found');
+  document.getElementById('unf-handle').textContent = '@…';
+} else {
+  // Has a username — try to look it up
+  var username = atMatch[1];
+  document.getElementById('unf-handle').textContent = '@' + username;
+
+  // Update page title while loading
+  document.title = '@' + username + ' — Cebear';
+
+  // Query Firestore for user with this username (case-insensitive via lowercase field)
+  // We store username as-is, so we try both the exact value and a lowercase index
+  db.collection('users')
+    .where('username', '==', username)
+    .limit(1)
+    .get()
+    .then(function(snap) {
+      if (snap.empty) {
+        // Try case-insensitive fallback
+        return db.collection('users')
+          .where('usernameLower', '==', username.toLowerCase())
+          .limit(1)
+          .get();
+      }
+      return snap;
+    })
+    .then(function(snap) {
+      if (snap.empty) {
+        show('user-not-found');
+        return;
+      }
+      renderProfile(snap.docs[0].data());
+    })
+    .catch(function(e) {
+      console.warn('lookup error:', e);
+      show('user-not-found');
+    });
+}
+
+// ── Render a user's public profile ────────────────────────────────────────────
+function renderProfile(user) {
+  var uname  = user.username || 'Anonymous';
+  var iq     = user.iq || 0;
+  var pic    = user.pic || '';
+  var answered = user.answered || 0;
+  var correct  = user.correct  || 0;
+  var bestStreak = user.bestStreak || 0;
+  var level    = user.level || 1;
+  var accuracy = answered > 0 ? Math.round(correct / answered * 100) : 0;
+
+  document.title = '@' + uname + ' — Cebear';
+
+  // Avatar
+  var avEl = document.getElementById('prof-av');
+  var avImg = document.getElementById('prof-av-img');
+  if (pic) {
+    avImg.src = pic;
+    avImg.onload = function(){ avEl.classList.add('has-pic'); };
+    avImg.onerror = function(){ /* keep placeholder */ };
+  }
+
+  // Handle + IQ
+  document.getElementById('prof-username').textContent = '@' + uname;
+  document.getElementById('prof-iq').textContent = iq || '--';
+
+  // Percentile badge
+  if (iq) {
+    var pct = iqToPercentile(iq);
+    var pctEl = document.getElementById('prof-pct');
+    pctEl.textContent = 'Top ' + formatPercentile(pct);
+    pctEl.style.display = 'inline-block';
+  }
+
+  // Stats
+  document.getElementById('prof-answered').textContent = answered;
+  document.getElementById('prof-accuracy').textContent = accuracy + '%';
+  document.getElementById('prof-streak').textContent = bestStreak;
+  document.getElementById('prof-level').textContent = level;
+
+  // Abilities
+  var abCard = document.getElementById('prof-abilities');
+  abCard.innerHTML = '';
+  var abilities = user.abilities || {};
+  AB.forEach(function(a) {
+    var val = abilities[a.key] !== undefined ? abilities[a.key] : Math.floor(Math.random() * 40 + 30);
+    var pct = Math.max(6, Math.min(100, val));
+    var row = document.createElement('div');
+    row.className = 'ab-row';
+    row.innerHTML =
+      '<div class="ab-dot" style="background:' + a.color + '"></div>' +
+      '<div class="ab-mid">' +
+        '<div class="ab-name">' + a.name + '</div>' +
+        '<div class="ab-bar"><div class="ab-fill" style="background:' + a.color + ';width:0%" data-val="' + pct + '"></div></div>' +
+      '</div>' +
+      '<div class="ab-val">' + pct + '</div>';
+    abCard.appendChild(row);
+  });
+
+  // Animate bars after DOM paint
+  requestAnimationFrame(function(){
+    setTimeout(function(){
+      abCard.querySelectorAll('.ab-fill').forEach(function(b){
+        b.style.width = b.dataset.val + '%';
+      });
+    }, 120);
+  });
+
+  // Challenge button — copies a link to this profile
+  var challengeBtn = document.getElementById('challenge-btn');
+  challengeBtn.style.display = 'flex';
+  challengeBtn.addEventListener('click', function() {
+    var url = window.location.origin + '/@' + uname;
+    if (navigator.share) {
+      navigator.share({
+        title: uname + ' has an IQ of ' + iq + ' on Cebear!',
+        text: 'Can you beat @' + uname + '\'s IQ score? Train on Cebear!',
+        url: url
+      }).catch(function(){});
+    } else {
+      navigator.clipboard.writeText(url).then(function(){
+        showToast('Profile link copied!');
+      }).catch(function(){
+        showToast('Link: ' + url);
+      });
+    }
+  });
+
+  // Set meta tags for social sharing
+  setMeta('og:title', '@' + uname + ' — IQ ' + (iq||'?') + ' on Cebear');
+  setMeta('og:description', 'Can you beat @' + uname + '\'s IQ score? Train your brain on Cebear!');
+  setMeta('og:url', window.location.href);
+  setMeta('twitter:card', 'summary');
+  setMeta('twitter:title', '@' + uname + ' — IQ ' + (iq||'?') + ' on Cebear');
+  setMeta('twitter:description', 'Challenge @' + uname + ' on Cebear!');
+
+  show('profile-page');
+}
+
+function setMeta(property, content) {
+  var el = document.querySelector('meta[property="' + property + '"]') ||
+           document.querySelector('meta[name="' + property + '"]');
+  if (!el) {
+    el = document.createElement('meta');
+    var attr = property.startsWith('og:') ? 'property' : 'name';
+    el.setAttribute(attr, property);
+    document.head.appendChild(el);
+  }
+  el.setAttribute('content', content);
+}
+</script>
+</body>
+</html>
