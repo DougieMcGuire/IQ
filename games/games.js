@@ -105,7 +105,7 @@ function _launchEndlessReaction(container,idx){
   var state='waiting',goTime=0,timer=null,done=false;
   var delay=1200+Math.random()*2800;
   timer=setTimeout(function(){if(done)return;state='go';goTime=Date.now();circle.classList.add('react-go');circle.textContent='TAP!';},delay);
-  circle.addEventListener('click',function(){if(done)return;if(state==='waiting'){done=true;clearTimeout(timer);circle.classList.add('react-fail');circle.textContent='Too early!';result.textContent='Wait for green!';setTimeout(newRound,1200);}else if(state==='go'){done=true;var ms=Date.now()-goTime;if(ms<best)best=ms;attempts++;circle.classList.remove('react-go');circle.classList.add(ms<400?'react-success':'react-slow');circle.textContent=ms+'ms';result.textContent=(ms<250?'⚡ Lightning! ':'ms<400?'Nice! ':'Slow... ')+' Best: '+best+'ms';setTimeout(newRound,1400);}});}
+  circle.addEventListener('click',function(){if(done)return;if(state==='waiting'){done=true;clearTimeout(timer);circle.classList.add('react-fail');circle.textContent='Too early!';result.textContent='Wait for green!';setTimeout(newRound,1200);}else if(state==='go'){done=true;var ms=Date.now()-goTime;if(ms<best)best=ms;attempts++;circle.classList.remove('react-go');circle.classList.add(ms<400?'react-success':'react-slow');circle.textContent=ms+'ms';result.textContent=(ms<250?'⚡ Lightning!':ms<400?'Nice!':'Slow...')+' Best: '+best+'ms';setTimeout(newRound,1400);}});}
   newRound();
 }
 
