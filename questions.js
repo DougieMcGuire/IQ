@@ -1,113 +1,70 @@
 // ═══════════════════════════════════════════════════
 // QUESTIONS.JS — Core registry + shared utilities
 // ═══════════════════════════════════════════════════
-//
-// Question types self-register via:
-//   Q.register(name, generatorFn, weight)
-//
-// Types with custom card UI (like Wordle) also call:
-//   Q.registerRenderer(name, { render(q, idx), attach(slideEl, q, idx, ctx) })
-//
-// Default multiple-choice rendering is handled by improve.html
-// for any type that doesn't register a custom renderer.
-//
-// ═══════════════════════════════════════════════════
 
 var Q = {
   age: 25,
   used: new Set(),
-  _lastType: null,         // prevent consecutive same game type
-  _typeHistory: [],        // recent type history for balancing
-  _typeCounts: {},         // count per type in recent window
-  _BALANCE_WINDOW: 12,     // look back 12 cards for balance
+  _lastType: null,
+  _recentTypes: [], // rolling window for balance
 
-  // ─── Registry internals ──────────────────────────
-  _types: {},       // name → generator function
-  _weights: [],     // weighted array of type names for random selection
-  _renderers: {},   // name → { render(q,idx), attach(slideEl,q,idx,ctx) }
+  _types: {},
+  _weights: [],
+  _renderers: {},
 
-  // ─── Public: register a question type ────────────
   register(name, fn, weight) {
     if (typeof weight !== 'number' || weight < 1) weight = 1;
     this._types[name] = fn;
     for (let i = 0; i < weight; i++) this._weights.push(name);
   },
 
-  // ─── Public: register a custom renderer ──────────
   registerRenderer(name, renderer) {
     this._renderers[name] = renderer;
   },
 
-  // ─── Public API ──────────────────────────────────
   setAge(a) { this.age = a || 25; },
-
-  // Get a shuffled pool of type names, excluding the last played type
-  // and types that have appeared too frequently in the recent window
-  _getBalancedType() {
-    const allTypes = Object.keys(this._types);
-    if (!allTypes.length) return null;
-
-    // Count recent type appearances
-    const recent = this._typeHistory.slice(-this._BALANCE_WINDOW);
-    const counts = {};
-    recent.forEach(t => { counts[t] = (counts[t] || 0) + 1; });
-
-    // Max times a type can appear in the window (soft cap)
-    const softCap = Math.max(2, Math.ceil(this._BALANCE_WINDOW / allTypes.length) + 1);
-
-    // Build a candidate pool from _weights, excluding last type and over-represented types
-    let pool = this._weights.filter(t => {
-      if (t === this._lastType) return false;
-      if ((counts[t] || 0) >= softCap) return false;
-      return true;
-    });
-
-    // If pool is empty (e.g. only one type registered), allow the last type
-    if (!pool.length) {
-      pool = this._weights.filter(t => t !== this._lastType);
-    }
-    // If still empty, use everything
-    if (!pool.length) {
-      pool = this._weights.slice();
-    }
-
-    return pool[Math.floor(Math.random() * pool.length)];
-  },
 
   generate(targetDifficulty) {
     if (targetDifficulty === undefined) targetDifficulty = 1.0;
     const tolerance = 0.45;
+    if (!this._weights.length) return null;
+
     let q, tries = 0;
     do {
-      const typeName = this._getBalancedType();
-      if (!typeName) break;
+      // Build candidate pool: exclude last type on first few tries for variety
+      // but ALWAYS fall back to full pool so we never get stuck
+      let pool = this._weights;
+      if (tries < 10 && this._lastType) {
+        const filtered = this._weights.filter(t => t !== this._lastType);
+        if (filtered.length) pool = filtered;
+      }
+
+      const typeName = pool[Math.floor(Math.random() * pool.length)];
       const fn = this._types[typeName];
-      if (!fn) continue;
-      q = fn.call(this);
+      if (!fn) { tries++; continue; }
+
+      try { q = fn.call(this); } catch(e) { tries++; continue; }
       tries++;
-      if (tries > 30) break;
+      if (tries > 40) break;
     } while (
+      !q ||
       this.used.has(this.hash(q)) ||
       Math.abs(q.difficulty - targetDifficulty) > tolerance
     );
 
     if (!q) return null;
 
-    // Track type history for consecutive/balance prevention
     this._lastType = q.type;
-    this._typeHistory.push(q.type);
-    if (this._typeHistory.length > this._BALANCE_WINDOW * 2) {
-      this._typeHistory = this._typeHistory.slice(-this._BALANCE_WINDOW);
-    }
+    this._recentTypes.push(q.type);
+    if (this._recentTypes.length > 20) this._recentTypes.shift();
 
     this.used.add(this.hash(q));
     if (this.used.size > 1500) this.used = new Set([...this.used].slice(-750));
     return q;
   },
 
-  // ─── Shared Utilities (available to all game types via `this`) ───
   rand(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; },
-  pick(arr) { return arr[this.rand(0, arr.length - 1)]; },
+  pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; },
 
   shuffle(arr) {
     const a = [...arr];
@@ -134,7 +91,6 @@ var Q = {
 
   hash(q) { return q.type + ':' + q.question.slice(0, 50) + (q.sequence || []).join(''); },
 
-  // ─── Difficulty helpers ──────────────────────────
   getTargetDifficulty(iq) {
     if (iq < 85)  return 0.6;
     if (iq < 95)  return 0.8;
