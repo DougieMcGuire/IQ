@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <style>
   @font-face {
@@ -17,14 +17,26 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
+
+    /* Disable interaction */
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
   }
 
   .container {
     text-align: center;
     color: white;
+    pointer-events: none;
   }
 
-  /* Logo */
+  img {
+    -webkit-user-drag: none;
+    user-drag: none;
+    pointer-events: none;
+  }
+
   .logo {
     width: 170px;
     display: block;
@@ -39,6 +51,8 @@
     font-size: 92px;
     margin-top: 6px;
     white-space: nowrap;
+    padding: 0 8px;              /* prevents side clipping */
+    overflow: visible;
   }
 
   .letter {
@@ -46,9 +60,11 @@
     opacity: 0;
     transform: translateY(28px) scale(0.6);
     animation: popLetter cubic-bezier(.34,1.56,.64,1) forwards;
+    will-change: transform;
+    backface-visibility: hidden;
   }
 
-  /* All letters finish at 0.8s */
+  /* All letters finish exactly at 0.8s */
   .letter:nth-child(1) { animation-delay: 0.15s; animation-duration: 0.65s; }
   .letter:nth-child(2) { animation-delay: 0.19s; animation-duration: 0.61s; }
   .letter:nth-child(3) { animation-delay: 0.23s; animation-duration: 0.57s; }
@@ -87,10 +103,11 @@
   }
 </style>
 </head>
+
 <body>
 
 <div class="container">
-  <img src="logo.png" class="logo">
+  <img src="logo.png" class="logo" draggable="false">
   <div class="text">
     <span class="letter">c</span><span class="letter">e</span><span class="letter">b</span><span class="letter">e</span><span class="letter">a</span><span class="letter">r</span>
   </div>
