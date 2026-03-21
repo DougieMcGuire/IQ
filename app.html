@@ -5,29 +5,80 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#1b2d5b">
+  <meta name="theme-color" content="#0474fc">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="manifest" href="manifest.json">
   <title>Cebear</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Chewy&display=swap" rel="stylesheet">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     html,body{width:100%;height:100dvh;overflow:hidden;background:#1b2d5b;font-family:'Nunito',sans-serif;touch-action:manipulation}
-    #splash{position:fixed;inset:0;z-index:9999;background:#151f3e;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .35s}
+
+    /* ══ NEW SPLASH — matches testintro.html exactly ══ */
+    #splash{
+      position:fixed;inset:0;z-index:9999;
+      background:#0474fc;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      transition:opacity .4s ease;
+      touch-action:manipulation;
+      -webkit-user-select:none;user-select:none;
+      -webkit-touch-callout:none;
+    }
     #splash.hide{opacity:0;pointer-events:none}
-    #splash .sb{width:72px;height:72px;display:flex;align-items:center;justify-content:center;animation:bob 1.4s ease-in-out infinite}
-    #splash .sb img{width:100%;height:100%;object-fit:contain}
-    #splash .sn{font-size:28px;font-weight:900;color:#F0EAD6;margin-top:14px;letter-spacing:-.5px}
-    #splash .sd{margin-top:18px;display:flex;gap:7px}
-    #splash .sd span{width:8px;height:8px;border-radius:50%;background:rgba(240,234,214,.2);animation:dp 1s ease infinite}
-    #splash .sd span:nth-child(2){animation-delay:.15s}
-    #splash .sd span:nth-child(3){animation-delay:.3s}
-    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-    @keyframes dp{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+
+    #splash .sp-logo{
+      width:170px;display:block;margin:0 auto;
+      opacity:0;
+      transform:translateY(28px) scale(0.6);
+      animation:splashPop 0.8s cubic-bezier(.34,1.56,.64,1) forwards;
+      pointer-events:none;
+      -webkit-user-drag:none;user-drag:none;
+    }
+
+    #splash .sp-text{
+      font-family:'Chewy',cursive;
+      font-size:clamp(64px,20vw,92px);
+      color:#fff;
+      margin-top:6px;
+      white-space:nowrap;
+      padding:0 8px;
+      overflow:visible;
+      line-height:1;
+    }
+
+    #splash .sp-letter{
+      display:inline-block;
+      opacity:0;
+      transform:translateY(28px) scale(0.6);
+      animation:splashLetter cubic-bezier(.34,1.56,.64,1) forwards;
+      will-change:transform;
+      backface-visibility:hidden;
+    }
+    #splash .sp-letter:nth-child(1){animation-delay:0.15s;animation-duration:0.65s}
+    #splash .sp-letter:nth-child(2){animation-delay:0.19s;animation-duration:0.61s}
+    #splash .sp-letter:nth-child(3){animation-delay:0.23s;animation-duration:0.57s}
+    #splash .sp-letter:nth-child(4){animation-delay:0.27s;animation-duration:0.53s}
+    #splash .sp-letter:nth-child(5){animation-delay:0.31s;animation-duration:0.49s}
+    #splash .sp-letter:nth-child(6){animation-delay:0.35s;animation-duration:0.45s}
+
+    @keyframes splashPop{
+      0%{opacity:0;transform:translateY(28px) scale(0.6)}
+      65%{opacity:1;transform:translateY(-6px) scale(1.08)}
+      100%{opacity:1;transform:translateY(0) scale(1)}
+    }
+    @keyframes splashLetter{
+      0%{opacity:0;transform:translateY(28px) scale(0.6)}
+      65%{opacity:1;transform:translateY(-6px) scale(1.08)}
+      100%{opacity:1;transform:translateY(0) scale(1)}
+    }
+
+    /* ══ SCREENS ══ */
     .screen{position:absolute;top:0;left:0;right:0;bottom:0;display:none;overflow:hidden}
     .screen.active{display:block}
     .screen iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;touch-action:manipulation}
     body.has-nav .screen iframe{height:calc(100dvh - 58px - env(safe-area-inset-bottom,0px))}
+
+    /* ══ NAV ══ */
     #nav{position:fixed;bottom:0;left:0;right:0;height:calc(58px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:#1b2d5b;border-top:1px solid rgba(240,234,214,.08);display:none;justify-content:space-around;align-items:center;z-index:100}
     body.has-nav #nav{display:flex}
     .nb{padding:8px 0 2px;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:rgba(240,234,214,.35);font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;cursor:pointer;position:relative;transition:color .15s;-webkit-tap-highlight-color:transparent}
@@ -38,29 +89,45 @@
     .nb.active .ni svg{stroke:#F0EAD6}
     .nbdg{position:absolute;top:4px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:#e8443a;border:2px solid #1b2d5b;display:none}
     .nbdg.show{display:block}
+
+    /* ══ AUTH WAIT ══ */
     .auth-wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#1b2d5b}
     .auth-wait-dots{display:flex;gap:7px}
     .auth-wait-dot{width:10px;height:10px;border-radius:50%;background:rgba(240,234,214,.2);animation:dp 1s ease infinite}
     .auth-wait-dot:nth-child(2){animation-delay:.15s}
     .auth-wait-dot:nth-child(3){animation-delay:.3s}
+    @keyframes dp{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+
+    /* ══ OFFLINE TOAST ══ */
     #offline-toast{position:fixed;top:calc(env(safe-area-inset-top,20px) + 12px);left:50%;transform:translateX(-50%);background:#1b2d5b;border:1px solid rgba(240,234,214,.15);color:rgba(240,234,214,.7);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;padding:10px 18px;border-radius:14px;z-index:9999;opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap}
     #offline-toast.show{opacity:1}
   </style>
 </head>
 <body>
-<div id="splash"><div class="sb"><img src="logo.png" alt="Cebear" style="width:48px;height:48px;object-fit:contain"></div><div class="sn">Cebear</div><div class="sd"><span></span><span></span><span></span></div></div>
+
+<!-- ══ NEW SPLASH ══ -->
+<div id="splash">
+  <img src="logo.png" class="sp-logo" alt="Cebear" draggable="false">
+  <div class="sp-text">
+    <span class="sp-letter">c</span><span class="sp-letter">e</span><span class="sp-letter">b</span><span class="sp-letter">e</span><span class="sp-letter">a</span><span class="sp-letter">r</span>
+  </div>
+</div>
+
 <div id="offline-toast">No connection — come back online for this</div>
+
 <div class="screen" id="screen-auth"></div>
 <div class="screen" id="screen-improve"></div>
 <div class="screen" id="screen-profile"></div>
 <div class="screen" id="screen-leaderboard"></div>
 <div class="screen" id="screen-tasks"></div>
+
 <nav id="nav">
   <button class="nb" data-page="leaderboard" onclick="goTo('leaderboard')"><span class="ni"><svg viewBox="0 0 24 24"><path d="M6 9H2v12h4V9z"/><path d="M14 4h-4v17h4V4z"/><path d="M22 13h-4v8h4v-8z"/></svg></span>Ranks</button>
   <button class="nb active" data-page="improve" onclick="goTo('improve')"><span class="ni"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>Train</button>
   <button class="nb" data-page="tasks" onclick="goTo('tasks')"><span class="ni"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-6"/></svg></span>Tasks<span class="nbdg" id="tasks-badge"></span></button>
   <button class="nb" data-page="profile" onclick="goTo('profile')"><span class="ni"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg></span>Profile</button>
 </nav>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -69,10 +136,22 @@ firebase.initializeApp({apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDom
 var WORKER_URL='https://cebear.com/api/redeem-install-token';
 var isStandalone=!!('standalone' in navigator&&navigator.standalone||window.matchMedia('(display-mode: standalone)').matches);
 
+/* ── Splash dismiss — wait for animations to finish (~1s), then hide ── */
+var _splashDismissed=false;
+function dismissSplash(){
+  if(_splashDismissed)return;
+  _splashDismissed=true;
+  var sp=document.getElementById('splash');
+  if(!sp)return;
+  sp.classList.add('hide');
+  setTimeout(function(){if(sp.parentNode)sp.parentNode.removeChild(sp);},450);
+}
+// Auto-dismiss after 1.2s regardless (letter animations finish at ~0.8s)
+setTimeout(dismissSplash,1200);
+
 /* ── Nav helpers ── */
-function showNav(s){document.body.classList.toggle('has-nav',s)}
-function updateNavActive(p){document.querySelectorAll('#nav .nb').forEach(function(b){b.classList.toggle('active',b.dataset.page===p)})}
-function dismissSplash(){var sp=document.getElementById('splash');if(sp&&!sp.classList.contains('hide')){sp.classList.add('hide');setTimeout(function(){sp.parentNode&&sp.remove()},400)}}
+function showNav(s){document.body.classList.toggle('has-nav',s);}
+function updateNavActive(p){document.querySelectorAll('#nav .nb').forEach(function(b){b.classList.toggle('active',b.dataset.page===p);});}
 
 /* ── Auth state ── */
 var _isAuthed=false,_authResolved=false,_authWaiters=[];
@@ -80,35 +159,31 @@ firebase.auth().onAuthStateChanged(function(u){
   _isAuthed=!!u;
   if(!_authResolved){
     _authResolved=true;
-    _authWaiters.forEach(function(fn){fn(u)});
+    _authWaiters.forEach(function(fn){fn(u);});
     _authWaiters=[];
   }
   if(u){
-    /* Signed in — make sure we're on improve */
     if(!currentScreen||currentScreen==='auth')goTo('improve');
-    /* Tell the improve iframe if it's already loaded */
     _notifyImprove('authSuccess');
   }else if(isStandalone){
-    /* Standalone + signed out → force auth page */
     currentScreen=null;screensLoaded={};
-    document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+    document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
     goTo('auth');
   }
 });
 function authReady(){
   if(_authResolved)return Promise.resolve(_isAuthed);
-  return new Promise(function(r){_authWaiters.push(function(){r(_isAuthed)})});
+  return new Promise(function(r){_authWaiters.push(function(){r(_isAuthed);});});
 }
 function _notifyImprove(type,extra){
-  /* Retry posting a message to the improve iframe until it's ready */
   (function attempt(n){
     var f=document.querySelector('#screen-improve iframe');
     if(f&&f.contentWindow){f.contentWindow.postMessage(Object.assign({type:type},extra||{}),'*');}
-    else if(n>0){setTimeout(function(){attempt(n-1)},100);}
+    else if(n>0){setTimeout(function(){attempt(n-1);},100);}
   })(30);
 }
 
-/* ── Guest wall interception for nav tabs ── */
+/* ── Guest wall interception ── */
 function tryGuestWall(page){
   if(isStandalone||_isAuthed)return false;
   if(page!=='profile'&&page!=='tasks'&&page!=='leaderboard')return false;
@@ -124,70 +199,46 @@ function tryGuestWall(page){
 window.addEventListener('message',function(e){
   if(!e.data||!e.data.type)return;
   var t=e.data.type;
-
-  if(t==='authSuccess'){
-    _isAuthed=true;
-    if(currentScreen==='auth')goTo('improve');
-    return;
-  }
-
-  /* Google sign-in from web iframe — handle popup in parent (top window), never redirect */
+  if(t==='authSuccess'){_isAuthed=true;if(currentScreen==='auth')goTo('improve');return;}
   if(t==='googleAuthRequest'){
     var gp=new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(gp)
-      .then(function(r){
-        _isAuthed=true;
-        ensureUser(r.user);
-        // onAuthStateChanged will fire and call _notifyImprove automatically
-      })
+      .then(function(r){_isAuthed=true;ensureUser(r.user);})
       .catch(function(err){
         if(err.code==='auth/popup-closed-by-user'||err.code==='auth/cancelled-popup-request')return;
         _notifyImprove('authError',{msg:'Google sign-in failed. Try email instead.'});
       });
     return;
   }
-  /* Standalone iOS uses google-redirect.html — keep this path for that */
-  if(t==='googleRedirect'){
-    location.href='google-redirect.html';
-    return;
-  }
-
+  if(t==='googleRedirect'){location.href='google-redirect.html';return;}
   if(t==='savePushSub')firebase.auth().onAuthStateChanged(function(u){
     if(u)firebase.firestore().collection('pushSubscriptions').doc(u.uid)
       .set({subscription:e.data.sub,uid:u.uid,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){});
   });
-  if(t==='tasksUpdated'){var f=document.querySelector('#screen-tasks iframe');f&&f.contentWindow&&f.contentWindow.postMessage({type:'tasksUpdated'},'*')}
-  if(t==='xpAwarded'){var f2=document.querySelector('#screen-improve iframe');f2&&f2.contentWindow&&f2.contentWindow.postMessage({type:'xpAwarded',xp:e.data.xp},'*')}
+  if(t==='tasksUpdated'){var f=document.querySelector('#screen-tasks iframe');f&&f.contentWindow&&f.contentWindow.postMessage({type:'tasksUpdated'},'*');}
+  if(t==='xpAwarded'){var f2=document.querySelector('#screen-improve iframe');f2&&f2.contentWindow&&f2.contentWindow.postMessage({type:'xpAwarded',xp:e.data.xp},'*');}
 });
 
 /* ── Screen management ── */
 var currentScreen=null,screensLoaded={};
 var AUTH_PAGES=['profile','tasks','leaderboard'];
-var NETWORK_PAGES=['profile','tasks','leaderboard']; // pages that need network
+var NETWORK_PAGES=['profile','tasks','leaderboard'];
 
 function isOffline(){return!navigator.onLine;}
 var _offlineTimer=null;
 function showOfflineToast(){
-  var t=document.getElementById('offline-toast');
-  if(!t)return;
-  t.classList.add('show');
-  clearTimeout(_offlineTimer);
+  var t=document.getElementById('offline-toast');if(!t)return;
+  t.classList.add('show');clearTimeout(_offlineTimer);
   _offlineTimer=setTimeout(function(){t.classList.remove('show');},2500);
 }
 
 window.goTo=function(page){
   if(tryGuestWall(page))return;
-  // If offline and this page needs network, show toast and stay put
-  if(isOffline()&&NETWORK_PAGES.indexOf(page)!==-1){
-    showOfflineToast();
-    return;
-  }
-  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
-  /* Always reload profile + leaderboard (live data) */
+  if(isOffline()&&NETWORK_PAGES.indexOf(page)!==-1){showOfflineToast();return;}
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
   if((page==='profile'||page==='leaderboard')&&screensLoaded[page]){
     var old=document.querySelector('#screen-'+page+' iframe');
-    if(old)old.remove();
-    screensLoaded[page]=false;
+    if(old)old.remove();screensLoaded[page]=false;
   }
   var sc=document.getElementById('screen-'+page);
   if(sc)sc.classList.add('active');
@@ -196,14 +247,12 @@ window.goTo=function(page){
   updateNavActive(page);
   dismissSplash();
   if(screensLoaded[page])return;
-  var c=document.getElementById('screen-'+page);
-  if(!c)return;
-  /* On standalone, wait for auth before loading auth-required pages */
+  var c=document.getElementById('screen-'+page);if(!c)return;
   if(AUTH_PAGES.indexOf(page)!==-1&&isStandalone&&!_authResolved){
     var w=document.createElement('div');w.className='auth-wait';
     w.innerHTML='<div class="auth-wait-dots"><div class="auth-wait-dot"></div><div class="auth-wait-dot"></div><div class="auth-wait-dot"></div></div>';
     c.appendChild(w);
-    authReady().then(function(){var aw=c.querySelector('.auth-wait');if(aw)aw.remove();if(currentScreen===page)_loadIframe(page,c)});
+    authReady().then(function(){var aw=c.querySelector('.auth-wait');if(aw)aw.remove();if(currentScreen===page)_loadIframe(page,c);});
     return;
   }
   _loadIframe(page,c);
@@ -212,7 +261,7 @@ window.goTo=function(page){
 function _loadIframe(page,c){
   if(screensLoaded[page])return;
   var f=document.createElement('iframe'),src=page+'.html';
-  if(page==='improve'){var qs=sessionStorage.getItem('cebear_shared_qs');if(qs){src+=qs;sessionStorage.removeItem('cebear_shared_qs')}}
+  if(page==='improve'){var qs=sessionStorage.getItem('cebear_shared_qs');if(qs){src+=qs;sessionStorage.removeItem('cebear_shared_qs');}}
   f.src=src;f.allow='web-share';c.appendChild(f);screensLoaded[page]=true;
 }
 
@@ -242,32 +291,28 @@ function redeemSessionToken(sid){
   localStorage.removeItem('iq_guest');
   var p=new URLSearchParams(location.search),tT=p.get('t'),sI=p.get('session');
   if(tT||sI)history.replaceState({},'',location.pathname);
-
-  /* Stash shared Q params — survive any redirect */
   var qParam=p.get('q'),fromParam=p.get('from');
   if(qParam||fromParam){
     var qs='?';
     if(qParam)qs+='q='+encodeURIComponent(qParam);
-    if(fromParam)qs+=(qParam?'&':'')+ 'from='+encodeURIComponent(fromParam);
+    if(fromParam)qs+=(qParam?'&':'')+'from='+encodeURIComponent(fromParam);
     sessionStorage.setItem('cebear_shared_qs',qs);
     history.replaceState({},'',location.pathname);
   }
-
-  /* Check for GIS token from google-redirect.html (iOS standalone flow) */
   var gT=sessionStorage.getItem('bd_gis_token');
   if(gT){
     sessionStorage.removeItem('bd_gis_token');
     firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(gT))
-      .then(function(r){ensureUser(r.user)})
-      .then(function(){goTo('improve')})
-      .catch(function(){start()});
+      .then(function(r){ensureUser(r.user);})
+      .then(function(){goTo('improve');})
+      .catch(function(){start();});
     return;
   }
   if(sI){redeemSessionToken(sI).then(start).catch(start);return;}
   if(tT){
     fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tT})})
-      .then(function(r){return r.ok?r.json():null})
-      .then(function(b){b&&b.customToken?firebase.auth().signInWithCustomToken(b.customToken).then(function(){location.reload()}):start()})
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(b){b&&b.customToken?firebase.auth().signInWithCustomToken(b.customToken).then(function(){location.reload();}):start();})
       .catch(start);
     return;
   }
@@ -275,18 +320,16 @@ function redeemSessionToken(sid){
 
   function start(){
     if(isStandalone){
-      /* Standalone: wait for Firebase auth before showing anything */
-      authReady().then(function(){if(!currentScreen)goTo(_isAuthed?'improve':'auth')});
+      authReady().then(function(){if(!currentScreen)goTo(_isAuthed?'improve':'auth');});
     }else{
-      /* Web: load improve immediately — guest wall handles unauthed users */
       goTo('improve');
     }
   }
 })();
 
 var deferredPrompt=null;
-window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e});
-window.triggerInstall=function(){deferredPrompt&&deferredPrompt.prompt()};
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;});
+window.triggerInstall=function(){deferredPrompt&&deferredPrompt.prompt();};
 </script>
 </body>
 </html>
