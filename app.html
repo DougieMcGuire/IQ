@@ -14,30 +14,35 @@
     *{margin:0;padding:0;box-sizing:border-box}
     html,body{width:100%;height:100dvh;overflow:hidden;background:#1b2d5b;font-family:'Nunito',sans-serif;touch-action:manipulation}
 
-    /* ══ NEW SPLASH — matches testintro.html exactly ══ */
+    /* ══════════════════════════════════════════
+       SPLASH — exact copy of testintro.html
+       Blue bg, logo pops, Chewy letters stagger
+    ══════════════════════════════════════════ */
     #splash{
       position:fixed;inset:0;z-index:9999;
       background:#0474fc;
       display:flex;flex-direction:column;align-items:center;justify-content:center;
-      transition:opacity .4s ease;
       touch-action:manipulation;
       -webkit-user-select:none;user-select:none;
       -webkit-touch-callout:none;
+      transition:opacity .35s;
     }
     #splash.hide{opacity:0;pointer-events:none}
 
-    #splash .sp-logo{
-      width:170px;display:block;margin:0 auto;
+    #splash .logo{
+      width:170px;
+      display:block;
+      margin:0 auto;
       opacity:0;
       transform:translateY(28px) scale(0.6);
-      animation:splashPop 0.8s cubic-bezier(.34,1.56,.64,1) forwards;
+      animation:pop 0.8s cubic-bezier(.34,1.56,.64,1) forwards;
       pointer-events:none;
-      -webkit-user-drag:none;user-drag:none;
+      -webkit-user-drag:none;
     }
 
-    #splash .sp-text{
+    #splash .text{
       font-family:'Chewy',cursive;
-      font-size:clamp(64px,20vw,92px);
+      font-size:92px;
       color:#fff;
       margin-top:6px;
       white-space:nowrap;
@@ -46,29 +51,31 @@
       line-height:1;
     }
 
-    #splash .sp-letter{
+    #splash .letter{
       display:inline-block;
       opacity:0;
       transform:translateY(28px) scale(0.6);
-      animation:splashLetter cubic-bezier(.34,1.56,.64,1) forwards;
+      animation:popLetter cubic-bezier(.34,1.56,.64,1) forwards;
       will-change:transform;
       backface-visibility:hidden;
     }
-    #splash .sp-letter:nth-child(1){animation-delay:0.15s;animation-duration:0.65s}
-    #splash .sp-letter:nth-child(2){animation-delay:0.19s;animation-duration:0.61s}
-    #splash .sp-letter:nth-child(3){animation-delay:0.23s;animation-duration:0.57s}
-    #splash .sp-letter:nth-child(4){animation-delay:0.27s;animation-duration:0.53s}
-    #splash .sp-letter:nth-child(5){animation-delay:0.31s;animation-duration:0.49s}
-    #splash .sp-letter:nth-child(6){animation-delay:0.35s;animation-duration:0.45s}
 
-    @keyframes splashPop{
-      0%{opacity:0;transform:translateY(28px) scale(0.6)}
-      65%{opacity:1;transform:translateY(-6px) scale(1.08)}
+    /* Exact same delays as testintro.html — all finish at ~0.8s */
+    #splash .letter:nth-child(1){animation-delay:0.15s;animation-duration:0.65s}
+    #splash .letter:nth-child(2){animation-delay:0.19s;animation-duration:0.61s}
+    #splash .letter:nth-child(3){animation-delay:0.23s;animation-duration:0.57s}
+    #splash .letter:nth-child(4){animation-delay:0.27s;animation-duration:0.53s}
+    #splash .letter:nth-child(5){animation-delay:0.31s;animation-duration:0.49s}
+    #splash .letter:nth-child(6){animation-delay:0.35s;animation-duration:0.45s}
+
+    @keyframes pop{
+      0%  {opacity:0;transform:translateY(28px) scale(0.6)}
+      65% {opacity:1;transform:translateY(-6px) scale(1.08)}
       100%{opacity:1;transform:translateY(0) scale(1)}
     }
-    @keyframes splashLetter{
-      0%{opacity:0;transform:translateY(28px) scale(0.6)}
-      65%{opacity:1;transform:translateY(-6px) scale(1.08)}
+    @keyframes popLetter{
+      0%  {opacity:0;transform:translateY(28px) scale(0.6)}
+      65% {opacity:1;transform:translateY(-6px) scale(1.08)}
       100%{opacity:1;transform:translateY(0) scale(1)}
     }
 
@@ -105,11 +112,11 @@
 </head>
 <body>
 
-<!-- ══ NEW SPLASH ══ -->
+<!-- ══ SPLASH — matches testintro.html exactly ══ -->
 <div id="splash">
-  <img src="logo.png" class="sp-logo" alt="Cebear" draggable="false">
-  <div class="sp-text">
-    <span class="sp-letter">c</span><span class="sp-letter">e</span><span class="sp-letter">b</span><span class="sp-letter">e</span><span class="sp-letter">a</span><span class="sp-letter">r</span>
+  <img src="logo.png" class="logo" alt="" draggable="false">
+  <div class="text">
+    <span class="letter">c</span><span class="letter">e</span><span class="letter">b</span><span class="letter">e</span><span class="letter">a</span><span class="letter">r</span>
   </div>
 </div>
 
@@ -136,18 +143,17 @@ firebase.initializeApp({apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDom
 var WORKER_URL='https://cebear.com/api/redeem-install-token';
 var isStandalone=!!('standalone' in navigator&&navigator.standalone||window.matchMedia('(display-mode: standalone)').matches);
 
-/* ── Splash dismiss — wait for animations to finish (~1s), then hide ── */
-var _splashDismissed=false;
+/* ── Splash dismiss — letters finish at 0.8s, auto-dismiss at 1s ── */
+var _splashGone=false;
 function dismissSplash(){
-  if(_splashDismissed)return;
-  _splashDismissed=true;
+  if(_splashGone)return;
+  _splashGone=true;
   var sp=document.getElementById('splash');
   if(!sp)return;
   sp.classList.add('hide');
-  setTimeout(function(){if(sp.parentNode)sp.parentNode.removeChild(sp);},450);
+  setTimeout(function(){if(sp&&sp.parentNode)sp.parentNode.removeChild(sp);},400);
 }
-// Auto-dismiss after 1.2s regardless (letter animations finish at ~0.8s)
-setTimeout(dismissSplash,1200);
+setTimeout(dismissSplash,1000);
 
 /* ── Nav helpers ── */
 function showNav(s){document.body.classList.toggle('has-nav',s);}
@@ -157,19 +163,9 @@ function updateNavActive(p){document.querySelectorAll('#nav .nb').forEach(functi
 var _isAuthed=false,_authResolved=false,_authWaiters=[];
 firebase.auth().onAuthStateChanged(function(u){
   _isAuthed=!!u;
-  if(!_authResolved){
-    _authResolved=true;
-    _authWaiters.forEach(function(fn){fn(u);});
-    _authWaiters=[];
-  }
-  if(u){
-    if(!currentScreen||currentScreen==='auth')goTo('improve');
-    _notifyImprove('authSuccess');
-  }else if(isStandalone){
-    currentScreen=null;screensLoaded={};
-    document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
-    goTo('auth');
-  }
+  if(!_authResolved){_authResolved=true;_authWaiters.forEach(function(fn){fn(u);});_authWaiters=[];}
+  if(u){if(!currentScreen||currentScreen==='auth')goTo('improve');_notifyImprove('authSuccess');}
+  else if(isStandalone){currentScreen=null;screensLoaded={};document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});goTo('auth');}
 });
 function authReady(){
   if(_authResolved)return Promise.resolve(_isAuthed);
@@ -178,12 +174,12 @@ function authReady(){
 function _notifyImprove(type,extra){
   (function attempt(n){
     var f=document.querySelector('#screen-improve iframe');
-    if(f&&f.contentWindow){f.contentWindow.postMessage(Object.assign({type:type},extra||{}),'*');}
-    else if(n>0){setTimeout(function(){attempt(n-1);},100);}
+    if(f&&f.contentWindow)f.contentWindow.postMessage(Object.assign({type:type},extra||{}),'*');
+    else if(n>0)setTimeout(function(){attempt(n-1);},100);
   })(30);
 }
 
-/* ── Guest wall interception ── */
+/* ── Guest wall interception for nav tabs ── */
 function tryGuestWall(page){
   if(isStandalone||_isAuthed)return false;
   if(page!=='profile'&&page!=='tasks'&&page!=='leaderboard')return false;
@@ -223,7 +219,6 @@ window.addEventListener('message',function(e){
 var currentScreen=null,screensLoaded={};
 var AUTH_PAGES=['profile','tasks','leaderboard'];
 var NETWORK_PAGES=['profile','tasks','leaderboard'];
-
 function isOffline(){return!navigator.onLine;}
 var _offlineTimer=null;
 function showOfflineToast(){
@@ -240,12 +235,8 @@ window.goTo=function(page){
     var old=document.querySelector('#screen-'+page+' iframe');
     if(old)old.remove();screensLoaded[page]=false;
   }
-  var sc=document.getElementById('screen-'+page);
-  if(sc)sc.classList.add('active');
-  currentScreen=page;
-  showNav(page!=='auth');
-  updateNavActive(page);
-  dismissSplash();
+  var sc=document.getElementById('screen-'+page);if(sc)sc.classList.add('active');
+  currentScreen=page;showNav(page!=='auth');updateNavActive(page);dismissSplash();
   if(screensLoaded[page])return;
   var c=document.getElementById('screen-'+page);if(!c)return;
   if(AUTH_PAGES.indexOf(page)!==-1&&isStandalone&&!_authResolved){
@@ -303,9 +294,7 @@ function redeemSessionToken(sid){
   if(gT){
     sessionStorage.removeItem('bd_gis_token');
     firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(gT))
-      .then(function(r){ensureUser(r.user);})
-      .then(function(){goTo('improve');})
-      .catch(function(){start();});
+      .then(function(r){ensureUser(r.user);}).then(function(){goTo('improve');}).catch(function(){start();});
     return;
   }
   if(sI){redeemSessionToken(sI).then(start).catch(start);return;}
@@ -317,13 +306,9 @@ function redeemSessionToken(sid){
     return;
   }
   start();
-
   function start(){
-    if(isStandalone){
-      authReady().then(function(){if(!currentScreen)goTo(_isAuthed?'improve':'auth');});
-    }else{
-      goTo('improve');
-    }
+    if(isStandalone){authReady().then(function(){if(!currentScreen)goTo(_isAuthed?'improve':'auth');});}
+    else{goTo('improve');}
   }
 })();
 
