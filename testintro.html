@@ -2,11 +2,9 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 <style>
   html, body {
     margin: 0;
-    padding: 0;
     height: 100%;
     background: #0474fc;
     display: flex;
@@ -17,23 +15,14 @@
 
   video {
     width: min(90vw, 90vh);
-    height: auto;
-    opacity: 0;
-    transition: opacity 0.15s linear;
     pointer-events: none;
-  }
-
-  video.visible {
-    opacity: 1;
   }
 </style>
 </head>
-
 <body>
 
 <video
   id="intro"
-  autoplay
   muted
   playsinline
   preload="auto"
@@ -45,9 +34,14 @@
 <script>
   const video = document.getElementById("intro");
 
-  video.addEventListener("loadeddata", () => {
-    video.classList.add("visible");
-    video.play();
+  video.addEventListener("loadedmetadata", () => {
+    video.currentTime = 0;
+  });
+
+  video.addEventListener("canplaythrough", () => {
+    requestAnimationFrame(() => {
+      video.play();
+    });
   });
 
   video.onended = () => {
