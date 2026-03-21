@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
 <style>
   html, body {
     margin: 0;
@@ -16,20 +17,23 @@
 
   video {
     width: min(90vw, 90vh);
+    height: auto;
     opacity: 0;
-    transition: opacity 0.12s linear;
+    transition: opacity 0.15s linear;
     pointer-events: none;
   }
 
-  video.show {
+  video.visible {
     opacity: 1;
   }
 </style>
 </head>
+
 <body>
 
 <video
   id="intro"
+  autoplay
   muted
   playsinline
   preload="auto"
@@ -39,16 +43,16 @@
 </video>
 
 <script>
-  const vid = document.getElementById("intro");
+  const video = document.getElementById("intro");
 
-  vid.addEventListener("loadeddata", () => {
-    vid.classList.add("show");
-    vid.play();
+  video.addEventListener("loadeddata", () => {
+    video.classList.add("visible");
+    video.play();
   });
 
-  vid.onended = () => {
-    vid.pause();
-    vid.currentTime = vid.duration - 0.001;
+  video.onended = () => {
+    video.pause();
+    video.currentTime = video.duration - 0.001;
   };
 </script>
 
