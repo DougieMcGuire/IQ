@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
+  @font-face {
+    font-family: 'Chewy';
+    src: url('Chewy-Regular.ttf') format('truetype');
+  }
+
   html, body {
     margin: 0;
     height: 100%;
@@ -13,42 +18,61 @@
     overflow: hidden;
   }
 
-  video {
-    width: min(90vw, 90vh);
-    pointer-events: none;
+  .container {
+    text-align: center;
+    color: white;
+  }
+
+  .logo {
+    width: 160px;
+    opacity: 0;
+    transform: scale(0.6);
+    animation: logoIn 0.6s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+
+  .text {
+    font-family: 'Chewy', cursive;
+    font-size: 64px;
+    margin-top: 10px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: textIn 0.6s ease-out forwards;
+    animation-delay: 0.2s;
+  }
+
+  @keyframes logoIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+    70% {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes textIn {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 </style>
 </head>
 <body>
 
-<video
-  id="intro"
-  muted
-  playsinline
-  preload="auto"
-  disablepictureinpicture
->
-  <source src="copy_204462D8-E7CB-4CE8-AA6C-277226155A65.mp4" type="video/mp4">
-</video>
-
-<script>
-  const video = document.getElementById("intro");
-
-  video.addEventListener("loadedmetadata", () => {
-    video.currentTime = 0;
-  });
-
-  video.addEventListener("canplaythrough", () => {
-    requestAnimationFrame(() => {
-      video.play();
-    });
-  });
-
-  video.onended = () => {
-    video.pause();
-    video.currentTime = video.duration - 0.001;
-  };
-</script>
+<div class="container">
+  <img src="logo.png" class="logo">
+  <div class="text">cebear</div>
+</div>
 
 </body>
 </html>
