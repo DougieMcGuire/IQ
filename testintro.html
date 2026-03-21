@@ -24,17 +24,16 @@
     color: white;
   }
 
-  /* Bear logo */
+  /* Logo */
   .logo {
     width: 170px;
     display: block;
     margin: 0 auto;
     opacity: 0;
-    transform: scale(0.6);
-    animation: pop 0.7s cubic-bezier(.34,1.56,.64,1) forwards;
+    transform: translateY(28px) scale(0.6);
+    animation: pop 0.8s cubic-bezier(.34,1.56,.64,1) forwards;
   }
 
-  /* Text container */
   .text {
     font-family: 'Chewy', cursive;
     font-size: 92px;
@@ -42,24 +41,37 @@
     white-space: nowrap;
   }
 
-  /* Individual letters */
   .letter {
     display: inline-block;
     opacity: 0;
     transform: translateY(28px) scale(0.6);
-    animation: pop 0.7s cubic-bezier(.34,1.56,.64,1) forwards;
+    animation: popLetter cubic-bezier(.34,1.56,.64,1) forwards;
   }
 
-  /* Very subtle stagger */
-  .letter:nth-child(1) { animation-delay: 0.12s; }
-  .letter:nth-child(2) { animation-delay: 0.16s; }
-  .letter:nth-child(3) { animation-delay: 0.20s; }
-  .letter:nth-child(4) { animation-delay: 0.24s; }
-  .letter:nth-child(5) { animation-delay: 0.28s; }
-  .letter:nth-child(6) { animation-delay: 0.32s; }
+  /* All letters finish at 0.8s */
+  .letter:nth-child(1) { animation-delay: 0.15s; animation-duration: 0.65s; }
+  .letter:nth-child(2) { animation-delay: 0.19s; animation-duration: 0.61s; }
+  .letter:nth-child(3) { animation-delay: 0.23s; animation-duration: 0.57s; }
+  .letter:nth-child(4) { animation-delay: 0.27s; animation-duration: 0.53s; }
+  .letter:nth-child(5) { animation-delay: 0.31s; animation-duration: 0.49s; }
+  .letter:nth-child(6) { animation-delay: 0.35s; animation-duration: 0.45s; }
 
-  /* Shared animation for PERFECT sync */
   @keyframes pop {
+    0% {
+      opacity: 0;
+      transform: translateY(28px) scale(0.6);
+    }
+    65% {
+      opacity: 1;
+      transform: translateY(-6px) scale(1.08);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes popLetter {
     0% {
       opacity: 0;
       transform: translateY(28px) scale(0.6);
