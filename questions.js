@@ -16,6 +16,10 @@
 var Q = {
   age: 25,
   used: new Set(),
+  _lastType: null,         // prevent consecutive same game type
+  _typeHistory: [],        // recent type history for balancing
+  _typeCounts: {},         // count per type in recent window
+  _BALANCE_WINDOW: 12,     // look back 12 cards for balance
 
   // ─── Registry internals ──────────────────────────
   _types: {},       // name → generator function
@@ -23,7 +27,6 @@ var Q = {
   _renderers: {},   // name → { render(q,idx), attach(slideEl,q,idx,ctx) }
 
   // ─── Public: register a question type ────────────
-  // weight controls how often this type appears relative to others
   register(name, fn, weight) {
     if (typeof weight !== 'number' || weight < 1) weight = 1;
     this._types[name] = fn;
@@ -31,10 +34,6 @@ var Q = {
   },
 
   // ─── Public: register a custom renderer ──────────
-  // render(q, idx) → HTML string for the slide
-  // attach(slideEl, q, idx, ctx) → called after DOM insert for event binding
-  //   ctx provides: { feed, flashEl, confettiEl, IQData, getEncouragement,
-  //                   updateUI, checkMore, spawnConfetti, answerStartRef }
   registerRenderer(name, renderer) {
     this._renderers[name] = renderer;
   },
@@ -42,12 +41,46 @@ var Q = {
   // ─── Public API ──────────────────────────────────
   setAge(a) { this.age = a || 25; },
 
+  // Get a shuffled pool of type names, excluding the last played type
+  // and types that have appeared too frequently in the recent window
+  _getBalancedType() {
+    const allTypes = Object.keys(this._types);
+    if (!allTypes.length) return null;
+
+    // Count recent type appearances
+    const recent = this._typeHistory.slice(-this._BALANCE_WINDOW);
+    const counts = {};
+    recent.forEach(t => { counts[t] = (counts[t] || 0) + 1; });
+
+    // Max times a type can appear in the window (soft cap)
+    const softCap = Math.max(2, Math.ceil(this._BALANCE_WINDOW / allTypes.length) + 1);
+
+    // Build a candidate pool from _weights, excluding last type and over-represented types
+    let pool = this._weights.filter(t => {
+      if (t === this._lastType) return false;
+      if ((counts[t] || 0) >= softCap) return false;
+      return true;
+    });
+
+    // If pool is empty (e.g. only one type registered), allow the last type
+    if (!pool.length) {
+      pool = this._weights.filter(t => t !== this._lastType);
+    }
+    // If still empty, use everything
+    if (!pool.length) {
+      pool = this._weights.slice();
+    }
+
+    return pool[Math.floor(Math.random() * pool.length)];
+  },
+
   generate(targetDifficulty) {
     if (targetDifficulty === undefined) targetDifficulty = 1.0;
     const tolerance = 0.45;
     let q, tries = 0;
     do {
-      const typeName = this.pick(this._weights);
+      const typeName = this._getBalancedType();
+      if (!typeName) break;
       const fn = this._types[typeName];
       if (!fn) continue;
       q = fn.call(this);
@@ -57,6 +90,15 @@ var Q = {
       this.used.has(this.hash(q)) ||
       Math.abs(q.difficulty - targetDifficulty) > tolerance
     );
+
+    if (!q) return null;
+
+    // Track type history for consecutive/balance prevention
+    this._lastType = q.type;
+    this._typeHistory.push(q.type);
+    if (this._typeHistory.length > this._BALANCE_WINDOW * 2) {
+      this._typeHistory = this._typeHistory.slice(-this._BALANCE_WINDOW);
+    }
 
     this.used.add(this.hash(q));
     if (this.used.size > 1500) this.used = new Set([...this.used].slice(-750));
