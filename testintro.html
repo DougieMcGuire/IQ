@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #0474fc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    touch-action: manipulation;
+  }
+
+  video {
+    width: min(90vw, 90vh);
+    height: auto;
+    object-fit: contain;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<video
+  id="intro"
+  autoplay
+  muted
+  playsinline
+  preload="auto"
+>
+  <source src="copy_204462D8-E7CB-4CE8-AA6C-277226155A65.mp4" type="video/mp4">
+</video>
+
+<script>
+  const vid = document.getElementById("intro");
+
+  vid.onended = () => {
+    vid.pause();
+    vid.currentTime = vid.duration - 0.001;
+  };
+</script>
+
+</body>
+</html>
