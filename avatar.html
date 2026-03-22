@@ -6,588 +6,551 @@
   <title>Avatar Editor — Cebear</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#151f3e;--navy:#1b2d5b;--navyM:#243a6e;--cream:#F0EAD6;--green:#3fba4f;--gd:#2d9a3c;--red:#e8443a;--gold:#e8a817;--goldd:#c48e10;--blue:#3a7df2;--dim:rgba(240,234,214,.4);--dimmer:rgba(240,234,214,.15)}
+    :root{--bg:#151f3e;--navy:#1b2d5b;--navyM:#243a6e;--cream:#F0EAD6;--green:#3fba4f;--gd:#2d9a3c;--red:#e8443a;--gold:#e8a817;--goldd:#c48e10;--blue:#3a7df2;--dim:rgba(240,234,214,.4);--dimmer:rgba(240,234,214,.12)}
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-    html,body{width:100%;height:100dvh;overflow:hidden;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--cream)}
+    html,body{width:100%;height:100%;overflow:hidden;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--cream)}
+    .editor{display:flex;flex-direction:column;height:100%;overflow:hidden}
 
-    /* ── LAYOUT ── */
-    .editor{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
-
-    /* ── HEADER ── */
-    .header{display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top,12px) + 8px) 16px 10px;background:var(--navy);border-bottom:1px solid var(--dimmer);flex-shrink:0}
-    .header-title{font-size:17px;font-weight:900;color:var(--cream)}
-    .btn-close{background:var(--dimmer);border:none;border-radius:10px;padding:7px 14px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:var(--dim);cursor:pointer;transition:all .15s}
-    .btn-close:active{opacity:.7}
-    .btn-save{background:var(--green);border:none;border-radius:10px;padding:7px 18px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;color:#fff;cursor:pointer;box-shadow:0 3px 0 var(--gd);transition:transform .1s;display:flex;align-items:center;gap:6px}
+    /* header */
+    .hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;background:var(--navy);border-bottom:1px solid var(--dimmer);flex-shrink:0}
+    .hdr-title{font-size:16px;font-weight:900}
+    .btn-x{background:var(--dimmer);border:none;border-radius:10px;padding:7px 12px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:var(--dim);cursor:pointer}
+    .btn-save{background:var(--green);border:none;border-radius:10px;padding:7px 18px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;color:#fff;cursor:pointer;box-shadow:0 3px 0 var(--gd)}
     .btn-save:active{transform:translateY(3px);box-shadow:none}
-    .btn-save:disabled{opacity:.45;pointer-events:none}
-    .btn-save svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+    .btn-save:disabled{opacity:.4;pointer-events:none}
 
-    /* ── PREVIEW ── */
-    .preview-area{display:flex;justify-content:center;align-items:center;padding:16px;flex-shrink:0;background:var(--navy)}
-    .avatar-ring{width:140px;height:140px;border-radius:50%;overflow:hidden;border:3px solid var(--dimmer);background:var(--navyM);position:relative;flex-shrink:0}
-    .avatar-ring canvas{width:100%;height:100%;display:block}
-    .avatar-ring .loading-ring{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-    .spin{width:28px;height:28px;border:3px solid var(--dimmer);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
+    /* preview */
+    .preview-row{display:flex;justify-content:center;padding:12px 16px;background:var(--navy);flex-shrink:0}
+    .av-ring{width:120px;height:120px;border-radius:50%;overflow:hidden;border:3px solid var(--dimmer);background:var(--navyM);flex-shrink:0}
+    .av-ring canvas{width:100%;height:100%;display:block}
+
+    /* category tabs */
+    .cat-row{display:flex;gap:6px;overflow-x:auto;padding:8px 16px;flex-shrink:0;scroll-snap-type:x mandatory}
+    .cat-row::-webkit-scrollbar{display:none}
+    .cat-tab{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;cursor:pointer;padding:7px 9px;border-radius:12px;background:var(--dimmer);border:2px solid transparent;min-width:52px;transition:all .12s}
+    .cat-tab.active{background:rgba(58,125,242,.2);border-color:var(--blue)}
+    .cat-tab:active{opacity:.7}
+    .cat-tab-icon{font-size:20px;line-height:1}
+    .cat-tab-lbl{font-size:9px;font-weight:800;color:var(--dim);white-space:nowrap}
+    .cat-tab.active .cat-tab-lbl{color:var(--blue)}
+
+    /* color strip */
+    .color-row{flex-shrink:0;padding:6px 16px 4px;display:none}
+    .color-row.show{display:block}
+    .color-row-lbl{font-size:9px;font-weight:900;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
+    .color-dots{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+    .color-dots::-webkit-scrollbar{display:none}
+    .cdot{width:26px;height:26px;border-radius:50%;flex-shrink:0;cursor:pointer;border:3px solid transparent;transition:transform .1s,border-color .1s}
+    .cdot.on{border-color:#fff;transform:scale(1.22)}
+    .cdot:active{transform:scale(.88)}
+
+    /* items grid */
+    .items-wrap{flex:1;overflow-y:auto;padding:8px 16px 24px}
+    .items-wrap::-webkit-scrollbar{display:none}
+    .items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:7px}
+    .icard{aspect-ratio:1;border-radius:12px;background:var(--dimmer);border:2.5px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;transition:border-color .1s}
+    .icard:active{opacity:.7}
+    .icard.on{border-color:var(--gold);background:rgba(232,168,23,.1)}
+    .icard canvas{width:82%;height:82%}
+    .icard-none{font-size:11px;font-weight:800;color:var(--dim);text-align:center}
+    .icheck{position:absolute;bottom:3px;right:3px;width:14px;height:14px;background:var(--gold);border-radius:50%;display:none;align-items:center;justify-content:center}
+    .icard.on .icheck{display:flex}
+    .icheck svg{width:9px;height:9px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+
+    /* saving */
+    .saving{position:fixed;inset:0;background:rgba(21,31,62,.88);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:99;backdrop-filter:blur(6px)}
+    .saving.show{display:flex}
+    .saving-lbl{font-size:15px;font-weight:800}
+    .spin{width:38px;height:38px;border:4px solid var(--dimmer);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    /* ── CATEGORY TABS ── */
-    .cat-scroll{display:flex;gap:8px;overflow-x:auto;padding:10px 16px;flex-shrink:0;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
-    .cat-scroll::-webkit-scrollbar{display:none}
-    .cat-tab{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;cursor:pointer;scroll-snap-align:start;padding:8px 10px;border-radius:14px;background:var(--dimmer);border:2px solid transparent;transition:all .15s;min-width:58px}
-    .cat-tab.active{background:rgba(58,125,242,.2);border-color:var(--blue)}
-    .cat-tab:active{transform:scale(.94)}
-    .cat-tab-icon{font-size:22px;line-height:1}
-    .cat-tab-label{font-size:10px;font-weight:800;color:var(--dim);white-space:nowrap}
-    .cat-tab.active .cat-tab-label{color:var(--blue)}
-
-    /* ── COLOR STRIP ── */
-    .color-strip-wrap{flex-shrink:0;padding:8px 16px 4px;display:none}
-    .color-strip-wrap.show{display:block}
-    .color-strip-label{font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
-    .color-strip{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px}
-    .color-strip::-webkit-scrollbar{display:none}
-    .color-dot{width:28px;height:28px;border-radius:50%;flex-shrink:0;cursor:pointer;border:3px solid transparent;transition:transform .1s,border-color .1s}
-    .color-dot.active{border-color:#fff;transform:scale(1.2)}
-    .color-dot:active{transform:scale(.9)}
-
-    /* ── ITEMS GRID ── */
-    .items-area{flex:1;overflow-y:auto;padding:8px 16px calc(env(safe-area-inset-bottom,0px) + 16px);-webkit-overflow-scrolling:touch}
-    .items-area::-webkit-scrollbar{display:none}
-    .items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px}
-    .item-card{width:100%;aspect-ratio:1;border-radius:14px;background:var(--dimmer);border:2.5px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:border-color .12s,transform .1s;position:relative}
-    .item-card:active{transform:scale(.93)}
-    .item-card.active{border-color:var(--gold);background:rgba(232,168,23,.12)}
-    .item-card canvas{width:80%;height:80%;image-rendering:pixelated}
-    .item-card-none{font-size:11px;font-weight:800;color:var(--dim);text-align:center;line-height:1.3}
-    .item-card .item-check{position:absolute;bottom:4px;right:4px;width:16px;height:16px;background:var(--gold);border-radius:50%;display:none;align-items:center;justify-content:center}
-    .item-card.active .item-check{display:flex}
-    .item-check svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
-
-    /* ── TOAST ── */
-    .toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--green);color:#fff;border-radius:14px;padding:10px 22px;font-size:14px;font-weight:800;opacity:0;pointer-events:none;transition:all .3s;z-index:999;white-space:nowrap}
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--green);color:#fff;border-radius:12px;padding:9px 20px;font-size:13px;font-weight:800;opacity:0;pointer-events:none;transition:all .3s;z-index:100;white-space:nowrap}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    .toast.error{background:var(--red)}
-
-    /* saving overlay */
-    .saving-overlay{position:fixed;inset:0;background:rgba(21,31,62,.85);display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:500;backdrop-filter:blur(6px)}
-    .saving-overlay.show{display:flex}
-    .saving-text{font-size:16px;font-weight:800;color:var(--cream)}
+    .toast.err{background:var(--red)}
   </style>
 </head>
 <body>
 <div class="editor">
-
-  <div class="header">
-    <button class="btn-close" onclick="closeEditor()">✕ Close</button>
-    <div class="header-title">Edit Avatar</div>
-    <button class="btn-save" id="save-btn" onclick="saveAvatar()">
-      <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      Save
-    </button>
+  <div class="hdr">
+    <button class="btn-x" onclick="closeMe()">✕</button>
+    <div class="hdr-title">Edit Avatar</div>
+    <button class="btn-save" id="save-btn" onclick="doSave()">Save</button>
   </div>
-
-  <div class="preview-area">
-    <div class="avatar-ring">
-      <canvas id="preview-canvas" width="280" height="280"></canvas>
-    </div>
+  <div class="preview-row">
+    <div class="av-ring"><canvas id="pv" width="240" height="240"></canvas></div>
   </div>
-
-  <!-- Category tabs -->
-  <div class="cat-scroll" id="cat-scroll"></div>
-
-  <!-- Color strip -->
-  <div class="color-strip-wrap" id="color-strip-wrap">
-    <div class="color-strip-label" id="color-strip-label">Color</div>
-    <div class="color-strip" id="color-strip"></div>
+  <div class="cat-row" id="cat-row"></div>
+  <div class="color-row" id="color-row">
+    <div class="color-row-lbl" id="color-lbl">Color</div>
+    <div class="color-dots" id="color-dots"></div>
   </div>
-
-  <!-- Items -->
-  <div class="items-area">
-    <div class="items-grid" id="items-grid"></div>
-  </div>
-
+  <div class="items-wrap"><div class="items-grid" id="grid"></div></div>
 </div>
-
+<div class="saving" id="saving"><div class="spin"></div><div class="saving-lbl">Saving...</div></div>
 <div class="toast" id="toast"></div>
-<div class="saving-overlay" id="saving-overlay">
-  <div class="spin" style="width:44px;height:44px;border-width:4px"></div>
-  <div class="saving-text">Saving avatar...</div>
-</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
+'use strict';
+
 // ── Firebase ──────────────────────────────────────────────────────────────────
-var _fb = null, _auth = null, _db = null, _user = null;
+var _auth, _db, _user = null;
 (function(){
   try {
-    // Try to reuse parent firebase if in iframe
     if (window.parent !== window && window.parent.firebase) {
-      _fb = window.parent.firebase;
-      _auth = _fb.auth();
-      _db = _fb.firestore();
+      var pf = window.parent.firebase;
+      _auth = pf.auth(); _db = pf.firestore();
       _user = _auth.currentUser;
       _auth.onAuthStateChanged(function(u){ _user = u; });
       return;
     }
   } catch(e){}
-  // Standalone init
-  var cfg = {
-    apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
-    authDomain:"braindeer-backend.firebaseapp.com",
-    projectId:"braindeer-backend",
-    storageBucket:"braindeer-backend.firebasestorage.app",
-    messagingSenderId:"331205139765",
-    appId:"1:331205139765:web:20cfef8194af63fc55c07c"
-  };
-  if (!firebase.apps.length) firebase.initializeApp(cfg);
-  _auth = firebase.auth();
-  _db = firebase.firestore();
-  _auth.onAuthStateChanged(function(u){ _user = u; });
+  var cfg={apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend"};
+  if(!firebase.apps.length) firebase.initializeApp(cfg);
+  _auth=firebase.auth(); _db=firebase.firestore();
+  _auth.onAuthStateChanged(function(u){ _user=u; });
 })();
 
-// ── Constants ─────────────────────────────────────────────────────────────────
-var BASE_URL = '/Avatars/';
+// ── Config ────────────────────────────────────────────────────────────────────
+var BASE = '/Avatars/';
 
-var LAYER_ORDER = ['bases','neck','hair','eyes','brows','noses','mouths','tops','glasses','hats'];
+// Render order for baking
+var LAYERS = ['bases','neck','hair','eyes','brows','noses','mouths','tops','glasses','hats'];
 
-var CATEGORIES = [
-  { id:'skin',    label:'Skin',       icon:'🧑',  colorKey:'bases',    layerKey:'bases'   },
-  { id:'hair',    label:'Hair',       icon:'💇',  colorKey:'hair',     layerKey:'hair'    },
-  { id:'eyes',    label:'Eyes',       icon:'👁',  colorKey:'eyes',     layerKey:'eyes'    },
-  { id:'brows',   label:'Brows',      icon:'🤨',  colorKey:'brows',    layerKey:'brows'   },
-  { id:'noses',   label:'Nose',       icon:'👃',  colorKey:null,       layerKey:'noses'   },
-  { id:'mouths',  label:'Mouth',      icon:'👄',  colorKey:'mouths',   layerKey:'mouths'  },
-  { id:'tops',    label:'Clothes',    icon:'👕',  colorKey:'tops',     layerKey:'tops'    },
-  { id:'neck',    label:'Neck',       icon:'📿',  colorKey:'neck',     layerKey:'neck'    },
-  { id:'glasses', label:'Glasses',    icon:'🕶',  colorKey:'glasses',  layerKey:'glasses' },
-  { id:'hats',    label:'Hats',       icon:'🎩',  colorKey:'hats',     layerKey:'hats'    },
-  { id:'bg',      label:'Background', icon:'🎨',  colorKey:'bg',       layerKey:null      },
+// Which layers have no colorable green (draw as-is)
+var NO_COL = {brows:1, noses:1};
+
+var CATS = [
+  {id:'skin',    lbl:'Skin',    icon:'🧑', ck:'bases',   lk:'bases'},
+  {id:'hair',    lbl:'Hair',    icon:'💇', ck:'hair',    lk:'hair'},
+  {id:'eyes',    lbl:'Eyes',    icon:'👁', ck:'eyes',    lk:'eyes'},
+  {id:'brows',   lbl:'Brows',   icon:'🤨', ck:null,      lk:'brows'},
+  {id:'noses',   lbl:'Nose',    icon:'👃', ck:null,      lk:'noses'},
+  {id:'mouths',  lbl:'Mouth',   icon:'👄', ck:'mouths',  lk:'mouths'},
+  {id:'tops',    lbl:'Clothes', icon:'👕', ck:'tops',    lk:'tops'},
+  {id:'neck',    lbl:'Neck',    icon:'📿', ck:'neck',    lk:'neck'},
+  {id:'glasses', lbl:'Glasses', icon:'🕶', ck:'glasses', lk:'glasses'},
+  {id:'hats',    lbl:'Hats',    icon:'🎩', ck:'hats',    lk:'hats'},
+  {id:'bg',      lbl:'BG',      icon:'🎨', ck:'bg',      lk:null},
 ];
 
-// Sections that allow "none" selection
-var OPTIONAL = ['neck','glasses','hats','brows','noses'];
-// Sections with no color (noses has no colorable green pixels worth exposing)
-var NO_COLOR = ['noses','brows'];
+var OPTIONAL = {neck:1, glasses:1, hats:1, brows:1, noses:1};
 
-var COLOR_PALETTE = [
-  // Skin tones
+var COLORS = [
   '#FDBCB4','#F4C2A1','#E8B982','#D1A374','#C19A6B','#A67C5A','#8D5524','#6B4423',
-  // Warm
-  '#FF4500','#FF6347','#FFA500','#FFD700','#F0E68C','#FFFACD',
-  // Cool
-  '#87CEEB','#4169E1','#000080','#6A5ACD','#9370DB','#FF69B4','#FF1493',
-  // Nature
-  '#228B22','#006400','#8FBC8F','#90EE90','#20B2AA','#008B8B',
-  // Neutral
-  '#FFFFFF','#F5F5F5','#D3D3D3','#A9A9A9','#808080','#696969','#404040','#1C1C1C','#000000',
-  // Rich
-  '#8B0000','#A52A2A','#B8860B','#DAA520','#CD853F','#8B4513',
-  // Bright
-  '#FF00FF','#FF007F','#00FFFF','#00FF7F','#7FFF00','#FF7F00',
+  '#FF4500','#FF6347','#FFA500','#FFD700','#F5DEB3','#FFDAB9',
+  '#FF69B4','#FF1493','#FF00FF','#FF007F','#DC143C','#8B0000',
+  '#87CEEB','#4169E1','#000080','#6A5ACD','#9370DB','#00FFFF',
+  '#228B22','#006400','#90EE90','#20B2AA','#008B8B','#00FF7F',
+  '#FFFFFF','#D3D3D3','#A9A9A9','#808080','#404040','#1C1C1C','#000000',
+  '#8B4513','#A0522D','#CD853F','#DAA520','#B8860B','#FF7F00',
 ];
 
-var BG_PALETTE = [
+var BG_COLORS = [
   '#0474fc','#3a7df2','#6d4aed','#e8443a','#3fba4f','#e8a817','#e87d1a','#e8557a',
-  '#00bcd4','#009688','#4caf50','#8bc34a','#cddc39','#ffeb3b','#ff9800','#ff5722',
-  '#795548','#607d8b','#9e9e9e','#1b2d5b','#151f3e','#243a6e','#2f4a88',
+  '#00bcd4','#009688','#1b2d5b','#151f3e','#243a6e','#2f4a88',
   '#FF9A9E','#FECFEF','#667eea','#764ba2','#f093fb','#4facfe','#43e97b','#fa709a',
+  '#ff5722','#795548','#607d8b','#9e9e9e','#ffeb3b','#ff9800','#cddc39','#8bc34a',
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────────
 var manifest = {};
-var currentCat = 'skin';
-var state = {
-  parts: {
-    bases: 'base.png',
-    neck: '',
-    hair: '1.png',
-    eyes: 'BasicMale.png',
-    brows: 'Basic.png',
-    noses: 'basic.png',
-    mouths: 'Basic.png',
-    tops: '16.png',
-    glasses: '',
-    hats: '',
-  },
-  colors: {
-    bases: '#E8B982',
-    neck: '#C0C0C0',
-    hair: '#8B4513',
-    eyes: '#4169E1',
-    brows: '#8B4513',
-    mouths: '#CC6666',
-    tops: '#3a7df2',
-    glasses: '#1C1C1C',
-    hats: '#e8443a',
-    bg: '#1b2d5b',
-  }
+var cur = 'skin';
+
+var S = {
+  parts: { bases:'base.png', neck:'', hair:'1.png', eyes:'BasicMale.png',
+           brows:'Basic.png', noses:'basic.png', mouths:'Basic.png',
+           tops:'16.png', glasses:'', hats:'' },
+  colors: { bases:'#E8B982', neck:'#C0C0C0', hair:'#8B4513', eyes:'#4169E1',
+            brows:'#8B4513', mouths:'#CC6666', tops:'#3a7df2',
+            glasses:'#1C1C1C', hats:'#e8443a', bg:'#1b2d5b' }
 };
 
-// Image cache
-var imgCache = {};
+// ── Image cache (never evicted — images are small PNGs) ───────────────────────
+var IC = {};
 function loadImg(src) {
-  if (imgCache[src]) return Promise.resolve(imgCache[src]);
-  return new Promise(function(res) {
+  if (IC[src] !== undefined) return Promise.resolve(IC[src]);
+  return new Promise(function(res){
     var img = new Image();
     img.crossOrigin = 'anonymous';
-    img.onload = function() { imgCache[src] = img; res(img); };
-    img.onerror = function() { res(null); };
+    img.onload  = function(){ IC[src] = img; res(img); };
+    img.onerror = function(){ IC[src] = null; res(null); };
     img.src = src;
   });
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
-async function init() {
-  try {
-    var r = await fetch('/Avatars/manifest.json');
-    manifest = await r.json();
-  } catch(e) {
-    showToast('Could not load manifest', true);
-    return;
+// ── Pixel-level green→color replace ──────────────────────────────────────────
+// Returns an ImageBitmap-like canvas, cached by src+hex
+var CC = {}; // colored canvas cache: "src|hex" → canvas
+function coloredCanvas(img, w, h, hex) {
+  if (!img) return null;
+  var key = img.src + '|' + hex;
+  if (CC[key]) return CC[key];
+
+  var c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  var x = c.getContext('2d');
+  x.drawImage(img, 0, 0, w, h);
+  var d = x.getImageData(0,0,w,h), px = d.data;
+  var r = parseInt(hex.slice(1,3),16);
+  var g = parseInt(hex.slice(3,5),16);
+  var b = parseInt(hex.slice(5,7),16);
+  for (var i = 0; i < px.length; i+=4) {
+    if (px[i+3] < 30) continue;
+    var gr = px[i+1];
+    if (gr > 175 && gr > px[i]+40 && gr > px[i+2]+40) {
+      px[i]=r; px[i+1]=g; px[i+2]=b;
+    }
   }
-
-  // Load saved config from Firestore if user is logged in
-  await loadSavedConfig();
-
-  buildCategoryTabs();
-  renderPreview();
-  switchCategory('skin');
+  x.putImageData(d,0,0);
+  CC[key] = c;
+  return c;
 }
 
-async function loadSavedConfig() {
-  if (!_db) return;
-  // Wait briefly for auth
-  await new Promise(function(res){ setTimeout(res, 600); });
-  if (!_user && _auth) _user = _auth.currentUser;
-  if (!_user) return;
-  try {
-    var snap = await _db.collection('users').doc(_user.uid).get();
-    if (snap.exists) {
-      var d = snap.data();
-      if (d.avatarConfig) {
-        if (d.avatarConfig.parts) Object.assign(state.parts, d.avatarConfig.parts);
-        if (d.avatarConfig.colors) Object.assign(state.colors, d.avatarConfig.colors);
+// ── Render the main preview canvas ───────────────────────────────────────────
+// Debounced so rapid color-picking doesn't pile up
+var _pvRaf = null;
+function queuePreview() {
+  if (_pvRaf) return;
+  _pvRaf = requestAnimationFrame(function(){
+    _pvRaf = null;
+    drawPreview();
+  });
+}
+
+async function drawPreview() {
+  var cv = document.getElementById('pv');
+  var x = cv.getContext('2d');
+  var N = 240;
+  x.clearRect(0,0,N,N);
+  x.fillStyle = S.colors.bg || '#1b2d5b';
+  x.fillRect(0,0,N,N);
+
+  for (var i = 0; i < LAYERS.length; i++) {
+    var lk = LAYERS[i];
+    var part = S.parts[lk];
+    if (!part) continue;
+
+    var cat = CATS.find(function(c){ return c.lk === lk; });
+    var ck = cat ? cat.ck : null;
+    var col = (ck && !NO_COL[lk]) ? S.colors[ck] : null;
+
+    var img = await loadImg(BASE + lk + '/' + part);
+    if (img) {
+      if (col) {
+        var colored = coloredCanvas(img, N, N, col);
+        if (colored) x.drawImage(colored, 0, 0, N, N);
+      } else {
+        x.drawImage(img, 0, 0, N, N);
       }
     }
-  } catch(e) { console.warn('load config error:', e); }
+
+    var ov = await loadImg(BASE + lk + '/' + part.replace('.png','overlay.png'));
+    if (ov) x.drawImage(ov, 0, 0, N, N);
+  }
 }
 
-// ── Category Tabs ─────────────────────────────────────────────────────────────
-function buildCategoryTabs() {
-  var el = document.getElementById('cat-scroll');
-  el.innerHTML = CATEGORIES.map(function(c) {
-    return '<div class="cat-tab" id="tab-'+c.id+'" onclick="switchCategory(\''+c.id+'\')">' +
+// ── Draw a single item-card thumbnail ────────────────────────────────────────
+// Also cached: once drawn for a given (lk+item+color) combo, just reuse
+var _drawn = {}; // "lk/item/color" → true
+async function drawThumb(canvasId, lk, item, col) {
+  var key = lk + '/' + item + '/' + (col||'');
+  var cv = document.getElementById(canvasId);
+  if (!cv) return;
+
+  // If already drawn with same color, skip
+  if (cv.dataset.colorKey === key) return;
+  cv.dataset.colorKey = key;
+
+  var x = cv.getContext('2d');
+  x.clearRect(0,0,60,60);
+
+  var img = await loadImg(BASE + lk + '/' + item);
+  if (!img) return;
+
+  if (col && !NO_COL[lk]) {
+    var colored = coloredCanvas(img, 60, 60, col);
+    if (colored) x.drawImage(colored, 0, 0, 60, 60);
+  } else {
+    x.drawImage(img, 0, 0, 60, 60);
+  }
+
+  var ov = await loadImg(BASE + lk + '/' + item.replace('.png','overlay.png'));
+  if (ov) x.drawImage(ov, 0, 0, 60, 60);
+}
+
+// ── Build category tabs ───────────────────────────────────────────────────────
+function buildTabs() {
+  document.getElementById('cat-row').innerHTML = CATS.map(function(c){
+    return '<div class="cat-tab" id="tab-'+c.id+'" onclick="switchCat(\''+c.id+'\')">' +
       '<span class="cat-tab-icon">'+c.icon+'</span>' +
-      '<span class="cat-tab-label">'+c.label+'</span>' +
+      '<span class="cat-tab-lbl">'+c.lbl+'</span>' +
     '</div>';
   }).join('');
 }
 
-function switchCategory(id) {
-  currentCat = id;
-  // Update tabs
+// ── Switch category ───────────────────────────────────────────────────────────
+function switchCat(id) {
+  cur = id;
   document.querySelectorAll('.cat-tab').forEach(function(t){ t.classList.remove('active'); });
   var tab = document.getElementById('tab-'+id);
   if (tab) { tab.classList.add('active'); tab.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'}); }
 
-  var cat = CATEGORIES.find(function(c){ return c.id === id; });
+  var cat = CATS.find(function(c){ return c.id === id; });
   if (!cat) return;
 
   // Color strip
-  var stripWrap = document.getElementById('color-strip-wrap');
-  var stripLabel = document.getElementById('color-strip-label');
-  if (cat.colorKey && NO_COLOR.indexOf(id) === -1) {
-    stripWrap.classList.add('show');
-    stripLabel.textContent = cat.label + ' Color';
-    buildColorStrip(cat.colorKey, id === 'bg' ? BG_PALETTE : COLOR_PALETTE);
+  var crow = document.getElementById('color-row');
+  if (cat.ck) {
+    crow.classList.add('show');
+    document.getElementById('color-lbl').textContent = cat.lbl + ' Color';
+    buildColorDots(cat.ck, id === 'bg' ? BG_COLORS : COLORS);
   } else {
-    stripWrap.classList.remove('show');
+    crow.classList.remove('show');
   }
 
-  buildItemsGrid(id);
+  buildGrid(id);
 }
 
-function buildColorStrip(colorKey, palette) {
-  var current = state.colors[colorKey] || '#000000';
-  var el = document.getElementById('color-strip');
-  el.innerHTML = palette.map(function(c) {
-    var border = c.toLowerCase() === '#ffffff' ? 'border:2px solid #666;' : '';
-    return '<div class="color-dot'+(c.toLowerCase()===current.toLowerCase()?' active':'')+'" '+
-      'style="background:'+c+';'+border+'" onclick="pickColor(\''+colorKey+'\',\''+c+'\')"></div>';
+// ── Color dots ────────────────────────────────────────────────────────────────
+function buildColorDots(ck, palette) {
+  var cur_col = S.colors[ck] || '#000';
+  document.getElementById('color-dots').innerHTML = palette.map(function(c){
+    var outline = (c === '#FFFFFF' || c === '#FFFACD' || c === '#F5DEB3') ? 'outline:1.5px solid #555;outline-offset:-1px;' : '';
+    return '<div class="cdot'+(c.toLowerCase()===cur_col.toLowerCase()?' on':'')+'" '+
+      'style="background:'+c+';'+outline+'" onclick="pickCol(\''+ck+'\',\''+c+'\')"></div>';
   }).join('');
 }
 
-function pickColor(colorKey, color) {
-  state.colors[colorKey] = color;
-  // Refresh color strip selection
-  var cat = CATEGORIES.find(function(c){ return c.colorKey === colorKey; });
-  if (cat) buildColorStrip(colorKey, currentCat === 'bg' ? BG_PALETTE : COLOR_PALETTE);
-  // Re-render preview and items (to show updated color on previews)
-  renderPreview();
-  // Refresh item previews for current category
-  var catObj = CATEGORIES.find(function(c){ return c.id === currentCat; });
-  if (catObj && catObj.colorKey === colorKey) {
-    buildItemsGrid(currentCat);
+function pickCol(ck, col) {
+  S.colors[ck] = col;
+
+  // Update dot selection
+  var cat = CATS.find(function(c){ return c.ck === ck; });
+  buildColorDots(ck, cur === 'bg' ? BG_COLORS : COLORS);
+
+  // Invalidate colored canvas cache for this color key so thumbnails redraw
+  // (clear only entries with old color — easiest: just clear all for this layer)
+  if (cat && cat.lk) {
+    var prefix = BASE + cat.lk + '/';
+    Object.keys(CC).forEach(function(k){
+      if (k.startsWith(prefix)) delete CC[k];
+    });
+    // Also reset colorKey on all thumbnails so they redraw
+    var lk = cat.lk;
+    document.querySelectorAll('#grid canvas').forEach(function(cv){
+      if (cv.id.startsWith('ic-'+lk)) cv.dataset.colorKey = '';
+    });
+    // Redraw only currently visible thumbnails
+    redrawVisibleThumbs(lk, col);
   }
+
+  queuePreview();
 }
 
-// ── Items Grid ────────────────────────────────────────────────────────────────
-function buildItemsGrid(catId) {
-  var cat = CATEGORIES.find(function(c){ return c.id === catId; });
-  if (!cat) return;
-  var grid = document.getElementById('items-grid');
+function redrawVisibleThumbs(lk, col) {
+  var items = manifest[lk] ? manifest[lk].filter(function(f){ return f.indexOf('overlay')===-1; }) : [];
+  items.forEach(function(item){
+    var cid = 'ic-'+lk+'-'+item.replace(/[^a-zA-Z0-9]/g,'_');
+    drawThumb(cid, lk, item, col);
+  });
+}
 
-  // Background is color-only
+// ── Build items grid ──────────────────────────────────────────────────────────
+function buildGrid(catId) {
+  var cat = CATS.find(function(c){ return c.id === catId; });
+  if (!cat) return;
+  var grid = document.getElementById('grid');
+
+  // BG: color-only, no items
   if (catId === 'bg') {
-    grid.innerHTML = '<div style="color:var(--dim);font-size:13px;font-weight:700;text-align:center;padding:20px;grid-column:1/-1">Pick a background color above</div>';
+    grid.innerHTML = '<div style="color:var(--dim);font-size:12px;font-weight:700;padding:16px 0;grid-column:1/-1;text-align:center">Choose a background color above ↑</div>';
     return;
   }
 
-  var layerKey = cat.layerKey;
-  var items = manifest[layerKey] ? manifest[layerKey].filter(function(f){ return f.indexOf('overlay') === -1; }) : [];
-  var currentPart = state.parts[layerKey] || '';
-  var colorKey = cat.colorKey;
-  var currentColor = colorKey ? (state.colors[colorKey] || '#888888') : null;
+  var lk = cat.lk;
+  var items = manifest[lk] ? manifest[lk].filter(function(f){ return f.indexOf('overlay')===-1; }) : [];
+  var sel = S.parts[lk] || '';
+  var ck = cat.ck;
+  var col = (ck && !NO_COL[lk]) ? S.colors[ck] : null;
 
   var html = '';
-
-  // "None" option for optional categories
-  if (OPTIONAL.indexOf(catId) !== -1) {
-    html += '<div class="item-card'+(currentPart===''?' active':'')+'" onclick="selectPart(\''+layerKey+'\',\'\')">' +
-      '<div class="item-card-none">None</div>' +
-      '<div class="item-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>' +
+  if (OPTIONAL[catId]) {
+    html += '<div class="icard'+(sel===''?' on':'')+'" onclick="selPart(\''+lk+'\',\'\')">' +
+      '<div class="icard-none">None</div>' +
+      '<div class="icheck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>' +
     '</div>';
   }
-
-  // Item cards — rendered as canvases
-  items.forEach(function(item) {
-    var canvasId = 'ic-'+layerKey+'-'+item.replace(/[^a-zA-Z0-9]/g,'_');
-    html += '<div class="item-card'+(currentPart===item?' active':'')+'" '+
-      'id="icard-'+canvasId+'" onclick="selectPart(\''+layerKey+'\',\''+item+'\')">' +
-      '<canvas id="'+canvasId+'" width="60" height="60"></canvas>' +
-      '<div class="item-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>' +
+  items.forEach(function(item){
+    var cid = 'ic-'+lk+'-'+item.replace(/[^a-zA-Z0-9]/g,'_');
+    html += '<div class="icard'+(sel===item?' on':'')+'" id="wrap-'+cid+'" onclick="selPart(\''+lk+'\',\''+item+'\')">' +
+      '<canvas id="'+cid+'" width="60" height="60"></canvas>' +
+      '<div class="icheck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>' +
     '</div>';
   });
-
   grid.innerHTML = html;
 
-  // Draw each item canvas async
-  items.forEach(function(item) {
-    var canvasId = 'ic-'+layerKey+'-'+item.replace(/[^a-zA-Z0-9]/g,'_');
-    drawItemPreview(canvasId, layerKey, item, currentColor);
+  // Draw thumbnails — staggered with requestIdleCallback to not block UI
+  var idx = 0;
+  function drawNext() {
+    if (idx >= items.length) return;
+    var item = items[idx++];
+    var cid = 'ic-'+lk+'-'+item.replace(/[^a-zA-Z0-9]/g,'_');
+    drawThumb(cid, lk, item, col).then(drawNext);
+  }
+  // Draw first 12 immediately, rest via idle
+  var first = Math.min(12, items.length);
+  for (var i = 0; i < first; i++) {
+    var item = items[i]; idx++;
+    var cid = 'ic-'+lk+'-'+item.replace(/[^a-zA-Z0-9]/g,'_');
+    drawThumb(cid, lk, item, col);
+  }
+  if (idx < items.length) {
+    if (typeof requestIdleCallback === 'function') {
+      requestIdleCallback(function() {
+        var rem = items.slice(idx);
+        rem.forEach(function(item){
+          var cid = 'ic-'+lk+'-'+item.replace(/[^a-zA-Z0-9]/g,'_');
+          drawThumb(cid, lk, item, col);
+        });
+      });
+    } else {
+      setTimeout(function(){
+        var rem = items.slice(idx);
+        rem.forEach(function(item){
+          var cid = 'ic-'+lk+'-'+item.replace(/[^a-zA-Z0-9]/g,'_');
+          drawThumb(cid, lk, item, col);
+        });
+      }, 100);
+    }
+  }
+}
+
+// ── Select part ───────────────────────────────────────────────────────────────
+function selPart(lk, item) {
+  S.parts[lk] = item;
+  document.querySelectorAll('#grid .icard').forEach(function(c){ c.classList.remove('on'); });
+  // Find by onclick
+  document.querySelectorAll('#grid .icard').forEach(function(c){
+    var oc = c.getAttribute('onclick');
+    if (oc && oc.indexOf("'"+lk+"','"+item+"'") !== -1) c.classList.add('on');
   });
+  queuePreview();
 }
 
-async function drawItemPreview(canvasId, layerKey, item, color) {
-  var canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-  var ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, 60, 60);
+// ── Bake ──────────────────────────────────────────────────────────────────────
+async function bake(size) {
+  var cv = document.createElement('canvas');
+  cv.width = size; cv.height = size;
+  var x = cv.getContext('2d');
+  x.fillStyle = S.colors.bg || '#1b2d5b';
+  x.fillRect(0,0,size,size);
 
-  // Base layer with color replacement
-  var src = BASE_URL + layerKey + '/' + item;
-  var img = await loadImg(src);
-  if (!img) return;
-
-  if (color) {
-    drawWithColorReplace(ctx, img, 60, 60, color);
-  } else {
-    ctx.drawImage(img, 0, 0, 60, 60);
-  }
-
-  // Overlay
-  var overlayFile = item.replace('.png', 'overlay.png');
-  var overlayImg = await loadImg(BASE_URL + layerKey + '/' + overlayFile);
-  if (overlayImg) ctx.drawImage(overlayImg, 0, 0, 60, 60);
-}
-
-// ── Part Selection ────────────────────────────────────────────────────────────
-function selectPart(layerKey, item) {
-  state.parts[layerKey] = item;
-  // Update active state in grid
-  var catId = currentCat;
-  document.querySelectorAll('#items-grid .item-card').forEach(function(c){ c.classList.remove('active'); });
-  var cat = CATEGORIES.find(function(c){ return c.id === catId; });
-  if (cat) {
-    var canvasId = item ? 'icard-ic-'+layerKey+'-'+item.replace(/[^a-zA-Z0-9]/g,'_') : null;
-    // find by onclick
-    document.querySelectorAll('#items-grid .item-card').forEach(function(c){
-      if (c.getAttribute('onclick') === "selectPart('"+layerKey+"','"+item+"')") c.classList.add('active');
-    });
-  }
-  renderPreview();
-}
-
-// ── Color Replace (green → chosen color) ─────────────────────────────────────
-function drawWithColorReplace(ctx, img, w, h, hexColor) {
-  // Draw to temp canvas
-  var tmp = document.createElement('canvas');
-  tmp.width = w; tmp.height = h;
-  var tc = tmp.getContext('2d');
-  tc.drawImage(img, 0, 0, w, h);
-  var data = tc.getImageData(0, 0, w, h);
-  var px = data.data;
-
-  var tr = parseInt(hexColor.slice(1,3), 16);
-  var tg = parseInt(hexColor.slice(3,5), 16);
-  var tb = parseInt(hexColor.slice(5,7), 16);
-
-  for (var i = 0; i < px.length; i += 4) {
-    if (px[i+3] < 30) continue; // skip transparent
-    var r = px[i], g = px[i+1], b = px[i+2];
-    // Green dominant: g > 200, g > r+50, g > b+50
-    if (g > 180 && g > r + 40 && g > b + 40) {
-      px[i]   = tr;
-      px[i+1] = tg;
-      px[i+2] = tb;
-    }
-  }
-  tc.putImageData(data, 0, 0);
-  ctx.drawImage(tmp, 0, 0);
-}
-
-// ── Render Preview ────────────────────────────────────────────────────────────
-async function renderPreview() {
-  var canvas = document.getElementById('preview-canvas');
-  var ctx = canvas.getContext('2d');
-  var S = 280;
-  ctx.clearRect(0, 0, S, S);
-
-  // Background color
-  ctx.fillStyle = state.colors.bg || '#1b2d5b';
-  ctx.fillRect(0, 0, S, S);
-
-  // Draw each layer in order
-  for (var i = 0; i < LAYER_ORDER.length; i++) {
-    var layerKey = LAYER_ORDER[i];
-    var part = state.parts[layerKey];
+  for (var i = 0; i < LAYERS.length; i++) {
+    var lk = LAYERS[i];
+    var part = S.parts[lk];
     if (!part) continue;
+    var cat = CATS.find(function(c){ return c.lk === lk; });
+    var ck = cat ? cat.ck : null;
+    var col = (ck && !NO_COL[lk]) ? S.colors[ck] : null;
 
-    // Find color for this layer
-    var colorKey = null;
-    var cat = CATEGORIES.find(function(c){ return c.layerKey === layerKey; });
-    if (cat) colorKey = cat.colorKey;
-    var color = colorKey ? state.colors[colorKey] : null;
-
-    var src = BASE_URL + layerKey + '/' + part;
-    var img = await loadImg(src);
+    var img = await loadImg(BASE + lk + '/' + part);
     if (img) {
-      if (color && NO_COLOR.indexOf(layerKey) === -1) {
-        drawWithColorReplace(ctx, img, S, S, color);
+      if (col) {
+        // Use coloredCanvas at bake size
+        var tmp = document.createElement('canvas');
+        tmp.width = size; tmp.height = size;
+        var tx = tmp.getContext('2d');
+        tx.drawImage(img,0,0,size,size);
+        var d = tx.getImageData(0,0,size,size), px = d.data;
+        var r=parseInt(col.slice(1,3),16), g=parseInt(col.slice(3,5),16), b=parseInt(col.slice(5,7),16);
+        for (var j=0;j<px.length;j+=4){
+          if(px[j+3]<30)continue;
+          if(px[j+1]>175&&px[j+1]>px[j]+40&&px[j+1]>px[j+2]+40){px[j]=r;px[j+1]=g;px[j+2]=b;}
+        }
+        tx.putImageData(d,0,0);
+        x.drawImage(tmp,0,0);
       } else {
-        ctx.drawImage(img, 0, 0, S, S);
+        x.drawImage(img,0,0,size,size);
       }
     }
-
-    // Overlay
-    var overlayFile = part.replace('.png', 'overlay.png');
-    var overlayImg = await loadImg(BASE_URL + layerKey + '/' + overlayFile);
-    if (overlayImg) ctx.drawImage(overlayImg, 0, 0, S, S);
+    var ov = await loadImg(BASE + lk + '/' + part.replace('.png','overlay.png'));
+    if (ov) x.drawImage(ov,0,0,size,size);
   }
-}
-
-// ── Bake Full-Res Image ───────────────────────────────────────────────────────
-async function bakeAvatar(size) {
-  size = size || 400;
-  var canvas = document.createElement('canvas');
-  canvas.width = size; canvas.height = size;
-  var ctx = canvas.getContext('2d');
-
-  // Background
-  ctx.fillStyle = state.colors.bg || '#1b2d5b';
-  ctx.fillRect(0, 0, size, size);
-
-  for (var i = 0; i < LAYER_ORDER.length; i++) {
-    var layerKey = LAYER_ORDER[i];
-    var part = state.parts[layerKey];
-    if (!part) continue;
-
-    var cat = CATEGORIES.find(function(c){ return c.layerKey === layerKey; });
-    var colorKey = cat ? cat.colorKey : null;
-    var color = colorKey ? state.colors[colorKey] : null;
-
-    var img = await loadImg(BASE_URL + layerKey + '/' + part);
-    if (img) {
-      if (color && NO_COLOR.indexOf(layerKey) === -1) {
-        drawWithColorReplace(ctx, img, size, size, color);
-      } else {
-        ctx.drawImage(img, 0, 0, size, size);
-      }
-    }
-    var overlayImg = await loadImg(BASE_URL + layerKey + '/' + part.replace('.png','overlay.png'));
-    if (overlayImg) ctx.drawImage(overlayImg, 0, 0, size, size);
-  }
-
-  // Return as WebP base64 (quality 0.88)
-  return canvas.toDataURL('image/webp', 0.88);
+  return cv.toDataURL('image/webp', 0.88);
 }
 
 // ── Save ──────────────────────────────────────────────────────────────────────
-async function saveAvatar() {
-  if (!_db) { showToast('Not connected to Firebase', true); return; }
+async function doSave() {
   if (!_user && _auth) _user = _auth.currentUser;
-  if (!_user) { showToast('Please sign in first', true); return; }
-
-  document.getElementById('saving-overlay').classList.add('show');
+  if (!_user) { toast('Please sign in first', true); return; }
+  document.getElementById('saving').classList.add('show');
   document.getElementById('save-btn').disabled = true;
-
   try {
-    // Bake at 400px
-    var bakedImg = await bakeAvatar(400);
-
-    var config = {
-      parts: Object.assign({}, state.parts),
-      colors: Object.assign({}, state.colors),
-    };
-
+    var img = await bake(400);
     await _db.collection('users').doc(_user.uid).set({
-      avatarConfig: config,
-      avatarIMG: bakedImg,
+      avatarConfig: { parts: Object.assign({},S.parts), colors: Object.assign({},S.colors) },
+      avatarIMG: img,
       lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-
-    showToast('Avatar saved! ✓');
-
-    // Tell parent to refresh
-    if (window.parent !== window) {
-      window.parent.postMessage({ type: 'avatarSaved', avatarIMG: bakedImg }, '*');
-    }
-
-    setTimeout(function(){ closeEditor(); }, 800);
-
+    }, {merge:true});
+    toast('Saved!');
+    if (window.parent !== window) window.parent.postMessage({type:'avatarSaved', avatarIMG: img}, '*');
+    setTimeout(closeMe, 700);
   } catch(e) {
-    console.error('save error:', e);
-    showToast('Save failed: ' + e.message, true);
-  } finally {
-    document.getElementById('saving-overlay').classList.remove('show');
+    toast('Save failed: '+e.message, true);
     document.getElementById('save-btn').disabled = false;
+  } finally {
+    document.getElementById('saving').classList.remove('show');
   }
 }
 
-function closeEditor() {
-  if (window.parent !== window) {
-    window.parent.postMessage({ type: 'avatarEditorClose' }, '*');
-  } else {
-    history.back();
-  }
+function closeMe() {
+  if (window.parent !== window) window.parent.postMessage({type:'avatarEditorClose'}, '*');
+  else history.back();
 }
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
-var _toastTimer = null;
-function showToast(msg, isError) {
+var _tt = null;
+function toast(msg, err) {
   var t = document.getElementById('toast');
   t.textContent = msg;
-  t.className = 'toast' + (isError ? ' error' : '');
+  t.className = 'toast' + (err?' err':'');
   t.classList.add('show');
-  clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2400);
+  clearTimeout(_tt);
+  _tt = setTimeout(function(){ t.classList.remove('show'); }, 2200);
 }
 
-// ── Start ─────────────────────────────────────────────────────────────────────
-init();
+// ── Init ──────────────────────────────────────────────────────────────────────
+(async function init(){
+  try {
+    var r = await fetch('/Avatars/manifest.json');
+    manifest = await r.json();
+  } catch(e) { toast('Could not load manifest', true); return; }
+
+  // Load saved config
+  if (_db) {
+    await new Promise(function(res){ setTimeout(res, 500); });
+    if (!_user && _auth) _user = _auth.currentUser;
+    if (_user) {
+      try {
+        var snap = await _db.collection('users').doc(_user.uid).get();
+        if (snap.exists) {
+          var d = snap.data();
+          if (d.avatarConfig) {
+            if (d.avatarConfig.parts)  Object.assign(S.parts,  d.avatarConfig.parts);
+            if (d.avatarConfig.colors) Object.assign(S.colors, d.avatarConfig.colors);
+          }
+        }
+      } catch(e){}
+    }
+  }
+
+  buildTabs();
+  switchCat('skin');
+  drawPreview();
+})();
 </script>
 </body>
 </html>
