@@ -10,39 +10,20 @@
   <meta name="description" content="Cebear — train your brain, track your IQ">
   <link rel="manifest" href="manifest.json">
   <title>Cebear</title>
-  <!-- Preconnect for font performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    html,body{width:100%;height:100dvh;overflow:hidden;background:#0474fc;font-family:'Nunito',sans-serif;touch-action:manipulation}
+    html,body{width:100%;height:100dvh;overflow:hidden;background:#f5f0e8;font-family:'Nunito',sans-serif;touch-action:manipulation}
 
     /* ── SPLASH ── */
-    #splash{
-      position:fixed;inset:0;z-index:9999;
-      background:#0474fc;
-      display:flex;justify-content:center;align-items:center;overflow:hidden;
-      -webkit-user-select:none;user-select:none;
-    }
+    #splash{position:fixed;inset:0;z-index:9999;background:#0474fc;display:flex;justify-content:center;align-items:center;overflow:hidden;-webkit-user-select:none;user-select:none}
     #splash.hide{opacity:0;pointer-events:none;transition:opacity .4s ease}
     #splash .container{text-align:center;color:#fff;pointer-events:none}
-    #splash .logo{
-      width:clamp(120px,25vw,170px);display:block;margin:0 auto;
-      opacity:0;transform:translateY(28px) scale(.6);
-      animation:pop .8s cubic-bezier(.34,1.56,.64,1) forwards;
-    }
-    #splash .text{
-      font-family:'Chewy',cursive;
-      font-size:clamp(52px,14vw,92px);
-      margin-top:6px;white-space:nowrap;
-    }
-    #splash .letter{
-      display:inline-block;opacity:0;
-      transform:translateY(28px) scale(.6);
-      animation:popLetter cubic-bezier(.34,1.56,.64,1) forwards;
-      will-change:transform;
-    }
+    #splash .logo{width:clamp(120px,25vw,170px);display:block;margin:0 auto;opacity:0;transform:translateY(28px) scale(.6);animation:pop .8s cubic-bezier(.34,1.56,.64,1) forwards}
+    #splash .text{font-family:'Chewy',cursive;font-size:clamp(52px,14vw,92px);margin-top:6px;white-space:nowrap}
+    #splash .letter{display:inline-block;opacity:0;transform:translateY(28px) scale(.6);animation:popLetter cubic-bezier(.34,1.56,.64,1) forwards;will-change:transform}
     #splash .letter:nth-child(1){animation-delay:.15s;animation-duration:.65s}
     #splash .letter:nth-child(2){animation-delay:.19s;animation-duration:.61s}
     #splash .letter:nth-child(3){animation-delay:.23s;animation-duration:.57s}
@@ -56,57 +37,67 @@
     .screen{position:absolute;inset:0;display:none;overflow:hidden}
     .screen.active{display:block}
     .screen iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;touch-action:manipulation}
-    body.has-nav .screen iframe{height:calc(100dvh - 60px - env(safe-area-inset-bottom,0px))}
+    body.has-nav .screen iframe{height:calc(100dvh - 72px - env(safe-area-inset-bottom,0px))}
 
-    /* ── NAV BAR — white pill nav ── */
+    /* ── NAV — Blooket style: cream card floating above bg, rounded top, chunky ── */
     #nav{
       position:fixed;bottom:0;left:0;right:0;
-      height:calc(60px + env(safe-area-inset-bottom,0px));
+      height:calc(72px + env(safe-area-inset-bottom,0px));
       padding-bottom:env(safe-area-inset-bottom,0px);
-      background:rgba(255,255,255,.95);
-      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-      border-top:1px solid rgba(4,116,252,.1);
-      display:none;justify-content:space-around;align-items:center;
+      /* The nav itself is the blue strip */
+      background:#0474fc;
+      /* Rounded top corners = Blooket vibe */
+      border-radius:24px 24px 0 0;
+      display:none;justify-content:space-around;align-items:flex-start;
+      padding-top:8px;
       z-index:100;
+      /* Hard shadow like a card sitting on screen */
+      box-shadow:0 -4px 0 #0358c4, 0 -8px 32px rgba(4,116,252,.4);
     }
     body.has-nav #nav{display:flex}
+
     .nb{
-      padding:6px 0 2px;background:none;border:none;
-      display:flex;flex-direction:column;align-items:center;gap:3px;
-      color:rgba(4,116,252,.35);
+      flex:1;padding:0;background:none;border:none;
+      display:flex;flex-direction:column;align-items:center;gap:4px;
+      color:rgba(255,255,255,.5);
       font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;
       cursor:pointer;position:relative;transition:color .15s;
       -webkit-tap-highlight-color:transparent;
-      min-width:60px;
     }
     .nb .ni{
-      width:32px;height:28px;display:flex;align-items:center;justify-content:center;
-      border-radius:14px;transition:all .2s;
+      width:38px;height:32px;
+      display:flex;align-items:center;justify-content:center;
+      border-radius:12px;
+      transition:all .18s cubic-bezier(.34,1.4,.64,1);
     }
-    .nb .ni svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-    .nb.active{color:#0474fc}
-    .nb.active .ni{background:rgba(4,116,252,.12);width:44px}
-    .nb.active .ni svg{stroke:#0474fc}
-    .nbdg{position:absolute;top:3px;right:calc(50% - 18px);width:8px;height:8px;border-radius:50%;background:#ef4444;border:2px solid #fff;display:none}
+    .nb .ni svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
+    /* Active: white pill with colored stroke */
+    .nb.active{color:#fff}
+    .nb.active .ni{
+      background:rgba(255,255,255,.22);
+      width:50px;
+      box-shadow:inset 0 -2px 0 rgba(0,0,0,.15);
+    }
+    .nb.active .ni svg{stroke:#fff}
+    /* Each tab gets its own color accent on active */
+    .nb[data-page="leaderboard"].active .ni{background:rgba(245,158,11,.3)}
+    .nb[data-page="improve"].active .ni{background:rgba(255,255,255,.25)}
+    .nb[data-page="tasks"].active .ni{background:rgba(34,197,94,.3)}
+    .nb[data-page="profile"].active .ni{background:rgba(139,92,246,.3)}
+
+    .nbdg{position:absolute;top:0;right:calc(50% - 20px);width:9px;height:9px;border-radius:50%;background:#ef4444;border:2.5px solid #0474fc;display:none}
     .nbdg.show{display:block}
 
     /* ── AUTH WAIT ── */
-    .auth-wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0474fc}
+    .auth-wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#f5f0e8}
     .auth-wait-dots{display:flex;gap:8px}
-    .auth-wait-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.35);animation:dp 1s ease infinite}
+    .auth-wait-dot{width:10px;height:10px;border-radius:50%;background:rgba(4,116,252,.2);animation:dp 1s ease infinite}
     .auth-wait-dot:nth-child(2){animation-delay:.15s}
     .auth-wait-dot:nth-child(3){animation-delay:.3s}
     @keyframes dp{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
 
     /* ── OFFLINE TOAST ── */
-    #offline-toast{
-      position:fixed;top:calc(env(safe-area-inset-top,20px) + 12px);left:50%;
-      transform:translateX(-50%);
-      background:rgba(10,22,40,.9);color:rgba(255,255,255,.9);
-      font-size:13px;font-weight:800;
-      padding:10px 18px;border-radius:14px;
-      z-index:9999;opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap;
-    }
+    #offline-toast{position:fixed;top:calc(env(safe-area-inset-top,20px) + 12px);left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;font-size:13px;font-weight:800;padding:10px 18px;border-radius:14px;z-index:9999;opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap}
     #offline-toast.show{opacity:1}
   </style>
 </head>
@@ -114,14 +105,14 @@
 
 <div id="splash">
   <div class="container">
-    <img src="logo.png" class="logo" draggable="false" alt="Cebear logo" width="170" height="170">
+    <img src="logo.png" class="logo" draggable="false" alt="Cebear" width="170" height="170">
     <div class="text" aria-label="cebear">
       <span class="letter">c</span><span class="letter">e</span><span class="letter">b</span><span class="letter">e</span><span class="letter">a</span><span class="letter">r</span>
     </div>
   </div>
 </div>
 
-<div id="offline-toast" role="status">No connection — come back online</div>
+<div id="offline-toast">No connection</div>
 <div class="screen" id="screen-auth"></div>
 <div class="screen" id="screen-improve"></div>
 <div class="screen" id="screen-profile"></div>
@@ -130,20 +121,20 @@
 
 <nav id="nav" aria-label="Main navigation">
   <button class="nb" data-page="leaderboard" onclick="goTo('leaderboard')" aria-label="Rankings">
-    <span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9H2v12h4V9z"/><path d="M14 4h-4v17h4V4z"/><path d="M22 13h-4v8h4v-8z"/></svg></span>
+    <span class="ni"><svg viewBox="0 0 24 24"><path d="M6 9H2v12h4V9z"/><path d="M14 4h-4v17h4V4z"/><path d="M22 13h-4v8h4v-8z"/></svg></span>
     Ranks
   </button>
   <button class="nb active" data-page="improve" onclick="goTo('improve')" aria-label="Train">
-    <span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>
+    <span class="ni"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>
     Train
   </button>
   <button class="nb" data-page="tasks" onclick="goTo('tasks')" aria-label="Tasks">
-    <span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-6"/></svg></span>
+    <span class="ni"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-6"/></svg></span>
     Tasks<span class="nbdg" id="tasks-badge" aria-hidden="true"></span>
   </button>
   <button class="nb" data-page="profile" onclick="goTo('profile')" aria-label="Profile">
-    <span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg></span>
-    Profile
+    <span class="ni"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg></span>
+    Me
   </button>
 </nav>
 
@@ -155,12 +146,11 @@ firebase.initializeApp({apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDom
 var WORKER_URL='https://cebear.com/api/redeem-install-token';
 var isStandalone=!!('standalone' in navigator&&navigator.standalone||window.matchMedia('(display-mode: standalone)').matches);
 
-// ── Splash timing ─────────────────────────────────────────────────────────────
+// ── Splash ────────────────────────────────────────────────────────────────────
 var _splashDone=false;
 function _doHide(){
-  if(_splashDone)return; _splashDone=true;
-  var sp=document.getElementById('splash');
-  if(!sp)return;
+  if(_splashDone)return;_splashDone=true;
+  var sp=document.getElementById('splash');if(!sp)return;
   sp.classList.add('hide');
   setTimeout(function(){if(sp.parentNode)sp.parentNode.removeChild(sp);},450);
 }
@@ -168,30 +158,26 @@ function _doHide(){
   var letters=document.querySelectorAll('#splash .letter');
   var last=letters[letters.length-1];
   if(!last){setTimeout(_doHide,1800);return;}
-  var held=false,holdTimer=null;
-  last.addEventListener('animationend',function(){
-    if(held)return; held=true;
-    holdTimer=setTimeout(_doHide,800);
-  });
+  var held=false;
+  last.addEventListener('animationend',function(){if(held)return;held=true;setTimeout(_doHide,800);});
   setTimeout(function(){if(!_splashDone)_doHide();},1800);
 })();
 
-// ── Auth state ────────────────────────────────────────────────────────────────
+// ── Auth ──────────────────────────────────────────────────────────────────────
 var _isAuthed=false,_authResolved=false,_authWaiters=[];
 firebase.auth().onAuthStateChanged(function(u){
-  _isAuthed=!!u; _authResolved=true;
+  _isAuthed=!!u;_authResolved=true;
   if(u)ensureUser(u);
-  _authWaiters.forEach(function(fn){fn();}); _authWaiters=[];
+  _authWaiters.forEach(function(fn){fn();});_authWaiters=[];
   if(u){
-    var tb=document.getElementById('tasks-badge');
-    if(tb)firebase.firestore().collection('tasks').doc(u.uid).get()
-      .then(function(s){if(s.exists&&s.data()&&!s.data().allClaimed)tb.classList.add('show');})
+    firebase.firestore().collection('dailyTasks').doc(u.uid).get()
+      .then(function(s){if(s.exists&&s.data()&&!s.data().allClaimed){var tb=document.getElementById('tasks-badge');if(tb)tb.classList.add('show');}})
       .catch(function(){});
   }
 });
 function authReady(){
   if(_authResolved)return Promise.resolve(_isAuthed);
-  return new Promise(function(r){_authWaiters.push(function(){r(_isAuthed)});});
+  return new Promise(function(r){_authWaiters.push(function(){r(_isAuthed);});});
 }
 function _notifyImprove(type,extra){
   (function attempt(n){
@@ -203,11 +189,7 @@ function _notifyImprove(type,extra){
 function tryGuestWall(page){
   if(isStandalone||_isAuthed)return false;
   if(page!=='profile'&&page!=='tasks'&&page!=='leaderboard')return false;
-  try{
-    var f=document.querySelector('#screen-improve iframe');
-    if(f&&f.contentWindow&&typeof f.contentWindow.showGuestWallForNav==='function')
-      return f.contentWindow.showGuestWallForNav(page);
-  }catch{}
+  try{var f=document.querySelector('#screen-improve iframe');if(f&&f.contentWindow&&typeof f.contentWindow.showGuestWallForNav==='function')return f.contentWindow.showGuestWallForNav(page);}catch{}
   goTo('auth');return true;
 }
 
@@ -218,60 +200,34 @@ window.addEventListener('message',function(e){
   if(t==='googleAuthRequest'){
     firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider())
       .then(function(r){_isAuthed=true;ensureUser(r.user);})
-      .catch(function(err){
-        if(err.code==='auth/popup-closed-by-user'||err.code==='auth/cancelled-popup-request')return;
-        _notifyImprove('authError',{msg:'Google sign-in failed. Try email instead.'});
-      });
+      .catch(function(err){if(err.code==='auth/popup-closed-by-user'||err.code==='auth/cancelled-popup-request')return;_notifyImprove('authError',{msg:'Google sign-in failed.'});});
     return;
   }
   if(t==='googleRedirect'){location.href='google-redirect.html';return;}
-  if(t==='savePushSub')firebase.auth().onAuthStateChanged(function(u){
-    if(u)firebase.firestore().collection('pushSubscriptions').doc(u.uid)
-      .set({subscription:e.data.sub,uid:u.uid,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){});
-  });
+  if(t==='savePushSub')firebase.auth().onAuthStateChanged(function(u){if(u)firebase.firestore().collection('pushSubscriptions').doc(u.uid).set({subscription:e.data.sub,uid:u.uid,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){});});
   if(t==='tasksUpdated'){var f=document.querySelector('#screen-tasks iframe');f&&f.contentWindow&&f.contentWindow.postMessage({type:'tasksUpdated'},'*');}
   if(t==='xpAwarded'){var f2=document.querySelector('#screen-improve iframe');f2&&f2.contentWindow&&f2.contentWindow.postMessage({type:'xpAwarded',xp:e.data.xp},'*');}
 });
 
-// ── Navigation ────────────────────────────────────────────────────────────────
+// ── Nav ───────────────────────────────────────────────────────────────────────
 var currentScreen=null,screensLoaded={};
 var AUTH_PAGES=['profile','tasks','leaderboard'];
 var NETWORK_PAGES=['profile','tasks','leaderboard'];
-
 function isOffline(){return!navigator.onLine;}
 var _offlineTimer=null;
-function showOfflineToast(){
-  var t=document.getElementById('offline-toast');
-  if(!t)return;
-  t.classList.add('show');
-  clearTimeout(_offlineTimer);
-  _offlineTimer=setTimeout(function(){t.classList.remove('show');},2500);
-}
-
+function showOfflineToast(){var t=document.getElementById('offline-toast');if(!t)return;t.classList.add('show');clearTimeout(_offlineTimer);_offlineTimer=setTimeout(function(){t.classList.remove('show');},2500);}
 function showNav(show){document.body.classList.toggle('has-nav',show);}
-function updateNavActive(page){
-  document.querySelectorAll('.nb').forEach(function(b){
-    b.classList.toggle('active',b.dataset.page===page);
-  });
-}
+function updateNavActive(page){document.querySelectorAll('.nb').forEach(function(b){b.classList.toggle('active',b.dataset.page===page);});}
 
 window.goTo=function(page){
   if(tryGuestWall(page))return;
   if(isOffline()&&NETWORK_PAGES.indexOf(page)!==-1){showOfflineToast();return;}
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
-  if((page==='profile'||page==='leaderboard')&&screensLoaded[page]){
-    var old=document.querySelector('#screen-'+page+' iframe');
-    if(old)old.remove();
-    screensLoaded[page]=false;
-  }
-  var sc=document.getElementById('screen-'+page);
-  if(sc)sc.classList.add('active');
-  currentScreen=page;
-  showNav(page!=='auth');
-  updateNavActive(page);
+  if((page==='profile'||page==='leaderboard')&&screensLoaded[page]){var old=document.querySelector('#screen-'+page+' iframe');if(old)old.remove();screensLoaded[page]=false;}
+  var sc=document.getElementById('screen-'+page);if(sc)sc.classList.add('active');
+  currentScreen=page;showNav(page!=='auth');updateNavActive(page);
   if(screensLoaded[page])return;
-  var c=document.getElementById('screen-'+page);
-  if(!c)return;
+  var c=document.getElementById('screen-'+page);if(!c)return;
   if(AUTH_PAGES.indexOf(page)!==-1&&isStandalone&&!_authResolved){
     var w=document.createElement('div');w.className='auth-wait';
     w.innerHTML='<div class="auth-wait-dots"><div class="auth-wait-dot"></div><div class="auth-wait-dot"></div><div class="auth-wait-dot"></div></div>';
@@ -292,19 +248,13 @@ function _loadIframe(page,c){
 window.authCheck=function(){};
 function ensureUser(u){
   var r=firebase.firestore().collection('users').doc(u.uid);
-  return r.get().then(function(s){
-    return s.exists
-      ?r.set({lastSeen:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})
-      :r.set({uid:u.uid,email:u.email,username:u.displayName||null,pic:u.photoURL||null,createdAt:firebase.firestore.FieldValue.serverTimestamp(),lastSeen:firebase.firestore.FieldValue.serverTimestamp()});
-  });
+  return r.get().then(function(s){return s.exists?r.set({lastSeen:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}):r.set({uid:u.uid,email:u.email,username:u.displayName||null,pic:u.photoURL||null,createdAt:firebase.firestore.FieldValue.serverTimestamp(),lastSeen:firebase.firestore.FieldValue.serverTimestamp()});});
 }
 function redeemSessionToken(sid){
   return firebase.firestore().collection('authSessions').doc(sid).get().then(function(s){
-    if(!s.exists)throw'nf';
-    var d=s.data();if(d.used)throw'u';
+    if(!s.exists)throw'nf';var d=s.data();if(d.used)throw'u';
     var exp=d.expiresAt&&d.expiresAt.toDate?d.expiresAt.toDate():new Date(d.expiresAt);
-    if(new Date()>exp)throw'e';
-    s.ref.update({used:true});
+    if(new Date()>exp)throw'e';s.ref.update({used:true});
     return firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(d.idToken));
   });
 }
@@ -314,38 +264,13 @@ function redeemSessionToken(sid){
   var p=new URLSearchParams(location.search),tT=p.get('t'),sI=p.get('session');
   if(tT||sI)history.replaceState({},'',location.pathname);
   var qParam=p.get('q'),fromParam=p.get('from');
-  if(qParam||fromParam){
-    var qs='?';
-    if(qParam)qs+='q='+encodeURIComponent(qParam);
-    if(fromParam)qs+=(qParam?'&':'')+'from='+encodeURIComponent(fromParam);
-    sessionStorage.setItem('cebear_shared_qs',qs);
-    history.replaceState({},'',location.pathname);
-  }
+  if(qParam||fromParam){var qs='?';if(qParam)qs+='q='+encodeURIComponent(qParam);if(fromParam)qs+=(qParam?'&':'')+'from='+encodeURIComponent(fromParam);sessionStorage.setItem('cebear_shared_qs',qs);history.replaceState({},'',location.pathname);}
   var gT=sessionStorage.getItem('bd_gis_token');
-  if(gT){
-    sessionStorage.removeItem('bd_gis_token');
-    firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(gT))
-      .then(function(r){ensureUser(r.user);})
-      .then(function(){goTo('improve');})
-      .catch(function(){start();});
-    return;
-  }
+  if(gT){sessionStorage.removeItem('bd_gis_token');firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(gT)).then(function(r){ensureUser(r.user);}).then(function(){goTo('improve');}).catch(function(){start();});return;}
   if(sI){redeemSessionToken(sI).then(start).catch(start);return;}
-  if(tT){
-    fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tT})})
-      .then(function(r){return r.ok?r.json():null;})
-      .then(function(b){b&&b.customToken?firebase.auth().signInWithCustomToken(b.customToken).then(function(){location.reload();}):start();})
-      .catch(start);
-    return;
-  }
+  if(tT){fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tT})}).then(function(r){return r.ok?r.json():null;}).then(function(b){b&&b.customToken?firebase.auth().signInWithCustomToken(b.customToken).then(function(){location.reload();}):start();}).catch(start);return;}
   start();
-  function start(){
-    if(isStandalone){
-      authReady().then(function(){if(!currentScreen)goTo(_isAuthed?'improve':'auth');});
-    }else{
-      goTo('improve');
-    }
-  }
+  function start(){isStandalone?authReady().then(function(){if(!currentScreen)goTo(_isAuthed?'improve':'auth');}):goTo('improve');}
 })();
 
 var deferredPrompt=null;
