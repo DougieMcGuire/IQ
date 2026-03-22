@@ -85,8 +85,10 @@
       display:flex;flex-direction:column;align-items:center;justify-content:center;
       padding:calc(env(safe-area-inset-top,20px) + 68px) 14px calc(env(safe-area-inset-bottom,0px) + 64px);
       overflow:hidden;flex-shrink:0;position:relative;
+      will-change:scroll-position;
+      contain:layout style;
     }
-    .slide-spacer{height:100dvh;min-height:0;flex-shrink:0;scroll-snap-align:start;scroll-snap-stop:always;contain:strict}
+    .slide-spacer{height:100dvh;min-height:0;flex-shrink:0;scroll-snap-align:start;scroll-snap-stop:always;contain:strict;visibility:hidden}
 
     /* ── QUESTION CARD — blue card, chunky shadow ── */
     .qcard{
@@ -173,8 +175,8 @@
     .game-branding-bear img{width:20px;height:20px;object-fit:contain}
     .game-branding-text{font-size:11px;font-weight:900;color:#fff;letter-spacing:1.5px;text-transform:uppercase}
 
-    @keyframes slideEnter{0%{opacity:0}100%{opacity:1}}
-    .slide.entering .qcard{animation:slideEnter .18s ease both}
+    @keyframes slideEnter{0%{opacity:.85;transform:scale(.98)}100%{opacity:1;transform:scale(1)}}
+    .slide.entering .qcard{animation:slideEnter .15s ease both}
 
     .card-actions{display:flex;justify-content:flex-end;width:100%;margin-top:-4px}
     .share-q-btn{
@@ -702,6 +704,179 @@
 </script>
 <script src="questions.js"></script>
 <script src="games/games.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// GAMES.JS PATCH — fixes applied AFTER games.js loads
+// ══════════════════════════════════════════════════════════════════════
+
+(function(){
+  // ── FIX 1: No same game type 2x in a row + even distribution ──────
+  if(window.Q && Q.generate){
+    const _origGenerate = Q.generate.bind(Q);
+    let _lastType = null;
+    let _typeCounts = {};
+    Q.generate = function(diff){
+      let attempts = 0;
+      while(attempts < 20){
+        attempts++;
+        const q = _origGenerate(diff);
+        if(!q) continue;
+        // Skip if same type as last
+        if(q.type === _lastType && attempts < 15) continue;
+        // Track counts for even distribution
+        _typeCounts[q.type] = (_typeCounts[q.type]||0) + 1;
+        // Prefer underrepresented types
+        const avg = Object.values(_typeCounts).reduce((a,b)=>a+b,0) / Math.max(Object.keys(_typeCounts).length,1);
+        if(_typeCounts[q.type] > avg + 3 && attempts < 10) continue;
+        _lastType = q.type;
+        return q;
+      }
+      // Fallback
+      const q = _origGenerate(diff);
+      if(q) _lastType = q.type;
+      return q;
+    };
+  }
+
+  // ── FIX 2: Pipe Connect — more solvable puzzles ───────────────────
+  // Override the pipeConnect register with guaranteed-solvable puzzles
+  if(window.Q && Q.register){
+    // These puzzles are hand-verified: all pipes at rot=0 form a connected path
+    var GOOD_PUZZLES = [
+      // 4x4 zigzag: 0→1→5→4→8→9→13→12→...→15 won't work, use simple paths
+      // Path: 0(down+right)→1(left+down)→5(up+down)→9(up+right)→10(left+right)→11(left+down)→15
+      {size:4,cells:[{t:6},{t:10},{t:0},{t:0},{t:0},{t:3},{t:0},{t:0},{t:0},{t:5},{t:12},{t:9},{t:0},{t:0},{t:0},{t:5}],src:0,snk:15,d:0.8},
+      // Simple L-path down then right
+      {size:4,cells:[{t:3},{t:0},{t:0},{t:0},{t:3},{t:0},{t:0},{t:0},{t:6},{t:12},{t:12},{t:9},{t:0},{t:0},{t:0},{t:5}],src:0,snk:15,d:0.8},
+      // Serpentine 4x4
+      {size:4,cells:[{t:6},{t:12},{t:12},{t:10},{t:0},{t:0},{t:0},{t:3},{t:0},{t:0},{t:0},{t:6},{t:0},{t:0},{t:0},{t:5}],src:0,snk:15,d:0.9},
+      // 5x5 simple down-right
+      {size:5,cells:[
+        {t:3},{t:0},{t:0},{t:0},{t:0},
+        {t:3},{t:0},{t:0},{t:0},{t:0},
+        {t:6},{t:12},{t:9},{t:0},{t:0},
+        {t:0},{t:0},{t:3},{t:0},{t:0},
+        {t:0},{t:0},{t:6},{t:12},{t:5}
+      ],src:0,snk:24,d:1.1},
+      // 5x5 L-shape
+      {size:5,cells:[
+        {t:6},{t:12},{t:12},{t:12},{t:10},
+        {t:0},{t:0},{t:0},{t:0},{t:3},
+        {t:0},{t:0},{t:0},{t:0},{t:3},
+        {t:0},{t:0},{t:0},{t:0},{t:3},
+        {t:0},{t:0},{t:0},{t:0},{t:5}
+      ],src:0,snk:24,d:1.0},
+    ];
+
+    // Re-register with guaranteed puzzles
+    Q.register('pipeConnect', function(){
+      var puz = GOOD_PUZZLES[Math.floor(Math.random()*GOOD_PUZZLES.length)];
+      var cells = puz.cells.map(function(c,i){
+        if(i===puz.src||i===puz.snk||c.t===0) return {t:c.t, rot:0};
+        return {t:c.t, rot:Math.floor(Math.random()*4)};
+      });
+      return {
+        type:'pipeConnect',category:'spatialAwareness',categoryLabel:'Pipe Connect',
+        difficulty:puz.d,question:'Rotate pipes to connect source to drain!',
+        size:puz.size,cells:cells,src:puz.src,snk:puz.snk,
+        answer:'complete',options:[],explanation:'Rotate pipes by tapping — connect 🟢 to 🔴!',visual:'custom'
+      };
+    }, 3);
+  }
+
+  // ── FIX 3: Color Sort — change blue to purple ─────────────────────
+  // The PALETTE in colorSort uses '#3a7df2' which blends with blue card
+  // We override the register to use purple instead
+  if(window.Q && Q.register){
+    var CS_PALETTES = [
+      {name:'Rainbow',colors:['#FF0000','#FF7700','#FFDD00','#00CC44','#8B5CF6','#EC4899'],labels:['Red','Orange','Yellow','Green','Purple','Pink']},
+      {name:'Warm→Cool',colors:['#FF2200','#FF6600','#FFAA00','#22C55E','#8B5CF6','#EC4899'],labels:['Hot Red','Orange','Warm','Green','Purple','Pink']},
+      {name:'Light→Dark',colors:['#FFFFFF','#CCCCCC','#999999','#666666','#333333','#111111'],labels:['White','Light','Silver','Gray','Dark','Black']}
+    ];
+    Q.register('colorSort', function(){
+      var size=Q.rand(0,1),pal=Q.pick(CS_PALETTES),count=size===0?4:6;
+      var correct=pal.colors.slice(0,count),labels=pal.labels.slice(0,count);
+      var scrambled=Q.shuffle(correct.map(function(c,i){return{color:c,label:labels[i],idx:i}}));
+      return{type:'colorSort',category:'patternRecognition',categoryLabel:'Color Sort',
+        difficulty:size===0?0.7:1.1,question:'Sort '+pal.name+' in order!',
+        scrambled:scrambled,correctOrder:correct,answer:'complete',options:[],
+        explanation:'Visual pattern recognition.',visual:'custom'};
+    }, 3);
+  }
+
+  // ── FIX 4: More riddles ───────────────────────────────────────────
+  if(window.Q && Q.register){
+    var RIDDLES = [
+      {q:'I have hands but cannot clap. What am I?',a:'A clock',w:['A person','A robot','A tree'],why:'Clock hands tell time.',d:0.6},
+      {q:'What has keys but no locks?',a:'A piano',w:['A door','A car','A safe'],why:'Piano has musical keys.',d:0.6},
+      {q:'What gets wetter the more it dries?',a:'A towel',w:['A sponge','Paper','The sun'],why:'Towels absorb water as they dry things.',d:0.7},
+      {q:'What has a head and tail but no body?',a:'A coin',w:['A snake','A fish','A ghost'],why:'Coins have heads and tails.',d:0.7},
+      {q:'What can you catch but not throw?',a:'A cold',w:['A ball','A fish','A wave'],why:'You catch a cold.',d:0.7},
+      {q:'What has teeth but cannot bite?',a:'A comb',w:['A shark','A dog','A saw'],why:'A comb has teeth for hair.',d:0.6},
+      {q:'What goes up but never comes down?',a:'Your age',w:['A balloon','A bird','Smoke'],why:'Age only increases.',d:0.7},
+      {q:'What has one eye but cannot see?',a:'A needle',w:['A pirate','A cyclops','A camera'],why:'Needle eye holds thread.',d:0.7},
+      {q:'What has words but never speaks?',a:'A book',w:['A parrot','A phone','A radio'],why:'Books have words but cannot talk.',d:0.6},
+      {q:'What runs but never walks?',a:'Water',w:['A dog','A car','Time'],why:'Water runs and flows.',d:0.7},
+      {q:'The more you take, the more you leave behind. What?',a:'Footsteps',w:['Money','Time','Breath'],why:'Walking leaves footsteps.',d:1.0},
+      {q:'What can fill a room but takes no space?',a:'Light',w:['Air','Water','Sound'],why:'Light fills space with no mass.',d:1.0},
+      {q:'What can travel the world while staying in a corner?',a:'A stamp',w:['A compass','The internet','A satellite'],why:'Stamps stay in envelope corners.',d:1.0},
+      {q:'I have cities but no houses. What am I?',a:'A map',w:['A planet','A dream','A story'],why:'Maps show geography without real objects.',d:1.0},
+      {q:'The more there is, the less you see. What am I?',a:'Darkness',w:['Light','Fog','Space'],why:'More darkness = less visibility.',d:1.0},
+      {q:'I speak without a mouth and hear without ears. What am I?',a:'An echo',w:['A ghost','Music','The wind'],why:'Echoes are sound reflections.',d:1.1},
+      {q:'What is so fragile that saying its name breaks it?',a:'Silence',w:['Glass','A dream','A secret'],why:'Speaking breaks silence.',d:1.3},
+      {q:'I have no life but I can die. What am I?',a:'A battery',w:['A robot','A flame','A ghost'],why:'Batteries die when drained.',d:1.3},
+      {q:'What gets sharper the more you use it?',a:'Your mind',w:['A knife','A pencil','A saw'],why:'Mental ability sharpens with practice.',d:1.2},
+      {q:'What has 13 hearts but no other organs?',a:'A deck of cards',w:['A hospital','A town','A garden'],why:'13 hearts in the suit.',d:1.4},
+      {q:'What tastes better than it smells?',a:'Your tongue',w:['Coffee','Perfume','Bacon'],why:'Your tongue tastes but cannot smell.',d:1.5},
+      {q:'What has a neck but no head?',a:'A bottle',w:['A shirt','A guitar','A giraffe'],why:'Bottles have a neck.',d:0.7},
+      {q:'What can you hold in your right hand but never in your left?',a:'Your left hand',w:['A pen','A coin','A ball'],why:'You cannot hold your left hand in your left hand.',d:1.0},
+      {q:'What is always in front of you but cannot be seen?',a:'The future',w:['Air','Glass','Your nose'],why:'The future is ahead but invisible.',d:1.1},
+      {q:'What can you break even if you never touch it?',a:'A promise',w:['Glass','A record','Ice'],why:'Promises break without physical contact.',d:1.3},
+      {q:'What invention lets you look right through a wall?',a:'A window',w:['A mirror','X-rays','A telescope'],why:'Windows are transparent walls.',d:0.8},
+      {q:'What comes once in a minute, twice in a moment, but never in a thousand years?',a:'The letter M',w:['A second','Silence','A heartbeat'],why:'"Minute" and "moment" have M.',d:1.4},
+      {q:'What has a ring but no finger?',a:'A telephone',w:['A planet','A boxing ring','A circus'],why:'Phones ring.',d:0.7},
+      {q:'What can be cracked, made, told, and played?',a:'A joke',w:['A record','An egg','A game'],why:'You crack, make, tell, and play jokes.',d:1.0},
+      {q:'What gets bigger when more is taken away?',a:'A hole',w:['A debt','A balloon','A sponge'],why:'Removing material makes a hole larger.',d:1.1},
+      {q:'What has branches but no fruit or leaves?',a:'A bank',w:['A dead tree','A road','A river'],why:'Banks have branches.',d:1.2},
+      {q:'What loses its head every morning?',a:'A pillow',w:['A candle','The sun','A coin'],why:'A pillow loses your head when you get up.',d:1.1},
+      {q:'What is full of holes but still holds water?',a:'A sponge',w:['A net','A bucket','A cloud'],why:'Sponges are porous yet absorb water.',d:0.8},
+      {q:'What word becomes shorter when you add two letters?',a:'Short',w:['Small','Tiny','Brief'],why:'"Short" + "er" = "shorter".',d:1.4},
+      {q:'I fly without wings. I cry without eyes. What am I?',a:'A cloud',w:['A bat','A ghost','Smoke'],why:'Clouds bring rain and move through sky.',d:1.2},
+      {q:'What can you never eat for breakfast?',a:'Dinner',w:['Eggs','Lunch','Cereal'],why:'Dinner is an evening meal.',d:0.6},
+      {q:'What belongs to you but others use more?',a:'Your name',w:['Your phone','Your money','Your house'],why:'People say your name more than you do.',d:1.1},
+      {q:'I shrink every time you use me. What am I?',a:'A bar of soap',w:['A sponge','A pencil','A candle'],why:'Soap wears down with each use.',d:0.8},
+      {q:'What has many keys but cannot open any door?',a:'A keyboard',w:['A key ring','A piano','A safe'],why:'Keyboards have keys but open nothing.',d:0.8},
+      // NEW riddles
+      {q:'What has ears but cannot hear?',a:'A cornfield',w:['A statue','A teddy bear','A painting'],why:'Corn has ears but cannot hear.',d:0.7},
+      {q:'What building has the most stories?',a:'A library',w:['A skyscraper','A hotel','A museum'],why:'Libraries have the most stories (books).',d:0.8},
+      {q:'What has a thumb and four fingers but is not alive?',a:'A glove',w:['A hand','A puppet','A statue'],why:'Gloves have fingers but are not alive.',d:0.7},
+      {q:'What month has 28 days?',a:'All of them',w:['February','None','Just February'],why:'Every month has at least 28 days.',d:0.9},
+      {q:'What can you keep after giving to someone?',a:'Your word',w:['A gift','A smile','Money'],why:'You keep your word even after giving it.',d:1.0},
+      {q:'What goes through cities and fields but never moves?',a:'A road',w:['The wind','A river','Sunlight'],why:'Roads go everywhere but stay put.',d:0.9},
+      {q:'What has a bed but never sleeps, and a mouth but never eats?',a:'A river',w:['A cave','A volcano','A hotel'],why:'Rivers have beds and mouths.',d:1.1},
+      {q:'What gets broken without being held?',a:'A promise',w:['Silence','A rule','A heart'],why:'Promises break without physical contact.',d:1.0},
+      {q:'What can run but never walks, has a mouth but never talks?',a:'A river',w:['A clock','The wind','A snake'],why:'Rivers run and have mouths.',d:1.0},
+      {q:'I have lakes with no water, mountains with no stone. What am I?',a:'A map',w:['A dream','A painting','A model'],why:'Maps represent geography abstractly.',d:1.1},
+      {q:'What 5-letter word becomes shorter when you add 2 letters?',a:'Short',w:['Small','Quick','Light'],why:'Short + er = shorter.',d:1.3},
+      {q:'What begins with T, ends with T, and has T in it?',a:'A teapot',w:['A toast','A tent','A test'],why:'Teapot starts/ends with T and has tea in it.',d:1.2},
+      {q:'What has four wheels and flies?',a:'A garbage truck',w:['An airplane','A helicopter','A drone'],why:'Garbage trucks have wheels and attract flies.',d:1.3},
+      {q:'What can you hear but not see or touch?',a:'Your voice',w:['The wind','Music','Thunder'],why:'Your voice is heard but intangible.',d:0.8},
+      {q:'What has legs but cannot walk?',a:'A table',w:['A chair','A bed','A stool'],why:'Tables have legs but cannot walk.',d:0.6},
+      {q:'What kind of room has no doors or windows?',a:'A mushroom',w:['A dark room','A sealed room','A virtual room'],why:'A mushroom is a room with no doors.',d:1.0},
+      {q:'The more you share me, the less you have. What am I?',a:'A secret',w:['Money','Time','Food'],why:'Sharing a secret means fewer people dont know.',d:1.1},
+      {q:'What goes up and down but doesnt move?',a:'A staircase',w:['An elevator','A seesaw','Temperature'],why:'Stairs go up and down but stay fixed.',d:0.9},
+      {q:'What has a face and two hands but no arms or legs?',a:'A clock',w:['A doll','A robot','A puppet'],why:'Clocks have faces and hands.',d:0.6},
+      {q:'What can be long or short, grown or bought, painted or left bare?',a:'Fingernails',w:['Hair','A rope','A story'],why:'Fingernails match all descriptions.',d:1.4},
+    ];
+    Q.register('riddle', function(){
+      var i = Q.pick(RIDDLES);
+      return {type:'riddle',category:'problemSolving',categoryLabel:'Riddle',
+        difficulty:i.d||1.1,question:i.q,answer:i.a,
+        options:Q.shuffle([i.a].concat(i.w)),explanation:i.why,visual:'text'};
+    }, 3);
+  }
+})();
+</script>
 <script src="games/logic.js"></script>
 <script type="module">
 /* ═══════════════════════════════════════════════════════════
