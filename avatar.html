@@ -6,64 +6,55 @@
   <title>Avatar — Cebear</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#151f3e;--navy:#1b2d5b;--navyM:#243a6e;--cream:#F0EAD6;--green:#3fba4f;--gd:#2d9a3c;--red:#e8443a;--gold:#e8a817;--blue:#3a7df2;--dim:rgba(240,234,214,.4);--dimmer:rgba(240,234,214,.1)}
+    :root{--bg:#151f3e;--navy:#1b2d5b;--navyM:#243a6e;--cream:#F0EAD6;--green:#3fba4f;--gd:#2d9a3c;--red:#e8443a;--gold:#e8a817;--goldd:#c48e10;--blue:#3a7df2;--dim:rgba(240,234,214,.38);--dimmer:rgba(240,234,214,.09)}
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     html,body{width:100%;height:100%;overflow:hidden;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--cream)}
     .editor{display:flex;flex-direction:column;height:100%;overflow:hidden}
-
     .hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--navy);border-bottom:1px solid var(--dimmer);flex-shrink:0;gap:8px}
     .hdr-title{font-size:15px;font-weight:900;flex:1;text-align:center}
-    .btn-x{background:var(--dimmer);border:none;border-radius:10px;padding:7px 13px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:var(--cream);cursor:pointer;flex-shrink:0}
+    .btn-x{background:var(--dimmer);border:none;border-radius:10px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:var(--cream);cursor:pointer;display:flex;align-items:center;gap:6px;flex-shrink:0}
     .btn-x:active{opacity:.6}
-    .btn-save{background:var(--green);border:none;border-radius:10px;padding:7px 16px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;color:#fff;cursor:pointer;box-shadow:0 3px 0 var(--gd);flex-shrink:0}
+    .btn-save{background:var(--green);border:none;border-radius:10px;padding:8px 18px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;color:#fff;cursor:pointer;box-shadow:0 3px 0 var(--gd);flex-shrink:0;display:flex;align-items:center;gap:6px}
     .btn-save:active{transform:translateY(3px);box-shadow:none}
     .btn-save:disabled{opacity:.4;pointer-events:none}
-
-    /* preview */
-    .preview-row{display:flex;justify-content:center;align-items:center;padding:14px;background:var(--navy);flex-shrink:0}
-    .av-ring{width:130px;height:130px;border-radius:50%;overflow:hidden;border:3px solid rgba(240,234,214,.2);background:var(--navyM);flex-shrink:0}
-    .av-ring canvas{width:100%;height:100%;display:block;image-rendering:auto}
-
-    /* cat tabs */
+    .hdr svg,.btn-save svg,.btn-x svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+    .preview-row{display:flex;justify-content:center;padding:14px 16px 10px;background:var(--navy);flex-shrink:0}
+    .av-ring{width:140px;height:140px;border-radius:50%;overflow:hidden;border:3px solid rgba(240,234,214,.18);background:var(--navyM)}
+    .av-ring canvas{width:100%;height:100%;display:block}
     .cat-row{display:flex;gap:6px;overflow-x:auto;padding:8px 14px;flex-shrink:0}
     .cat-row::-webkit-scrollbar{display:none}
-    .cat-tab{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;cursor:pointer;padding:7px 10px;border-radius:12px;background:var(--dimmer);border:2px solid transparent;min-width:54px;transition:border-color .12s,background .12s}
-    .cat-tab.active{background:rgba(58,125,242,.18);border-color:var(--blue)}
+    .cat-tab{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;cursor:pointer;padding:8px 10px;border-radius:12px;background:var(--dimmer);border:2px solid transparent;min-width:54px;transition:all .12s}
+    .cat-tab.active{background:rgba(58,125,242,.2);border-color:var(--blue)}
     .cat-tab:active{opacity:.65}
-    .cat-icon{font-size:20px;line-height:1}
+    .cat-icon svg{width:18px;height:18px;stroke:var(--dim);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block}
+    .cat-tab.active .cat-icon svg{stroke:var(--blue)}
     .cat-lbl{font-size:9px;font-weight:800;color:var(--dim);white-space:nowrap}
     .cat-tab.active .cat-lbl{color:var(--blue)}
-
-    /* color strip */
     .color-row{flex-shrink:0;padding:6px 14px 2px;display:none}
     .color-row.show{display:block}
     .color-title{font-size:9px;font-weight:900;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
-    .dots{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+    .dots{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px}
     .dots::-webkit-scrollbar{display:none}
     .dot{width:28px;height:28px;border-radius:50%;flex-shrink:0;cursor:pointer;border:3px solid transparent;transition:transform .1s,border-color .1s}
     .dot.on{border-color:#fff;transform:scale(1.18)}
     .dot:active{transform:scale(.85)}
-
-    /* items */
-    .items-wrap{flex:1;overflow-y:auto;padding:8px 14px 20px}
+    .items-wrap{flex:1;overflow-y:auto;padding:8px 14px 20px;-webkit-overflow-scrolling:touch}
     .items-wrap::-webkit-scrollbar{display:none}
     .items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:7px}
     .icard{aspect-ratio:1;border-radius:12px;background:var(--dimmer);border:2.5px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;transition:border-color .1s}
     .icard:active{opacity:.65}
-    .icard.on{border-color:var(--gold);background:rgba(232,168,23,.08)}
-    /* canvas fills the card fully — quality fix */
-    .icard canvas{width:100%;height:100%;display:block;image-rendering:auto}
-    .none-lbl{font-size:11px;font-weight:800;color:var(--dim);text-align:center;padding:4px}
+    .icard.on{border-color:var(--gold);background:rgba(232,168,23,.1)}
+    .icard canvas{width:100%;height:100%;display:block}
+    .none-lbl{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:800;color:var(--dim)}
+    .none-lbl svg{width:16px;height:16px;stroke:var(--dim);fill:none;stroke-width:2;stroke-linecap:round;display:block}
     .icheck{position:absolute;bottom:3px;right:3px;width:15px;height:15px;background:var(--gold);border-radius:50%;display:none;align-items:center;justify-content:center}
     .icard.on .icheck{display:flex}
-    .icheck svg{width:9px;height:9px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round}
-
+    .icheck svg{width:9px;height:9px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
     .saving{position:fixed;inset:0;background:rgba(15,22,44,.9);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:99;backdrop-filter:blur(6px)}
     .saving.show{display:flex}
     .saving-lbl{font-size:15px;font-weight:800}
-    .spin{border:4px solid var(--dimmer);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-
+    .spin{border:4px solid var(--dimmer);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
     .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--green);color:#fff;border-radius:12px;padding:9px 20px;font-size:13px;font-weight:800;opacity:0;pointer-events:none;transition:all .28s;z-index:200;white-space:nowrap}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .toast.err{background:var(--red)}
@@ -72,12 +63,16 @@
 <body>
 <div class="editor">
   <div class="hdr">
-    <button class="btn-x" id="close-btn">✕ Close</button>
+    <button class="btn-x" id="close-btn">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Close
+    </button>
     <div class="hdr-title">Edit Avatar</div>
-    <button class="btn-save" id="save-btn">Save</button>
+    <button class="btn-save" id="save-btn">
+      <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save
+    </button>
   </div>
   <div class="preview-row">
-    <div class="av-ring"><canvas id="pv" width="260" height="260"></canvas></div>
+    <div class="av-ring"><canvas id="pv" width="280" height="280"></canvas></div>
   </div>
   <div class="cat-row" id="cat-row"></div>
   <div class="color-row" id="color-row">
@@ -95,478 +90,397 @@
 <script>
 'use strict';
 
-// ── Firebase — always use own init, NOT parent ─────────────────────────────
-// (parent firebase is compat v9, may conflict; own init is safe in iframe)
+// ── Firebase ──────────────────────────────────────────────────────────────────
 var _auth, _db, _user = null;
 (function(){
-  var cfg = {
-    apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",
-    authDomain:"braindeer-backend.firebaseapp.com",
-    projectId:"braindeer-backend",
-    storageBucket:"braindeer-backend.firebasestorage.app",
-    messagingSenderId:"331205139765",
-    appId:"1:331205139765:web:20cfef8194af63fc55c07c"
-  };
-  // Reuse app if already initialized (e.g. page reload)
-  var app = firebase.apps.length ? firebase.app() : firebase.initializeApp(cfg);
-  _auth = firebase.auth(app);
-  _db   = firebase.firestore(app);
-  _auth.onAuthStateChanged(function(u){ _user = u; });
+  var cfg={apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend",storageBucket:"braindeer-backend.firebasestorage.app",messagingSenderId:"331205139765",appId:"1:331205139765:web:20cfef8194af63fc55c07c"};
+  var app=firebase.apps.length?firebase.app():firebase.initializeApp(cfg);
+  _auth=firebase.auth(app); _db=firebase.firestore(app);
+  _auth.onAuthStateChanged(function(u){_user=u;});
 })();
 
-// ── Constants ─────────────────────────────────────────────────────────────────
-var BASE = '/Avatars/';
-var LAYERS = ['bases','neck','hair','eyes','brows','noses','mouths','tops','glasses','hats'];
-// These layers have no green pixels to colorize
-var NO_COL = {brows:true, noses:true};
+// ── Config ────────────────────────────────────────────────────────────────────
+var BASE='/Avatars/';
 
-var CATS = [
-  {id:'skin',    lbl:'Skin',    icon:'🧑', ck:'bases',   lk:'bases'},
-  {id:'hair',    lbl:'Hair',    icon:'💇', ck:'hair',    lk:'hair'},
-  {id:'eyes',    lbl:'Eyes',    icon:'👁',  ck:'eyes',    lk:'eyes'},
-  {id:'brows',   lbl:'Brows',   icon:'🤨', ck:null,      lk:'brows'},
-  {id:'noses',   lbl:'Nose',    icon:'👃', ck:null,      lk:'noses'},
-  {id:'mouths',  lbl:'Mouth',   icon:'👄', ck:'mouths',  lk:'mouths'},
-  {id:'tops',    lbl:'Clothes', icon:'👕', ck:'tops',    lk:'tops'},
-  {id:'neck',    lbl:'Neck',    icon:'📿', ck:'neck',    lk:'neck'},
-  {id:'glasses', lbl:'Glasses', icon:'🕶', ck:'glasses', lk:'glasses'},
-  {id:'hats',    lbl:'Hats',    icon:'🎩', ck:'hats',    lk:'hats'},
-  {id:'bg',      lbl:'BG',      icon:'🎨', ck:'bg',      lk:null},
+// Correct anatomical order:
+// skin → hair (behind face) → eyes → brows → nose → mouth
+// → neck chain (over skin, under shirt collar) → tops → glasses → hats
+var LAYERS=['bases','hair','eyes','brows','noses','mouths','neck','tops','glasses','hats'];
+
+// No colorable green in these layers
+var NO_COL={brows:true,noses:true};
+
+var CATS=[
+  {id:'skin',   lbl:'Skin',   lk:'bases',  ck:'bases',
+   svg:'<circle cx="12" cy="8" r="4"/><path d="M5 20a7 7 0 0114 0"/>'},
+  {id:'hair',   lbl:'Hair',   lk:'hair',   ck:'hair',
+   svg:'<path d="M12 3C8.5 3 6 5.5 6 9c0 1.5.5 3 1.5 4.5C6 14.5 5 16 5 17h14c0-1-1-2.5-2.5-3.5C17.5 12 18 10.5 18 9c0-3.5-2.5-6-6-6z"/>'},
+  {id:'eyes',   lbl:'Eyes',   lk:'eyes',   ck:'eyes',
+   svg:'<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/>'},
+  {id:'brows',  lbl:'Brows',  lk:'brows',  ck:null,
+   svg:'<path d="M5 9c2-2 5-3 7-3s5 1 7 3"/><path d="M5 6c2-2 5-3 7-3s5 1 7 3"/>'},
+  {id:'noses',  lbl:'Nose',   lk:'noses',  ck:null,
+   svg:'<path d="M12 5v9"/><path d="M9 14c0 1.7 1.3 3 3 3s3-1.3 3-3"/><line x1="9" y1="14" x2="7" y2="14"/><line x1="15" y1="14" x2="17" y2="14"/>'},
+  {id:'mouths', lbl:'Mouth',  lk:'mouths', ck:'mouths',
+   svg:'<path d="M8 13s1.5 4 4 4 4-4 4-4"/>'},
+  {id:'tops',   lbl:'Clothes',lk:'tops',   ck:'tops',
+   svg:'<path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/>'},
+  {id:'neck',   lbl:'Neck',   lk:'neck',   ck:'neck',
+   svg:'<circle cx="12" cy="17" r="2"/><path d="M9 9l3 6 3-6"/><path d="M9 6l3-4 3 4"/>'},
+  {id:'glasses',lbl:'Glasses',lk:'glasses',ck:'glasses',
+   svg:'<circle cx="6" cy="12" r="3"/><circle cx="18" cy="12" r="3"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="2" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="22" y2="12"/>'},
+  {id:'hats',   lbl:'Hats',   lk:'hats',   ck:'hats',
+   svg:'<path d="M4 18h16"/><path d="M6 18V12a6 6 0 0112 0v6"/><line x1="2" y1="18" x2="22" y2="18"/>'},
+  {id:'bg',     lbl:'BG',     lk:null,     ck:'bg',
+   svg:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>'},
 ];
 
-var OPTIONAL = {neck:true, glasses:true, hats:true, brows:true, noses:true};
+var OPTIONAL={neck:true,glasses:true,hats:true,brows:true,noses:true};
 
-var COLORS = [
-  // skin tones
+var COLORS=[
   '#FDBCB4','#F4C2A1','#E8B982','#D1A374','#C19A6B','#A67C5A','#8D5524','#6B4423',
   '#FFEEE6','#F5D5C4','#EBCCA2','#E1B380','#D79A5E','#CD813C','#B94F00',
-  // hair
   '#1C1C1C','#2C1810','#4A2E1A','#8B4513','#A0522D','#CD853F','#DAA520',
   '#F5DEB3','#FFD700','#C0C0C0','#808080','#FF4500','#FF69B4','#FF1493',
-  // general
   '#FFFFFF','#D3D3D3','#404040','#000000',
-  '#FF0000','#FF7F00','#FFFF00','#00FF00','#0000FF','#8B00FF',
-  '#87CEEB','#4169E1','#000080','#6A5ACD','#9370DB',
-  '#228B22','#006400','#90EE90','#20B2AA','#008B8B',
-  '#8B0000','#A52A2A','#FF6347','#FFA07A',
+  '#FF0000','#FF7F00','#FFFF00','#0000FF','#8B00FF',
+  '#87CEEB','#4169E1','#000080','#6A5ACD','#228B22','#006400','#20B2AA','#008B8B',
+  '#8B0000','#A52A2A','#FF6347',
 ];
 
-var BG_COLORS = [
+var BG_COLORS=[
   '#1b2d5b','#151f3e','#243a6e','#2f4a88',
   '#0474fc','#3a7df2','#6d4aed','#e8443a','#3fba4f','#e8a817','#e87d1a','#e8557a',
   '#00bcd4','#009688','#ff5722','#795548',
   '#FF9A9E','#FECFEF','#667eea','#764ba2','#f093fb','#4facfe','#43e97b','#fa709a',
-  '#ffeb3b','#ff9800','#8bc34a','#607d8b','#9e9e9e',
-  '#000000','#FFFFFF',
+  '#ffeb3b','#ff9800','#8bc34a','#607d8b','#9e9e9e','#000000','#FFFFFF',
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────────
-var manifest = {};
-var curCat = 'skin';
-var S = {
-  parts:  { bases:'base.png', neck:'', hair:'1.png', eyes:'BasicMale.png',
-            brows:'Basic.png', noses:'basic.png', mouths:'Basic.png',
-            tops:'16.png', glasses:'', hats:'' },
-  colors: { bases:'#E8B982', neck:'#C0C0C0', hair:'#4A2E1A', eyes:'#4169E1',
-            brows:'#4A2E1A', mouths:'#CC6666', tops:'#3a7df2',
-            glasses:'#1C1C1C', hats:'#e8443a', bg:'#1b2d5b' }
+var manifest={};
+var curCat='skin';
+var S={
+  parts: {bases:'base.png',neck:'',hair:'1.png',eyes:'BasicMale.png',
+          brows:'Basic.png',noses:'basic.png',mouths:'Basic.png',
+          tops:'16.png',glasses:'',hats:''},
+  colors:{bases:'#E8B982',neck:'#C0C0C0',hair:'#4A2E1A',eyes:'#4169E1',
+          brows:'#4A2E1A',mouths:'#CC6666',tops:'#3a7df2',
+          glasses:'#1C1C1C',hats:'#e8443a',bg:'#1b2d5b'}
 };
 
 // ── Image cache ───────────────────────────────────────────────────────────────
-var IC = {};
-function loadImg(src) {
-  if (src in IC) return Promise.resolve(IC[src]);
+var IC={};
+function loadImg(src){
+  if(src in IC)return Promise.resolve(IC[src]);
   return new Promise(function(res){
-    var img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload  = function(){ IC[src] = img; res(img); };
-    img.onerror = function(){ IC[src] = null;  res(null); };
-    img.src = src;
+    var img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=function(){IC[src]=img;res(img);};
+    img.onerror=function(){IC[src]=null;res(null);};
+    img.src=src;
   });
 }
 
-// ── Green → color replace ─────────────────────────────────────────────────────
-// TIGHT tolerance matching the reference code:
-// green channel > 200, AND green > red+50, AND green > blue+50
-function replaceGreen(img, w, h, hex) {
-  var c = document.createElement('canvas');
-  c.width = w; c.height = h;
-  var x = c.getContext('2d');
-  x.drawImage(img, 0, 0, w, h);
-  var d = x.getImageData(0, 0, w, h);
-  var px = d.data;
-  var tr = parseInt(hex.slice(1,3), 16);
-  var tg = parseInt(hex.slice(3,5), 16);
-  var tb = parseInt(hex.slice(5,7), 16);
-  for (var i = 0; i < px.length; i += 4) {
-    if (px[i+3] < 128) continue;          // skip transparent/semi-transparent
-    var R = px[i], G = px[i+1], B = px[i+2];
-    // Must be a clearly green pixel — same as reference project
-    if (G > 200 && G > R + 50 && G > B + 50) {
-      px[i]   = tr;
-      px[i+1] = tg;
-      px[i+2] = tb;
+// ── Green replacement — the RIGHT way ─────────────────────────────────────────
+//
+// Root cause of green fringe: if you replace pixels AFTER scaling down the image,
+// the browser's bilinear filter blends the replaced pixels back with the original
+// green pixels at the edges, producing green fringe.
+//
+// Fix: ALWAYS replace at the image's NATIVE pixel dimensions.
+// Then draw the result to whatever target size — scaling happens AFTER replacement,
+// so edge pixels are already in the target color and any blending is color→transparent,
+// not green→transparent.
+//
+// Detection: ratio-based (G must be > R*1.4 AND > B*1.4 AND > 80).
+// This catches pure green and lime while ignoring teal (B≈G), yellow (R≈G), skin, hair.
+// Smooth blend for anti-aliased edges based on how dominant green is.
+//
+// Cache: keyed by "src|hex" — size-independent because native dims are fixed.
+
+var NC={};
+function replaceGreen(img,hex){
+  if(!img)return null;
+  var key=img.src+'|'+hex;
+  if(NC[key])return NC[key];
+
+  // Always use naturalWidth — never 0 because img is already loaded
+  var W=img.naturalWidth||img.width||256;
+  var H=img.naturalHeight||img.height||256;
+
+  var c=document.createElement('canvas');
+  c.width=W; c.height=H;
+  var ctx=c.getContext('2d');
+  ctx.drawImage(img,0,0,W,H);
+
+  var id=ctx.getImageData(0,0,W,H);
+  var px=id.data;
+  var tr=parseInt(hex.slice(1,3),16);
+  var tg=parseInt(hex.slice(3,5),16);
+  var tb=parseInt(hex.slice(5,7),16);
+
+  for(var i=0;i<px.length;i+=4){
+    if(px[i+3]===0)continue; // fully transparent: skip
+    var R=px[i],G=px[i+1],B=px[i+2];
+    // Green must dominate both channels by a ratio — ignores teal, yellow, skin
+    if(G>80 && G>R*1.4 && G>B*1.4){
+      // Strength: how purely green is this pixel (1.0=pure, lower=edge blend)
+      var maxOther=Math.max(R,B);
+      var strength=Math.min(1,(G-maxOther)/60);
+      px[i]  =(R+(tr-R)*strength+0.5)|0;
+      px[i+1]=(G+(tg-G)*strength+0.5)|0;
+      px[i+2]=(B+(tb-B)*strength+0.5)|0;
+      // Alpha preserved: semi-transparent edges stay semi-transparent
+      // but now in the target color, so they blend to transparent not to green
     }
   }
-  x.putImageData(d, 0, 0);
+  ctx.putImageData(id,0,0);
+  NC[key]=c;
   return c;
 }
 
-// Colored-canvas cache keyed by "url|hex|w|h"
-var CC = {};
-function getColored(img, w, h, hex) {
-  if (!img) return null;
-  var key = img.src + '|' + hex + '|' + w + '|' + h;
-  if (!CC[key]) CC[key] = replaceGreen(img, w, h, hex);
-  return CC[key];
+// ── Draw one layer to a context ───────────────────────────────────────────────
+function drawLayer(ctx,img,col,lk,sz){
+  if(!img)return;
+  if(col&&!NO_COL[lk]){
+    var colored=replaceGreen(img,col);
+    if(colored)ctx.drawImage(colored,0,0,sz,sz);
+  }else{
+    ctx.drawImage(img,0,0,sz,sz);
+  }
 }
 
 // ── Preview ───────────────────────────────────────────────────────────────────
-var _pvPending = false;
-function queuePreview() {
-  if (_pvPending) return;
-  _pvPending = true;
-  requestAnimationFrame(function(){
-    _pvPending = false;
-    drawPreview();
-  });
+var _pvPending=false;
+function queuePreview(){
+  if(_pvPending)return;
+  _pvPending=true;
+  requestAnimationFrame(function(){_pvPending=false;drawPreview();});
 }
 
-async function drawPreview() {
-  var cv = document.getElementById('pv');
-  if (!cv) return;
-  var x = cv.getContext('2d');
-  var N = 260;
-  x.clearRect(0, 0, N, N);
-  x.fillStyle = S.colors.bg || '#1b2d5b';
-  x.fillRect(0, 0, N, N);
-
-  for (var i = 0; i < LAYERS.length; i++) {
-    var lk = LAYERS[i];
-    var part = S.parts[lk];
-    if (!part) continue;
-
-    var cat = CATS.find(function(c){ return c.lk === lk; });
-    var ck  = cat ? cat.ck : null;
-    var col = (ck && !NO_COL[lk]) ? S.colors[ck] : null;
-
-    var img = await loadImg(BASE + lk + '/' + part);
-    if (img) {
-      if (col) {
-        var colored = getColored(img, N, N, col);
-        if (colored) x.drawImage(colored, 0, 0, N, N);
-      } else {
-        x.drawImage(img, 0, 0, N, N);
-      }
-    }
-    // Overlay (ignore 404 — loadImg returns null)
-    var ov = await loadImg(BASE + lk + '/' + part.replace('.png', 'overlay.png'));
-    if (ov) x.drawImage(ov, 0, 0, N, N);
+async function drawPreview(){
+  var cv=document.getElementById('pv');if(!cv)return;
+  var ctx=cv.getContext('2d');
+  var N=280;
+  ctx.clearRect(0,0,N,N);
+  ctx.fillStyle=S.colors.bg||'#1b2d5b';
+  ctx.fillRect(0,0,N,N);
+  for(var i=0;i<LAYERS.length;i++){
+    var lk=LAYERS[i],part=S.parts[lk];if(!part)continue;
+    var cat=CATS.find(function(c){return c.lk===lk;});
+    var col=(cat&&cat.ck&&!NO_COL[lk])?S.colors[cat.ck]:null;
+    var img=await loadImg(BASE+lk+'/'+part);
+    drawLayer(ctx,img,col,lk,N);
+    var ov=await loadImg(BASE+lk+'/'+part.replace('.png','overlay.png'));
+    if(ov)ctx.drawImage(ov,0,0,N,N);
   }
 }
 
 // ── Thumbnails ────────────────────────────────────────────────────────────────
-async function drawThumb(cvId, lk, item, col) {
-  var cv = document.getElementById(cvId);
-  if (!cv) return;
-  var key = lk + '|' + item + '|' + (col || '');
-  if (cv.dataset.k === key) return; // already drawn, skip
-  cv.dataset.k = key;
-
-  var SZ = 80; // higher than before = sharper
-  cv.width = SZ; cv.height = SZ;
-  var x = cv.getContext('2d');
-  x.clearRect(0, 0, SZ, SZ);
-
-  var img = await loadImg(BASE + lk + '/' + item);
-  if (!img) { cv.dataset.k = ''; return; } // failed — allow retry
-
-  if (col && !NO_COL[lk]) {
-    var colored = getColored(img, SZ, SZ, col);
-    if (colored) x.drawImage(colored, 0, 0, SZ, SZ);
-  } else {
-    x.drawImage(img, 0, 0, SZ, SZ);
-  }
-
-  var ov = await loadImg(BASE + lk + '/' + item.replace('.png', 'overlay.png'));
-  if (ov) x.drawImage(ov, 0, 0, SZ, SZ);
+async function drawThumb(cvId,lk,item,col){
+  var cv=document.getElementById(cvId);if(!cv)return;
+  var key=lk+'|'+item+'|'+(col||'_');
+  if(cv.dataset.k===key)return;
+  cv.dataset.k=key;
+  var SZ=100;
+  cv.width=SZ;cv.height=SZ;
+  var ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,SZ,SZ);
+  var img=await loadImg(BASE+lk+'/'+item);
+  if(!img){cv.dataset.k='';return;}
+  drawLayer(ctx,img,col,lk,SZ);
+  var ov=await loadImg(BASE+lk+'/'+item.replace('.png','overlay.png'));
+  if(ov)ctx.drawImage(ov,0,0,SZ,SZ);
 }
 
-// ── Category tabs ─────────────────────────────────────────────────────────────
-function buildTabs() {
-  var el = document.getElementById('cat-row');
-  el.innerHTML = CATS.map(function(c){
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+function buildTabs(){
+  var el=document.getElementById('cat-row');
+  el.innerHTML=CATS.map(function(c){
     return '<div class="cat-tab" id="ctab-'+c.id+'">' +
-      '<span class="cat-icon">'+c.icon+'</span>' +
-      '<span class="cat-lbl">'+c.lbl+'</span>' +
-    '</div>';
+      '<div class="cat-icon"><svg viewBox="0 0 24 24">'+c.svg+'</svg></div>' +
+      '<span class="cat-lbl">'+c.lbl+'</span></div>';
   }).join('');
-  el.addEventListener('click', function(e){
-    var tab = e.target.closest('.cat-tab');
-    if (!tab) return;
-    var id = tab.id.replace('ctab-','');
-    switchCat(id);
+  el.addEventListener('click',function(e){
+    var tab=e.target.closest('.cat-tab');
+    if(tab)switchCat(tab.id.replace('ctab-',''));
   });
 }
 
-function switchCat(id) {
-  curCat = id;
-  document.querySelectorAll('.cat-tab').forEach(function(t){ t.classList.remove('active'); });
-  var tab = document.getElementById('ctab-'+id);
-  if (tab) { tab.classList.add('active'); tab.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'}); }
-
-  var cat = CATS.find(function(c){ return c.id === id; });
-  if (!cat) return;
-
-  var crow = document.getElementById('color-row');
-  if (cat.ck) {
+function switchCat(id){
+  curCat=id;
+  document.querySelectorAll('.cat-tab').forEach(function(t){t.classList.remove('active');});
+  var tab=document.getElementById('ctab-'+id);
+  if(tab){tab.classList.add('active');tab.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});}
+  var cat=CATS.find(function(c){return c.id===id;});if(!cat)return;
+  var crow=document.getElementById('color-row');
+  if(cat.ck){
     crow.classList.add('show');
-    document.getElementById('color-title').textContent = cat.lbl + ' Color';
-    buildDots(cat.ck, id === 'bg' ? BG_COLORS : COLORS);
-  } else {
-    crow.classList.remove('show');
-  }
-
+    document.getElementById('color-title').textContent=cat.lbl+' Color';
+    buildDots(cat.ck,id==='bg'?BG_COLORS:COLORS);
+  }else{crow.classList.remove('show');}
   buildGrid(id);
 }
 
-// ── Color dots ────────────────────────────────────────────────────────────────
-function buildDots(ck, palette) {
-  var curCol = (S.colors[ck] || '#000000').toLowerCase();
-  var el = document.getElementById('dots');
-  el.innerHTML = palette.map(function(c){
-    var light = c === '#FFFFFF' || c === '#F5DEB3' || c === '#FFD700' || c === '#FFDAB9';
-    var style = 'background:'+c+';' + (light ? 'outline:1.5px solid rgba(0,0,0,.3);outline-offset:-1px;' : '');
-    return '<div class="dot'+(c.toLowerCase()===curCol?' on':'')+'" data-ck="'+ck+'" data-col="'+c+'" style="'+style+'"></div>';
+// ── Dots ──────────────────────────────────────────────────────────────────────
+function buildDots(ck,palette){
+  var curCol=(S.colors[ck]||'').toLowerCase();
+  var el=document.getElementById('dots');
+  el.innerHTML=palette.map(function(c){
+    var lc=c.toLowerCase();
+    var isLight=(lc==='#ffffff'||lc==='#ffd700'||lc==='#f5deb3'||lc==='#ffeb3b'||lc==='#fdbcb4'||lc==='#f4c2a1'||lc==='#e8b982'||lc==='#ffeee6'||lc==='#f5d5c4'||lc==='#ebcca2');
+    var style='background:'+c+';'+(isLight?'outline:1.5px solid rgba(0,0,0,.2);outline-offset:-2px;':'');
+    return '<div class="dot'+(lc===curCol?' on':'')+'" data-ck="'+ck+'" data-col="'+c+'" style="'+style+'"></div>';
   }).join('');
-  el.onclick = function(e){
-    var dot = e.target.closest('.dot');
-    if (!dot) return;
-    pickColor(dot.dataset.ck, dot.dataset.col);
-  };
+  el.onclick=function(e){var dot=e.target.closest('.dot');if(dot)pickColor(dot.dataset.ck,dot.dataset.col);};
 }
 
-function pickColor(ck, col) {
-  S.colors[ck] = col;
-  // Update dot selection
-  buildDots(ck, curCat === 'bg' ? BG_COLORS : COLORS);
-
-  // Invalidate colored canvas cache for this layer
-  var cat = CATS.find(function(c){ return c.ck === ck; });
-  if (cat && cat.lk) {
-    var pfx = BASE + cat.lk + '/';
-    Object.keys(CC).forEach(function(k){ if (k.startsWith(pfx)) delete CC[k]; });
-    // Reset drawn-key on thumbnails so they redraw
+function pickColor(ck,col){
+  S.colors[ck]=col;
+  buildDots(ck,curCat==='bg'?BG_COLORS:COLORS);
+  var cat=CATS.find(function(c){return c.ck===ck;});
+  if(cat&&cat.lk){
+    var pfx=BASE+cat.lk+'/';
+    Object.keys(NC).forEach(function(k){if(k.startsWith(pfx))delete NC[k];});
     document.querySelectorAll('#grid canvas').forEach(function(cv){
-      if (cv.id.startsWith('ic-'+cat.lk+'-')) cv.dataset.k = '';
+      if(cv.id.startsWith('ic-'+cat.lk+'-'))cv.dataset.k='';
     });
-    redrawThumbs(cat.lk, col);
+    redrawThumbs(cat.lk,col);
   }
-
   queuePreview();
 }
 
-function redrawThumbs(lk, col) {
-  var items = (manifest[lk] || []).filter(function(f){ return f.indexOf('overlay') === -1; });
-  items.forEach(function(item){
-    drawThumb('ic-'+lk+'-'+safeId(item), lk, item, col);
-  });
+function redrawThumbs(lk,col){
+  (manifest[lk]||[]).filter(function(f){return f.indexOf('overlay')===-1;})
+    .forEach(function(item){drawThumb('ic-'+lk+'-'+safeId(item),lk,item,col);});
 }
 
-// ── Items grid ────────────────────────────────────────────────────────────────
-// Safe ID: encode special chars so they work in HTML id attributes
-function safeId(s) { return s.replace(/[^a-zA-Z0-9]/g, '_'); }
+// ── Grid ──────────────────────────────────────────────────────────────────────
+function safeId(s){return s.replace(/[^a-zA-Z0-9]/g,'_');}
 
-function buildGrid(catId) {
-  var cat = CATS.find(function(c){ return c.id === catId; });
-  if (!cat) return;
-  var grid = document.getElementById('grid');
-
-  if (catId === 'bg') {
-    grid.innerHTML = '<div style="color:var(--dim);font-size:12px;font-weight:700;padding:20px 0;grid-column:1/-1;text-align:center">Pick a color above ↑</div>';
+function buildGrid(catId){
+  var cat=CATS.find(function(c){return c.id===catId;});if(!cat)return;
+  var grid=document.getElementById('grid');
+  if(catId==='bg'){
+    grid.innerHTML='<div style="color:var(--dim);font-size:12px;font-weight:700;padding:20px 0;grid-column:1/-1;text-align:center">Pick a color above ↑</div>';
     return;
   }
-
-  var lk   = cat.lk;
-  var items = (manifest[lk] || []).filter(function(f){ return f.indexOf('overlay') === -1; });
-  var sel   = S.parts[lk] || '';
-  var ck    = cat.ck;
-  var col   = (ck && !NO_COL[lk]) ? S.colors[ck] : null;
-
-  // Build HTML using data attributes (not onclick with string args — avoids special char bugs)
-  var html = '';
-  if (OPTIONAL[catId]) {
-    html += '<div class="icard'+(sel===''?' on':'')+'" data-lk="'+lk+'" data-item="">' +
-      '<div class="none-lbl">None</div>' +
-      '<div class="icheck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>' +
-    '</div>';
+  var lk=cat.lk;
+  var items=(manifest[lk]||[]).filter(function(f){return f.indexOf('overlay')===-1;});
+  var sel=S.parts[lk]||'';
+  var col=(cat.ck&&!NO_COL[lk])?S.colors[cat.ck]:null;
+  var html='';
+  if(OPTIONAL[catId]){
+    html+='<div class="icard'+(sel===''?' on':'')+'" data-lk="'+lk+'" data-item="">'+
+      '<div class="none-lbl"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>None</div>'+
+      '<div class="icheck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>';
   }
   items.forEach(function(item){
-    var cid = 'ic-'+lk+'-'+safeId(item);
-    html += '<div class="icard'+(sel===item?' on':'')+'" data-lk="'+lk+'" data-item="'+encodeURIComponent(item)+'">' +
-      '<canvas id="'+cid+'" width="80" height="80"></canvas>' +
-      '<div class="icheck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>' +
-    '</div>';
+    var cid='ic-'+lk+'-'+safeId(item);
+    html+='<div class="icard'+(sel===item?' on':'')+'" data-lk="'+lk+'" data-item="'+encodeURIComponent(item)+'">'+
+      '<canvas id="'+cid+'" width="100" height="100"></canvas>'+
+      '<div class="icheck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>';
   });
-  grid.innerHTML = html;
-
-  // Click handler on grid (not individual cards — avoids rebinding)
-  grid.onclick = function(e){
-    var card = e.target.closest('.icard');
-    if (!card) return;
-    var lkk  = card.dataset.lk;
-    var itm  = decodeURIComponent(card.dataset.item);
-    selPart(lkk, itm);
+  grid.innerHTML=html;
+  grid.onclick=function(e){
+    var card=e.target.closest('.icard');
+    if(card)selPart(card.dataset.lk,decodeURIComponent(card.dataset.item));
   };
-
-  // Draw first 16 thumbnails immediately
-  var drawn = 0;
-  items.forEach(function(item){
-    if (drawn < 16) {
-      drawThumb('ic-'+lk+'-'+safeId(item), lk, item, col);
-      drawn++;
-    }
-  });
-  // Rest via idle callback
-  if (items.length > 16) {
-    var rest = items.slice(16);
-    function doRest(){
-      rest.forEach(function(item){
-        drawThumb('ic-'+lk+'-'+safeId(item), lk, item, col);
-      });
-    }
-    typeof requestIdleCallback === 'function' ? requestIdleCallback(doRest) : setTimeout(doRest, 80);
+  items.slice(0,16).forEach(function(item){drawThumb('ic-'+lk+'-'+safeId(item),lk,item,col);});
+  if(items.length>16){
+    var rest=items.slice(16);
+    function doRest(){rest.forEach(function(item){drawThumb('ic-'+lk+'-'+safeId(item),lk,item,col);});}
+    typeof requestIdleCallback==='function'?requestIdleCallback(doRest):setTimeout(doRest,80);
   }
 }
 
-// ── Select part ───────────────────────────────────────────────────────────────
-function selPart(lk, item) {
-  S.parts[lk] = item;
+function selPart(lk,item){
+  S.parts[lk]=item;
   document.querySelectorAll('#grid .icard').forEach(function(c){
-    var itm = decodeURIComponent(c.dataset.item || '');
-    c.classList.toggle('on', itm === item && c.dataset.lk === lk);
+    c.classList.toggle('on',decodeURIComponent(c.dataset.item||'')===item&&c.dataset.lk===lk);
   });
   queuePreview();
 }
 
-// ── Bake full resolution ──────────────────────────────────────────────────────
-async function bake(size) {
-  var cv = document.createElement('canvas');
-  cv.width = size; cv.height = size;
-  var x = cv.getContext('2d');
-  x.fillStyle = S.colors.bg || '#1b2d5b';
-  x.fillRect(0, 0, size, size);
-
-  for (var i = 0; i < LAYERS.length; i++) {
-    var lk   = LAYERS[i];
-    var part = S.parts[lk];
-    if (!part) continue;
-
-    var cat  = CATS.find(function(c){ return c.lk === lk; });
-    var ck   = cat ? cat.ck : null;
-    var col  = (ck && !NO_COL[lk]) ? S.colors[ck] : null;
-
-    var img  = await loadImg(BASE + lk + '/' + part);
-    if (img) {
-      if (col) {
-        // Always do fresh pixel replace at bake size for best quality
-        var baked = replaceGreen(img, size, size, col);
-        x.drawImage(baked, 0, 0, size, size);
-      } else {
-        x.drawImage(img, 0, 0, size, size);
-      }
-    }
-    var ov = await loadImg(BASE + lk + '/' + part.replace('.png', 'overlay.png'));
-    if (ov) x.drawImage(ov, 0, 0, size, size);
+// ── Bake ──────────────────────────────────────────────────────────────────────
+async function bake(size){
+  var cv=document.createElement('canvas');
+  cv.width=size;cv.height=size;
+  var ctx=cv.getContext('2d');
+  ctx.fillStyle=S.colors.bg||'#1b2d5b';
+  ctx.fillRect(0,0,size,size);
+  for(var i=0;i<LAYERS.length;i++){
+    var lk=LAYERS[i],part=S.parts[lk];if(!part)continue;
+    var cat=CATS.find(function(c){return c.lk===lk;});
+    var col=(cat&&cat.ck&&!NO_COL[lk])?S.colors[cat.ck]:null;
+    var img=await loadImg(BASE+lk+'/'+part);
+    drawLayer(ctx,img,col,lk,size);
+    var ov=await loadImg(BASE+lk+'/'+part.replace('.png','overlay.png'));
+    if(ov)ctx.drawImage(ov,0,0,size,size);
   }
-  return cv.toDataURL('image/webp', 0.9);
+  return cv.toDataURL('image/webp',0.92);
 }
 
 // ── Save ──────────────────────────────────────────────────────────────────────
-document.getElementById('save-btn').onclick = async function(){
-  if (!_user) _user = _auth.currentUser;
-  if (!_user) { toast('Please sign in first', true); return; }
-
-  document.getElementById('saving').classList.add('show');
-  document.getElementById('save-btn').disabled = true;
-
-  try {
-    var bakedImg = await bake(400);
-    var TS = firebase.firestore.FieldValue.serverTimestamp();
-
+document.getElementById('save-btn').onclick=async function(){
+  if(!_user)_user=_auth.currentUser;
+  if(!_user){toast('Please sign in first',true);return;}
+  var saveBtn=document.getElementById('save-btn');
+  var savingEl=document.getElementById('saving');
+  saveBtn.disabled=true;
+  savingEl.classList.add('show');
+  try{
+    var bakedImg=await bake(400);
     await _db.collection('users').doc(_user.uid).set({
-      avatarConfig: {
-        parts:  JSON.parse(JSON.stringify(S.parts)),
-        colors: JSON.parse(JSON.stringify(S.colors))
-      },
-      avatarIMG: bakedImg,
-      lastSeen: TS
-    }, {merge: true});
-
-    toast('Saved!');
-
-    // Notify parent (profile.html iframe host)
-    try { window.parent.postMessage({type:'avatarSaved', avatarIMG: bakedImg}, '*'); } catch(e){}
-
-    setTimeout(function(){ doClose(); }, 600);
-
-  } catch(e) {
-    console.error('save error', e);
-    toast('Save failed: ' + e.message, true);
-    document.getElementById('save-btn').disabled = false;
-  } finally {
-    document.getElementById('saving').classList.remove('show');
+      avatarConfig:{parts:JSON.parse(JSON.stringify(S.parts)),colors:JSON.parse(JSON.stringify(S.colors))},
+      avatarIMG:bakedImg,
+      lastSeen:firebase.firestore.FieldValue.serverTimestamp()
+    },{merge:true});
+    savingEl.classList.remove('show');
+    saveBtn.disabled=false; // re-enable BEFORE close so saving twice in a row works
+    toast('Saved! ✓');
+    try{window.parent.postMessage({type:'avatarSaved',avatarIMG:bakedImg},'*');}catch(e){}
+    setTimeout(doClose,600);
+  }catch(e){
+    console.error('save:',e);
+    savingEl.classList.remove('show');
+    saveBtn.disabled=false;
+    toast('Save failed: '+e.message,true);
   }
 };
 
-// ── Close ─────────────────────────────────────────────────────────────────────
-function doClose() {
-  try { window.parent.postMessage({type:'avatarEditorClose'}, '*'); } catch(e){}
-}
-document.getElementById('close-btn').onclick = doClose;
+function doClose(){try{window.parent.postMessage({type:'avatarEditorClose'},'*');}catch(e){}}
+document.getElementById('close-btn').onclick=doClose;
 
-// ── Toast ─────────────────────────────────────────────────────────────────────
-var _tt = null;
-function toast(msg, err) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast' + (err ? ' err' : '') + ' show';
-  clearTimeout(_tt);
-  _tt = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+var _tt=null;
+function toast(msg,err){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast'+(err?' err':'')+' show';
+  clearTimeout(_tt);_tt=setTimeout(function(){t.classList.remove('show');},2200);
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 (async function init(){
-  // Fetch manifest
-  try {
-    var r = await fetch('/Avatars/manifest.json');
-    manifest = await r.json();
-  } catch(e) {
-    toast('Could not load avatar assets', true);
-    return;
-  }
+  try{var r=await fetch('/Avatars/manifest.json');manifest=await r.json();}
+  catch(e){toast('Could not load avatar assets',true);return;}
 
-  // Wait for auth then load saved config
   await new Promise(function(res){
-    if (_auth.currentUser) { _user = _auth.currentUser; res(); return; }
-    var unsub = _auth.onAuthStateChanged(function(u){
-      _user = u; unsub(); res();
-    });
-    // Timeout after 3s so we don't hang forever
-    setTimeout(res, 3000);
+    if(_auth.currentUser){_user=_auth.currentUser;return res();}
+    var unsub=_auth.onAuthStateChanged(function(u){_user=u;unsub();res();});
+    setTimeout(res,3000);
   });
 
-  if (_user) {
-    try {
-      var snap = await _db.collection('users').doc(_user.uid).get();
-      if (snap.exists) {
-        var d = snap.data();
-        if (d.avatarConfig) {
-          if (d.avatarConfig.parts)  Object.assign(S.parts,  d.avatarConfig.parts);
-          if (d.avatarConfig.colors) Object.assign(S.colors, d.avatarConfig.colors);
+  if(_user){
+    try{
+      var snap=await _db.collection('users').doc(_user.uid).get();
+      if(snap.exists){
+        var d=snap.data();
+        if(d.avatarConfig){
+          if(d.avatarConfig.parts)Object.assign(S.parts,d.avatarConfig.parts);
+          if(d.avatarConfig.colors)Object.assign(S.colors,d.avatarConfig.colors);
         }
       }
-    } catch(e) { console.warn('load config:', e); }
+    }catch(e){console.warn('loadConfig:',e);}
   }
 
   buildTabs();
