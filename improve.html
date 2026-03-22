@@ -188,87 +188,87 @@
     .share-q-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
     .share-q-btn.copied{color:#a7f3d0;background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3)}
 
-    /* ── GAME SPECIFIC STYLES — all flat, consistent with card system ── */
+    /* ── GAME SPECIFIC STYLES — WHITE tiles/buttons, DARK text on blue card ── */
 
     /* Wordle */
     .wordle-grid{display:flex;flex-direction:column;gap:4px;margin:0}
     .wordle-row{display:flex;gap:4px}
     .wordle-tile{
       width:clamp(34px,9vw,44px);height:clamp(34px,9vw,44px);border-radius:10px;
-      background:rgba(255,255,255,.12);border:2.5px solid rgba(255,255,255,.25);
+      background:#fff;border:2.5px solid #e8e2d6;
       display:flex;align-items:center;justify-content:center;
-      font-size:clamp(14px,3.8vw,18px);font-weight:900;color:#fff;
-      transition:border-color .08s;
+      font-size:clamp(14px,3.8vw,18px);font-weight:900;color:var(--text);
+      transition:border-color .08s;box-shadow:0 3px 0 #d6cfc0;
     }
-    .wordle-tile.has-letter{border-color:rgba(255,255,255,.6);animation:wtP .08s}
-    .wordle-tile.reveal-correct{background:var(--green);border-color:var(--green);color:#fff}
-    .wordle-tile.reveal-present{background:var(--gold);border-color:var(--gold);color:#fff}
-    .wordle-tile.reveal-absent{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.35)}
+    .wordle-tile.has-letter{border-color:var(--blue);box-shadow:0 3px 0 var(--blue-dark);animation:wtP .08s}
+    .wordle-tile.reveal-correct{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 3px 0 var(--green-dark)}
+    .wordle-tile.reveal-present{background:var(--gold);border-color:var(--gold);color:#fff;box-shadow:0 3px 0 var(--gold-dark)}
+    .wordle-tile.reveal-absent{background:#e2e8f0;border-color:#d1d5db;color:#94a3b8;box-shadow:0 3px 0 #c8ccd2}
     .wordle-tile.shake{animation:wtS .4s}
     @keyframes wtP{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
     @keyframes wtS{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
-    .wordle-msg{font-size:12px;font-weight:800;color:rgba(255,255,255,.55);min-height:14px;text-align:center}
+    .wordle-msg{font-size:12px;font-weight:800;color:rgba(255,255,255,.7);min-height:14px;text-align:center}
     .wordle-msg.error{color:#fca5a5;animation:wtS .3s}
     .wordle-msg.success{color:#a7f3d0}
     .wordle-kb{display:flex;flex-direction:column;gap:4px;width:100%;max-width:340px}
     .wordle-kb-row{display:flex;gap:4px;justify-content:center}
     .wk{
-      height:38px;flex:1;min-width:0;max-width:34px;border:2px solid rgba(255,255,255,.2);border-radius:10px;
-      background:rgba(255,255,255,.12);color:#fff;font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;
+      height:38px;flex:1;min-width:0;max-width:34px;border:2.5px solid #e8e2d6;border-radius:10px;
+      background:#fff;color:var(--text);font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;
       cursor:pointer;display:flex;align-items:center;justify-content:center;
-      transition:background .2s;user-select:none;box-shadow:0 3px 0 rgba(0,0,0,.1);
+      transition:background .2s;user-select:none;box-shadow:0 3px 0 #d6cfc0;
     }
     .wk:active{transform:translateY(3px);box-shadow:none}
     .wk.wide{max-width:50px;font-size:11px}
     .wk.st-correct{background:var(--green);color:#fff;border-color:var(--green);box-shadow:var(--shadow-green)}
     .wk.st-present{background:var(--gold);color:#fff;border-color:var(--gold);box-shadow:var(--shadow-gold)}
-    .wk.st-absent{background:rgba(255,255,255,.04);color:rgba(255,255,255,.25);border-color:rgba(255,255,255,.08);box-shadow:none}
+    .wk.st-absent{background:#e2e8f0;color:#94a3b8;border-color:#d1d5db;box-shadow:0 3px 0 #c8ccd2}
 
     /* Tic Tac Toe */
     .ttt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:clamp(180px,48vw,240px);margin:4px 0}
     .ttt-cell{
-      aspect-ratio:1;border:2.5px solid rgba(255,255,255,.2);border-radius:14px;background:rgba(255,255,255,.1);
+      aspect-ratio:1;border:2.5px solid #e8e2d6;border-radius:14px;background:#fff;
       cursor:pointer;font-family:'Nunito',sans-serif;font-size:clamp(28px,8vw,38px);font-weight:900;
-      color:#fff;display:flex;align-items:center;justify-content:center;
-      transition:all .15s;box-shadow:0 3px 0 rgba(0,0,0,.1);
+      color:var(--text);display:flex;align-items:center;justify-content:center;
+      transition:all .15s;box-shadow:0 3px 0 #d6cfc0;
     }
     .ttt-cell:active{transform:translateY(3px);box-shadow:none}
-    .ttt-cell.ttt-x{color:#fff}
-    .ttt-cell.ttt-o{color:#fca5a5}
+    .ttt-cell.ttt-x{color:var(--blue)}
+    .ttt-cell.ttt-o{color:var(--red)}
     .ttt-cell.ttt-win{background:var(--green);color:#fff;border-color:var(--green);box-shadow:var(--shadow-green);animation:pop .4s}
-    .ttt-status{font-size:14px;font-weight:800;color:rgba(255,255,255,.55);min-height:20px;text-align:center}
+    .ttt-status{font-size:14px;font-weight:800;color:rgba(255,255,255,.7);min-height:20px;text-align:center}
 
     /* Memory */
     .mem-grid{display:grid;gap:6px;margin:4px 0;justify-content:center}
     .mem-cols-3{grid-template-columns:repeat(3,1fr);width:clamp(160px,44vw,210px)}
     .mem-cols-4{grid-template-columns:repeat(4,1fr);width:clamp(210px,56vw,280px)}
     .mem-card{
-      aspect-ratio:1;border:2.5px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.1);
+      aspect-ratio:1;border:2.5px solid #e8e2d6;border-radius:12px;background:#fff;
       cursor:pointer;font-size:clamp(20px,5.5vw,28px);display:flex;align-items:center;justify-content:center;
       transition:transform .3s,background .3s;position:relative;user-select:none;
-      box-shadow:0 3px 0 rgba(0,0,0,.1);
+      box-shadow:0 3px 0 #d6cfc0;
     }
     .mem-front,.mem-back{position:absolute;backface-visibility:hidden}
-    .mem-front{color:rgba(255,255,255,.35);font-weight:900;font-size:18px}
+    .mem-front{color:var(--text-light);font-weight:900;font-size:18px}
     .mem-back{opacity:0;transition:opacity .2s}
     .mem-card.mem-flip .mem-front{opacity:0}
     .mem-card.mem-flip .mem-back{opacity:1}
-    .mem-card.mem-flip{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.5);transform:scale(1.05)}
+    .mem-card.mem-flip{background:#e8f2ff;border-color:var(--blue);box-shadow:0 3px 0 var(--blue-dark);transform:scale(1.05)}
     .mem-card.mem-matched{background:var(--green);border-color:var(--green);box-shadow:var(--shadow-green);animation:pop .4s}
     .mem-card.mem-matched .mem-back{opacity:1}.mem-card.mem-matched .mem-front{opacity:0}
-    .mem-status{font-size:13px;font-weight:800;color:rgba(255,255,255,.55);min-height:18px;text-align:center}
+    .mem-status{font-size:13px;font-weight:800;color:rgba(255,255,255,.7);min-height:18px;text-align:center}
 
     /* Simon Says */
     .simon-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:clamp(160px,42vw,200px);margin:6px 0}
     .simon-pad{
-      aspect-ratio:1;border:none;border-radius:18px;cursor:pointer;
-      opacity:.45;transition:opacity .15s,transform .1s;user-select:none;
-      box-shadow:0 4px 0 rgba(0,0,0,.15);
+      aspect-ratio:1;border:4px solid rgba(255,255,255,.3);border-radius:18px;cursor:pointer;
+      opacity:.6;transition:opacity .15s,transform .1s;user-select:none;
+      box-shadow:0 4px 0 rgba(0,0,0,.2);
     }
     .simon-pad:active{transform:translateY(4px);box-shadow:none}
-    .simon-pad.simon-lit{opacity:1;transform:scale(1.06)}
-    .simon-status{font-size:14px;font-weight:800;color:rgba(255,255,255,.55);min-height:20px;text-align:center}
-    .simon-level{font-size:12px;font-weight:700;color:rgba(255,255,255,.35);text-align:center}
+    .simon-pad.simon-lit{opacity:1;transform:scale(1.06);border-color:#fff}
+    .simon-status{font-size:14px;font-weight:800;color:rgba(255,255,255,.7);min-height:20px;text-align:center}
+    .simon-level{font-size:12px;font-weight:700;color:rgba(255,255,255,.5);text-align:center}
 
     /* Reaction time */
     .react-zone{display:flex;justify-content:center;margin:8px 0}
@@ -276,14 +276,14 @@
       width:clamp(120px,32vw,160px);height:clamp(120px,32vw,160px);border-radius:50%;
       background:var(--red);display:flex;align-items:center;justify-content:center;
       font-size:18px;font-weight:900;color:#fff;cursor:pointer;user-select:none;
-      transition:all .15s;box-shadow:0 6px 0 var(--red-dark);
+      transition:all .15s;box-shadow:0 6px 0 var(--red-dark);border:4px solid rgba(255,255,255,.2);
     }
     .react-circle:active{transform:scale(.95)}
     .react-circle.react-go{background:var(--green);box-shadow:0 6px 0 var(--green-dark);animation:pop .3s}
     .react-circle.react-fail{background:var(--red);box-shadow:0 6px 0 var(--red-dark)}
     .react-circle.react-success{background:var(--green);box-shadow:0 6px 0 var(--green-dark);font-size:28px}
     .react-circle.react-slow{background:var(--gold);box-shadow:0 6px 0 var(--gold-dark);color:#fff;font-size:28px}
-    .react-result{font-size:14px;font-weight:800;text-align:center;min-height:20px;margin-top:4px;color:rgba(255,255,255,.55)}
+    .react-result{font-size:14px;font-weight:800;text-align:center;min-height:20px;margin-top:4px;color:rgba(255,255,255,.7)}
 
     /* Word Scramble */
     .ws-hint{font-size:12px;font-weight:700;color:var(--gold);text-align:center;margin-bottom:4px}
@@ -293,52 +293,54 @@
       display:flex;align-items:center;justify-content:center;
       font-size:clamp(16px,4.5vw,20px);font-weight:900;font-family:'Nunito',sans-serif;user-select:none;
     }
-    .ws-src{background:rgba(255,255,255,.12);color:#fff;border:2.5px solid rgba(255,255,255,.25);cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.1);transition:transform .1s}
+    .ws-src{background:#fff;color:var(--text);border:2.5px solid #e8e2d6;cursor:pointer;box-shadow:0 3px 0 #d6cfc0;transition:transform .1s}
     .ws-src:active{transform:translateY(3px);box-shadow:none}
-    .ws-src.ws-used{opacity:.1;pointer-events:none}
-    .ws-slot{background:rgba(255,255,255,.06);color:#fff;border:2.5px dashed rgba(255,255,255,.2)}
-    .ws-slot.ws-filled{border-style:solid;border-color:rgba(255,255,255,.5);cursor:pointer}
-    .ws-slot.ws-correct{border-color:var(--green);background:var(--green);color:#fff;animation:pop .3s}
-    .ws-status{font-size:13px;font-weight:800;text-align:center;min-height:18px;color:rgba(255,255,255,.55)}
+    .ws-src.ws-used{opacity:.15;pointer-events:none}
+    .ws-slot{background:rgba(255,255,255,.15);color:#fff;border:2.5px dashed rgba(255,255,255,.35)}
+    .ws-slot.ws-filled{background:#fff;color:var(--text);border-style:solid;border-color:#e8e2d6;cursor:pointer;box-shadow:0 3px 0 #d6cfc0}
+    .ws-slot.ws-correct{border-color:var(--green);background:var(--green);color:#fff;box-shadow:0 3px 0 var(--green-dark);animation:pop .3s}
+    .ws-status{font-size:13px;font-weight:800;text-align:center;min-height:18px;color:rgba(255,255,255,.7)}
     .ws-shake{animation:wtS .4s}
 
     /* Sliding puzzle */
     .slide-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;width:clamp(150px,40vw,200px);margin:4px 0}
     .slide-cell{
-      aspect-ratio:1;border:2.5px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.12);
-      color:#fff;font-family:'Nunito',sans-serif;font-size:clamp(22px,6vw,30px);font-weight:900;
+      aspect-ratio:1;border:2.5px solid #e8e2d6;border-radius:12px;background:#fff;
+      color:var(--text);font-family:'Nunito',sans-serif;font-size:clamp(22px,6vw,30px);font-weight:900;
       cursor:pointer;display:flex;align-items:center;justify-content:center;
-      box-shadow:0 3px 0 rgba(0,0,0,.1);transition:transform .12s;
+      box-shadow:0 3px 0 #d6cfc0;transition:transform .12s;
     }
     .slide-cell:active{transform:translateY(3px);box-shadow:none}
-    .slide-empty{background:transparent;box-shadow:none;cursor:default;border-color:transparent}
+    .slide-empty{background:rgba(255,255,255,.08);box-shadow:none;cursor:default;border-color:rgba(255,255,255,.1)}
     .slide-cell.slide-win{background:var(--green);color:#fff;border-color:var(--green);box-shadow:var(--shadow-green);animation:pop .4s}
-    .slide-moves{font-size:13px;font-weight:800;color:rgba(255,255,255,.55);text-align:center;min-height:18px}
+    .slide-moves{font-size:13px;font-weight:800;color:rgba(255,255,255,.7);text-align:center;min-height:18px}
 
-    /* Color sort */
+    /* Color sort — tiles keep their bg color but get white border + text outline */
     .csort-pool{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:6px 0}
     .csort-tile{
-      width:clamp(42px,11vw,52px);height:clamp(42px,11vw,52px);border-radius:12px;border:none;
+      width:clamp(42px,11vw,52px);height:clamp(42px,11vw,52px);border-radius:12px;
+      border:3px solid rgba(255,255,255,.4);
       cursor:pointer;font-size:10px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;
       transition:transform .1s,opacity .2s;font-family:'Nunito',sans-serif;
-      box-shadow:0 4px 0 rgba(0,0,0,.15);
+      box-shadow:0 4px 0 rgba(0,0,0,.2);text-shadow:0 1px 2px rgba(0,0,0,.3);
     }
     .csort-tile:active{transform:translateY(4px);box-shadow:none}
-    .csort-tile.csort-used{opacity:.1;pointer-events:none}
+    .csort-tile.csort-used{opacity:.15;pointer-events:none}
     .csort-placed{display:flex;gap:4px;justify-content:center;margin:4px 0;min-height:36px}
-    .csort-placed-tile{width:clamp(30px,8vw,38px);height:clamp(30px,8vw,38px);border-radius:10px;animation:pop .25s}
-    .csort-status{font-size:13px;font-weight:800;text-align:center;min-height:18px;color:rgba(255,255,255,.55)}
+    .csort-placed-tile{width:clamp(30px,8vw,38px);height:clamp(30px,8vw,38px);border-radius:10px;border:2px solid rgba(255,255,255,.3);animation:pop .25s}
+    .csort-status{font-size:13px;font-weight:800;text-align:center;min-height:18px;color:rgba(255,255,255,.7)}
 
     /* Math Rush */
     .mr-eq{
-      font-size:clamp(22px,6vw,30px);font-weight:900;color:#fff;text-align:center;
+      font-size:clamp(22px,6vw,30px);font-weight:900;color:var(--text);text-align:center;
       min-height:40px;padding:8px 16px;border-radius:14px;
-      background:rgba(255,255,255,.1);border:2.5px solid rgba(255,255,255,.2);
+      background:#fff;border:2.5px solid #e8e2d6;
+      box-shadow:0 3px 0 #d6cfc0;
       transition:background .2s,color .2s,border-color .2s;
     }
-    .mr-eq.mr-correct{background:var(--green);color:#fff;border-color:var(--green)}
-    .mr-eq.mr-wrong{background:var(--red);color:#fff;border-color:var(--red)}
-    .mr-timer{font-size:16px;font-weight:800;text-align:center;color:rgba(255,255,255,.55);min-height:22px}
+    .mr-eq.mr-correct{background:var(--green);color:#fff;border-color:var(--green);box-shadow:0 3px 0 var(--green-dark)}
+    .mr-eq.mr-wrong{background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 3px 0 var(--red-dark)}
+    .mr-timer{font-size:16px;font-weight:800;text-align:center;color:#fff;min-height:22px}
     .mr-btns{display:flex;gap:10px;justify-content:center;margin:8px 0}
     .mr-btn{
       flex:1;max-width:140px;height:48px;border:none;border-radius:14px;cursor:pointer;
@@ -346,27 +348,27 @@
       transition:transform .1s;
     }
     .mr-btn:active{transform:translateY(4px);box-shadow:none}
-    .mr-true{background:var(--green);color:#fff;box-shadow:var(--shadow-green)}
-    .mr-false{background:var(--red);color:#fff;box-shadow:var(--shadow-red)}
-    .mr-score{font-size:14px;font-weight:800;color:rgba(255,255,255,.55);text-align:center}
+    .mr-true{background:#fff;color:var(--green);border:2.5px solid var(--green);box-shadow:0 4px 0 var(--green-dark)}
+    .mr-false{background:#fff;color:var(--red);border:2.5px solid var(--red);box-shadow:0 4px 0 var(--red-dark)}
+    .mr-score{font-size:14px;font-weight:800;color:rgba(255,255,255,.7);text-align:center}
     .mr-progress{display:flex;gap:6px;justify-content:center;margin:4px 0}
-    .mr-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2)}
+    .mr-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3)}
     .mr-dot-active{background:var(--gold);border-color:var(--gold)}
     .mr-dot-done{background:var(--green);border-color:var(--green)}
 
     /* Odd one out */
     .oto-grid{display:grid;gap:4px;margin:4px 0}
-    .oto-tile{border:2.5px solid rgba(255,255,255,.2);border-radius:8px;cursor:pointer;transition:transform .1s,opacity .15s;padding:0;box-shadow:0 3px 0 rgba(0,0,0,.1)}
+    .oto-tile{border:3px solid rgba(255,255,255,.3);border-radius:10px;cursor:pointer;transition:transform .1s,opacity .15s;padding:0;box-shadow:0 3px 0 rgba(0,0,0,.12)}
     .oto-tile:active{transform:scale(.93)}
-    .oto-tile.oto-correct{border-color:var(--green);border-width:3px;box-shadow:var(--shadow-green);animation:pop .3s}
-    .oto-tile.oto-wrong{border-color:var(--red);border-width:3px;opacity:.5}
-    .oto-status{font-size:14px;font-weight:800;text-align:center;min-height:20px;color:rgba(255,255,255,.55)}
+    .oto-tile.oto-correct{border-color:#fff;border-width:4px;box-shadow:0 0 0 3px var(--green);animation:pop .3s}
+    .oto-tile.oto-wrong{border-color:var(--red);border-width:4px;opacity:.5}
+    .oto-status{font-size:14px;font-weight:800;text-align:center;min-height:20px;color:rgba(255,255,255,.7)}
     .oto-rounds{display:flex;gap:6px;justify-content:center;margin:2px 0}
-    .oto-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2);transition:background .2s}
+    .oto-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);transition:background .2s}
     .oto-dot-active{background:var(--gold);border-color:var(--gold)}
     .oto-dot-done{background:var(--green);border-color:var(--green)}
 
-    .stc-result{font-size:15px;font-weight:800;text-align:center;min-height:22px;color:rgba(255,255,255,.55)}
+    .stc-result{font-size:15px;font-weight:800;text-align:center;min-height:22px;color:rgba(255,255,255,.7)}
 
     /* ── INSTALL CARD ── */
     .install-card{
@@ -525,31 +527,23 @@
     #push-prompt .pp-yes{flex:1;background:var(--green);color:#fff;border:none;border-radius:12px;padding:10px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;cursor:pointer;box-shadow:var(--shadow-green)}
     #push-prompt .pp-yes:active{transform:translateY(4px);box-shadow:none}
     /* ══════════════════════════════════════════════════════════
-       GAME OVERRIDE LAYER — fixes games.js injected CSS
-       games.js injects styles for the old dark-navy theme.
-       These overrides make EVERY game work on our blue card.
-       Must come LAST in stylesheet to win specificity.
+       GAME OVERRIDE LAYER — overrides games.js injected CSS
+       ALL interactive elements: WHITE bg, DARK text, chunky shadows.
        ══════════════════════════════════════════════════════════ */
 
-    /* CSS vars that games.js references from old theme */
-    :root{
-      --cream:#fff;
-      --goldd:#d97706;
-      --gd:#16a34a;
-    }
+    :root{--cream:#fff;--goldd:#d97706;--gd:#16a34a}
 
-    /* ── Simon Says — higher base opacity so pads pop on blue ── */
-    .simon-pad{opacity:.65!important;border-radius:18px;border:3px solid rgba(255,255,255,.15)!important}
-    .simon-pad.simon-lit{opacity:1!important;border-color:rgba(255,255,255,.5)!important}
+    /* ── Simon Says — white border, higher opacity ── */
+    .simon-pad{opacity:.65!important;border:4px solid rgba(255,255,255,.3)!important;border-radius:18px!important}
+    .simon-pad.simon-lit{opacity:1!important;border-color:#fff!important}
 
-    /* ── Color Sort — white outlines so tiles don't vanish on blue ── */
-    .csort-tile{border:3px solid rgba(255,255,255,.3)!important;box-shadow:0 4px 0 rgba(0,0,0,.2)!important}
-    .csort-tile:active{box-shadow:none!important;transform:translateY(4px)!important}
-    .csort-placed-tile{border:2px solid rgba(255,255,255,.2)!important}
+    /* ── Color Sort — white border on colored tiles ── */
+    .csort-tile{border:3px solid rgba(255,255,255,.4)!important;box-shadow:0 4px 0 rgba(0,0,0,.2)!important;text-shadow:0 1px 2px rgba(0,0,0,.3)!important}
+    .csort-placed-tile{border:2px solid rgba(255,255,255,.3)!important}
 
-    /* ── Mini 2048 — override dark navy bg ── */
-    .m48-wrap{background:rgba(255,255,255,.08)!important;border:2px solid rgba(255,255,255,.12)!important;border-radius:16px!important}
-    .m48-cell{background:rgba(255,255,255,.06)!important;color:rgba(255,255,255,.2)!important;border-radius:10px!important}
+    /* ── Mini 2048 — white tiles with dark text ── */
+    .m48-wrap{background:rgba(255,255,255,.1)!important;border:2px solid rgba(255,255,255,.15)!important;border-radius:16px!important}
+    .m48-cell{background:rgba(255,255,255,.08)!important;color:rgba(255,255,255,.2)!important;border-radius:10px!important}
     .m48-cell[data-v="2"]{background:#fff!important;color:var(--blue)!important}
     .m48-cell[data-v="4"]{background:#e8f2ff!important;color:#0358c4!important}
     .m48-cell[data-v="8"]{background:var(--orange)!important;color:#fff!important}
@@ -557,130 +551,97 @@
     .m48-cell[data-v="32"]{background:var(--green)!important;color:#fff!important}
     .m48-cell[data-v="64"]{background:var(--gold)!important;color:#fff!important}
     .m48-cell[data-v="128"]{background:#fff!important;color:var(--blue)!important}
-    .m48-sbox{background:rgba(255,255,255,.1)!important;border:1.5px solid rgba(255,255,255,.15)!important;border-radius:12px!important}
-    .m48-sl{color:rgba(255,255,255,.4)!important}
+    .m48-sbox{background:rgba(255,255,255,.12)!important;border:1.5px solid rgba(255,255,255,.18)!important;border-radius:12px!important}
+    .m48-sl{color:rgba(255,255,255,.5)!important}
     .m48-sv{color:#fff!important}
-    .m48-msg{color:rgba(255,255,255,.5)!important}
+    .m48-msg{color:rgba(255,255,255,.6)!important}
 
-    /* ── Water Sort — white tube borders, visible on blue ── */
-    .ws2-tube{border-color:rgba(255,255,255,.35)!important;background:rgba(255,255,255,.06)!important;border-width:2.5px!important}
-    .ws2-tube.ws2-sel{border-color:#fff!important;transform:translateY(-9px)!important}
+    /* ── Water Sort — white tube borders ── */
+    .ws2-tube{border-color:rgba(255,255,255,.4)!important;background:rgba(255,255,255,.06)!important;border-width:2.5px!important}
+    .ws2-tube.ws2-sel{border-color:#fff!important}
     .ws2-tube.ws2-done{border-color:var(--green)!important}
-    .ws2-cap{background:rgba(255,255,255,.15)!important}
-    .ws2-pours{color:rgba(255,255,255,.3)!important}
-    .ws2-status{color:rgba(255,255,255,.55)!important}
+    .ws2-cap{background:rgba(255,255,255,.2)!important}
+    .ws2-pours{color:rgba(255,255,255,.4)!important}
+    .ws2-status{color:rgba(255,255,255,.7)!important}
     .ws2-layer.ws2-empty{background:transparent!important}
 
-    /* ── Pipe Connect — white-tinted cells on blue ── */
-    .pc-grid{background:rgba(255,255,255,.06)!important;border:2px solid rgba(255,255,255,.1)!important;border-radius:14px!important}
-    .pc-cell{background:rgba(255,255,255,.06)!important;border-radius:8px!important}
-    .pc-cell:active{background:rgba(255,255,255,.15)!important}
-    .pc-cell.pc-wall{background:rgba(0,0,0,.12)!important}
-    .pc-cell.pc-src{background:rgba(34,197,94,.2)!important}
-    .pc-cell.pc-snk{background:rgba(239,68,68,.2)!important}
+    /* ── Pipe Connect — white cells ── */
+    .pc-grid{background:rgba(255,255,255,.08)!important;border:2px solid rgba(255,255,255,.12)!important;border-radius:14px!important}
+    .pc-cell{background:rgba(255,255,255,.08)!important;border-radius:8px!important}
+    .pc-cell:active{background:rgba(255,255,255,.2)!important}
+    .pc-cell.pc-wall{background:rgba(0,0,0,.15)!important}
+    .pc-cell.pc-src{background:rgba(34,197,94,.25)!important}
+    .pc-cell.pc-snk{background:rgba(239,68,68,.25)!important}
     .pc-cell.pc-lit .pc-arm,.pc-cell.pc-lit .pc-dot{background:var(--green)!important}
-    .pc-cell.pc-src.pc-lit{background:rgba(34,197,94,.35)!important}
-    .pc-arm{background:rgba(255,255,255,.4)!important}
-    .pc-dot{background:rgba(255,255,255,.5)!important}
+    .pc-cell.pc-src.pc-lit{background:rgba(34,197,94,.4)!important}
+    .pc-arm{background:rgba(255,255,255,.5)!important}
+    .pc-dot{background:rgba(255,255,255,.6)!important}
     .pc-label{color:#fff!important}
-    .pc-status{color:rgba(255,255,255,.55)!important}
-    .pc-moves{color:rgba(255,255,255,.3)!important}
+    .pc-status{color:rgba(255,255,255,.7)!important}
+    .pc-moves{color:rgba(255,255,255,.4)!important}
 
-    /* ── Word Ladder — white text/controls on blue ── */
-    .wl-ep-lbl{color:rgba(255,255,255,.35)!important}
-    .wl-ep-tile{background:rgba(255,255,255,.12)!important;color:rgba(255,255,255,.6)!important;border:1.5px solid rgba(255,255,255,.15)!important}
-    .wl-arrow{color:rgba(255,255,255,.25)!important}
-    .wl-cur-tile{background:rgba(255,255,255,.1)!important;border:2.5px solid rgba(255,255,255,.25)!important;color:#fff!important}
-    .wl-cur-tile.wl-sel{background:rgba(245,158,11,.25)!important;border-color:var(--gold)!important;color:var(--gold)!important}
-    .wl-cur-tile.wl-match{background:rgba(34,197,94,.2)!important;border-color:var(--green)!important;color:var(--green)!important}
-    .wl-lbtn{background:rgba(255,255,255,.14)!important;color:#fff!important;border:none!important;box-shadow:0 3px 0 rgba(0,0,0,.15)!important}
-    .wl-lbtn:active{background:rgba(255,255,255,.3)!important;transform:translateY(3px)!important;box-shadow:none!important}
-    .wl-lbtn.wl-same{background:rgba(255,255,255,.04)!important;color:rgba(255,255,255,.15)!important;box-shadow:none!important}
-    .wl-moves{color:rgba(255,255,255,.35)!important}
-    .wl-status{color:rgba(255,255,255,.55)!important}
-    .wl-hist-w{color:rgba(255,255,255,.35)!important;background:rgba(255,255,255,.08)!important}
+    /* ── Word Ladder — WHITE tiles and keyboard ── */
+    .wl-ep-lbl{color:rgba(255,255,255,.5)!important}
+    .wl-ep-tile{background:#fff!important;color:var(--text)!important;border:2px solid #e8e2d6!important;border-radius:8px!important;box-shadow:0 2px 0 #d6cfc0!important}
+    .wl-arrow{color:rgba(255,255,255,.35)!important}
+    .wl-cur-tile{background:#fff!important;border:2.5px solid #e8e2d6!important;color:var(--text)!important;box-shadow:0 3px 0 #d6cfc0!important}
+    .wl-cur-tile.wl-sel{background:#fff3cd!important;border-color:var(--gold)!important;color:var(--gold-dark)!important;box-shadow:0 3px 0 var(--gold-dark)!important}
+    .wl-cur-tile.wl-match{background:#dcfce7!important;border-color:var(--green)!important;color:var(--green-dark)!important;box-shadow:0 3px 0 var(--green-dark)!important;pointer-events:none!important}
+    .wl-lbtn{background:#fff!important;color:var(--text)!important;border:2px solid #e8e2d6!important;border-radius:10px!important;box-shadow:0 3px 0 #d6cfc0!important}
+    .wl-lbtn:active{background:#f5f0e8!important;transform:translateY(3px)!important;box-shadow:none!important}
+    .wl-lbtn.wl-same{background:#e2e8f0!important;color:#94a3b8!important;border-color:#d1d5db!important;box-shadow:none!important;pointer-events:none!important}
+    .wl-moves{color:rgba(255,255,255,.5)!important}
+    .wl-status{color:rgba(255,255,255,.7)!important}
+    .wl-hist-w{color:var(--text-dim)!important;background:#fff!important;border:1px solid #e8e2d6!important;border-radius:6px!important}
 
-    /* ── Connections — white text/controls on blue ── */
-    .conn-word{background:rgba(255,255,255,.12)!important;color:#fff!important;border:2px solid rgba(255,255,255,.18)!important;border-radius:10px!important}
-    .conn-word.conn-sel{background:rgba(255,255,255,.3)!important;border-color:rgba(255,255,255,.5)!important;box-shadow:0 4px 10px rgba(0,0,0,.15)!important}
+    /* ── Connections — WHITE word tiles with dark text ── */
+    .conn-word{background:#fff!important;color:var(--text)!important;border:2.5px solid #e8e2d6!important;border-radius:10px!important;box-shadow:0 3px 0 #d6cfc0!important}
+    .conn-word.conn-sel{background:#e8f2ff!important;border-color:var(--blue)!important;color:var(--blue)!important;box-shadow:0 3px 0 var(--blue-dark)!important;transform:translateY(-2px)!important}
     .conn-cat{border-radius:12px!important}
     .conn-cat-nm{color:#fff!important}
-    .conn-cat-wds{color:rgba(255,255,255,.85)!important}
+    .conn-cat-wds{color:rgba(255,255,255,.9)!important}
     .conn-dot{background:var(--gold)!important}
-    .conn-dot.gone{background:rgba(255,255,255,.1)!important}
-    .conn-sub{background:rgba(255,255,255,.12)!important;color:#fff!important;border:2.5px solid rgba(255,255,255,.25)!important;border-radius:14px!important}
-    .conn-sub:active{transform:translateY(3px)!important}
+    .conn-dot.gone{background:rgba(255,255,255,.15)!important}
+    .conn-sub{background:#fff!important;color:var(--text)!important;border:2.5px solid #e8e2d6!important;border-radius:14px!important;box-shadow:0 3px 0 #d6cfc0!important}
+    .conn-sub:active{transform:translateY(3px)!important;box-shadow:none!important}
     .conn-sub.ready{background:var(--green)!important;border-color:var(--green)!important;color:#fff!important;box-shadow:0 3px 0 var(--green-dark)!important}
-    .conn-sub:disabled{opacity:.3!important}
-    .conn-msg{color:rgba(255,255,255,.45)!important}
-    .conn-lives{margin:4px 0!important}
+    .conn-sub:disabled{opacity:.35!important}
+    .conn-msg{color:rgba(255,255,255,.6)!important}
     .conn-reveal-row{border-radius:12px!important}
     .conn-reveal-nm{color:inherit!important}
-    .conn-reveal-wds{color:rgba(255,255,255,.7)!important}
+    .conn-reveal-wds{color:rgba(255,255,255,.75)!important}
 
-    /* ── Full Game Button — white outline on blue ── */
-    .game-fullbtn{
-      background:rgba(255,255,255,.1)!important;
-      border:2px solid rgba(255,255,255,.2)!important;
-      color:rgba(255,255,255,.6)!important;
-      border-radius:14px!important;
-    }
-    .game-fullbtn:active{background:rgba(255,255,255,.2)!important}
+    /* ── Full Game Button — white ── */
+    .game-fullbtn{background:#fff!important;border:2.5px solid #e8e2d6!important;color:var(--text-dim)!important;border-radius:14px!important;box-shadow:0 3px 0 #d6cfc0!important}
+    .game-fullbtn:active{transform:translateY(3px)!important;box-shadow:none!important}
 
-    /* ── Game Branding from games.js — override to white-on-blue ── */
-    .qcard .game-branding{border-top-color:rgba(255,255,255,.1)!important}
-    .qcard .game-branding a{background:rgba(255,255,255,.1)!important;border-color:rgba(255,255,255,.18)!important}
+    /* ── Branding — white text ── */
+    .qcard .game-branding{border-top-color:rgba(255,255,255,.12)!important}
+    .qcard .game-branding a{background:rgba(255,255,255,.12)!important;border-color:rgba(255,255,255,.2)!important}
     .qcard .game-branding-text{color:#fff!important}
 
-    /* ── Scroll Hint from games.js — override to white-on-blue ── */
-    .qcard~.scroll-hint .scroll-hint-inner{
-      background:rgba(255,255,255,.15)!important;
-      border-color:rgba(255,255,255,.2)!important;
-      color:#fff!important;
-    }
+    /* ── Scroll Hint — white pill ── */
+    .qcard~.scroll-hint .scroll-hint-inner{background:rgba(255,255,255,.18)!important;border-color:rgba(255,255,255,.25)!important}
     .qcard~.scroll-hint .scroll-hint-inner svg{stroke:#fff!important}
-    .qcard~.scroll-hint .scroll-hint-inner span{color:rgba(255,255,255,.75)!important}
+    .qcard~.scroll-hint .scroll-hint-inner span{color:rgba(255,255,255,.8)!important}
 
-    /* ── In-game start/action buttons — white on blue ── */
-    .qcard button[id*="ready-"],
-    .qcard button[id*="start-"],
-    .qcard button[id*="simon-ready-"],
-    .qcard button[id*="stc-ready-"],
-    .qcard button[id*="react-ready-"],
-    .qcard button[id*="mr-ready-"]{
-      background:#fff!important;
-      color:var(--blue)!important;
-      border:none!important;
-      border-radius:14px!important;
-      padding:12px 32px!important;
-      font-family:'Nunito',sans-serif!important;
-      font-size:16px!important;
-      font-weight:900!important;
-      cursor:pointer!important;
+    /* ── Start/Action buttons — solid white ── */
+    .qcard button[id*="ready-"],.qcard button[id*="simon-ready-"],.qcard button[id*="stc-ready-"],.qcard button[id*="react-ready-"],.qcard button[id*="mr-ready-"]{
+      background:#fff!important;color:var(--blue)!important;border:none!important;border-radius:14px!important;
+      padding:12px 32px!important;font-family:'Nunito',sans-serif!important;font-size:16px!important;font-weight:900!important;
       box-shadow:0 4px 0 #d6cfc0!important;
     }
-    .qcard button[id*="ready-"]:active,
-    .qcard button[id*="start-"]:active{
-      transform:translateY(4px)!important;
-      box-shadow:none!important;
-    }
+    .qcard button[id*="ready-"]:active{transform:translateY(4px)!important;box-shadow:none!important}
 
-    /* ── Math Rush buttons — white True/False ── */
-    .mr-btn{border-radius:14px!important;font-weight:900!important;box-shadow:0 4px 0 rgba(0,0,0,.15)!important}
-    .mr-btn:active{transform:translateY(4px)!important;box-shadow:none!important}
+    /* ── Math Rush TRUE/FALSE — white outlined ── */
+    .mr-true{background:#fff!important;color:var(--green)!important;border:2.5px solid var(--green)!important;box-shadow:0 4px 0 var(--green-dark)!important}
+    .mr-false{background:#fff!important;color:var(--red)!important;border:2.5px solid var(--red)!important;box-shadow:0 4px 0 var(--red-dark)!important}
 
-    /* ── Reaction circle — ensure visibility ── */
-    .react-circle{border:4px solid rgba(255,255,255,.15)!important}
+    /* ── Reaction circle — white border ── */
+    .react-circle{border:4px solid rgba(255,255,255,.25)!important}
 
-    /* ── Stop the Clock canvas container ── */
-    .stc-result{color:rgba(255,255,255,.55)!important}
-
-    /* ── Install card — stays white (it's not inside qcard) ── */
+    .stc-result{color:rgba(255,255,255,.7)!important}
     .install-card{background:var(--card)!important;border-color:var(--card-border)!important}
-
-    /* ── Full-game modal overlay — keep dark bg ── */
-    .qcard[style*="gap:10px"] .question,
-    .qcard[style*="gap:8px"] .question{color:#fff!important}
 
   </style>
 </head>
