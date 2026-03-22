@@ -9,47 +9,40 @@
   <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#0474fc;--bg2:#0358c4;--bg3:#0245a0;
-      --surface:#fff;--s2:rgba(255,255,255,.14);--s3:rgba(255,255,255,.07);
-      --text:#0a1628;--ton:#fff;
-      --dim:rgba(255,255,255,.55);--dimmer:rgba(255,255,255,.18);
+      --bg:#f5f0e8;--cream:#F0EAD6;--navy:#1e3a5f;
+      --white:#ffffff;--text:#1e3a5f;--dim:#6b7a9e;--light:#a0acc4;
+      --blue:#0474fc;--blue2:#0358c4;
       --green:#22c55e;--gd:#16a34a;--red:#ef4444;
-      --gold:#f59e0b;--goldd:#d97706;
-      --orange:#f97316;--blue:#0474fc;--purple:#8b5cf6;
-      --shadow:0 4px 20px rgba(4,88,196,.25);
+      --gold:#f59e0b;--goldd:#d97706;--orange:#f97316;--purple:#8b5cf6;
+      --shadow:0 4px 0 rgba(0,0,0,.07),0 2px 12px rgba(30,58,95,.08);
       --card-r:20px;
     }
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     html,body{width:100%;height:100dvh;overflow:hidden;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text)}
     .page{display:flex;flex-direction:column;height:100dvh}
 
-    /* ── HERO ── */
+    /* ── HERO — blue band ── */
     .hero{
-      background:var(--bg);
-      padding:calc(env(safe-area-inset-top,20px) + 12px) 16px 0;
+      background:linear-gradient(180deg,#0474fc 0%,#0358c4 100%);
+      padding:calc(env(safe-area-inset-top,20px) + 10px) 16px 0;
       flex-shrink:0;
+      position:relative;
     }
+    /* Rounded bottom into cream bg */
+    .hero::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:28px;background:var(--bg);border-radius:28px 28px 0 0;}
     .hero-inner{max-width:460px;margin:0 auto}
-    .hero-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-    .hero-title{font-family:'Chewy',cursive;font-size:28px;letter-spacing:.5px;color:#fff}
-    .hero-countdown{
-      display:flex;align-items:center;gap:6px;
-      background:var(--s2);border:1.5px solid var(--dimmer);
-      border-radius:12px;padding:7px 12px;
-    }
-    .hero-countdown svg{width:14px;height:14px;stroke:rgba(255,255,255,.7);fill:none;stroke-width:2;stroke-linecap:round}
+    .hero-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .hero-title{font-family:'Chewy',cursive;font-size:26px;letter-spacing:.5px;color:#fff}
+    .hero-countdown{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.28);border-radius:12px;padding:7px 12px}
+    .hero-countdown svg{width:14px;height:14px;stroke:rgba(255,255,255,.8);fill:none;stroke-width:2;stroke-linecap:round}
     .cd-time{font-size:13px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums}
 
-    .hero-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
-    .h-card{
-      background:#fff;border-radius:var(--card-r);padding:18px 14px;
-      display:flex;flex-direction:column;align-items:center;text-align:center;
-      box-shadow:var(--shadow);
-    }
-    .streak-num{font-family:'Chewy',cursive;font-size:clamp(38px,10vw,48px);color:var(--orange);line-height:1}
-    .streak-label{font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-top:5px}
+    .hero-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:26px}
+    .h-card{background:#fff;border-radius:var(--card-r);padding:16px 14px;display:flex;flex-direction:column;align-items:center;text-align:center;box-shadow:var(--shadow)}
+    .streak-num{font-family:'Chewy',cursive;font-size:clamp(36px,10vw,46px);color:var(--orange);line-height:1}
+    .streak-label{font-size:10px;font-weight:800;color:var(--light);text-transform:uppercase;letter-spacing:1px;margin-top:5px}
     .streak-pips{display:flex;gap:4px;margin-top:10px;width:100%;justify-content:center}
-    .streak-pip{flex:1;max-width:22px;height:5px;border-radius:3px;background:#e2e8f0}
+    .streak-pip{flex:1;max-width:20px;height:5px;border-radius:3px;background:#e2e8f0}
     .streak-pip.done{background:var(--green)}
     .streak-pip.active{background:var(--orange)}
 
@@ -61,87 +54,55 @@
     .prog-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Chewy',cursive;font-size:clamp(16px,4vw,20px);color:var(--text)}
 
     /* ── BODY ── */
-    .body{
-      flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-      background:var(--bg);
-      padding:0 16px calc(env(safe-area-inset-bottom,0px) + 16px);
-    }
+    .body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg);padding:4px 16px calc(env(safe-area-inset-bottom,0px) + 16px)}
     .body::-webkit-scrollbar{display:none}
-    .body-inner{max-width:460px;margin:0 auto;padding-top:4px}
+    .body-inner{max-width:460px;margin:0 auto;padding-top:2px}
 
-    /* All done banner */
-    .complete{
-      display:none;background:linear-gradient(135deg,var(--green),#16a34a);
-      border-radius:var(--card-r);padding:16px;margin-bottom:14px;
-      align-items:center;gap:12px;color:#fff;
-      box-shadow:0 4px 16px rgba(22,163,74,.35);
-    }
+    .complete{display:none;background:linear-gradient(135deg,var(--green),#16a34a);border-radius:var(--card-r);padding:16px;margin-bottom:14px;align-items:center;gap:12px;color:#fff;box-shadow:0 4px 0 var(--gd),0 4px 16px rgba(22,163,74,.3)}
     .complete.show{display:flex;animation:popIn .5s cubic-bezier(.34,1.56,.64,1)}
-    .complete-ic{width:44px;height:44px;background:rgba(255,255,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .complete-ic{width:44px;height:44px;background:rgba(255,255,255,.22);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .complete-ic svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
-    .ct-title{font-family:'Chewy',cursive;font-size:18px;letter-spacing:.3px}
+    .ct-title{font-family:'Chewy',cursive;font-size:17px;letter-spacing:.3px}
     .ct-sub{font-size:11px;font-weight:700;opacity:.85;margin-top:2px}
 
-    .sec-lbl{font-size:10px;font-weight:900;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin:0 0 10px;padding:0 2px}
+    .sec-lbl{font-size:10px;font-weight:900;color:var(--light);letter-spacing:2px;text-transform:uppercase;margin:0 0 10px;padding:0 4px}
 
-    /* Task card */
-    .task{
-      background:#fff;border-radius:var(--card-r);
-      padding:16px;margin-bottom:10px;
-      position:relative;overflow:hidden;
-      transition:opacity .4s;
-      box-shadow:var(--shadow);
-    }
-    .task.claimed{opacity:.3;pointer-events:none}
-    .task.ready{box-shadow:0 0 0 2px var(--gold),var(--shadow)}
+    /* Task card — white on cream, Blooket chunky style */
+    .task{background:var(--white);border-radius:var(--card-r);padding:16px;margin-bottom:10px;position:relative;overflow:hidden;transition:opacity .4s;box-shadow:var(--shadow)}
+    .task.claimed{opacity:.35;pointer-events:none}
+    /* Gold border glow when ready to claim */
+    .task.ready{box-shadow:0 0 0 2.5px var(--gold),0 4px 16px rgba(245,158,11,.2)}
     .task-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
     .task-ic{width:46px;height:46px;background:#f1f5f9;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .task-ic svg{width:22px;height:22px}
-    .task-ic.ic-done{background:rgba(34,197,94,.12)}
-    .task-info{flex:1;min-width:0}
+    .task-ic.ic-done{background:rgba(34,197,94,.1)}
     .task-name{font-size:14px;font-weight:800;color:var(--text);line-height:1.3}
     .task-meta{display:flex;align-items:center;gap:8px;margin-top:3px}
     .task-xp{font-size:11px;font-weight:900;color:var(--goldd);background:rgba(245,158,11,.1);padding:2px 8px;border-radius:6px}
-    .task-ct{font-size:11px;font-weight:800;color:#94a3b8}
+    .task-ct{font-size:11px;font-weight:800;color:var(--light)}
     .task-bar{height:7px;background:#e2e8f0;border-radius:4px;overflow:hidden}
     .task-fill{height:100%;border-radius:4px;background:var(--blue);transition:width .5s cubic-bezier(.34,1.56,.64,1)}
     .task-fill.tdone{background:var(--gold)}
     .task-action{display:flex;justify-content:flex-end;margin-top:10px}
-    .task-claim{
-      background:var(--gold);color:var(--text);border:none;
-      border-radius:12px;padding:10px 20px;
-      font-family:'Chewy',cursive;font-size:15px;letter-spacing:.3px;
-      cursor:pointer;box-shadow:0 3px 0 var(--goldd);
-      transition:transform .1s,opacity .2s;display:flex;align-items:center;gap:6px;
-    }
-    .task-claim:active:not(:disabled){transform:translateY(3px);box-shadow:none}
-    .task-claim:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
+    .task-claim{background:var(--gold);color:#fff;border:none;border-radius:14px;padding:10px 20px;font-family:'Chewy',cursive;font-size:16px;letter-spacing:.3px;cursor:pointer;box-shadow:0 4px 0 var(--goldd);transition:transform .1s;display:flex;align-items:center;gap:6px}
+    .task-claim:active:not(:disabled){transform:translateY(4px);box-shadow:none}
+    .task-claim:disabled{opacity:.45;pointer-events:none}
     .task-claim svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5}
     .task-check{display:flex;align-items:center;gap:6px;color:var(--green);font-size:13px;font-weight:900}
-    .task-check-circle{width:28px;height:28px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center}
+    .task-check-circle{width:28px;height:28px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 var(--gd)}
     .task-check-circle svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round}
-    .task-claim-loading{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;color:#94a3b8;font-size:13px;font-weight:800}
+    .task-claim-loading{display:flex;align-items:center;gap:8px;padding:10px 20px;color:var(--light);font-size:13px;font-weight:800}
     .spin-sm{width:16px;height:16px;border:2.5px solid #e2e8f0;border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
 
-    /* XP toast */
-    .xp-toast{
-      position:fixed;top:calc(env(safe-area-inset-top,20px) + 16px);left:50%;
-      transform:translateX(-50%) translateY(-20px);
-      background:#fff;color:var(--blue);
-      border-radius:20px;padding:10px 24px;
-      font-family:'Chewy',cursive;font-size:20px;letter-spacing:.5px;
-      z-index:999;opacity:0;pointer-events:none;
-      box-shadow:0 8px 24px rgba(4,88,196,.25);
-      transition:opacity .25s,transform .35s cubic-bezier(.34,1.56,.64,1);
-    }
+    .xp-toast{position:fixed;top:calc(env(safe-area-inset-top,20px) + 16px);left:50%;transform:translateX(-50%) translateY(-20px);background:var(--gold);color:#fff;border-radius:20px;padding:10px 24px;font-family:'Chewy',cursive;font-size:22px;letter-spacing:.5px;z-index:999;opacity:0;pointer-events:none;box-shadow:0 4px 0 var(--goldd),0 8px 24px rgba(245,158,11,.3);transition:opacity .25s,transform .35s cubic-bezier(.34,1.56,.64,1)}
     .xp-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
     .confetti{position:fixed;inset:0;pointer-events:none;z-index:800;overflow:hidden}
     .confetti i{position:absolute;width:10px;height:10px;opacity:0;border-radius:3px}
     .confetti i.fall{animation:cf 1.3s ease-out forwards}
 
-    .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:60px 20px;color:rgba(255,255,255,.4);font-size:14px;font-weight:700}
-    .ld-spin{width:36px;height:36px;border:4px solid rgba(255,255,255,.15);border-top-color:rgba(255,255,255,.7);border-radius:50%;animation:spin .7s linear infinite}
+    .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:60px 20px;color:var(--light);font-size:14px;font-weight:700}
+    .ld-spin{width:36px;height:36px;border:4px solid #e2e8f0;border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
 
     @keyframes popIn{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
     @keyframes cf{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(100vh) rotate(720deg)}}
@@ -163,13 +124,13 @@
       </div>
       <div class="hero-cards">
         <div class="h-card">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#f97316" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f97316" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
           <div class="streak-num" id="streak-val">0</div>
           <div class="streak-label">Day Streak</div>
-          <div class="streak-pips" id="streak-pips" aria-hidden="true"></div>
+          <div class="streak-pips" id="streak-pips"></div>
         </div>
         <div class="h-card">
-          <div class="prog-ring-wrap" role="img" aria-label="Task completion ring">
+          <div class="prog-ring-wrap">
             <svg class="prog-ring" viewBox="0 0 36 36">
               <circle class="prog-ring-bg" cx="18" cy="18" r="15"/>
               <circle class="prog-ring-fill" id="prog-ring-fill" cx="18" cy="18" r="15" stroke-dasharray="94.25" stroke-dashoffset="94.25"/>
@@ -182,15 +143,15 @@
     </div>
   </div>
 
-  <div class="body" id="scroll-body" role="main">
+  <div class="body" id="scroll-body">
     <div class="body-inner" id="body-inner">
       <div class="loading"><div class="ld-spin"></div>Loading tasks...</div>
     </div>
   </div>
 </div>
 
-<div class="xp-toast" id="xp-toast" role="status" aria-live="polite"></div>
-<div class="confetti" id="confetti" aria-hidden="true"></div>
+<div class="xp-toast" id="xp-toast"></div>
+<div class="confetti" id="confetti"></div>
 
 <script type="module">
 import Haptics from './haptics.js';
@@ -203,83 +164,62 @@ var db=null,auth=null,_uid=null;
     if(window.parent!==window&&window.parent.firebase){
       db=window.parent.firebase.firestore();
       auth=window.parent.firebase.auth();
-      return;
     }
-  }catch(e){}
+  }catch(e){console.warn('firebase init:',e);}
 })();
 
 // ── Double-claim protection ───────────────────────────────────────────────────
-var _claimedIds=new Set();
-var _inFlight={};
+var _claimedIds=new Set(),_inFlight={};
 var _todayKey=(function(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();})();
 var _cacheKey='bd_claimed_'+_todayKey;
-
-function _loadClaimed(){
-  try{var s=sessionStorage.getItem(_cacheKey);if(s)JSON.parse(s).forEach(function(id){_claimedIds.add(id);});}catch(e){}
-}
-function _setClaimed(id){
-  _claimedIds.add(id);
-  try{var arr=Array.from(_claimedIds);sessionStorage.setItem(_cacheKey,JSON.stringify(arr));}catch(e){}
-}
+function _loadClaimed(){try{var s=sessionStorage.getItem(_cacheKey);if(s)JSON.parse(s).forEach(function(id){_claimedIds.add(id);});}catch(e){}}
+function _setClaimed(id){_claimedIds.add(id);try{sessionStorage.setItem(_cacheKey,JSON.stringify(Array.from(_claimedIds)));}catch(e){}}
 function _isClaimed(id){return _claimedIds.has(id);}
 _loadClaimed();
 
-function getTasksRef(uid){return db.collection('tasks').doc(uid);}
+function getTasksRef(uid){return db.collection('dailyTasks').doc(uid);}
 
 async function claimTask(uid,taskId){
   if(_inFlight[taskId])return null;
-  _inFlight[taskId]=true;
-  _setClaimed(taskId);
+  _inFlight[taskId]=true;_setClaimed(taskId);
   try{
-    var ref=getTasksRef(uid);
-    var earnedXp=null;
+    var ref=getTasksRef(uid),earnedXp=null;
     await db.runTransaction(async function(tx){
-      var snap=await tx.get(ref);
-      if(!snap.exists)return;
+      var snap=await tx.get(ref);if(!snap.exists)return;
       var st=snap.data();
       var task=st.tasks.find(function(t){return t.id===taskId;});
       if(!task||!task.done||task.claimed){earnedXp=null;return;}
-      task.claimed=true;
-      earnedXp=task.xp;
+      task.claimed=true;earnedXp=task.xp;
       if(st.tasks.every(function(t){return t.claimed;}))st.allClaimed=true;
       tx.set(ref,st);
     });
     return earnedXp;
-  }catch(e){console.warn('claimTask error:',e);return null;}
+  }catch(e){console.warn('claimTask:',e);return null;}
   finally{delete _inFlight[taskId];}
 }
 
 async function incrementStreakToday(uid){
-  var ref=getTasksRef(uid);
   try{
     await db.runTransaction(async function(tx){
-      var snap=await tx.get(ref);
-      if(!snap.exists)return;
-      var st=snap.data();
-      if(!st.allDone||st.streakBumped)return;
-      st.streakBumped=true;
-      st.dailyStreak=(st.dailyStreak||0)+1;
-      tx.set(ref,st);
+      var snap=await tx.get(getTasksRef(uid));if(!snap.exists)return;
+      var st=snap.data();if(!st.allDone||st.streakBumped)return;
+      st.streakBumped=true;st.dailyStreak=(st.dailyStreak||0)+1;tx.set(ref,st);
     });
-  }catch(e){console.warn('incrementStreak:',e);}
+  }catch(e){}
 }
 
-function awardXP(xp){
-  try{if(window.parent!==window)window.parent.postMessage({type:'xpAwarded',xp:xp},'*');}catch(e){}
-}
+function awardXP(xp){try{if(window.parent!==window)window.parent.postMessage({type:'xpAwarded',xp:xp},'*');}catch(e){}}
 
 // ── Countdown ─────────────────────────────────────────────────────────────────
 function updateCountdown(){
-  var now=new Date(),mid=new Date(now);
-  mid.setHours(24,0,0,0);
+  var now=new Date(),mid=new Date(now);mid.setHours(24,0,0,0);
   var d=mid-now,h=Math.floor(d/3600000),m=Math.floor((d%3600000)/60000),s=Math.floor((d%60000)/1000);
   var pad=function(n){return String(n).padStart(2,'0');};
   document.getElementById('countdown-text').textContent=pad(h)+':'+pad(m)+':'+pad(s);
 }
-setInterval(updateCountdown,1000);
-updateCountdown();
+setInterval(updateCountdown,1000);updateCountdown();
 
-// ── Confetti ──────────────────────────────────────────────────────────────────
+// ── Confetti + XP toast ───────────────────────────────────────────────────────
 function spawnConfetti(n){
   var colors=['#22c55e','#f59e0b','#ef4444','#0474fc','#8b5cf6','#f97316'];
   var el=document.getElementById('confetti');
@@ -293,30 +233,21 @@ function spawnConfetti(n){
     setTimeout((function(el){return function(){el.remove();};})(p),1600);
   }
 }
+function showXpToast(m){var t=document.getElementById('xp-toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2400);}
 
-function showXpToast(m){
-  var t=document.getElementById('xp-toast');
-  t.textContent=m;t.classList.add('show');
-  setTimeout(function(){t.classList.remove('show');},2400);
-}
-
-// ── Hero update ───────────────────────────────────────────────────────────────
+// ── Hero ──────────────────────────────────────────────────────────────────────
 function updateHero(state){
   document.getElementById('streak-val').textContent=state.dailyStreak||0;
   var pips=document.getElementById('streak-pips');
   var days=state.dailyStreak||0,pipCount=7;
   var filled=Math.min(days%pipCount||(days>0&&days%pipCount===0?pipCount:0),pipCount);
   pips.innerHTML='';
-  for(var p=0;p<pipCount;p++){
-    var pip=document.createElement('div');
-    pip.className='streak-pip'+(p<filled?' done':(p===filled?' active':''));
-    pips.appendChild(pip);
-  }
+  for(var p=0;p<pipCount;p++){var pip=document.createElement('div');pip.className='streak-pip'+(p<filled?' done':(p===filled?' active':''));pips.appendChild(pip);}
   var done=state.tasks.filter(function(t){return t.done;}).length;
   var total=state.tasks.length,pct=total>0?done/total:0;
   var ring=document.getElementById('prog-ring-fill');
   ring.style.strokeDashoffset=94.25-(94.25*pct);
-  ring.classList.toggle('alldone',state.allDone);
+  ring.classList.toggle('alldone',!!state.allDone);
   document.getElementById('prog-center').textContent=done+'/'+total;
 }
 
@@ -326,30 +257,23 @@ function render(state){
   body.innerHTML='<div class="body-inner" id="body-inner"></div>';
   var inner=document.getElementById('body-inner');
   updateHero(state);
-
   if(state.allDone){
     var cb=document.createElement('div');cb.className='complete show anim';
-    cb.innerHTML='<div class="complete-ic"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div><div><div class="ct-title">All tasks done! 🎉</div><div class="ct-sub">New tasks at midnight</div></div>';
+    cb.innerHTML='<div class="complete-ic"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div><div><div class="ct-title">All done! 🎉</div><div class="ct-sub">New tasks at midnight</div></div>';
     inner.appendChild(cb);
   }
-
   var lbl=document.createElement('div');lbl.className='sec-lbl anim d1';lbl.textContent="Today's Tasks";
   inner.appendChild(lbl);
-
   state.tasks.forEach(function(task,i){
     var pct=Math.min(100,Math.round(task.progress/task.target*100));
     var isClaimed=task.claimed||_isClaimed(task.id);
     var card=document.createElement('div');
     card.className='task anim'+(isClaimed?' claimed':(task.done?' ready':''))+' d'+(Math.min(i+2,4));
-
     var doneIc=task.done?'ic-done':'';
-    var iconSvg=getTaskIcon(task.type);
-    var iconColor=task.done?'#22c55e':'#94a3b8';
-
     card.innerHTML=`
       <div class="task-top">
-        <div class="task-ic ${doneIc}">${iconSvg.replace('ICONCOLOR',iconColor)}</div>
-        <div class="task-info">
+        <div class="task-ic ${doneIc}">${getTaskIcon(task.type,task.done)}</div>
+        <div>
           <div class="task-name">${task.label}</div>
           <div class="task-meta">
             <span class="task-xp">+${task.xp} XP</span>
@@ -366,86 +290,92 @@ function render(state){
 }
 
 function renderTaskAction(taskId,task,isClaimed){
-  var el=document.getElementById('action-'+taskId);
-  if(!el)return;
+  var el=document.getElementById('action-'+taskId);if(!el)return;
   if(isClaimed){
-    el.innerHTML='<div class="task-check"><div class="task-check-circle"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div>Claimed</div>';
+    el.innerHTML='<div class="task-check"><div class="task-check-circle"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div>Claimed!</div>';
     return;
   }
   if(task.done){
     var btn=document.createElement('button');
     btn.className='task-claim';
-    btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Claim Reward';
+    btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Claim!';
     btn.addEventListener('click',function(){
       if(_isClaimed(taskId)||_inFlight[taskId])return;
       btn.disabled=true;
-      // Optimistic UI — show loading immediately
       el.innerHTML='<div class="task-claim-loading"><div class="spin-sm"></div>Claiming...</div>';
       _setClaimed(taskId);
-      if(!_uid){el.innerHTML='<div class="task-check"><div class="task-check-circle"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div>Claimed</div>';return;}
+      if(!_uid){el.innerHTML='<div class="task-check"><div class="task-check-circle"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div>Claimed!</div>';return;}
       claimTask(_uid,taskId).then(function(xp){
-        el.innerHTML='<div class="task-check"><div class="task-check-circle"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div>Claimed</div>';
-        var taskCard=el.closest('.task');if(taskCard)taskCard.classList.add('claimed');
-        if(xp!=null){
-          Haptics.success();
-          showXpToast('+'+xp+' XP!');
-          spawnConfetti(30);
-          awardXP(xp);
-          try{if(window.parent!==window)window.parent.postMessage({type:'tasksUpdated'},'*');}catch(e){}
-        }
+        el.innerHTML='<div class="task-check"><div class="task-check-circle"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div>Claimed!</div>';
+        var c=el.closest('.task');if(c)c.classList.add('claimed');
+        if(xp!=null){Haptics.success();showXpToast('+'+xp+' XP!');spawnConfetti(30);awardXP(xp);try{if(window.parent!==window)window.parent.postMessage({type:'tasksUpdated'},'*');}catch(e){}}
       });
     });
     el.appendChild(btn);
   }
 }
 
-function getTaskIcon(type){
+function getTaskIcon(type,done){
+  var col=done?'#22c55e':'#94a3b8';
   var icons={
-    game:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="ICONCOLOR" stroke-width="2" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4M8 10v4"/><circle cx="16" cy="11" r=".5" fill="ICONCOLOR"/><circle cx="18" cy="13" r=".5" fill="ICONCOLOR"/></svg>',
-    answer:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="ICONCOLOR" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>',
-    streak:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="ICONCOLOR" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
-    iq:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="ICONCOLOR" stroke-width="2" stroke-linecap="round"><path d="M9 19H6a2 2 0 01-2-2v-4M3 9V7a2 2 0 012-2h4m4 0h2a2 2 0 012 2v2m0 4v4a2 2 0 01-2 2h-2M9 19h6M9 5h6"/></svg>',
+    game:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="'+col+'" stroke-width="2" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4M8 10v4"/><circle cx="16" cy="11" r=".5" fill="'+col+'"/><circle cx="18" cy="13" r=".5" fill="'+col+'"/></svg>',
+    answer:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="'+col+'" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>',
+    streak:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="'+col+'" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+    iq:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="'+col+'" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>',
   };
   return icons[type]||icons.answer;
 }
 
-// ── Load & listen ─────────────────────────────────────────────────────────────
+// ── Load tasks — properly waits for auth ──────────────────────────────────────
 var _debounceTimer=null;
-function scheduleRefresh(){
-  clearTimeout(_debounceTimer);
-  _debounceTimer=setTimeout(loadTasks,350);
-}
+function scheduleRefresh(){clearTimeout(_debounceTimer);_debounceTimer=setTimeout(loadTasks,350);}
 
 async function loadTasks(){
-  if(!auth)return;
-  var user=auth.currentUser;
-  if(!user){
-    setTimeout(loadTasks,500);
+  if(!auth||!db){
+    // Firebase not ready yet — retry
+    setTimeout(loadTasks,300);
     return;
   }
+
+  // Wait for auth to resolve (handles both already-authed and pending)
+  var user=auth.currentUser;
+  if(!user){
+    // Listen for state change once
+    var resolved=false;
+    var unsub=auth.onAuthStateChanged(function(u){
+      if(resolved)return;
+      resolved=true;
+      unsub();
+      if(u){_uid=u.uid;_doLoad(u.uid);}
+      else{document.getElementById('body-inner').innerHTML='<div class="loading">Sign in to see your tasks</div>';}
+    });
+    // Safety timeout
+    setTimeout(function(){if(!resolved){resolved=true;unsub();document.getElementById('body-inner').innerHTML='<div class="loading">Could not load — try again</div>';}},5000);
+    return;
+  }
+
   _uid=user.uid;
+  _doLoad(user.uid);
+}
+
+async function _doLoad(uid){
   try{
-    var snap=await getTasksRef(_uid).get();
+    var snap=await getTasksRef(uid).get();
     if(!snap.exists){
-      document.getElementById('body-inner').innerHTML='<div class="loading">No tasks today — check back soon!</div>';
+      document.getElementById('body-inner').innerHTML='<div class="loading">No tasks today yet — check back soon!</div>';
       return;
     }
     var state=snap.data();
-    // Overlay local claim cache so buttons never re-appear after claiming
     state.tasks.forEach(function(t){if(_isClaimed(t.id))t.claimed=true;});
     render(state);
-    if(state.allDone)incrementStreakToday(_uid);
+    if(state.allDone)incrementStreakToday(uid);
   }catch(e){
     console.warn('loadTasks error:',e);
     document.getElementById('body-inner').innerHTML='<div class="loading">Could not load tasks. Try again.</div>';
   }
 }
 
-// Listen for tasksUpdated from parent
-window.addEventListener('message',function(e){
-  if(e.data&&e.data.type==='tasksUpdated')scheduleRefresh();
-});
-
+window.addEventListener('message',function(e){if(e.data&&e.data.type==='tasksUpdated')scheduleRefresh();});
 loadTasks();
 </script>
 </body>
