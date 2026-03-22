@@ -11,8 +11,8 @@
   .game-fullbtn{display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(240,234,214,.07);border:1px solid rgba(240,234,214,.14);border-radius:12px;padding:8px 16px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;color:rgba(240,234,214,.55);cursor:pointer;width:100%;margin-top:6px;transition:all .15s;text-decoration:none}.game-fullbtn:active{background:rgba(240,234,214,.14);transform:scale(.97)}.game-fullbtn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;flex-shrink:0}
   .game-branding{width:100%;display:flex;justify-content:center;margin-top:8px;padding-top:10px;border-top:1px solid rgba(240,234,214,.06)}.game-branding a{display:inline-flex;align-items:center;gap:5px;background:rgba(240,234,214,.07);border:1px solid rgba(240,234,214,.12);border-radius:20px;padding:5px 12px 5px 8px;text-decoration:none;transition:all .15s}.game-branding a:active{transform:scale(.96)}.game-branding-bear{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}.game-branding-bear img{width:20px;height:20px;object-fit:contain}.game-branding-text{font-size:11px;font-weight:900;color:rgba(240,234,214,.5);letter-spacing:1.5px;text-transform:uppercase}
   .scroll-hint{position:absolute;bottom:14px;left:0;right:0;font-size:13px;font-weight:900;display:flex;flex-direction:column;align-items:center;gap:4px;transition:opacity .4s;pointer-events:none;opacity:0}.scroll-hint.show{opacity:1}.scroll-hint-inner{display:flex;align-items:center;gap:7px;background:rgba(240,234,214,.1);border:1px solid rgba(240,234,214,.15);border-radius:20px;padding:7px 16px;color:var(--cream)}.scroll-hint-inner svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:2.8;animation:bounce 1.2s infinite}.scroll-hint-inner span{font-size:12px;font-weight:900;color:rgba(240,234,214,.7);letter-spacing:.3px}@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}@keyframes pop{0%{transform:scale(1)}30%{transform:scale(1.12)}60%{transform:scale(.97)}100%{transform:scale(1)}}
-  .pc3-grid{display:grid;gap:5px;background:#e8e2d6;padding:6px;border-radius:14px;margin:4px auto;border:3px solid #d6cfc0;box-shadow:0 4px 0 #c8c2b8}.pc3-cell{border-radius:10px;background:#fff;border:2.5px solid #e8e2d6;position:relative;cursor:pointer;user-select:none;transition:border-color .12s,background .12s,box-shadow .12s;box-shadow:0 3px 0 #d6cfc0;overflow:hidden}.pc3-cell:not([style*='pointer-events:none']):active{transform:translateY(2px);box-shadow:0 1px 0 #d6cfc0}.pc3-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.6);min-height:18px}.pc3-moves{font-size:11px;font-weight:700;text-align:center;color:rgba(255,255,255,.3);min-height:14px}
-  .jig-grid{display:grid;gap:4px;background:#e8e2d6;padding:6px;border-radius:14px;margin:4px auto;border:3px solid #d6cfc0;box-shadow:0 4px 0 #c8c2b8}.jig-cell{border-radius:10px;border:2.5px solid #e8e2d6;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;font-size:clamp(20px,5.5vw,28px);transition:all .12s;box-shadow:0 3px 0 #d6cfc0}.jig-cell:active{transform:translateY(2px);box-shadow:0 1px 0 #d6cfc0}.jig-cell.jig-empty{background:#f1f5f9;border-style:dashed;border-color:#cbd5e1;box-shadow:none;cursor:default}.jig-cell.jig-placed{background:#dcfce7;border-color:#22c55e;box-shadow:0 3px 0 #16a34a;animation:pop .25s}.jig-cell.jig-wrong{animation:jigShake .35s}.jig-hand{display:flex;gap:8px;justify-content:center;align-items:center;margin:6px 0;flex-wrap:wrap}.jig-piece{width:clamp(44px,12vw,56px);height:clamp(44px,12vw,56px);border-radius:12px;border:2.5px solid #e8e2d6;background:#fff;display:flex;align-items:center;justify-content:center;font-size:clamp(22px,6vw,30px);cursor:pointer;box-shadow:0 3px 0 #d6cfc0;transition:all .12s;user-select:none}.jig-piece:active{transform:translateY(3px);box-shadow:none}.jig-piece.jig-piece-sel{background:#e8f2ff;border-color:#0474fc;box-shadow:0 3px 0 #0358c4;transform:translateY(-3px)}.jig-piece.jig-piece-used{opacity:.15;pointer-events:none}.jig-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.6);min-height:18px}@keyframes jigShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+  .pc3-grid{display:grid;gap:5px;background:#e2ddd4;padding:7px;border-radius:16px;margin:4px auto;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae}.pc3-cell{border-radius:10px;background:#fff;border:2.5px solid #e8e2d6;position:relative;cursor:pointer;user-select:none;transition:border-color .15s,background .15s,box-shadow .15s;box-shadow:0 3px 0 #d6cfc0;overflow:hidden;aspect-ratio:1}.pc3-cell:not([style*='pointer-events:none']):active{transform:translateY(3px);box-shadow:none}.pc3-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.6);min-height:18px}.pc3-moves{font-size:11px;font-weight:700;text-align:center;color:rgba(255,255,255,.3);min-height:14px}
+  .jig-tray{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:4px 0}.jig-tray-piece{border-radius:12px;background:#fff;border:2.5px solid #e8e2d6;cursor:pointer;box-shadow:0 3px 0 #d6cfc0;transition:all .15s;user-select:none;overflow:visible;display:flex;align-items:center;justify-content:center;padding:2px}.jig-tray-piece:active{transform:translateY(3px)!important;box-shadow:none!important}.jig-tray-piece.jig-tray-sel{border-color:#0474fc;background:#e8f2ff;box-shadow:0 3px 0 #0358c4;transform:translateY(-4px)}.jig-tray-piece.jig-used{opacity:.12;pointer-events:none}.jig-slot-filled{pointer-events:none}.jig-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.6);min-height:18px}
   `;
   document.head.appendChild(s);
 })();
@@ -259,7 +259,7 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
   },3);
   Q.registerRenderer('pipeConnect',{
     render:function(q,idx){
-      var sz=q.size,cellSz=Math.min(Math.floor(220/sz),Math.floor(56/sz));
+      var sz=q.size;var gridW=sz===4?Math.min(Math.round(window.innerWidth*0.78),300):Math.min(Math.round(window.innerWidth*0.82),320);var cellSz=Math.floor((gridW-12-sz*5)/sz);
       var cells='';
       for(var i=0;i<q.cells.length;i++){
         var c=q.cells[i],isSrc=i===q.src,isSnk=i===q.snk,isEmpty=!c||!c.t;
@@ -462,94 +462,193 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
   });
 })();
 
-// ── Jigsaw Puzzle ─────────────────────────────────────────────────────────────
+// ── Jigsaw Puzzle — REAL SVG PIECES ──────────────────────────────────────────
 (function(){
-  // Each puzzle is an emoji grid with some pieces removed — place them back
-  var PUZZLES=[
-    {grid:['🌞','🌈','⭐','🌙','🌊','🐬','🦋','🌸','🎵'],holes:[2,5,7],label:'Nature Scene',d:0.8},
-    {grid:['🦁','🐘','🦒','🐧','🦊','🐺','🦅','🐢','🐠'],holes:[0,4,8],label:'Wild Animals',d:0.9},
-    {grid:['🍕','🍔','🌮','🍜','🍣','🍩','🍦','🎂','🍇'],holes:[1,3,6],label:'Food Feast',d:0.8},
-    {grid:['🚀','🛸','⭐','🌍','🌙','☄️','🔭','🪐','🌌'],holes:[2,4,7],label:'Outer Space',d:1.0},
-    {grid:['🎸','🎹','🎺','🥁','🎻','🎷','🪗','🎵','🎶'],holes:[0,3,5],label:'Music Gear',d:0.9},
-    {grid:['⚽','🏀','🎾','🏈','⚾','🏐','🎱','🏓','🥊'],holes:[1,4,8],label:'Sports',d:0.9},
-    {grid:['🌹','🌷','🌻','🌺','🌸','💐','🪷','🌼','🌾'],holes:[2,5,6],label:'Flower Garden',d:1.0},
-    {grid:['🦄','🐉','🧚','🧜','🧝','🧙','🦸','🧞','🧟'],holes:[3,6,8],label:'Fantasy',d:1.1},
-    {grid:['🏔️','🌋','🏝️','🌊','🏜️','🌲','🗻','🌅','🌃'],holes:[1,4,7],label:'Landscapes',d:1.0},
-    {grid:['🍎','🍊','🍋','🍇','🍓','🍑','🍒','🥭','🫐'],holes:[0,5,8],label:'Fruit Bowl',d:0.8},
-    {grid:['😀','😎','🤩','😴','😡','🥺','🤔','😂','🥳'],holes:[2,4,6],label:'Emoji Faces',d:0.9},
-    {grid:['🏰','🗼','🗽','🏯','⛩️','🕌','🕍','🏛️','🎡'],holes:[0,3,7],label:'Landmarks',d:1.1},
+  // Color palettes for the puzzle image mosaic
+  var THEMES=[
+    {name:'Sunset',colors:['#ff6b35','#f7c59f','#efefd0','#004e89','#1a936f','#c84b31','#f4a261','#e76f51','#264653']},
+    {name:'Ocean',colors:['#03045e','#023e8a','#0077b6','#0096c7','#00b4d8','#48cae4','#90e0ef','#ade8f4','#caf0f8']},
+    {name:'Forest',colors:['#1b4332','#2d6a4f','#40916c','#52b788','#74c69d','#95d5b2','#b7e4c7','#d8f3dc','#081c15']},
+    {name:'Candy',colors:['#ff0a54','#ff477e','#ff5c8a','#ff7096','#ff85a1','#fbb1bd','#f9bec7','#f9c6cf','#ffb3c6']},
+    {name:'Galaxy',colors:['#10002b','#240046','#3c096c','#5a189a','#7b2d8b','#9d4edd','#c77dff','#e0aaff','#f72585']},
+    {name:'Earth',colors:['#6b4226','#8b5e3c','#a0522d','#c68642','#deb887','#f5deb3','#4a7c59','#2d5016','#1a3a1a']},
   ];
+
+  // Build jigsaw connector path for one edge
+  // dir: 0=right edge of cell, 1=bottom edge
+  // tab: 1=tab out, -1=blank in, 0=flat
+  function edgePath(x1,y1,x2,y2,tab){
+    if(tab===0)return'L'+x2+' '+y2;
+    var mx=(x1+x2)/2,my=(y1+y2)/2;
+    var dx=x2-x1,dy=y2-y1;
+    var len=Math.sqrt(dx*dx+dy*dy);
+    var nx=-dy/len,ny=dx/len; // normal
+    var bumpSize=len*0.22;
+    var bumpOut=tab*bumpSize;
+    // Control points for the tab/blank bump
+    var p1x=x1+dx*0.3+nx*bumpOut*0.5, p1y=y1+dy*0.3+ny*bumpOut*0.5;
+    var p2x=mx+nx*bumpOut*1.1, p2y=my+ny*bumpOut*1.1;
+    var p3x=x1+dx*0.5+nx*bumpOut*1.1, p3y=y1+dy*0.5+ny*bumpOut*1.1;
+    var p4x=x1+dx*0.7+nx*bumpOut*0.5, p4y=y1+dy*0.7+ny*bumpOut*0.5;
+    return'C'+p1x.toFixed(1)+' '+p1y.toFixed(1)+' '+p2x.toFixed(1)+' '+p2y.toFixed(1)+' '+p3x.toFixed(1)+' '+p3y.toFixed(1)+
+           'C'+p4x.toFixed(1)+' '+p4y.toFixed(1)+' '+x2.toFixed(1)+' '+y2.toFixed(1)+' '+x2.toFixed(1)+' '+y2.toFixed(1);
+  }
+
+  function makePuzzle(gridN,theme){
+    var cs=80; // cell size in SVG units
+    var totalW=gridN*cs, totalH=gridN*cs;
+    var pieces=[];
+    // Generate connector directions: 1=tab, -1=blank
+    // For each internal edge, one side is tab and other is blank
+    var hEdges=[]; // horizontal connectors [row][col] = tab value for TOP of cell (row,col)
+    var vEdges=[]; // vertical connectors [row][col] = tab value for LEFT of cell (row,col)
+    for(var r=0;r<gridN;r++){
+      hEdges[r]=[];vEdges[r]=[];
+      for(var c=0;c<gridN;c++){
+        hEdges[r][c]=0; // top edge (r=0 = flat, else random)
+        vEdges[r][c]=0; // left edge (c=0 = flat, else random)
+      }
+    }
+    for(var r=1;r<gridN;r++)for(var c=0;c<gridN;c++){var t=(Math.random()>0.5)?1:-1;hEdges[r][c]=t;}
+    for(var r=0;r<gridN;r++)for(var c=1;c<gridN;c++){var t=(Math.random()>0.5)?1:-1;vEdges[r][c]=t;}
+
+    for(var r=0;r<gridN;r++){for(var c=0;c<gridN;c++){
+      var x=c*cs,y=r*cs;
+      var topTab   = r===0?0:hEdges[r][c];
+      var botTab   = r===gridN-1?0:-hEdges[r+1][c];
+      var leftTab  = c===0?0:vEdges[r][c];
+      var rightTab = c===gridN-1?0:-vEdges[r][c+1];
+      // Build clip path for this piece
+      var path='M'+x+' '+y;
+      // Top edge (left to right)
+      path+=edgePath(x,y,x+cs,y,topTab);
+      // Right edge (top to bottom)
+      path+=edgePath(x+cs,y,x+cs,y+cs,rightTab);
+      // Bottom edge (right to left)
+      path+=edgePath(x+cs,y+cs,x,y+cs,-botTab);
+      // Left edge (bottom to top)
+      path+=edgePath(x,y+cs,x,y,-leftTab);
+      path+='Z';
+      pieces.push({r:r,c:c,x:x,y:y,path:path,color:theme.colors[(r*gridN+c)%theme.colors.length]});
+    }}
+    return{pieces:pieces,totalW:totalW,totalH:totalH,cs:cs};
+  }
+
   Q.register('jigsaw',function(){
-    var puz=Q.pick(PUZZLES);
-    var holesSet=new Set(puz.holes);
-    var pieces=Q.shuffle(puz.holes.map(function(i){return{emoji:puz.grid[i],pos:i};}));
-    return{type:'jigsaw',category:'spatialAwareness',categoryLabel:'Jigsaw',difficulty:puz.d,
-      question:'Place the missing pieces!',label:puz.label,
-      grid:puz.grid,holes:puz.holes,pieces:pieces,
-      answer:'complete',options:[],explanation:'Pattern recognition & spatial memory.',visual:'custom'};
+    var gridN=Q.rand(0,1)?3:3; // always 3x3 for now, feels right
+    var theme=Q.pick(THEMES);
+    var puz=makePuzzle(3,theme);
+    // Holes: always remove 3-5 pieces
+    var numHoles=Q.rand(3,5);
+    var allIdx=Q.shuffle([0,1,2,3,4,5,6,7,8]);
+    var holes=allIdx.slice(0,numHoles);
+    return{type:'jigsaw',category:'spatialAwareness',categoryLabel:'Jigsaw',
+      difficulty:numHoles<=3?0.8:1.1,
+      question:'Place the missing pieces!',
+      theme:theme.name,gridN:3,pieces:puz.pieces,holes:holes,
+      totalW:puz.totalW,totalH:puz.totalH,cs:puz.cs,
+      answer:'complete',options:[],explanation:'Spatial reasoning and pattern matching.',visual:'custom'};
   },3);
+
   Q.registerRenderer('jigsaw',{
     render:function(q,idx){
       var holesSet=new Set(q.holes);
-      var cells='';
-      for(var i=0;i<9;i++){
+      var vb='0 0 '+q.totalW+' '+q.totalH;
+      var svgSize='width:min(230px,60vw);height:min(230px,60vw)';
+      // Build SVG showing the puzzle with holes empty
+      var pieceSVG='';
+      q.pieces.forEach(function(p,i){
         if(holesSet.has(i)){
-          cells+='<div class="jig-cell jig-empty" data-jgi="'+idx+'" data-jgp="'+i+'" data-jgexpect="'+q.grid[i]+'"> </div>';
+          // Ghost outline for empty slot
+          pieceSVG+='<path d="'+p.path+'" fill="rgba(200,200,200,0.15)" stroke="#ccc" stroke-width="1.5" stroke-dasharray="4,3" class="jig-slot" data-jslot="'+i+'" data-ji="'+idx+'"/>';
         }else{
-          cells+='<div class="jig-cell" style="background:#fff">'+(q.grid[i])+'</div>';
+          pieceSVG+='<path d="'+p.path+'" fill="'+p.color+'" stroke="#fff" stroke-width="2"/>';
         }
-      }
-      var pieces='';
-      q.pieces.forEach(function(p,pi){
-        pieces+='<div class="jig-piece" data-jpi="'+idx+'" data-jpp="'+pi+'" data-jpe="'+p.emoji+'">'+p.emoji+'</div>';
       });
-      return'<div class="qcard" style="gap:8px">'+
-        '<div class="category">JIGSAW</div>'+
-        '<div class="question">Place the missing pieces!</div>'+
-        '<div style="font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.35)">'+q.label+'</div>'+
-        '<div class="jig-grid" id="jig-g-'+idx+'" style="grid-template-columns:repeat(3,1fr);width:min(210px,56vw)">'+cells+'</div>'+
-        '<div class="jig-hand" id="jig-h-'+idx+'">'+pieces+'</div>'+
-        '<div class="jig-status" id="jig-s-'+idx+'">Tap a piece, then tap where it goes</div>'+
-        '<div id="wa-'+idx+'"></div><div class="explanation" id="exp-'+idx+'"></div>'+
-        _gameBranding()+_scrollHint(idx)+'</div>';
+
+      // Build the tray pieces (scrambled order, shown below)
+      var trayPieces='';
+      var trayW=Math.max(q.cs*1.4,112),trayH=q.cs*1.4;
+      q.holes.forEach(function(pi,ti){
+        var p=q.pieces[pi];
+        // Each tray piece: small SVG centered on the piece
+        var pad=q.cs*0.35;
+        var tvb=(p.x-pad)+' '+(p.y-pad)+' '+(q.cs+pad*2)+' '+(q.cs+pad*2);
+        trayPieces+='<div class="jig-tray-piece" id="jtp-'+idx+'-'+ti+'" data-jti="'+idx+'" data-jtp="'+ti+'" data-jtpi="'+pi+'">'
+          +'<svg viewBox="'+tvb+'" xmlns="http://www.w3.org/2000/svg" style="width:'+trayW+'px;height:'+trayH+'px;display:block">'
+          +'<path d="'+p.path+'" fill="'+p.color+'" stroke="#fff" stroke-width="2"/>'
+          +'</svg></div>';
+      });
+
+      return'<div class="qcard" style="gap:8px">'
+        +'<div class="category">JIGSAW</div>'
+        +'<div class="question">'+q.question+'</div>'
+        +'<div style="font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.35)">'+q.theme+' theme</div>'
+        +'<div style="background:#e2ddd4;border-radius:16px;padding:8px;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae;display:inline-block">'
+          +'<svg id="jig-svg-'+idx+'" viewBox="'+vb+'" xmlns="http://www.w3.org/2000/svg" style="'+svgSize+';display:block;border-radius:8px">'
+          +pieceSVG
+          +'</svg>'
+        +'</div>'
+        +'<div class="jig-tray" id="jig-tray-'+idx+'">'+trayPieces+'</div>'
+        +'<div class="jig-status" id="jig-s-'+idx+'">Tap a piece, then tap its slot</div>'
+        +'<div id="wa-'+idx+'"></div><div class="explanation" id="exp-'+idx+'"></div>'
+        +_gameBranding()+_scrollHint(idx)+'</div>';
     },
     attach:function(slideEl,q,idx,ctx){
       var H=ctx.Haptics||{};
       var actEl=slideEl.querySelector('#wa-'+idx);if(actEl&&ctx.addShareBtn)ctx.addShareBtn(actEl,q);
-      var grid=document.getElementById('jig-g-'+idx),hand=document.getElementById('jig-h-'+idx),statEl=document.getElementById('jig-s-'+idx);
-      if(!grid)return;
-      var selectedPiece=null,placed=0,done=false,totalHoles=q.holes.length;
-      function getPieceEl(pi){return hand.querySelector('[data-jpp="'+pi+'"]');}
-      function clearSel(){if(selectedPiece!==null){var old=getPieceEl(selectedPiece);if(old)old.classList.remove('jig-piece-sel');selectedPiece=null;}}
-      // Tap piece in hand
-      hand.addEventListener('click',function(e){
-        var btn=e.target.closest('.jig-piece');if(!btn||done||btn.classList.contains('jig-piece-used'))return;
-        var pi=parseInt(btn.dataset.jpp);H.light&&H.light();
-        if(selectedPiece===pi){clearSel();statEl.textContent='Tap a piece, then tap where it goes';}
-        else{clearSel();selectedPiece=pi;btn.classList.add('jig-piece-sel');statEl.textContent='Now tap the empty slot for it';}
+      var svg=document.getElementById('jig-svg-'+idx),tray=document.getElementById('jig-tray-'+idx),statEl=document.getElementById('jig-s-'+idx);
+      if(!svg)return;
+      var selectedTrayIdx=null,placed=0,totalHoles=q.holes.length,done=false;
+
+      function getTrayEl(ti){return tray.querySelector('[data-jtp="'+ti+'"]');}
+      function clearSel(){
+        if(selectedTrayIdx!==null){var el=getTrayEl(selectedTrayIdx);if(el)el.classList.remove('jig-tray-sel');}
+        selectedTrayIdx=null;
+      }
+
+      // Tap tray piece
+      tray.addEventListener('click',function(e){
+        if(done)return;
+        var el=e.target.closest('.jig-tray-piece');if(!el||el.classList.contains('jig-used'))return;
+        var ti=parseInt(el.dataset.jtp);H.light&&H.light();
+        if(selectedTrayIdx===ti){clearSel();statEl.textContent='Tap a piece, then tap its slot';}
+        else{clearSel();selectedTrayIdx=ti;el.classList.add('jig-tray-sel');statEl.textContent='Now tap the matching slot in the puzzle';}
       });
-      // Tap slot in grid
-      grid.addEventListener('click',function(e){
-        var cell=e.target.closest('.jig-cell');if(!cell||done)return;if(!cell.classList.contains('jig-empty'))return;
-        if(selectedPiece===null){statEl.textContent='Pick a piece from below first!';return;}
-        var pieceEl=getPieceEl(selectedPiece);
-        var pieceEmoji=pieceEl?pieceEl.dataset.jpe:'';
-        var expectedEmoji=cell.dataset.jgexpect;
-        if(pieceEmoji===expectedEmoji){
+
+      // Tap slot in SVG
+      svg.addEventListener('click',function(e){
+        if(done)return;
+        var slot=e.target.closest('[data-jslot]');if(!slot)return;
+        if(selectedTrayIdx===null){statEl.textContent='Pick a piece from below first!';return;}
+        var slotIdx=parseInt(slot.dataset.jslot);
+        var trayEl=getTrayEl(selectedTrayIdx);
+        var pieceIdx=parseInt(trayEl.dataset.jtpi);
+        if(pieceIdx===slotIdx){
+          // Correct!
           H.medium&&H.medium();
-          cell.textContent=pieceEmoji;cell.classList.remove('jig-empty');cell.classList.add('jig-placed');
-          cell.style.background='#fff';cell.style.borderStyle='solid';
-          if(pieceEl){pieceEl.classList.add('jig-piece-used');}
+          var p=q.pieces[slotIdx];
+          // Replace ghost with real colored piece
+          slot.setAttribute('fill',p.color);
+          slot.setAttribute('stroke','#fff');
+          slot.setAttribute('stroke-width','2');
+          slot.removeAttribute('stroke-dasharray');
+          slot.classList.add('jig-slot-filled');
+          // Animate
+          slot.style.transition='fill 0.2s';
+          trayEl.classList.add('jig-used');
           clearSel();placed++;
           statEl.textContent=placed+'/'+totalHoles+' placed';
-          if(placed===totalHoles)setTimeout(function(){finish(true);},350);
+          if(placed===totalHoles)setTimeout(function(){finish(true);},400);
         }else{
+          // Wrong
           H.error&&H.error();
-          cell.classList.add('jig-wrong');setTimeout(function(){cell.classList.remove('jig-wrong');},400);
-          statEl.textContent='Wrong spot! Try again.';
+          trayEl.style.transform='translateX(-6px)';setTimeout(function(){trayEl.style.transform='';},350);
+          statEl.textContent='Wrong slot! Try another.';
         }
       });
-      function finish(won){done=true;var ms=Date.now()-ctx.answerStartRef.get(),data=ctx.IQData.recordAnswer(q.category,won,q.difficulty,ms);if(ctx.notifyGamePlayed)ctx.notifyGamePlayed('jigsaw');if(ctx.onAnswer)ctx.onAnswer(won,ms);if(won){H.streak&&H.streak();statEl.textContent='Puzzle complete! 🎉';ctx.flashEl.className='flash green show';ctx.spawnConfetti(18);}else{H.error&&H.error();ctx.flashEl.className='flash red show';}setTimeout(function(){ctx.flashEl.className='flash';},350);var expEl=slideEl.querySelector('#exp-'+idx),hintEl=document.getElementById('hint-'+idx);if(expEl){expEl.textContent=won?'Spatial pattern mastery!':'Complete the '+q.label+' puzzle.';expEl.classList.add('show');}setTimeout(function(){if(hintEl)hintEl.classList.add('show');},500);ctx.updateUI(data);var hintEl2=document.getElementById('hint-'+idx);setTimeout(function(){if(hintEl2)hintEl2.classList.add('show');},400);ctx.checkMore();ctx.answerStartRef.set(Date.now());}
+
+      function finish(won){done=true;var ms=Date.now()-ctx.answerStartRef.get(),data=ctx.IQData.recordAnswer(q.category,won,q.difficulty,ms);if(ctx.notifyGamePlayed)ctx.notifyGamePlayed('jigsaw');if(ctx.onAnswer)ctx.onAnswer(won,ms);if(won){H.streak&&H.streak();statEl.textContent='Puzzle solved! 🎉';ctx.flashEl.className='flash green show';ctx.spawnConfetti(20);}else{ctx.flashEl.className='flash red show';}setTimeout(function(){ctx.flashEl.className='flash';},350);var expEl=slideEl.querySelector('#exp-'+idx),hintEl=document.getElementById('hint-'+idx);if(expEl){expEl.textContent=won?'Spatial master!':'Fit each piece into its matching slot.';expEl.classList.add('show');}setTimeout(function(){if(hintEl)hintEl.classList.add('show');},500);ctx.updateUI(data);ctx.checkMore();ctx.answerStartRef.set(Date.now());}
       ctx.answerStartRef.set(Date.now());
     }
   });
