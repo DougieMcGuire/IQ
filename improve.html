@@ -138,7 +138,7 @@
     @keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
     @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
-    .feedback{font-family:'Chewy',cursive;font-size:18px;letter-spacing:.5px;min-height:24px;opacity:0;transition:opacity .3s}
+    .feedback{font-family:'Nunito',sans-serif;font-size:17px;font-weight:900;letter-spacing:.3px;min-height:24px;opacity:0;transition:opacity .3s}
     .feedback.show{opacity:1}.feedback.correct{color:#a7f3d0}.feedback.wrong{color:#fca5a5}
     .explain,.explanation{
       background:rgba(255,255,255,.1);border-radius:14px;padding:10px 14px;
@@ -171,7 +171,7 @@
     .game-branding a:active{transform:scale(.95)}
     .game-branding-bear{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
     .game-branding-bear img{width:20px;height:20px;object-fit:contain}
-    .game-branding-text{font-size:11px;font-weight:900;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase}
+    .game-branding-text{font-size:11px;font-weight:900;color:#fff;letter-spacing:1.5px;text-transform:uppercase}
 
     @keyframes slideEnter{0%{opacity:0}100%{opacity:1}}
     .slide.entering .qcard{animation:slideEnter .18s ease both}
@@ -524,7 +524,164 @@
     #push-prompt .pp-btns{display:flex;gap:8px}
     #push-prompt .pp-yes{flex:1;background:var(--green);color:#fff;border:none;border-radius:12px;padding:10px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;cursor:pointer;box-shadow:var(--shadow-green)}
     #push-prompt .pp-yes:active{transform:translateY(4px);box-shadow:none}
-    #push-prompt .pp-no{background:#f1f5f9;color:var(--text-dim);border:2px solid var(--card-border);border-radius:12px;padding:10px 16px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;cursor:pointer}
+    /* ══════════════════════════════════════════════════════════
+       GAME OVERRIDE LAYER — fixes games.js injected CSS
+       games.js injects styles for the old dark-navy theme.
+       These overrides make EVERY game work on our blue card.
+       Must come LAST in stylesheet to win specificity.
+       ══════════════════════════════════════════════════════════ */
+
+    /* CSS vars that games.js references from old theme */
+    :root{
+      --cream:#fff;
+      --goldd:#d97706;
+      --gd:#16a34a;
+    }
+
+    /* ── Simon Says — higher base opacity so pads pop on blue ── */
+    .simon-pad{opacity:.65!important;border-radius:18px;border:3px solid rgba(255,255,255,.15)!important}
+    .simon-pad.simon-lit{opacity:1!important;border-color:rgba(255,255,255,.5)!important}
+
+    /* ── Color Sort — white outlines so tiles don't vanish on blue ── */
+    .csort-tile{border:3px solid rgba(255,255,255,.3)!important;box-shadow:0 4px 0 rgba(0,0,0,.2)!important}
+    .csort-tile:active{box-shadow:none!important;transform:translateY(4px)!important}
+    .csort-placed-tile{border:2px solid rgba(255,255,255,.2)!important}
+
+    /* ── Mini 2048 — override dark navy bg ── */
+    .m48-wrap{background:rgba(255,255,255,.08)!important;border:2px solid rgba(255,255,255,.12)!important;border-radius:16px!important}
+    .m48-cell{background:rgba(255,255,255,.06)!important;color:rgba(255,255,255,.2)!important;border-radius:10px!important}
+    .m48-cell[data-v="2"]{background:#fff!important;color:var(--blue)!important}
+    .m48-cell[data-v="4"]{background:#e8f2ff!important;color:#0358c4!important}
+    .m48-cell[data-v="8"]{background:var(--orange)!important;color:#fff!important}
+    .m48-cell[data-v="16"]{background:var(--red)!important;color:#fff!important}
+    .m48-cell[data-v="32"]{background:var(--green)!important;color:#fff!important}
+    .m48-cell[data-v="64"]{background:var(--gold)!important;color:#fff!important}
+    .m48-cell[data-v="128"]{background:#fff!important;color:var(--blue)!important}
+    .m48-sbox{background:rgba(255,255,255,.1)!important;border:1.5px solid rgba(255,255,255,.15)!important;border-radius:12px!important}
+    .m48-sl{color:rgba(255,255,255,.4)!important}
+    .m48-sv{color:#fff!important}
+    .m48-msg{color:rgba(255,255,255,.5)!important}
+
+    /* ── Water Sort — white tube borders, visible on blue ── */
+    .ws2-tube{border-color:rgba(255,255,255,.35)!important;background:rgba(255,255,255,.06)!important;border-width:2.5px!important}
+    .ws2-tube.ws2-sel{border-color:#fff!important;transform:translateY(-9px)!important}
+    .ws2-tube.ws2-done{border-color:var(--green)!important}
+    .ws2-cap{background:rgba(255,255,255,.15)!important}
+    .ws2-pours{color:rgba(255,255,255,.3)!important}
+    .ws2-status{color:rgba(255,255,255,.55)!important}
+    .ws2-layer.ws2-empty{background:transparent!important}
+
+    /* ── Pipe Connect — white-tinted cells on blue ── */
+    .pc-grid{background:rgba(255,255,255,.06)!important;border:2px solid rgba(255,255,255,.1)!important;border-radius:14px!important}
+    .pc-cell{background:rgba(255,255,255,.06)!important;border-radius:8px!important}
+    .pc-cell:active{background:rgba(255,255,255,.15)!important}
+    .pc-cell.pc-wall{background:rgba(0,0,0,.12)!important}
+    .pc-cell.pc-src{background:rgba(34,197,94,.2)!important}
+    .pc-cell.pc-snk{background:rgba(239,68,68,.2)!important}
+    .pc-cell.pc-lit .pc-arm,.pc-cell.pc-lit .pc-dot{background:var(--green)!important}
+    .pc-cell.pc-src.pc-lit{background:rgba(34,197,94,.35)!important}
+    .pc-arm{background:rgba(255,255,255,.4)!important}
+    .pc-dot{background:rgba(255,255,255,.5)!important}
+    .pc-label{color:#fff!important}
+    .pc-status{color:rgba(255,255,255,.55)!important}
+    .pc-moves{color:rgba(255,255,255,.3)!important}
+
+    /* ── Word Ladder — white text/controls on blue ── */
+    .wl-ep-lbl{color:rgba(255,255,255,.35)!important}
+    .wl-ep-tile{background:rgba(255,255,255,.12)!important;color:rgba(255,255,255,.6)!important;border:1.5px solid rgba(255,255,255,.15)!important}
+    .wl-arrow{color:rgba(255,255,255,.25)!important}
+    .wl-cur-tile{background:rgba(255,255,255,.1)!important;border:2.5px solid rgba(255,255,255,.25)!important;color:#fff!important}
+    .wl-cur-tile.wl-sel{background:rgba(245,158,11,.25)!important;border-color:var(--gold)!important;color:var(--gold)!important}
+    .wl-cur-tile.wl-match{background:rgba(34,197,94,.2)!important;border-color:var(--green)!important;color:var(--green)!important}
+    .wl-lbtn{background:rgba(255,255,255,.14)!important;color:#fff!important;border:none!important;box-shadow:0 3px 0 rgba(0,0,0,.15)!important}
+    .wl-lbtn:active{background:rgba(255,255,255,.3)!important;transform:translateY(3px)!important;box-shadow:none!important}
+    .wl-lbtn.wl-same{background:rgba(255,255,255,.04)!important;color:rgba(255,255,255,.15)!important;box-shadow:none!important}
+    .wl-moves{color:rgba(255,255,255,.35)!important}
+    .wl-status{color:rgba(255,255,255,.55)!important}
+    .wl-hist-w{color:rgba(255,255,255,.35)!important;background:rgba(255,255,255,.08)!important}
+
+    /* ── Connections — white text/controls on blue ── */
+    .conn-word{background:rgba(255,255,255,.12)!important;color:#fff!important;border:2px solid rgba(255,255,255,.18)!important;border-radius:10px!important}
+    .conn-word.conn-sel{background:rgba(255,255,255,.3)!important;border-color:rgba(255,255,255,.5)!important;box-shadow:0 4px 10px rgba(0,0,0,.15)!important}
+    .conn-cat{border-radius:12px!important}
+    .conn-cat-nm{color:#fff!important}
+    .conn-cat-wds{color:rgba(255,255,255,.85)!important}
+    .conn-dot{background:var(--gold)!important}
+    .conn-dot.gone{background:rgba(255,255,255,.1)!important}
+    .conn-sub{background:rgba(255,255,255,.12)!important;color:#fff!important;border:2.5px solid rgba(255,255,255,.25)!important;border-radius:14px!important}
+    .conn-sub:active{transform:translateY(3px)!important}
+    .conn-sub.ready{background:var(--green)!important;border-color:var(--green)!important;color:#fff!important;box-shadow:0 3px 0 var(--green-dark)!important}
+    .conn-sub:disabled{opacity:.3!important}
+    .conn-msg{color:rgba(255,255,255,.45)!important}
+    .conn-lives{margin:4px 0!important}
+    .conn-reveal-row{border-radius:12px!important}
+    .conn-reveal-nm{color:inherit!important}
+    .conn-reveal-wds{color:rgba(255,255,255,.7)!important}
+
+    /* ── Full Game Button — white outline on blue ── */
+    .game-fullbtn{
+      background:rgba(255,255,255,.1)!important;
+      border:2px solid rgba(255,255,255,.2)!important;
+      color:rgba(255,255,255,.6)!important;
+      border-radius:14px!important;
+    }
+    .game-fullbtn:active{background:rgba(255,255,255,.2)!important}
+
+    /* ── Game Branding from games.js — override to white-on-blue ── */
+    .qcard .game-branding{border-top-color:rgba(255,255,255,.1)!important}
+    .qcard .game-branding a{background:rgba(255,255,255,.1)!important;border-color:rgba(255,255,255,.18)!important}
+    .qcard .game-branding-text{color:#fff!important}
+
+    /* ── Scroll Hint from games.js — override to white-on-blue ── */
+    .qcard~.scroll-hint .scroll-hint-inner{
+      background:rgba(255,255,255,.15)!important;
+      border-color:rgba(255,255,255,.2)!important;
+      color:#fff!important;
+    }
+    .qcard~.scroll-hint .scroll-hint-inner svg{stroke:#fff!important}
+    .qcard~.scroll-hint .scroll-hint-inner span{color:rgba(255,255,255,.75)!important}
+
+    /* ── In-game start/action buttons — white on blue ── */
+    .qcard button[id*="ready-"],
+    .qcard button[id*="start-"],
+    .qcard button[id*="simon-ready-"],
+    .qcard button[id*="stc-ready-"],
+    .qcard button[id*="react-ready-"],
+    .qcard button[id*="mr-ready-"]{
+      background:#fff!important;
+      color:var(--blue)!important;
+      border:none!important;
+      border-radius:14px!important;
+      padding:12px 32px!important;
+      font-family:'Nunito',sans-serif!important;
+      font-size:16px!important;
+      font-weight:900!important;
+      cursor:pointer!important;
+      box-shadow:0 4px 0 #d6cfc0!important;
+    }
+    .qcard button[id*="ready-"]:active,
+    .qcard button[id*="start-"]:active{
+      transform:translateY(4px)!important;
+      box-shadow:none!important;
+    }
+
+    /* ── Math Rush buttons — white True/False ── */
+    .mr-btn{border-radius:14px!important;font-weight:900!important;box-shadow:0 4px 0 rgba(0,0,0,.15)!important}
+    .mr-btn:active{transform:translateY(4px)!important;box-shadow:none!important}
+
+    /* ── Reaction circle — ensure visibility ── */
+    .react-circle{border:4px solid rgba(255,255,255,.15)!important}
+
+    /* ── Stop the Clock canvas container ── */
+    .stc-result{color:rgba(255,255,255,.55)!important}
+
+    /* ── Install card — stays white (it's not inside qcard) ── */
+    .install-card{background:var(--card)!important;border-color:var(--card-border)!important}
+
+    /* ── Full-game modal overlay — keep dark bg ── */
+    .qcard[style*="gap:10px"] .question,
+    .qcard[style*="gap:8px"] .question{color:#fff!important}
+
   </style>
 </head>
 <body>
