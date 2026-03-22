@@ -4,32 +4,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <title>Avatar — Cebear</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#151f3e;--navy:#1b2d5b;--navyM:#243a6e;--cream:#F0EAD6;--green:#3fba4f;--gd:#2d9a3c;--red:#e8443a;--gold:#e8a817;--goldd:#c48e10;--blue:#3a7df2;--dim:rgba(240,234,214,.38);--dimmer:rgba(240,234,214,.09)}
+    :root{--bg:#0474fc;--navy:#0358c4;--navyM:#0245a0;--cream:#F0EAD6;--green:#22c55e;--gd:#16a34a;--red:#ef4444;--gold:#f59e0b;--goldd:#d97706;--blue:#0474fc;--dim:rgba(255,255,255,.45);--dimmer:rgba(255,255,255,.12)}
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     html,body{width:100%;height:100%;overflow:hidden;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--cream)}
     .editor{display:flex;flex-direction:column;height:100%;overflow:hidden}
     .hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--navy);border-bottom:1px solid var(--dimmer);flex-shrink:0;gap:8px}
-    .hdr-title{font-size:15px;font-weight:900;flex:1;text-align:center}
+    .hdr-title{font-family:'Chewy',cursive;font-size:18px;letter-spacing:.5px;flex:1;text-align:center}
     .btn-x{background:var(--dimmer);border:none;border-radius:10px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:var(--cream);cursor:pointer;display:flex;align-items:center;gap:6px;flex-shrink:0}
     .btn-x:active{opacity:.6}
-    .btn-save{background:var(--green);border:none;border-radius:10px;padding:8px 18px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;color:#fff;cursor:pointer;box-shadow:0 3px 0 var(--gd);flex-shrink:0;display:flex;align-items:center;gap:6px}
+    .btn-save{background:#fff;border:none;border-radius:10px;padding:8px 18px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;color:var(--blue);cursor:pointer;box-shadow:0 3px 0 rgba(255,255,255,.3);flex-shrink:0;display:flex;align-items:center;gap:6px}
     .btn-save:active{transform:translateY(3px);box-shadow:none}
     .btn-save:disabled{opacity:.4;pointer-events:none}
     .hdr svg,.btn-save svg,.btn-x svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-    .preview-row{display:flex;justify-content:center;padding:14px 16px 10px;background:var(--navy);flex-shrink:0}
-    .av-ring{width:140px;height:140px;border-radius:50%;overflow:hidden;border:3px solid rgba(240,234,214,.18);background:var(--navyM)}
+    .preview-row{display:flex;justify-content:center;padding:14px 16px 10px;background:var(--navyM);flex-shrink:0}
+    .av-ring{width:140px;height:140px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,.25);background:var(--navyM)}
     .av-ring canvas{width:100%;height:100%;display:block}
     .cat-row{display:flex;gap:6px;overflow-x:auto;padding:8px 14px;flex-shrink:0}
     .cat-row::-webkit-scrollbar{display:none}
     .cat-tab{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;cursor:pointer;padding:8px 10px;border-radius:12px;background:var(--dimmer);border:2px solid transparent;min-width:54px;transition:all .12s}
-    .cat-tab.active{background:rgba(58,125,242,.2);border-color:var(--blue)}
+    .cat-tab.active{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.6)}
     .cat-tab:active{opacity:.65}
     .cat-icon svg{width:18px;height:18px;stroke:var(--dim);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block}
-    .cat-tab.active .cat-icon svg{stroke:var(--blue)}
+    .cat-tab.active .cat-icon svg{stroke:#fff}
     .cat-lbl{font-size:9px;font-weight:800;color:var(--dim);white-space:nowrap}
-    .cat-tab.active .cat-lbl{color:var(--blue)}
+    .cat-tab.active .cat-lbl{color:#fff}
     .color-row{flex-shrink:0;padding:6px 14px 2px;display:none}
     .color-row.show{display:block}
     .color-title{font-size:9px;font-weight:900;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
