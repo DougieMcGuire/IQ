@@ -20,13 +20,13 @@
     .hero-out{background:rgba(27,45,91,.06);border:none;padding:7px 14px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:var(--dim);cursor:pointer}
 
     /* ── AVATAR ── */
-    .av-wrap{position:relative;margin-bottom:10px;cursor:pointer}
-    .av{width:min(100px,24vw);height:min(100px,24vw);border-radius:50%;background:var(--navy);overflow:hidden;display:flex;align-items:center;justify-content:center;border:4px solid var(--navy);box-shadow:0 4px 16px rgba(27,45,91,.2);transition:transform .15s}
-    .av:active{transform:scale(.94)}
+    .av-wrap{position:relative;margin-bottom:6px}
+    .av{width:min(100px,24vw);height:min(100px,24vw);border-radius:50%;background:var(--navy);overflow:hidden;display:flex;align-items:center;justify-content:center;border:4px solid var(--navy);box-shadow:0 4px 16px rgba(27,45,91,.2);cursor:pointer;transition:transform .12s}
+    .av:active{transform:scale(.93)}
     .av img{width:100%;height:100%;object-fit:cover}
-    .av-edit-badge{position:absolute;bottom:2px;right:2px;width:28px;height:28px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--cream);cursor:pointer}
-    .av-edit-badge svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-    .av-edit-label{font-size:11px;font-weight:800;color:var(--dim);margin-top:-6px;margin-bottom:8px;cursor:pointer}
+    .av-badge{position:absolute;bottom:2px;right:2px;width:28px;height:28px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--cream);cursor:pointer;pointer-events:none}
+    .av-badge svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+    .av-edit-lbl{font-size:11px;font-weight:800;color:var(--dim);margin-bottom:8px;cursor:pointer}
 
     .iq-big{font-size:min(80px,20vw);font-weight:900;line-height:1;color:var(--navy)}
     .iq-lbl{font-size:14px;font-weight:900;color:var(--light);letter-spacing:5px;text-transform:uppercase;margin-bottom:6px}
@@ -64,13 +64,11 @@
     .ab-val{font-size:16px;font-weight:900;color:var(--cream);min-width:32px;text-align:right}
     .reset-btn{margin:24px auto 0;background:none;border:none;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;color:rgba(240,234,214,.12);cursor:pointer;display:block;padding:12px;text-align:center}
 
-    /* ── AVATAR EDITOR MODAL ── */
-    .av-modal{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;background:transparent;pointer-events:none;transition:background .3s}
-    .av-modal.open{background:rgba(0,0,0,.7);pointer-events:all;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
-    .av-modal-sheet{position:absolute;bottom:0;left:0;right:0;height:92dvh;border-radius:24px 24px 0 0;overflow:hidden;background:#151f3e;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);box-shadow:0 -8px 40px rgba(0,0,0,.5)}
-    .av-modal.open .av-modal-sheet{transform:translateY(0)}
-    .av-modal-handle{width:36px;height:4px;background:rgba(240,234,214,.15);border-radius:2px;margin:10px auto 0}
-    .av-modal-iframe{width:100%;height:calc(100% - 24px);border:none;display:block}
+    /* ══ AVATAR EDITOR POPUP CARD ══ */
+    .av-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .25s}
+    .av-overlay.open{opacity:1;pointer-events:all}
+    .av-card{background:#151f3e;border-radius:24px;width:100%;max-width:480px;max-height:88dvh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.6);transform:scale(.94) translateY(12px);transition:transform .28s cubic-bezier(.34,1.2,.64,1)}
+    .av-overlay.open .av-card{transform:scale(1) translateY(0)}
 
     /* ── SHARE MODAL ── */
     .modal-overlay{position:fixed;inset:0;background:rgba(27,45,91,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;z-index:300;padding:20px}
@@ -102,18 +100,11 @@
       <div class="hero-name" id="username-display"></div>
       <button class="hero-out" id="signout-btn">Sign out</button>
     </div>
-
-    <!-- Avatar -->
     <div class="av-wrap" onclick="openAvatarEditor()">
-      <div class="av" id="av-circle">
-        <img id="av-img" src="Avatars/Anonymous.png" alt="Avatar">
-      </div>
-      <div class="av-edit-badge">
-        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
-      </div>
+      <div class="av"><img id="av-img" src="Avatars/Anonymous.png" alt="Avatar"></div>
+      <div class="av-badge"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></div>
     </div>
-    <div class="av-edit-label" onclick="openAvatarEditor()">Edit Avatar</div>
-
+    <div class="av-edit-lbl" onclick="openAvatarEditor()">Edit Avatar</div>
     <div class="iq-big" id="iq-num">--</div>
     <div class="iq-lbl">I Q</div>
     <div class="pct" id="pct-badge" style="display:none"></div>
@@ -137,11 +128,10 @@
   </div></div>
 </div>
 
-<!-- Avatar Editor Modal (bottom sheet with iframe) -->
-<div class="av-modal" id="av-modal" onclick="handleModalBgClick(event)">
-  <div class="av-modal-sheet" id="av-modal-sheet">
-    <div class="av-modal-handle"></div>
-    <iframe class="av-modal-iframe" id="av-iframe" src="" allow="camera"></iframe>
+<!-- ══ AVATAR EDITOR POPUP CARD ══ -->
+<div class="av-overlay" id="av-overlay" onclick="overlayClick(event)">
+  <div class="av-card" id="av-card">
+    <!-- avatar.html content injected here via JS -->
   </div>
 </div>
 
@@ -177,119 +167,129 @@ var AB=[
   {key:'numericalReasoning',name:'Numerical',color:'#e8a817'}
 ];
 
-function toast(m,err){
-  var t=document.getElementById('toast');
-  t.textContent=m;t.style.background=err?'var(--red)':'var(--green)';
-  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);
-}
+function pToast(m){var t=document.getElementById('toast');t.textContent=m;t.style.background='var(--green)';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 
-// ── Load profile data ──────────────────────────────────────────────────────
+// ── Profile data ──────────────────────────────────────────────────────────────
 function loadProfile(){
   var d=IQData.load();
   document.getElementById('username-display').textContent=d.username||IQData.getCurrentUser()?.displayName||'';
-  if(d.iq){
-    document.getElementById('iq-num').textContent=d.iq;
-    var b=document.getElementById('pct-badge');
-    b.textContent='Top '+formatPercentile(iqToPercentile(d.iq));
-    b.style.display='inline-block';
-  }
+  if(d.iq){document.getElementById('iq-num').textContent=d.iq;var b=document.getElementById('pct-badge');b.textContent='Top '+formatPercentile(iqToPercentile(d.iq));b.style.display='inline-block';}
   document.getElementById('answered').textContent=d.answered||0;
   document.getElementById('accuracy').textContent=IQData.getAccuracy()+'%';
   document.getElementById('best-streak').textContent=d.bestStreak||0;
   document.getElementById('level-val').textContent=d.level||1;
-  var list=document.getElementById('abilities');
-  list.innerHTML='';
+  var list=document.getElementById('abilities');list.innerHTML='';
   AB.forEach(a=>{
     var pct=IQData.getStatPercent(a.key);
     var row=document.createElement('div');row.className='ab-row';
     row.innerHTML='<div class="ab-dot" style="background:'+a.color+'"></div><div class="ab-mid"><div class="ab-name">'+a.name+'</div><div class="ab-bar"><div class="ab-fill" style="background:'+a.color+';width:0%" data-val="'+pct+'"></div></div></div><div class="ab-val">'+pct+'</div>';
     list.appendChild(row);
   });
-  requestAnimationFrame(()=>setTimeout(()=>{
-    document.querySelectorAll('.ab-fill').forEach(b=>{b.style.width=Math.max(6,parseInt(b.dataset.val))+'%'});
-  },80));
+  requestAnimationFrame(()=>setTimeout(()=>{document.querySelectorAll('.ab-fill').forEach(b=>{b.style.width=Math.max(6,parseInt(b.dataset.val))+'%';});},80));
 }
 
-// ── Avatar display ──────────────────────────────────────────────────────────
+// ── Avatar display ────────────────────────────────────────────────────────────
 async function loadAvatar(){
   try{
     const inIframe=window.parent!==window;
-    let fb=null;
-    if(inIframe){try{fb=window.parent.firebase}catch{}}
-    if(!fb){
-      // try local firebase (module)
-      return;
-    }
-    const u=fb.auth().currentUser;
-    if(!u)return;
+    const fb=inIframe?window.parent.firebase:null;
+    if(!fb)return;
+    const u=fb.auth().currentUser;if(!u)return;
     const snap=await fb.firestore().collection('users').doc(u.uid).get();
     if(!snap.exists)return;
     const data=snap.data();
-    if(data.avatarIMG){
-      setAvatarImg(data.avatarIMG);
-    }
-  }catch(e){console.warn('loadAvatar error:',e);}
+    if(data.avatarIMG) document.getElementById('av-img').src=data.avatarIMG;
+  }catch(e){}
 }
 
-function setAvatarImg(src){
-  var img=document.getElementById('av-img');
-  if(!img)return;
-  img.src=src;
-}
+// ── Avatar editor — opened as inline popup, NOT iframe ────────────────────────
+// We load avatar.html via fetch(), inject its <style> and <script> into the card div.
+// This runs in the SAME window context as profile.html so Firebase auth works.
+var _editorLoaded = false;
 
-// ── Avatar Editor Modal ─────────────────────────────────────────────────────
-window.openAvatarEditor=function(){
+window.openAvatarEditor = async function(){
   Haptics.medium();
-  var modal=document.getElementById('av-modal');
-  var iframe=document.getElementById('av-iframe');
-  // Load avatar.html into iframe if not already
-  if(!iframe.src||iframe.src==='about:blank'||iframe.src===''){
-    iframe.src='avatar.html';
+  const overlay = document.getElementById('av-overlay');
+
+  if (!_editorLoaded) {
+    _editorLoaded = true;
+    try {
+      const res = await fetch('avatar.html');
+      const html = await res.text();
+      const card = document.getElementById('av-card');
+
+      // Parse and inject
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      // Inject styles
+      doc.querySelectorAll('style').forEach(s=>{
+        const ns = document.createElement('style');
+        ns.textContent = s.textContent;
+        document.head.appendChild(ns);
+      });
+
+      // Inject body content (editor HTML)
+      card.innerHTML = doc.body.innerHTML;
+
+      // Inject and run scripts (in order)
+      const scripts = Array.from(doc.querySelectorAll('script'));
+      for (const orig of scripts) {
+        if (orig.src && orig.src.includes('firebase')) continue; // already loaded
+        const ns = document.createElement('script');
+        if (orig.src) {
+          // external: skip firebase SDKs already loaded
+          await new Promise((res,rej)=>{ ns.src=orig.src; ns.onload=res; ns.onerror=rej; document.head.appendChild(ns); });
+        } else {
+          ns.textContent = orig.textContent;
+          document.head.appendChild(ns);
+        }
+      }
+    } catch(e) {
+      console.error('Avatar editor load error:', e);
+      _editorLoaded = false;
+      return;
+    }
   }
-  modal.classList.add('open');
-  document.body.style.overflow='hidden';
+
+  overlay.classList.add('open');
 };
 
-window.handleModalBgClick=function(e){
-  // Only close if clicking the backdrop (not the sheet)
-  if(e.target===document.getElementById('av-modal')){
-    closeAvatarEditor();
-  }
+window.overlayClick = function(e){
+  if(e.target === document.getElementById('av-overlay')) closeAvatarEditor();
 };
 
 function closeAvatarEditor(){
-  var modal=document.getElementById('av-modal');
-  modal.classList.remove('open');
-  document.body.style.overflow='';
+  document.getElementById('av-overlay').classList.remove('open');
 }
 
-// Listen for messages from the avatar editor iframe
-window.addEventListener('message',function(e){
+// Override closeMe() that avatar.html defines so it closes the card instead of navigating
+window.closeMe = closeAvatarEditor;
+
+// Listen for avatarSaved from avatar.html's postMessage (fallback)
+window.addEventListener('message', function(e){
   if(!e.data||!e.data.type)return;
   if(e.data.type==='avatarSaved'){
-    // Update the displayed avatar immediately
-    if(e.data.avatarIMG) setAvatarImg(e.data.avatarIMG);
+    if(e.data.avatarIMG) document.getElementById('av-img').src = e.data.avatarIMG;
     closeAvatarEditor();
-    toast('Avatar updated! ✓');
+    pToast('Avatar updated! ✓');
     Haptics.success();
   }
-  if(e.data.type==='avatarEditorClose'){
-    closeAvatarEditor();
-  }
+  if(e.data.type==='avatarEditorClose') closeAvatarEditor();
 });
 
-// ── Sign out / reset ────────────────────────────────────────────────────────
-document.getElementById('signout-btn').onclick=()=>{Haptics.warning();IQData.signOut()};
+// ── Sign out / reset ──────────────────────────────────────────────────────────
+document.getElementById('signout-btn').onclick=()=>{Haptics.warning();IQData.signOut();};
 document.getElementById('reset-btn').onclick=()=>{
   Haptics.warning();
   if(confirm('Reset all progress?')){Haptics.error();IQData.reset();location.reload();}
 };
 
-// ── Share card ──────────────────────────────────────────────────────────────
+// ── Share card ────────────────────────────────────────────────────────────────
 var shareCanvas=null,shareUrl='';
 function getShareUrl(){var u=IQData.getCurrentUser();return u?'https://cebear.com/@'+u.uid:'https://cebear.com';}
-function rr(c,x,y,w,h,r,f){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();if(f){c.fillStyle=f;c.fill()}}
-function loadImg(src){return new Promise(r=>{if(!src){r(null);return}var img=new Image();img.crossOrigin='anonymous';img.onload=()=>r(img);img.onerror=()=>r(null);img.src=src})}
+function loadImg(src){return new Promise(r=>{if(!src){r(null);return}var img=new Image();img.crossOrigin='anonymous';img.onload=()=>r(img);img.onerror=()=>r(null);img.src=src});}
+function rr(c,x,y,w,h,r,f){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();if(f){c.fillStyle=f;c.fill();}}
 
 async function genShareCard(){
   var d=IQData.load(),W=1200,H=630,cv=document.createElement('canvas');
@@ -297,60 +297,38 @@ async function genShareCard(){
   var uname=d.username||IQData.getCurrentUser()?.displayName||'Brain';
   var acc=IQData.getAccuracy(),iq=String(d.iq||'--');
   var pctText=d.iq?'TOP '+formatPercentile(iqToPercentile(d.iq)).toUpperCase():'';
-
-  // Get avatar image
   var picSrc=document.getElementById('av-img')?.src||null;
   var [picImg,logoImg]=await Promise.all([loadImg(picSrc),loadImg('logo.png')]);
-
   c.fillStyle='#334570';c.fillRect(0,0,W,H);
-  var g1=c.createRadialGradient(350,220,0,350,220,380);
-  g1.addColorStop(0,'rgba(232,168,23,0.07)');g1.addColorStop(1,'transparent');
-  c.fillStyle=g1;c.fillRect(0,0,W,H);
-
+  var g1=c.createRadialGradient(350,220,0,350,220,380);g1.addColorStop(0,'rgba(232,168,23,0.07)');g1.addColorStop(1,'transparent');c.fillStyle=g1;c.fillRect(0,0,W,H);
   var pad=56,picR=110,picCx=pad+picR+20,picCy=200;
-  var pg=c.createRadialGradient(picCx,picCy,picR-30,picCx,picCy,picR+50);
-  pg.addColorStop(0,'rgba(232,168,23,0.18)');pg.addColorStop(1,'transparent');
-  c.fillStyle=pg;c.beginPath();c.arc(picCx,picCy,picR+50,0,Math.PI*2);c.fill();
+  var pg=c.createRadialGradient(picCx,picCy,picR-30,picCx,picCy,picR+50);pg.addColorStop(0,'rgba(232,168,23,0.18)');pg.addColorStop(1,'transparent');c.fillStyle=pg;c.beginPath();c.arc(picCx,picCy,picR+50,0,Math.PI*2);c.fill();
   c.lineWidth=8;c.strokeStyle='#e8a817';c.beginPath();c.arc(picCx,picCy,picR+10,0,Math.PI*2);c.stroke();
   c.fillStyle='#243a6e';c.beginPath();c.arc(picCx,picCy,picR,0,Math.PI*2);c.fill();
   if(picImg){c.save();c.beginPath();c.arc(picCx,picCy,picR,0,Math.PI*2);c.clip();c.drawImage(picImg,picCx-picR,picCy-picR,picR*2,picR*2);c.restore();}
   else{c.font='900 72px Nunito';c.textAlign='center';c.textBaseline='middle';c.fillStyle='rgba(240,234,214,0.3)';c.fillText(uname.charAt(0).toUpperCase(),picCx,picCy);}
   c.font='900 36px Nunito';c.fillStyle='#F0EAD6';c.textAlign='center';c.textBaseline='top';c.fillText(uname,picCx,picCy+picR+18);
-
-  var iqZoneLeft=picCx+picR+60,iqZoneRight=W-pad,iqCx=(iqZoneLeft+iqZoneRight)/2,iqCy=180;
+  var iqCx=((picCx+picR+60)+(W-pad))/2,iqCy=180;
   c.font='900 36px Nunito';c.fillStyle='rgba(240,234,214,0.3)';c.textAlign='center';c.textBaseline='bottom';c.fillText('IQ',iqCx,iqCy-100);
-  c.font='900 260px Nunito';c.fillStyle='#F0EAD6';c.textBaseline='middle';c.textAlign='center';c.fillText(iq,iqCx,iqCy);
-  var numW=c.measureText(iq).width;rr(c,iqCx-numW/2+10,iqCy+120,numW-20,6,3,'#e8a817');
-  if(pctText){c.font='900 24px Nunito';var tw=c.measureText(pctText).width+56,pillY=iqCy+140;rr(c,iqCx-tw/2,pillY,tw,48,24,'rgba(232,168,23,0.15)');c.strokeStyle='#e8a817';c.lineWidth=3;c.beginPath();c.moveTo(iqCx-tw/2+24,pillY);c.lineTo(iqCx+tw/2-24,pillY);c.arc(iqCx+tw/2-24,pillY+24,24,-Math.PI/2,Math.PI/2);c.lineTo(iqCx-tw/2+24,pillY+48);c.arc(iqCx-tw/2+24,pillY+24,24,Math.PI/2,-Math.PI/2);c.closePath();c.stroke();c.fillStyle='#e8a817';c.textBaseline='middle';c.textAlign='center';c.fillText(pctText,iqCx,pillY+24);}
-
-  var band2Y=400,boxGap=14,boxW=(W-pad*2-boxGap*3)/4,boxH=90;
-  [{v:String(d.answered||0),l:'ANSWERED',color:'#3fba4f'},{v:acc+'%',l:'ACCURACY',color:'#3a7df2'},{v:String(d.bestStreak||0),l:'STREAK',color:'#e87d1a'},{v:'Lvl '+(d.level||1),l:'LEVEL',color:'#6d4aed'}].forEach(function(s,i){
-    var bx=pad+i*(boxW+boxGap);rr(c,bx,band2Y,boxW,boxH,16,'rgba(240,234,214,0.05)');rr(c,bx+16,band2Y,boxW-32,3,1.5,s.color);
-    c.font='900 36px Nunito';c.fillStyle='#F0EAD6';c.textAlign='center';c.textBaseline='middle';c.fillText(s.v,bx+boxW/2,band2Y+38);
-    c.font='800 13px Nunito';c.fillStyle='rgba(240,234,214,0.3)';c.fillText(s.l,bx+boxW/2,band2Y+68);
-  });
-
-  var brandY=band2Y+boxH+20,brandCy=brandY+((H-brandY)/2);
+  c.font='900 260px Nunito';c.fillStyle='#F0EAD6';c.textBaseline='middle';c.fillText(iq,iqCx,iqCy);
+  var nw=c.measureText(iq).width;rr(c,iqCx-nw/2+10,iqCy+120,nw-20,6,3,'#e8a817');
+  if(pctText){c.font='900 24px Nunito';var tw=c.measureText(pctText).width+56,py=iqCy+140;rr(c,iqCx-tw/2,py,tw,48,24,'rgba(232,168,23,0.15)');c.strokeStyle='#e8a817';c.lineWidth=3;c.strokeRect(iqCx-tw/2,py,tw,48);c.fillStyle='#e8a817';c.textBaseline='middle';c.fillText(pctText,iqCx,py+24);}
+  var by=400,bw=(W-pad*2-14*3)/4,bh=90;
+  [{v:String(d.answered||0),l:'ANSWERED',color:'#3fba4f'},{v:acc+'%',l:'ACCURACY',color:'#3a7df2'},{v:String(d.bestStreak||0),l:'STREAK',color:'#e87d1a'},{v:'Lvl '+(d.level||1),l:'LEVEL',color:'#6d4aed'}].forEach(function(s,i){var bx=pad+i*(bw+14);rr(c,bx,by,bw,bh,16,'rgba(240,234,214,0.05)');rr(c,bx+16,by,bw-32,3,1.5,s.color);c.font='900 36px Nunito';c.fillStyle='#F0EAD6';c.textAlign='center';c.textBaseline='middle';c.fillText(s.v,bx+bw/2,by+38);c.font='800 13px Nunito';c.fillStyle='rgba(240,234,214,0.3)';c.fillText(s.l,bx+bw/2,by+68);});
+  var brandY=by+bh+20,brandCy=brandY+((H-brandY)/2);
   c.strokeStyle='rgba(240,234,214,0.06)';c.lineWidth=1;c.beginPath();c.moveTo(pad,brandY);c.lineTo(W-pad,brandY);c.stroke();
-  var logoSize=48;c.font='900 48px Nunito';var cebW=c.measureText('cebear').width,comW=c.measureText('.com').width;
-  var totalBrandW=(logoImg?logoSize+14:0)+cebW+comW+14+60,bx2=W/2-totalBrandW/2;
-  if(logoImg){c.drawImage(logoImg,bx2,brandCy-logoSize/2,logoSize,logoSize);bx2+=logoSize+14;}
-  c.fillStyle='#F0EAD6';c.textAlign='left';c.textBaseline='middle';c.fillText('cebear',bx2,brandCy);bx2+=cebW;
-  c.fillStyle='rgba(240,234,214,0.4)';c.fillText('.com',bx2,brandCy);bx2+=comW+14;
+  var ls=48;c.font='900 48px Nunito';var cw=c.measureText('cebear').width,dw=c.measureText('.com').width;var bx2=W/2-((logoImg?ls+14:0)+cw+dw+34)/2;
+  if(logoImg){c.drawImage(logoImg,bx2,brandCy-ls/2,ls,ls);bx2+=ls+14;}
+  c.fillStyle='#F0EAD6';c.textAlign='left';c.textBaseline='middle';c.fillText('cebear',bx2,brandCy);bx2+=cw;
+  c.fillStyle='rgba(240,234,214,0.4)';c.fillText('.com',bx2,brandCy);bx2+=dw+14;
   c.fillStyle='#e8a817';c.beginPath();c.arc(bx2,brandCy,5,0,Math.PI*2);c.fill();bx2+=20;
   c.font='800 22px Nunito';c.fillStyle='#e8a817';c.fillText('Beat me!',bx2,brandCy);
-
   shareCanvas=cv;return cv;
 }
 
 async function uploadShareCard(){
-  var user=IQData.getCurrentUser();if(!user||!shareCanvas)return;
-  var d=IQData.load();
-  try{
-    var du=shareCanvas.toDataURL('image/png');var b64=du.split(',')[1];
-    var sd={iq:d.iq||0,username:d.username||user.displayName||'Brain',answered:d.answered||0,accuracy:parseInt(IQData.getAccuracy())||0,bestStreak:d.bestStreak||0,cardBase64:b64,updatedAt:new Date().toISOString()};
-    await parent.firebase.firestore().collection('shares').doc(user.uid).set(sd);
-  }catch{}
+  var user=IQData.getCurrentUser();if(!user||!shareCanvas)return;var d=IQData.load();
+  try{var b64=shareCanvas.toDataURL('image/png').split(',')[1];await parent.firebase.firestore().collection('shares').doc(user.uid).set({iq:d.iq||0,username:d.username||user.displayName||'Brain',cardBase64:b64,updatedAt:new Date().toISOString()});}catch{}
 }
 function buildShareGrid(){
   var hn=!!navigator.share,grid=document.getElementById('share-grid');grid.innerHTML='';
@@ -360,33 +338,23 @@ function buildShareGrid(){
   opts.push({id:'x',label:'X',cls:'sd-x',icon:'<svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>'});
   opts.push({id:'whatsapp',label:'WhatsApp',cls:'sd-wa',icon:'<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.13.556 4.13 1.532 5.87L.06 23.71l5.99-1.572A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>'});
   opts.push({id:'save',label:'Save',cls:'sd-save',icon:'<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>'});
-  opts.forEach(o=>{var b=document.createElement('button');b.className='share-dest '+o.cls;b.innerHTML='<div class="sd-icon">'+o.icon+'</div>'+o.label;b.onclick=()=>handleShareAction(o.id);grid.appendChild(b)});
+  opts.forEach(o=>{var b=document.createElement('button');b.className='share-dest '+o.cls;b.innerHTML='<div class="sd-icon">'+o.icon+'</div>'+o.label;b.onclick=()=>handleShareAction(o.id);grid.appendChild(b);});
 }
 function getShareText(){var d=IQData.load();return d.iq?'My IQ is '+d.iq+' on Cebear! Top '+formatPercentile(iqToPercentile(d.iq))+' — can you beat me?':'Training my brain on Cebear!';}
-function handleShareAction(id){
-  Haptics.medium();var text=getShareText();
-  switch(id){
-    case'native':navigator.share({title:'My Cebear IQ',text:text,url:shareUrl}).catch(()=>{});break;
-    case'copylink':navigator.clipboard.writeText(shareUrl).then(()=>{Haptics.success();toast('Link copied!')}).catch(()=>toast('Copy failed'));break;
-    case'x':window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(shareUrl),'_blank');break;
-    case'whatsapp':window.open('https://wa.me/?text='+encodeURIComponent(text+' '+shareUrl),'_blank');break;
-    case'save':if(!shareCanvas)return;Haptics.success();var a=document.createElement('a');a.download='cebear-stats.png';a.href=shareCanvas.toDataURL('image/png');a.click();toast('Image saved!');break;
-  }
-}
+function handleShareAction(id){Haptics.medium();var text=getShareText();switch(id){case'native':navigator.share({title:'My Cebear IQ',text,url:shareUrl}).catch(()=>{});break;case'copylink':navigator.clipboard.writeText(shareUrl).then(()=>{Haptics.success();pToast('Link copied!');}).catch(()=>pToast('Copy failed'));break;case'x':window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(shareUrl),'_blank');break;case'whatsapp':window.open('https://wa.me/?text='+encodeURIComponent(text+' '+shareUrl),'_blank');break;case'save':if(!shareCanvas)return;Haptics.success();var a=document.createElement('a');a.download='cebear-stats.png';a.href=shareCanvas.toDataURL('image/png');a.click();pToast('Image saved!');break;}}
 async function openShare(){
-  var fab=document.getElementById('share-btn');fab.disabled=true;fab.innerHTML='<svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Generating...';
+  var fab=document.getElementById('share-btn');fab.disabled=true;fab.textContent='Generating...';
   shareUrl=getShareUrl();await genShareCard();await uploadShareCard();
   fab.disabled=false;fab.innerHTML='<svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share Your IQ';
   document.getElementById('share-url').value=shareUrl;
-  var pv=document.getElementById('card-preview');pv.innerHTML='';
-  var pc=document.createElement('canvas');pc.width=600;pc.height=315;pc.getContext('2d').drawImage(shareCanvas,0,0,600,315);pv.appendChild(pc);
+  var pv=document.getElementById('card-preview');pv.innerHTML='';var pc=document.createElement('canvas');pc.width=600;pc.height=315;pc.getContext('2d').drawImage(shareCanvas,0,0,600,315);pv.appendChild(pc);
   buildShareGrid();document.getElementById('share-modal').classList.add('show');
 }
-document.getElementById('share-btn').onclick=()=>{Haptics.medium();openShare()};
+document.getElementById('share-btn').onclick=()=>{Haptics.medium();openShare();};
 document.getElementById('share-modal').onclick=e=>{if(e.target.id==='share-modal'){Haptics.light();document.getElementById('share-modal').classList.remove('show');}};
 document.getElementById('copy-link').onclick=()=>handleShareAction('copylink');
 
-// ── Start ──────────────────────────────────────────────────────────────────
+// ── Start ─────────────────────────────────────────────────────────────────────
 loadProfile();
 loadAvatar();
 </script>
