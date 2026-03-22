@@ -7,121 +7,144 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0474fc">
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="description" content="Cebear — train your brain, track your IQ">
   <link rel="manifest" href="manifest.json">
   <title>Cebear</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Preconnect for font performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    html,body{width:100%;height:100dvh;overflow:hidden;background:#1b2d5b;font-family:'Nunito',sans-serif;touch-action:manipulation}
+    html,body{width:100%;height:100dvh;overflow:hidden;background:#0474fc;font-family:'Nunito',sans-serif;touch-action:manipulation}
 
-    /* ── SPLASH ── exact testintro.html, dropped in as-is ── */
+    /* ── SPLASH ── */
     #splash{
       position:fixed;inset:0;z-index:9999;
       background:#0474fc;
       display:flex;justify-content:center;align-items:center;overflow:hidden;
-      touch-action:manipulation;
-      -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+      -webkit-user-select:none;user-select:none;
     }
-    #splash.hide{
-      opacity:0;pointer-events:none;
-      transition:opacity 0.4s ease;
-    }
-    /* testintro .container */
-    #splash .container{text-align:center;color:white;pointer-events:none}
-    /* testintro img */
-    #splash .container img{-webkit-user-drag:none;user-drag:none;pointer-events:none}
-    /* testintro .logo */
+    #splash.hide{opacity:0;pointer-events:none;transition:opacity .4s ease}
+    #splash .container{text-align:center;color:#fff;pointer-events:none}
     #splash .logo{
-      width:170px;display:block;margin:0 auto;
-      opacity:0;transform:translateY(28px) scale(0.6);
-      animation:pop 0.8s cubic-bezier(.34,1.56,.64,1) forwards;
+      width:clamp(120px,25vw,170px);display:block;margin:0 auto;
+      opacity:0;transform:translateY(28px) scale(.6);
+      animation:pop .8s cubic-bezier(.34,1.56,.64,1) forwards;
     }
-    /* testintro .text */
     #splash .text{
       font-family:'Chewy',cursive;
-      font-size:92px;
-      margin-top:6px;white-space:nowrap;padding:0 8px;overflow:visible;
+      font-size:clamp(52px,14vw,92px);
+      margin-top:6px;white-space:nowrap;
     }
-    /* testintro .letter */
     #splash .letter{
       display:inline-block;opacity:0;
-      transform:translateY(28px) scale(0.6);
+      transform:translateY(28px) scale(.6);
       animation:popLetter cubic-bezier(.34,1.56,.64,1) forwards;
-      will-change:transform;backface-visibility:hidden;
+      will-change:transform;
     }
-    /* testintro exact delays — all finish at 0.8s */
-    #splash .letter:nth-child(1){animation-delay:0.15s;animation-duration:0.65s}
-    #splash .letter:nth-child(2){animation-delay:0.19s;animation-duration:0.61s}
-    #splash .letter:nth-child(3){animation-delay:0.23s;animation-duration:0.57s}
-    #splash .letter:nth-child(4){animation-delay:0.27s;animation-duration:0.53s}
-    #splash .letter:nth-child(5){animation-delay:0.31s;animation-duration:0.49s}
-    #splash .letter:nth-child(6){animation-delay:0.35s;animation-duration:0.45s}
-    @keyframes pop{
-      0%{opacity:0;transform:translateY(28px) scale(0.6)}
-      65%{opacity:1;transform:translateY(-6px) scale(1.08)}
-      100%{opacity:1;transform:translateY(0) scale(1)}
-    }
-    @keyframes popLetter{
-      0%{opacity:0;transform:translateY(28px) scale(0.6)}
-      65%{opacity:1;transform:translateY(-6px) scale(1.08)}
-      100%{opacity:1;transform:translateY(0) scale(1)}
-    }
-    /* ── responsive for desktop: scale the whole container ── */
-    @media(min-width:600px){
-      #splash .logo{width:min(170px,20vh)}
-      #splash .text{font-size:min(92px,18vh)}
-    }
-    /* ── END SPLASH ── */
+    #splash .letter:nth-child(1){animation-delay:.15s;animation-duration:.65s}
+    #splash .letter:nth-child(2){animation-delay:.19s;animation-duration:.61s}
+    #splash .letter:nth-child(3){animation-delay:.23s;animation-duration:.57s}
+    #splash .letter:nth-child(4){animation-delay:.27s;animation-duration:.53s}
+    #splash .letter:nth-child(5){animation-delay:.31s;animation-duration:.49s}
+    #splash .letter:nth-child(6){animation-delay:.35s;animation-duration:.45s}
+    @keyframes pop{0%{opacity:0;transform:translateY(28px) scale(.6)}65%{opacity:1;transform:translateY(-6px) scale(1.08)}100%{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes popLetter{0%{opacity:0;transform:translateY(28px) scale(.6)}65%{opacity:1;transform:translateY(-6px) scale(1.08)}100%{opacity:1;transform:translateY(0) scale(1)}}
 
-    .screen{position:absolute;top:0;left:0;right:0;bottom:0;display:none;overflow:hidden}
+    /* ── SCREENS ── */
+    .screen{position:absolute;inset:0;display:none;overflow:hidden}
     .screen.active{display:block}
     .screen iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;touch-action:manipulation}
-    body.has-nav .screen iframe{height:calc(100dvh - 58px - env(safe-area-inset-bottom,0px))}
-    #nav{position:fixed;bottom:0;left:0;right:0;height:calc(58px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:#1b2d5b;border-top:1px solid rgba(240,234,214,.08);display:none;justify-content:space-around;align-items:center;z-index:100}
+    body.has-nav .screen iframe{height:calc(100dvh - 60px - env(safe-area-inset-bottom,0px))}
+
+    /* ── NAV BAR — white pill nav ── */
+    #nav{
+      position:fixed;bottom:0;left:0;right:0;
+      height:calc(60px + env(safe-area-inset-bottom,0px));
+      padding-bottom:env(safe-area-inset-bottom,0px);
+      background:rgba(255,255,255,.95);
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+      border-top:1px solid rgba(4,116,252,.1);
+      display:none;justify-content:space-around;align-items:center;
+      z-index:100;
+    }
     body.has-nav #nav{display:flex}
-    .nb{padding:8px 0 2px;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:rgba(240,234,214,.35);font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;cursor:pointer;position:relative;transition:color .15s;-webkit-tap-highlight-color:transparent}
-    .nb .ni{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:10px;transition:all .2s}
+    .nb{
+      padding:6px 0 2px;background:none;border:none;
+      display:flex;flex-direction:column;align-items:center;gap:3px;
+      color:rgba(4,116,252,.35);
+      font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;
+      cursor:pointer;position:relative;transition:color .15s;
+      -webkit-tap-highlight-color:transparent;
+      min-width:60px;
+    }
+    .nb .ni{
+      width:32px;height:28px;display:flex;align-items:center;justify-content:center;
+      border-radius:14px;transition:all .2s;
+    }
     .nb .ni svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-    .nb.active{color:#F0EAD6}
-    .nb.active .ni{background:rgba(240,234,214,.15);width:42px;height:28px}
-    .nb.active .ni svg{stroke:#F0EAD6}
-    .nbdg{position:absolute;top:4px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:#e8443a;border:2px solid #1b2d5b;display:none}
+    .nb.active{color:#0474fc}
+    .nb.active .ni{background:rgba(4,116,252,.12);width:44px}
+    .nb.active .ni svg{stroke:#0474fc}
+    .nbdg{position:absolute;top:3px;right:calc(50% - 18px);width:8px;height:8px;border-radius:50%;background:#ef4444;border:2px solid #fff;display:none}
     .nbdg.show{display:block}
-    .auth-wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#1b2d5b}
-    .auth-wait-dots{display:flex;gap:7px}
-    .auth-wait-dot{width:10px;height:10px;border-radius:50%;background:rgba(240,234,214,.2);animation:dp 1s ease infinite}
+
+    /* ── AUTH WAIT ── */
+    .auth-wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0474fc}
+    .auth-wait-dots{display:flex;gap:8px}
+    .auth-wait-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.35);animation:dp 1s ease infinite}
     .auth-wait-dot:nth-child(2){animation-delay:.15s}
     .auth-wait-dot:nth-child(3){animation-delay:.3s}
     @keyframes dp{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
-    #offline-toast{position:fixed;top:calc(env(safe-area-inset-top,20px) + 12px);left:50%;transform:translateX(-50%);background:#1b2d5b;border:1px solid rgba(240,234,214,.15);color:rgba(240,234,214,.7);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;padding:10px 18px;border-radius:14px;z-index:9999;opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap}
+
+    /* ── OFFLINE TOAST ── */
+    #offline-toast{
+      position:fixed;top:calc(env(safe-area-inset-top,20px) + 12px);left:50%;
+      transform:translateX(-50%);
+      background:rgba(10,22,40,.9);color:rgba(255,255,255,.9);
+      font-size:13px;font-weight:800;
+      padding:10px 18px;border-radius:14px;
+      z-index:9999;opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap;
+    }
     #offline-toast.show{opacity:1}
   </style>
-  <!-- Chewy loaded after page CSS so it's ready by animation time -->
-  <link href="https://fonts.googleapis.com/css2?family=Chewy&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<!-- SPLASH: testintro.html body, verbatim -->
 <div id="splash">
   <div class="container">
-    <img src="logo.png" class="logo" draggable="false">
-    <div class="text">
+    <img src="logo.png" class="logo" draggable="false" alt="Cebear logo" width="170" height="170">
+    <div class="text" aria-label="cebear">
       <span class="letter">c</span><span class="letter">e</span><span class="letter">b</span><span class="letter">e</span><span class="letter">a</span><span class="letter">r</span>
     </div>
   </div>
 </div>
 
-<div id="offline-toast">No connection — come back online for this</div>
+<div id="offline-toast" role="status">No connection — come back online</div>
 <div class="screen" id="screen-auth"></div>
 <div class="screen" id="screen-improve"></div>
 <div class="screen" id="screen-profile"></div>
 <div class="screen" id="screen-leaderboard"></div>
 <div class="screen" id="screen-tasks"></div>
-<nav id="nav">
-  <button class="nb" data-page="leaderboard" onclick="goTo('leaderboard')"><span class="ni"><svg viewBox="0 0 24 24"><path d="M6 9H2v12h4V9z"/><path d="M14 4h-4v17h4V4z"/><path d="M22 13h-4v8h4v-8z"/></svg></span>Ranks</button>
-  <button class="nb active" data-page="improve" onclick="goTo('improve')"><span class="ni"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>Train</button>
-  <button class="nb" data-page="tasks" onclick="goTo('tasks')"><span class="ni"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-6"/></svg></span>Tasks<span class="nbdg" id="tasks-badge"></span></button>
-  <button class="nb" data-page="profile" onclick="goTo('profile')"><span class="ni"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg></span>Profile</button>
+
+<nav id="nav" aria-label="Main navigation">
+  <button class="nb" data-page="leaderboard" onclick="goTo('leaderboard')" aria-label="Rankings">
+    <span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9H2v12h4V9z"/><path d="M14 4h-4v17h4V4z"/><path d="M22 13h-4v8h4v-8z"/></svg></span>
+    Ranks
+  </button>
+  <button class="nb active" data-page="improve" onclick="goTo('improve')" aria-label="Train">
+    <span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>
+    Train
+  </button>
+  <button class="nb" data-page="tasks" onclick="goTo('tasks')" aria-label="Tasks">
+    <span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-6"/></svg></span>
+    Tasks<span class="nbdg" id="tasks-badge" aria-hidden="true"></span>
+  </button>
+  <button class="nb" data-page="profile" onclick="goTo('profile')" aria-label="Profile">
+    <span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg></span>
+    Profile
+  </button>
 </nav>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -132,90 +155,51 @@ firebase.initializeApp({apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDom
 var WORKER_URL='https://cebear.com/api/redeem-install-token';
 var isStandalone=!!('standalone' in navigator&&navigator.standalone||window.matchMedia('(display-mode: standalone)').matches);
 
-/*
-  SPLASH TIMING — guaranteed sequence:
-    0ms    : page loads, animations begin
-    800ms  : last letter finishes (delay 0.35s + duration 0.45s = 0.8s)
-    800ms  : animationend fires on last letter → starts 800ms hold timer
-    2300ms : hold done → add .hide class (fade starts)
-    2700ms : fade done → remove element from DOM
-
-  animationend is the source of truth — not a fixed timeout.
-  Fixed timeout is a fallback in case animationend misfires.
-*/
-var _splashDone = false;
-
-function _doHide() {
-  if (_splashDone) return;
-  _splashDone = true;
-  var sp = document.getElementById('splash');
-  if (!sp) return;
+// ── Splash timing ─────────────────────────────────────────────────────────────
+var _splashDone=false;
+function _doHide(){
+  if(_splashDone)return; _splashDone=true;
+  var sp=document.getElementById('splash');
+  if(!sp)return;
   sp.classList.add('hide');
-  setTimeout(function() {
-    if (sp.parentNode) sp.parentNode.removeChild(sp);
-  }, 450);
+  setTimeout(function(){if(sp.parentNode)sp.parentNode.removeChild(sp);},450);
 }
-
-// Primary: use animationend on the last letter (letter 6 = nth-child(6))
-// It finishes at delay(0.35s) + duration(0.45s) = 0.8s
-// After it fires, hold 800ms then hide
-(function() {
-  var sp = document.getElementById('splash');
-  if (!sp) return;
-  var letters = sp.querySelectorAll('.letter');
-  var lastLetter = letters[letters.length - 1]; // the 'r'
-  if (!lastLetter) return;
-
-  var holdTimer = null;
-  lastLetter.addEventListener('animationend', function() {
-    holdTimer = setTimeout(_doHide, 800);
+(function(){
+  var letters=document.querySelectorAll('#splash .letter');
+  var last=letters[letters.length-1];
+  if(!last){setTimeout(_doHide,1800);return;}
+  var held=false,holdTimer=null;
+  last.addEventListener('animationend',function(){
+    if(held)return; held=true;
+    holdTimer=setTimeout(_doHide,800);
   });
-
-  // Fallback: if animationend never fires (font not loaded etc),
-  // hard cutoff at 800ms + 800ms + 200ms buffer = 1800ms
-  setTimeout(function() {
-    if (!_splashDone) {
-      clearTimeout(holdTimer);
-      _doHide();
-    }
-  }, 1800);
+  setTimeout(function(){if(!_splashDone)_doHide();},1800);
 })();
 
-// goTo() calls this but _splashDone guard means it only works AFTER the hold
-function dismissSplash() { /* intentionally does nothing — timing is guaranteed above */ }
-
-function showNav(s){document.body.classList.toggle('has-nav',s)}
-function updateNavActive(p){document.querySelectorAll('#nav .nb').forEach(function(b){b.classList.toggle('active',b.dataset.page===p)})}
-
+// ── Auth state ────────────────────────────────────────────────────────────────
 var _isAuthed=false,_authResolved=false,_authWaiters=[];
 firebase.auth().onAuthStateChanged(function(u){
-  _isAuthed=!!u;
-  if(!_authResolved){
-    _authResolved=true;
-    _authWaiters.forEach(function(fn){fn(u)});
-    _authWaiters=[];
-  }
+  _isAuthed=!!u; _authResolved=true;
+  if(u)ensureUser(u);
+  _authWaiters.forEach(function(fn){fn();}); _authWaiters=[];
   if(u){
-    if(!currentScreen||currentScreen==='auth')goTo('improve');
-    _notifyImprove('authSuccess');
-  }else if(isStandalone){
-    currentScreen=null;screensLoaded={};
-    document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
-    goTo('auth');
+    var tb=document.getElementById('tasks-badge');
+    if(tb)firebase.firestore().collection('tasks').doc(u.uid).get()
+      .then(function(s){if(s.exists&&s.data()&&!s.data().allClaimed)tb.classList.add('show');})
+      .catch(function(){});
   }
 });
 function authReady(){
   if(_authResolved)return Promise.resolve(_isAuthed);
-  return new Promise(function(r){_authWaiters.push(function(){r(_isAuthed)})});
+  return new Promise(function(r){_authWaiters.push(function(){r(_isAuthed)});});
 }
 function _notifyImprove(type,extra){
   (function attempt(n){
     var f=document.querySelector('#screen-improve iframe');
     if(f&&f.contentWindow){f.contentWindow.postMessage(Object.assign({type:type},extra||{}),'*');}
-    else if(n>0){setTimeout(function(){attempt(n-1)},100);}
+    else if(n>0){setTimeout(function(){attempt(n-1);},100);}
   })(30);
 }
-
 function tryGuestWall(page){
   if(isStandalone||_isAuthed)return false;
   if(page!=='profile'&&page!=='tasks'&&page!=='leaderboard')return false;
@@ -232,8 +216,7 @@ window.addEventListener('message',function(e){
   var t=e.data.type;
   if(t==='authSuccess'){_isAuthed=true;if(currentScreen==='auth')goTo('improve');return;}
   if(t==='googleAuthRequest'){
-    var gp=new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(gp)
+    firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider())
       .then(function(r){_isAuthed=true;ensureUser(r.user);})
       .catch(function(err){
         if(err.code==='auth/popup-closed-by-user'||err.code==='auth/cancelled-popup-request')return;
@@ -246,10 +229,11 @@ window.addEventListener('message',function(e){
     if(u)firebase.firestore().collection('pushSubscriptions').doc(u.uid)
       .set({subscription:e.data.sub,uid:u.uid,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){});
   });
-  if(t==='tasksUpdated'){var f=document.querySelector('#screen-tasks iframe');f&&f.contentWindow&&f.contentWindow.postMessage({type:'tasksUpdated'},'*')}
-  if(t==='xpAwarded'){var f2=document.querySelector('#screen-improve iframe');f2&&f2.contentWindow&&f2.contentWindow.postMessage({type:'xpAwarded',xp:e.data.xp},'*')}
+  if(t==='tasksUpdated'){var f=document.querySelector('#screen-tasks iframe');f&&f.contentWindow&&f.contentWindow.postMessage({type:'tasksUpdated'},'*');}
+  if(t==='xpAwarded'){var f2=document.querySelector('#screen-improve iframe');f2&&f2.contentWindow&&f2.contentWindow.postMessage({type:'xpAwarded',xp:e.data.xp},'*');}
 });
 
+// ── Navigation ────────────────────────────────────────────────────────────────
 var currentScreen=null,screensLoaded={};
 var AUTH_PAGES=['profile','tasks','leaderboard'];
 var NETWORK_PAGES=['profile','tasks','leaderboard'];
@@ -264,10 +248,17 @@ function showOfflineToast(){
   _offlineTimer=setTimeout(function(){t.classList.remove('show');},2500);
 }
 
+function showNav(show){document.body.classList.toggle('has-nav',show);}
+function updateNavActive(page){
+  document.querySelectorAll('.nb').forEach(function(b){
+    b.classList.toggle('active',b.dataset.page===page);
+  });
+}
+
 window.goTo=function(page){
   if(tryGuestWall(page))return;
   if(isOffline()&&NETWORK_PAGES.indexOf(page)!==-1){showOfflineToast();return;}
-  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
   if((page==='profile'||page==='leaderboard')&&screensLoaded[page]){
     var old=document.querySelector('#screen-'+page+' iframe');
     if(old)old.remove();
@@ -278,7 +269,6 @@ window.goTo=function(page){
   currentScreen=page;
   showNav(page!=='auth');
   updateNavActive(page);
-  // NOTE: does NOT call dismissSplash — splash timing is self-contained
   if(screensLoaded[page])return;
   var c=document.getElementById('screen-'+page);
   if(!c)return;
@@ -286,7 +276,7 @@ window.goTo=function(page){
     var w=document.createElement('div');w.className='auth-wait';
     w.innerHTML='<div class="auth-wait-dots"><div class="auth-wait-dot"></div><div class="auth-wait-dot"></div><div class="auth-wait-dot"></div></div>';
     c.appendChild(w);
-    authReady().then(function(){var aw=c.querySelector('.auth-wait');if(aw)aw.remove();if(currentScreen===page)_loadIframe(page,c)});
+    authReady().then(function(){var aw=c.querySelector('.auth-wait');if(aw)aw.remove();if(currentScreen===page)_loadIframe(page,c);});
     return;
   }
   _loadIframe(page,c);
@@ -295,7 +285,7 @@ window.goTo=function(page){
 function _loadIframe(page,c){
   if(screensLoaded[page])return;
   var f=document.createElement('iframe'),src=page+'.html';
-  if(page==='improve'){var qs=sessionStorage.getItem('cebear_shared_qs');if(qs){src+=qs;sessionStorage.removeItem('cebear_shared_qs')}}
+  if(page==='improve'){var qs=sessionStorage.getItem('cebear_shared_qs');if(qs){src+=qs;sessionStorage.removeItem('cebear_shared_qs');}}
   f.src=src;f.allow='web-share';c.appendChild(f);screensLoaded[page]=true;
 }
 
@@ -335,23 +325,23 @@ function redeemSessionToken(sid){
   if(gT){
     sessionStorage.removeItem('bd_gis_token');
     firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(gT))
-      .then(function(r){ensureUser(r.user)})
-      .then(function(){goTo('improve')})
-      .catch(function(){start()});
+      .then(function(r){ensureUser(r.user);})
+      .then(function(){goTo('improve');})
+      .catch(function(){start();});
     return;
   }
   if(sI){redeemSessionToken(sI).then(start).catch(start);return;}
   if(tT){
     fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tT})})
-      .then(function(r){return r.ok?r.json():null})
-      .then(function(b){b&&b.customToken?firebase.auth().signInWithCustomToken(b.customToken).then(function(){location.reload()}):start()})
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(b){b&&b.customToken?firebase.auth().signInWithCustomToken(b.customToken).then(function(){location.reload();}):start();})
       .catch(start);
     return;
   }
   start();
   function start(){
     if(isStandalone){
-      authReady().then(function(){if(!currentScreen)goTo(_isAuthed?'improve':'auth')});
+      authReady().then(function(){if(!currentScreen)goTo(_isAuthed?'improve':'auth');});
     }else{
       goTo('improve');
     }
@@ -359,8 +349,8 @@ function redeemSessionToken(sid){
 })();
 
 var deferredPrompt=null;
-window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e});
-window.triggerInstall=function(){deferredPrompt&&deferredPrompt.prompt()};
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;});
+window.triggerInstall=function(){deferredPrompt&&deferredPrompt.prompt();};
 </script>
 </body>
 </html>
