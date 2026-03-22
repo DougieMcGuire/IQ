@@ -405,6 +405,20 @@
     .pc3-cell:active{transform:translateY(3px);box-shadow:none}
     .pc3-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.6);min-height:18px}
     .pc3-moves{font-size:11px;font-weight:700;text-align:center;color:rgba(255,255,255,.3);min-height:14px}
+
+    /* ── Jigsaw ── */
+    .jig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;background:#e2ddd4;padding:7px;border-radius:16px;margin:0 auto;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae;width:min(240px,63vw)}
+    .jig-slot{aspect-ratio:1;border-radius:10px;border:2.5px solid rgba(255,255,255,.25);cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:center;transition:transform .15s,background .15s;box-shadow:0 3px 0 rgba(0,0,0,.15)}
+    .jig-slot:not(.jig-slot-fixed):not(.jig-slot-done){background:rgba(255,255,255,.12);border-style:dashed;border-color:rgba(255,255,255,.3)}
+    .jig-slot:not(.jig-slot-fixed):not(.jig-slot-done):active{transform:scale(.92)}
+    .jig-slot-fixed{pointer-events:none}
+    .jig-slot-done{border-style:solid;pointer-events:none}
+    .jig-tray{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:2px 0}
+    .jig-piece{width:clamp(48px,13vw,60px);height:clamp(48px,13vw,60px);border-radius:12px;border:3px solid rgba(255,255,255,.4);cursor:pointer;user-select:none;box-shadow:0 4px 0 rgba(0,0,0,.25);transition:all .15s}
+    .jig-piece:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.2)}
+    .jig-piece.jig-piece-sel{border-color:#fff;transform:translateY(-5px);box-shadow:0 8px 0 rgba(0,0,0,.2),0 0 0 3px rgba(255,255,255,.5)}
+    .jig-piece.jig-piece-used{opacity:.15;pointer-events:none;transform:none}
+    .jig-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.55);min-height:18px}
   </style>
 </head>
 <body>
