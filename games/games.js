@@ -12,6 +12,7 @@
   .game-branding{width:100%;display:flex;justify-content:center;margin-top:8px;padding-top:10px;border-top:1px solid rgba(240,234,214,.06)}.game-branding a{display:inline-flex;align-items:center;gap:5px;background:rgba(240,234,214,.07);border:1px solid rgba(240,234,214,.12);border-radius:20px;padding:5px 12px 5px 8px;text-decoration:none;transition:all .15s}.game-branding a:active{transform:scale(.96)}.game-branding-bear{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}.game-branding-bear img{width:20px;height:20px;object-fit:contain}.game-branding-text{font-size:11px;font-weight:900;color:rgba(240,234,214,.5);letter-spacing:1.5px;text-transform:uppercase}
   .scroll-hint{position:absolute;bottom:14px;left:0;right:0;font-size:13px;font-weight:900;display:flex;flex-direction:column;align-items:center;gap:4px;transition:opacity .4s;pointer-events:none;opacity:0}.scroll-hint.show{opacity:1}.scroll-hint-inner{display:flex;align-items:center;gap:7px;background:rgba(240,234,214,.1);border:1px solid rgba(240,234,214,.15);border-radius:20px;padding:7px 16px;color:var(--cream)}.scroll-hint-inner svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:2.8;animation:bounce 1.2s infinite}.scroll-hint-inner span{font-size:12px;font-weight:900;color:rgba(240,234,214,.7);letter-spacing:.3px}@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}@keyframes pop{0%{transform:scale(1)}30%{transform:scale(1.12)}60%{transform:scale(.97)}100%{transform:scale(1)}}
   .pc3-grid{display:grid;gap:5px;background:#e2ddd4;padding:7px;border-radius:16px;margin:4px auto;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae}.pc3-cell{border-radius:10px;background:#fff;border:2.5px solid #e8e2d6;position:relative;cursor:pointer;user-select:none;transition:border-color .15s,background .15s,box-shadow .15s;box-shadow:0 3px 0 #d6cfc0;overflow:hidden;aspect-ratio:1}.pc3-cell:not([style*='pointer-events:none']):active{transform:translateY(3px);box-shadow:none}.pc3-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.6);min-height:18px}.pc3-moves{font-size:11px;font-weight:700;text-align:center;color:rgba(255,255,255,.3);min-height:14px}
+  .jig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;background:#e2ddd4;padding:7px;border-radius:16px;margin:0 auto;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae;width:min(240px,63vw)}.jig-slot{aspect-ratio:1;border-radius:10px;border:2.5px solid rgba(255,255,255,.25);cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:center;transition:transform .15s,background .15s,border-color .15s;box-shadow:0 3px 0 rgba(0,0,0,.15)}.jig-slot:not(.jig-slot-fixed):not(.jig-slot-done){background:rgba(255,255,255,.12);border-style:dashed;border-color:rgba(255,255,255,.3)}.jig-slot:not(.jig-slot-fixed):not(.jig-slot-done):active{transform:scale(.92)}.jig-slot-fixed{pointer-events:none}.jig-slot-done{border-style:solid;pointer-events:none}.jig-tray{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:2px 0}.jig-piece{width:clamp(48px,13vw,60px);height:clamp(48px,13vw,60px);border-radius:12px;border:3px solid rgba(255,255,255,.4);cursor:pointer;user-select:none;box-shadow:0 4px 0 rgba(0,0,0,.25);transition:all .15s}.jig-piece:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.2)}.jig-piece.jig-piece-sel{border-color:#fff;transform:translateY(-5px);box-shadow:0 8px 0 rgba(0,0,0,.2),0 0 0 3px rgba(255,255,255,.5)}.jig-piece.jig-piece-used{opacity:.15;pointer-events:none;transform:none}.jig-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.55);min-height:18px}
   .jig-tray{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:4px 0}.jig-tray-piece{border-radius:12px;background:#fff;border:2.5px solid #e8e2d6;cursor:pointer;box-shadow:0 3px 0 #d6cfc0;transition:all .15s;user-select:none;overflow:visible;display:flex;align-items:center;justify-content:center;padding:2px}.jig-tray-piece:active{transform:translateY(3px)!important;box-shadow:none!important}.jig-tray-piece.jig-tray-sel{border-color:#0474fc;background:#e8f2ff;box-shadow:0 3px 0 #0358c4;transform:translateY(-4px)}.jig-tray-piece.jig-used{opacity:.12;pointer-events:none}.jig-slot-filled{pointer-events:none}.jig-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.6);min-height:18px}
   `;
   document.head.appendChild(s);
@@ -219,112 +220,280 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
   });
 })();
 
-// ── Pipe Connect — SLIDE PUZZLE AESTHETIC ─────────────────────────────────────
+// ── Pipe Connect ──────────────────────────────────────────────────────────────
 (function(){
   // Bitmask: N=1 S=2 E=4 W=8
-  function rotateBit(t,times){var r=t;for(var i=0;i<(times||0);i++){var n=(r&1)?1:0,s=(r&2)?1:0,e=(r&4)?1:0,w=(r&8)?1:0;r=(n?4:0)|(e?2:0)|(s?8:0)|(w?1:0);}return r;}
-  function getArms(t){var a=[];if(t&1)a.push('N');if(t&2)a.push('S');if(t&4)a.push('E');if(t&8)a.push('W');return a;}
-  function bfs(cells,size,start){
-    var vis=new Set([start]),q=[start];
-    while(q.length){var c=q.shift(),ct=rotateBit(cells[c].t,cells[c].rot),row=Math.floor(c/size),col=c%size;var dirs={N:{nb:c-size,opp:'S',v:row>0},S:{nb:c+size,opp:'N',v:row<size-1},E:{nb:c+1,opp:'W',v:col<size-1},W:{nb:c-1,opp:'E',v:col>0}};getArms(ct).forEach(function(arm){var d=dirs[arm];if(!d||!d.v||vis.has(d.nb))return;var nct=rotateBit(cells[d.nb].t,cells[d.nb].rot);if(getArms(nct).indexOf(d.opp)!==-1){vis.add(d.nb);q.push(d.nb);}});}return vis;
+  function rot(t,n){var r=t;for(var i=0;i<(n||0);i++){var N=(r&1)?1:0,S=(r&2)?1:0,E=(r&4)?1:0,W=(r&8)?1:0;r=(N?4:0)|(E?2:0)|(S?8:0)|(W?1:0);}return r;}
+  function arms(t){var a=[];if(t&1)a.push('N');if(t&2)a.push('S');if(t&4)a.push('E');if(t&8)a.push('W');return a;}
+  function connected(cells,size,src){
+    var vis=new Set([src]),q=[src];
+    while(q.length){
+      var c=q.shift(),ct=rot(cells[c].t,cells[c].r),row=Math.floor(c/size),col=c%size;
+      var nb={N:{i:c-size,op:'S',ok:row>0},S:{i:c+size,op:'N',ok:row<size-1},E:{i:c+1,op:'W',ok:col<size-1},W:{i:c-1,op:'E',ok:col>0}};
+      arms(ct).forEach(function(a){var d=nb[a];if(!d||!d.ok||vis.has(d.i))return;var nc=rot(cells[d.i].t,cells[d.i].r);if(arms(nc).indexOf(d.op)!==-1){vis.add(d.i);q.push(d.i);}});
+    }
+    return vis;
   }
-  // Draw pipe as CSS divs — white tile, blue arms — matches slide puzzle aesthetic
-  function makePipeInner(t,lit){
-    var arms=getArms(t);
-    var armColor=lit?'#22c55e':'#1e293b';
-    var dotColor=lit?'#22c55e':'#334155';
-    if(!arms.length)return'<div style="width:28%;height:28%;border-radius:50%;background:rgba(30,41,59,.15);position:absolute;top:36%;left:36%"></div>';
-    var html='';
-    // Arms: thick bars from center to edge
-    if(arms.indexOf('N')!==-1)html+='<div style="position:absolute;width:30%;height:55%;background:'+armColor+';left:35%;top:0;border-radius:0 0 3px 3px;transition:background .15s"></div>';
-    if(arms.indexOf('S')!==-1)html+='<div style="position:absolute;width:30%;height:55%;background:'+armColor+';left:35%;bottom:0;top:auto;border-radius:3px 3px 0 0;transition:background .15s"></div>';
-    if(arms.indexOf('E')!==-1)html+='<div style="position:absolute;height:30%;width:55%;background:'+armColor+';top:35%;right:0;left:auto;border-radius:3px 0 0 3px;transition:background .15s"></div>';
-    if(arms.indexOf('W')!==-1)html+='<div style="position:absolute;height:30%;width:55%;background:'+armColor+';top:35%;left:0;border-radius:0 3px 3px 0;transition:background .15s"></div>';
-    // Center dot
-    html+='<div style="position:absolute;width:34%;height:34%;border-radius:50%;background:'+dotColor+';top:33%;left:33%;transition:background .15s'+(lit?';box-shadow:0 0 6px rgba(34,197,94,.5)':'')+'"></div>';
-    return html;
+
+  // Draw a pipe tile as inline HTML — white bg, dark blue arms, green when lit
+  function drawPipe(t,lit,isSrc,isSnk){
+    if(isSrc)return'<div style="position:absolute;inset:22%;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px #fff inset"></div>';
+    if(isSnk)return'<div style="position:absolute;inset:22%;border-radius:50%;background:#ef4444;box-shadow:0 0 0 3px #fff inset"></div>';
+    var a=arms(t);
+    if(!a.length)return'<div style="position:absolute;inset:40%;border-radius:50%;background:rgba(30,41,59,.2)"></div>';
+    var ac=lit?'#22c55e':'#1e293b';
+    var dc=lit?'#22c55e':'#334155';
+    var s='';
+    // Arms — thick bars from center outward
+    if(a.indexOf('N')!==-1)s+='<div style="position:absolute;left:37%;right:37%;top:0;bottom:50%;background:'+ac+';border-radius:0 0 2px 2px"></div>';
+    if(a.indexOf('S')!==-1)s+='<div style="position:absolute;left:37%;right:37%;top:50%;bottom:0;background:'+ac+';border-radius:2px 2px 0 0"></div>';
+    if(a.indexOf('E')!==-1)s+='<div style="position:absolute;top:37%;bottom:37%;left:50%;right:0;background:'+ac+';border-radius:2px 0 0 2px"></div>';
+    if(a.indexOf('W')!==-1)s+='<div style="position:absolute;top:37%;bottom:37%;right:50%;left:0;background:'+ac+';border-radius:0 2px 2px 0"></div>';
+    // Center joint
+    s+='<div style="position:absolute;inset:32%;border-radius:50%;background:'+dc+(lit?';box-shadow:0 0 8px rgba(34,197,94,.5)':'')+'"></div>';
+    return s;
   }
-  var PZS=[
-    {s:4,c:[{t:6,r:0},{t:12,r:0},{t:12,r:0},{t:10,r:0},{t:3,r:0},{t:0},{t:0},{t:3,r:0},{t:3,r:0},{t:0},{t:0},{t:3,r:0},{t:5,r:0},{t:12,r:0},{t:12,r:0},{t:9,r:0}],sr:0,sk:15,d:0.8},
-    {s:4,c:[{t:6,r:0},{t:12,r:0},{t:12,r:0},{t:10,r:0},{t:0},{t:0},{t:0},{t:3,r:0},{t:0},{t:6,r:0},{t:9,r:0},{t:3,r:0},{t:0},{t:5,r:0},{t:12,r:0},{t:9,r:0}],sr:0,sk:14,d:0.85},
-    {s:4,c:[{t:6,r:0},{t:12,r:0},{t:10,r:0},{t:0},{t:3,r:0},{t:0},{t:6,r:0},{t:10,r:0},{t:6,r:0},{t:9,r:0},{t:3,r:0},{t:3,r:0},{t:5,r:0},{t:0},{t:5,r:0},{t:0}],sr:0,sk:14,d:0.9},
-    {s:5,c:[{t:6,r:0},{t:12,r:0},{t:12,r:0},{t:12,r:0},{t:10,r:0},{t:3,r:0},{t:0},{t:0},{t:0},{t:3,r:0},{t:3,r:0},{t:0},{t:0},{t:0},{t:3,r:0},{t:3,r:0},{t:0},{t:0},{t:0},{t:3,r:0},{t:5,r:0},{t:12,r:0},{t:12,r:0},{t:12,r:0},{t:9,r:0}],sr:0,sk:24,d:1.0},
-    {s:5,c:[{t:6,r:0},{t:12,r:0},{t:10,r:0},{t:0},{t:0},{t:0},{t:0},{t:6,r:0},{t:12,r:0},{t:10,r:0},{t:0},{t:6,r:0},{t:9,r:0},{t:0},{t:3,r:0},{t:5,r:0},{t:9,r:0},{t:0},{t:0},{t:3,r:0},{t:0},{t:0},{t:0},{t:5,r:0},{t:9,r:0}],sr:0,sk:24,d:1.1},
-    {s:5,c:[{t:6,r:0},{t:12,r:0},{t:12,r:0},{t:10,r:0},{t:0},{t:3,r:0},{t:6,r:0},{t:9,r:0},{t:3,r:0},{t:0},{t:3,r:0},{t:5,r:0},{t:0},{t:6,r:0},{t:10,r:0},{t:6,r:0},{t:12,r:0},{t:9,r:0},{t:5,r:0},{t:3,r:0},{t:5,r:0},{t:0},{t:0},{t:12,r:0},{t:9,r:0}],sr:0,sk:24,d:1.3},
+
+  // Hand-verified solvable puzzles
+  // Types: 3=NS 5=NE 6=SE 9=NW 10=SW 12=EW 15=cross 0=empty
+  var PUZZLES=[
+    // 4x4 easy L-shape
+    {sz:4,cells:[{t:6},{t:12},{t:12},{t:10},{t:3},{t:0},{t:0},{t:3},{t:3},{t:0},{t:0},{t:3},{t:5},{t:12},{t:12},{t:9}],src:0,snk:15,d:0.8},
+    // 4x4 U-shape
+    {sz:4,cells:[{t:6},{t:12},{t:12},{t:10},{t:3},{t:0},{t:0},{t:3},{t:6},{t:9},{t:6},{t:9},{t:0},{t:0},{t:5},{t:0}],src:0,snk:14,d:0.9},
+    // 4x4 S-curve
+    {sz:4,cells:[{t:6},{t:12},{t:10},{t:0},{t:3},{t:0},{t:6},{t:10},{t:6},{t:9},{t:3},{t:3},{t:5},{t:0},{t:5},{t:0}],src:0,snk:14,d:0.9},
+    // 5x5 straight L
+    {sz:5,cells:[{t:6},{t:12},{t:12},{t:12},{t:10},{t:3},{t:0},{t:0},{t:0},{t:3},{t:3},{t:0},{t:0},{t:0},{t:3},{t:3},{t:0},{t:0},{t:0},{t:3},{t:5},{t:12},{t:12},{t:12},{t:9}],src:0,snk:24,d:1.0},
+    // 5x5 Z
+    {sz:5,cells:[{t:6},{t:12},{t:10},{t:0},{t:0},{t:0},{t:0},{t:6},{t:12},{t:10},{t:0},{t:6},{t:9},{t:0},{t:3},{t:5},{t:9},{t:0},{t:0},{t:3},{t:0},{t:0},{t:0},{t:5},{t:9}],src:0,snk:24,d:1.1},
+    // 5x5 spiral-ish
+    {sz:5,cells:[{t:6},{t:12},{t:12},{t:10},{t:0},{t:3},{t:6},{t:9},{t:3},{t:0},{t:3},{t:5},{t:0},{t:6},{t:10},{t:6},{t:12},{t:9},{t:5},{t:3},{t:5},{t:0},{t:0},{t:12},{t:9}],src:0,snk:24,d:1.3},
   ];
+
   Q.register('pipeConnect',function(){
-    var puz=Q.pick(PZS);
-    var cells=puz.c.map(function(c,i){if(!c||!c.t)return{t:0,rot:0};if(i===puz.sr||i===puz.sk)return{t:c.t,rot:0};return{t:c.t,rot:Q.rand(0,3)};});
-    return{type:'pipeConnect',category:'spatialAwareness',categoryLabel:'Pipe Connect',difficulty:puz.d,question:'Rotate pipes to connect',size:puz.s,cells:cells,src:puz.sr,snk:puz.sk,answer:'complete',options:[],explanation:'Tap to rotate — connect green to red!',visual:'custom'};
+    var puz=Q.pick(PUZZLES);
+    var cells=puz.cells.map(function(c,i){
+      if(!c.t||i===puz.src||i===puz.snk)return{t:c.t||0,r:0};
+      return{t:c.t,r:Q.rand(0,3)};
+    });
+    return{type:'pipeConnect',category:'spatialAwareness',categoryLabel:'Pipe Connect',
+      difficulty:puz.d,question:'Rotate pipes to connect green to red',
+      sz:puz.sz,cells:cells,src:puz.src,snk:puz.snk,
+      answer:'complete',options:[],explanation:'Tap each pipe to rotate it 90°.',visual:'custom'};
   },3);
+
   Q.registerRenderer('pipeConnect',{
     render:function(q,idx){
-      var sz=q.size;var gridW=sz===4?Math.min(Math.round(window.innerWidth*0.78),300):Math.min(Math.round(window.innerWidth*0.82),320);var cellSz=Math.floor((gridW-12-sz*5)/sz);
+      var sz=q.sz;
       var cells='';
       for(var i=0;i<q.cells.length;i++){
-        var c=q.cells[i],isSrc=i===q.src,isSnk=i===q.snk,isEmpty=!c||!c.t;
-        var inner='';
-        var extraStyle='';
-        if(isSrc){
-          inner='<div style="position:absolute;inset:20%;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px #fff,0 3px 0 #16a34a"></div>';
-          extraStyle='background:#dcfce7;border-color:#22c55e;box-shadow:0 3px 0 #16a34a;cursor:default;pointer-events:none;';
-        }else if(isSnk){
-          inner='<div style="position:absolute;inset:20%;border-radius:50%;background:#ef4444;box-shadow:0 0 0 3px #fff,0 3px 0 #dc2626"></div>';
-          extraStyle='background:#fee2e2;border-color:#ef4444;box-shadow:0 3px 0 #dc2626;cursor:default;pointer-events:none;';
-        }else if(isEmpty){
-          extraStyle='background:#f1f5f9;border-color:#e2e8f0;box-shadow:none;cursor:default;pointer-events:none;opacity:.5;';
-        }else{
-          inner=makePipeInner(rotateBit(c.t,c.rot||0),false);
-        }
-        cells+='<div class="pc3-cell" id="pc3-'+idx+'-'+i+'" data-pi="'+idx+'" data-pc="'+i+'" style="width:'+cellSz+'px;height:'+cellSz+'px;'+extraStyle+'">'+inner+'</div>';
+        var c=q.cells[i];
+        var isSrc=i===q.src,isSnk=i===q.snk,isEmpty=!c.t&&!isSrc&&!isSnk;
+        var inner=isEmpty?'':drawPipe(rot(c.t,c.r),false,isSrc,isSnk);
+        var extraBg=isSrc?'background:#dcfce7;border-color:#22c55e;box-shadow:0 3px 0 #16a34a;':
+                    isSnk?'background:#fee2e2;border-color:#ef4444;box-shadow:0 3px 0 #dc2626;':
+                    isEmpty?'background:#f8fafc;border-color:#e2e8f0;box-shadow:none;opacity:.5;pointer-events:none;':'';
+        cells+='<button class="pc3-cell" id="pc3c-'+idx+'-'+i+'" data-pi="'+idx+'" data-pc="'+i+'"'+(isEmpty||isSrc||isSnk?' disabled':'')+' style="'+extraBg+'">'+inner+'</button>';
       }
-      return'<div class="qcard" style="gap:8px">'+
-        '<div class="category">PIPE CONNECT</div>'+
-        '<div style="display:flex;align-items:center;justify-content:center;gap:12px">'+
-          '<div style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:rgba(255,255,255,.7)"><div style="width:14px;height:14px;border-radius:50%;background:#22c55e;border:2px solid #fff;flex-shrink:0"></div>Source</div>'+
-          '<div style="color:rgba(255,255,255,.25);font-weight:900">→</div>'+
-          '<div style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:rgba(255,255,255,.7)"><div style="width:14px;height:14px;border-radius:50%;background:#ef4444;border:2px solid #fff;flex-shrink:0"></div>Drain</div>'+
-        '</div>'+
-        '<div class="pc3-grid" id="pc3-g-'+idx+'" style="grid-template-columns:repeat('+sz+','+cellSz+'px)">'+cells+'</div>'+
-        '<div class="pc3-status" id="pc3-s-'+idx+'">Tap pipes to rotate them</div>'+
-        '<div class="pc3-moves" id="pc3-m-'+idx+'"></div>'+
-        '<div id="wa-'+idx+'"></div><div class="explanation" id="exp-'+idx+'"></div>'+
-        _gameBranding()+_scrollHint(idx)+'</div>';
+      var hint='<div style="display:flex;gap:14px;justify-content:center;align-items:center;margin:2px 0">'
+        +'<div style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:rgba(255,255,255,.65)"><div style="width:13px;height:13px;border-radius:50%;background:#22c55e;border:2px solid rgba(255,255,255,.5)"></div>Source</div>'
+        +'<div style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:rgba(255,255,255,.65)"><div style="width:13px;height:13px;border-radius:50%;background:#ef4444;border:2px solid rgba(255,255,255,.5)"></div>Drain</div>'
+        +'</div>';
+      return'<div class="qcard" style="gap:8px">'
+        +'<div class="category">PIPE CONNECT</div>'
+        +'<div class="question" style="font-size:14px">'+q.question+'</div>'
+        +hint
+        +'<div class="pc3-grid" id="pc3g-'+idx+'" style="grid-template-columns:repeat('+sz+',1fr);width:min(260px,70vw)">'+cells+'</div>'
+        +'<div class="pc3-status" id="pc3s-'+idx+'">Tap pipes to rotate them</div>'
+        +'<div class="pc3-moves" id="pc3m-'+idx+'"></div>'
+        +'<div id="wa-'+idx+'"></div><div class="explanation" id="exp-'+idx+'"></div>'
+        +_gameBranding()+_scrollHint(idx)+'</div>';
     },
     attach:function(slideEl,q,idx,ctx){
       var H=ctx.Haptics||{};
       var actEl=slideEl.querySelector('#wa-'+idx);if(actEl&&ctx.addShareBtn)ctx.addShareBtn(actEl,q);
-      var grid=document.getElementById('pc3-g-'+idx),statEl=document.getElementById('pc3-s-'+idx),movEl=document.getElementById('pc3-m-'+idx);
-      if(!grid)return;
-      var cells=q.cells.map(function(c){return{t:c&&c.t?c.t:0,rot:c&&c.rot?c.rot:0};}),moves=0,done=false;
-      function getCellEl(i){return document.getElementById('pc3-'+idx+'-'+i);}
+      var cells=q.cells.map(function(c){return{t:c.t,r:c.r};}),moves=0,done=false;
+      var statEl=document.getElementById('pc3s-'+idx),movEl=document.getElementById('pc3m-'+idx);
+
+      function getEl(i){return document.getElementById('pc3c-'+idx+'-'+i);}
+
       function refresh(){
-        var lit=bfs(cells,q.size,q.src);
+        var lit=connected(cells,q.sz,q.src);
         for(var i=0;i<cells.length;i++){
           if(i===q.src||i===q.snk||!cells[i].t)continue;
-          var el=getCellEl(i);if(!el)continue;
+          var el=getEl(i);if(!el)continue;
           var isLit=lit.has(i);
-          el.innerHTML=makePipeInner(rotateBit(cells[i].t,cells[i].rot),isLit);
+          el.innerHTML=drawPipe(rot(cells[i].t,cells[i].r),isLit,false,false);
           el.style.background=isLit?'#f0fdf4':'#fff';
           el.style.borderColor=isLit?'#22c55e':'#e8e2d6';
           el.style.boxShadow=isLit?'0 3px 0 #16a34a':'0 3px 0 #d6cfc0';
         }
-        // Light up src/snk when connected
-        var srcEl=getCellEl(q.src),snkEl=getCellEl(q.snk);
-        if(srcEl)srcEl.style.boxShadow=lit.has(q.src)?'0 3px 0 #15803d,0 0 12px rgba(34,197,94,.3)':'0 3px 0 #16a34a';
-        if(snkEl)snkEl.style.boxShadow=lit.has(q.snk)?'0 3px 0 #991b1b,0 0 12px rgba(239,68,68,.3)':'0 3px 0 #dc2626';
+        var srcEl=getEl(q.src),snkEl=getEl(q.snk);
+        if(srcEl&&lit.has(q.src))srcEl.style.boxShadow='0 3px 0 #15803d,0 0 14px rgba(34,197,94,.35)';
+        if(snkEl&&lit.has(q.snk))snkEl.style.boxShadow='0 3px 0 #991b1b,0 0 14px rgba(239,68,68,.35)';
+        return lit.has(q.snk);
       }
+
+      var grid=document.getElementById('pc3g-'+idx);
+      if(!grid)return;
       grid.addEventListener('click',function(e){
-        if(done)return;var el=e.target.closest('[data-pc]');if(!el||+el.dataset.pi!==idx)return;
-        var i=parseInt(el.dataset.pc);if(i===q.src||i===q.snk||!cells[i].t)return;
-        H.light&&H.light();cells[i].rot=(cells[i].rot+1)%4;
-        el.style.transform='scale(.88)';setTimeout(function(){el.style.transform='';},120);
+        if(done)return;
+        var btn=e.target.closest('[data-pc]');if(!btn||+btn.dataset.pi!==idx||btn.disabled)return;
+        var i=parseInt(btn.dataset.pc);if(i===q.src||i===q.snk||!cells[i].t)return;
+        H.light&&H.light();
+        cells[i].r=(cells[i].r+1)%4;
+        btn.style.transform='scale(.88)';setTimeout(function(){btn.style.transform='';},110);
         moves++;movEl.textContent=moves+' rotation'+(moves===1?'':'s');
-        refresh();
-        if(bfs(cells,q.size,q.src).has(q.snk)){statEl.textContent='Connected! 🎉';setTimeout(function(){finish(true);},300);}
+        var won=refresh();
+        if(won){statEl.textContent='Connected! 🎉';setTimeout(function(){finish(true);},300);}
       });
-      function finish(won){done=true;var ms=Date.now()-ctx.answerStartRef.get(),data=ctx.IQData.recordAnswer(q.category,won,q.difficulty,ms);if(ctx.notifyGamePlayed)ctx.notifyGamePlayed('pipeConnect');if(ctx.onAnswer)ctx.onAnswer(won,ms);if(won){H.streak&&H.streak();ctx.flashEl.className='flash green show';ctx.spawnConfetti(16);}setTimeout(function(){ctx.flashEl.className='flash';},350);var expEl=slideEl.querySelector('#exp-'+idx),hintEl=document.getElementById('hint-'+idx);if(expEl){expEl.textContent=won?'Pipeline complete in '+moves+' rotations!':'Rotate pipes to form a connected path.';expEl.classList.add('show');}setTimeout(function(){if(hintEl)hintEl.classList.add('show');},500);ctx.updateUI(data);var hintEl2=document.getElementById('hint-'+idx);setTimeout(function(){if(hintEl2)hintEl2.classList.add('show');},400);ctx.checkMore();ctx.answerStartRef.set(Date.now());}
+
+      function finish(won){
+        done=true;
+        var ms=Date.now()-ctx.answerStartRef.get(),data=ctx.IQData.recordAnswer(q.category,won,q.difficulty,ms);
+        if(ctx.notifyGamePlayed)ctx.notifyGamePlayed('pipeConnect');
+        if(ctx.onAnswer)ctx.onAnswer(won,ms);
+        if(won){H.streak&&H.streak();ctx.flashEl.className='flash green show';ctx.spawnConfetti(16);}
+        setTimeout(function(){ctx.flashEl.className='flash';},350);
+        var expEl=slideEl.querySelector('#exp-'+idx),hintEl=document.getElementById('hint-'+idx);
+        if(expEl){expEl.textContent=won?'Pipes connected in '+moves+' rotations!':'Rotate each pipe to link source to drain.';expEl.classList.add('show');}
+        setTimeout(function(){if(hintEl)hintEl.classList.add('show');},500);
+        ctx.updateUI(data);ctx.checkMore();ctx.answerStartRef.set(Date.now());
+      }
       refresh();ctx.answerStartRef.set(Date.now());
+    }
+  });
+})();
+
+// ── Jigsaw Puzzle ─────────────────────────────────────────────────────────────
+(function(){
+  // Grid of colored tiles. Some are removed and shuffled into a tray.
+  // Player taps a tray piece then taps the correct empty slot in the grid.
+  // The "image" is a bold color-block pattern — simple, clear, satisfying.
+
+  var PATTERNS=[
+    // Each pattern is a 3x3 array of colors making a simple image
+    {name:'Flag',colors:['#e8443a','#e8443a','#e8443a','#ffffff','#ffffff','#ffffff','#3a7df2','#3a7df2','#3a7df2']},
+    {name:'Gradient',colors:['#ff0000','#ff6600','#ffcc00','#ff6600','#ff9900','#ffcc00','#cc0000','#ff3300','#ff6600']},
+    {name:'Checkers',colors:['#1e293b','#f0eaD6','#1e293b','#f0ead6','#1e293b','#f0ead6','#1e293b','#f0ead6','#1e293b']},
+    {name:'Sunset',colors:['#1a1a2e','#16213e','#0f3460','#e94560','#f5a623','#ffdd57','#e94560','#f5a623','#ffdd57']},
+    {name:'Rainbow',colors:['#ff0000','#ff7700','#ffdd00','#00cc44','#0066ff','#8833ff','#ff0000','#ff7700','#ffdd00']},
+    {name:'Diamond',colors:['#3a7df2','#ffffff','#3a7df2','#ffffff','#e8a817','#ffffff','#3a7df2','#ffffff','#3a7df2']},
+    {name:'Stripes',colors:['#e8443a','#3a7df2','#3fba4f','#e8443a','#3a7df2','#3fba4f','#e8443a','#3a7df2','#3fba4f']},
+    {name:'Bullseye',colors:['#3a7df2','#3a7df2','#3a7df2','#3a7df2','#e8443a','#3a7df2','#3a7df2','#3a7df2','#3a7df2']},
+    {name:'Cross',colors:['#f0ead6','#3a7df2','#f0ead6','#3a7df2','#3a7df2','#3a7df2','#f0ead6','#3a7df2','#f0ead6']},
+    {name:'Quarters',colors:['#e8443a','#e8443a','#3fba4f','#e8443a','#e8a817','#3fba4f','#3a7df2','#3a7df2','#3a7df2']},
+  ];
+
+  Q.register('jigsaw',function(){
+    var pat=Q.pick(PATTERNS);
+    // Remove 4 pieces and shuffle them
+    var allIdx=[0,1,2,3,4,5,6,7,8];
+    var removed=Q.shuffle(allIdx.slice()).slice(0,4);
+    var tray=Q.shuffle(removed.slice()); // shuffled order in tray
+    return{type:'jigsaw',category:'patternRecognition',categoryLabel:'Jigsaw',
+      difficulty:1.0,question:'Complete the pattern!',
+      patternName:pat.name,colors:pat.colors,removed:removed,tray:tray,
+      answer:'complete',options:[],explanation:'Spatial pattern recognition.',visual:'custom'};
+  },3);
+
+  Q.registerRenderer('jigsaw',{
+    render:function(q,idx){
+      var removedSet=new Set(q.removed);
+      // Build 3x3 puzzle grid
+      var gridCells='';
+      for(var i=0;i<9;i++){
+        if(removedSet.has(i)){
+          gridCells+='<div class="jig-slot" id="jigsl-'+idx+'-'+i+'" data-jsi="'+idx+'" data-jsp="'+i+'" data-jsexpect="'+q.colors[i]+'">'
+            +'<div style="width:60%;height:60%;border-radius:4px;background:rgba(255,255,255,.15)"></div>'
+            +'</div>';
+        }else{
+          gridCells+='<div class="jig-slot jig-slot-fixed" style="background:'+q.colors[i]+';cursor:default;border-color:rgba(255,255,255,.3)"></div>';
+        }
+      }
+      // Build tray pieces
+      var trayPieces='';
+      q.tray.forEach(function(gridPos,trayIdx){
+        trayPieces+='<button class="jig-piece" id="jigp-'+idx+'-'+trayIdx+'" data-jpii="'+idx+'" data-jpti="'+trayIdx+'" data-jpgp="'+gridPos+'" data-jpcolor="'+q.colors[gridPos]+'" style="background:'+q.colors[gridPos]+'"></button>';
+      });
+      return'<div class="qcard" style="gap:10px">'
+        +'<div class="category">JIGSAW</div>'
+        +'<div class="question">'+q.question+'</div>'
+        +'<div style="font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3)">'+q.patternName+'</div>'
+        +'<div class="jig-grid" id="jigg-'+idx+'">'+gridCells+'</div>'
+        +'<div style="font-size:11px;font-weight:800;color:rgba(255,255,255,.4);text-align:center">Pieces to place:</div>'
+        +'<div class="jig-tray" id="jigt-'+idx+'">'+trayPieces+'</div>'
+        +'<div class="jig-status" id="jigst-'+idx+'">Tap a piece, then tap its slot</div>'
+        +'<div id="wa-'+idx+'"></div><div class="explanation" id="exp-'+idx+'"></div>'
+        +_gameBranding()+_scrollHint(idx)+'</div>';
+    },
+    attach:function(slideEl,q,idx,ctx){
+      var H=ctx.Haptics||{};
+      var actEl=slideEl.querySelector('#wa-'+idx);if(actEl&&ctx.addShareBtn)ctx.addShareBtn(actEl,q);
+      var statEl=document.getElementById('jigst-'+idx);
+      var selectedTray=null,placed=0,done=false,total=q.removed.length;
+
+      function getPieceEl(ti){return document.getElementById('jigp-'+idx+'-'+ti);}
+      function getSlotEl(pos){return document.getElementById('jigsl-'+idx+'-'+pos);}
+
+      function clearSel(){
+        if(selectedTray!==null){var el=getPieceEl(selectedTray);if(el)el.classList.remove('jig-piece-sel');}
+        selectedTray=null;
+      }
+
+      // Tap tray piece
+      var tray=document.getElementById('jigt-'+idx);
+      if(tray)tray.addEventListener('click',function(e){
+        if(done)return;
+        var btn=e.target.closest('.jig-piece');if(!btn||btn.classList.contains('jig-piece-used'))return;
+        var ti=parseInt(btn.dataset.jpti);H.light&&H.light();
+        if(selectedTray===ti){clearSel();statEl.textContent='Tap a piece, then tap its slot';}
+        else{clearSel();selectedTray=ti;btn.classList.add('jig-piece-sel');statEl.textContent='Now tap the empty slot where it belongs';}
+      });
+
+      // Tap grid slot
+      var grid=document.getElementById('jigg-'+idx);
+      if(grid)grid.addEventListener('click',function(e){
+        if(done)return;
+        var slot=e.target.closest('.jig-slot:not(.jig-slot-fixed):not(.jig-slot-done)');if(!slot)return;
+        if(selectedTray===null){statEl.textContent='Pick a piece from below first!';return;}
+        var pieceEl=getPieceEl(selectedTray);if(!pieceEl)return;
+        var pieceColor=pieceEl.dataset.jpcolor;
+        var expectedColor=slot.dataset.jsexpect;
+        if(pieceColor===expectedColor){
+          H.medium&&H.medium();
+          // Snap piece in — fill slot with color
+          slot.style.background=pieceColor;
+          slot.style.borderColor='rgba(255,255,255,.3)';
+          slot.innerHTML='';
+          slot.classList.add('jig-slot-done');
+          // Animate slot
+          slot.style.transform='scale(1.08)';setTimeout(function(){slot.style.transform='';},200);
+          pieceEl.classList.remove('jig-piece-sel');pieceEl.classList.add('jig-piece-used');
+          clearSel();placed++;
+          statEl.textContent=placed===total?'Complete! 🎉':placed+' / '+total+' placed';
+          if(placed===total)setTimeout(function(){finish(true);},350);
+        }else{
+          H.error&&H.error();
+          pieceEl.style.transform='rotate(-8deg)';setTimeout(function(){pieceEl.style.transform='';},300);
+          statEl.textContent='Wrong spot! Look at the colors.';
+        }
+      });
+
+      function finish(won){
+        done=true;
+        var ms=Date.now()-ctx.answerStartRef.get(),data=ctx.IQData.recordAnswer(q.category,won,q.difficulty,ms);
+        if(ctx.notifyGamePlayed)ctx.notifyGamePlayed('jigsaw');
+        if(ctx.onAnswer)ctx.onAnswer(won,ms);
+        if(won){H.streak&&H.streak();ctx.flashEl.className='flash green show';ctx.spawnConfetti(18);}
+        setTimeout(function(){ctx.flashEl.className='flash';},350);
+        var expEl=slideEl.querySelector('#exp-'+idx),hintEl=document.getElementById('hint-'+idx);
+        if(expEl){expEl.textContent=won?'Pattern complete!':'Match each color piece to its correct slot.';expEl.classList.add('show');}
+        setTimeout(function(){if(hintEl)hintEl.classList.add('show');},500);
+        ctx.updateUI(data);ctx.checkMore();ctx.answerStartRef.set(Date.now());
+      }
+      ctx.answerStartRef.set(Date.now());
     }
   });
 })();
