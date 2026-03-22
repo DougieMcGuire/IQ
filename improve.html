@@ -133,12 +133,13 @@
       box-shadow:0 4px 0 #d6cfc0;
     }
     .opt:active{transform:translateY(4px);box-shadow:none}
-    .opt.correct{background:var(--green);color:#fff;border-color:var(--green);box-shadow:var(--shadow-green);animation:pop .4s}
-    .opt.wrong{background:var(--red);color:#fff;border-color:var(--red);box-shadow:var(--shadow-red);animation:shake .4s}
-    .opt.dim{opacity:.15;pointer-events:none}
-    .opt.show-correct{background:var(--green);color:#fff;border-color:var(--green);box-shadow:var(--shadow-green);opacity:1}
-    @keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+    .opt.correct{background:var(--green);color:#fff;border-color:var(--green);box-shadow:0 4px 0 var(--green-dark);animation:correctSlam .45s cubic-bezier(.34,1.56,.64,1)}
+    .opt.wrong{background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 4px 0 var(--red-dark);animation:shake .45s}
+    .opt.dim{opacity:.12;pointer-events:none;transform:scale(.96)}
+    .opt.show-correct{background:var(--green);color:#fff;border-color:var(--green);box-shadow:0 4px 0 var(--green-dark);opacity:1;animation:correctSlam .45s}
+    @keyframes correctSlam{0%{transform:scale(1)}25%{transform:scale(1.08)}50%{transform:scale(.96)}100%{transform:scale(1)}}
+    @keyframes pop{0%{transform:scale(1)}30%{transform:scale(1.12)}60%{transform:scale(.97)}100%{transform:scale(1)}}
+    @keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-8px)}30%{transform:translateX(8px)}45%{transform:translateX(-6px)}60%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
 
     .feedback{font-family:'Nunito',sans-serif;font-size:17px;font-weight:900;letter-spacing:.3px;min-height:24px;opacity:0;transition:opacity .3s}
     .feedback.show{opacity:1}.feedback.correct{color:#a7f3d0}.feedback.wrong{color:#fca5a5}
@@ -358,15 +359,15 @@
     .mr-dot-active{background:var(--gold);border-color:var(--gold)}
     .mr-dot-done{background:var(--green);border-color:var(--green)}
 
-    /* Odd one out */
-    .oto-grid{display:grid;gap:4px;margin:4px 0}
-    .oto-tile{border:3px solid rgba(255,255,255,.3);border-radius:10px;cursor:pointer;transition:transform .1s,opacity .15s;padding:0;box-shadow:0 3px 0 rgba(0,0,0,.12)}
-    .oto-tile:active{transform:scale(.93)}
-    .oto-tile.oto-correct{border-color:#fff;border-width:4px;box-shadow:0 0 0 3px var(--green);animation:pop .3s}
-    .oto-tile.oto-wrong{border-color:var(--red);border-width:4px;opacity:.5}
-    .oto-status{font-size:14px;font-weight:800;text-align:center;min-height:20px;color:rgba(255,255,255,.7)}
-    .oto-rounds{display:flex;gap:6px;justify-content:center;margin:2px 0}
-    .oto-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);transition:background .2s}
+    /* Odd one out — vivid tiles */
+    .oto-grid{display:grid;gap:5px;margin:4px 0}
+    .oto-tile{border:3px solid rgba(255,255,255,.35);border-radius:12px;cursor:pointer;transition:transform .1s,opacity .15s,border-color .2s;padding:0;box-shadow:0 3px 0 rgba(0,0,0,.15)}
+    .oto-tile:active{transform:scale(.9)}
+    .oto-tile.oto-correct{border-color:#fff;border-width:4px;box-shadow:0 0 0 4px var(--green),0 4px 0 var(--green-dark);animation:pop .3s}
+    .oto-tile.oto-wrong{border-color:var(--red);border-width:4px;opacity:.4}
+    .oto-status{font-size:14px;font-weight:800;text-align:center;min-height:20px;color:rgba(255,255,255,.75)}
+    .oto-rounds{display:flex;gap:6px;justify-content:center;margin:4px 0}
+    .oto-dot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);transition:background .2s}
     .oto-dot-active{background:var(--gold);border-color:var(--gold)}
     .oto-dot-done{background:var(--green);border-color:var(--green)}
 
@@ -462,24 +463,25 @@
     /* ── STREAK POPUP ── */
     .streak-popup{
       position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-      background:rgba(4,116,252,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+      background:rgba(4,116,252,.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
       z-index:200;opacity:0;pointer-events:none;transition:opacity .3s;
     }
-    .streak-popup.show{opacity:1}
-    .streak-popup .si{width:60px;height:60px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:8px;box-shadow:var(--shadow-gold)}
-    .streak-popup .si svg{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-    .streak-popup .num{font-family:'Chewy',cursive;font-size:88px;color:#fff;line-height:1}
-    .streak-popup .txt{font-family:'Chewy',cursive;font-size:28px;color:#fff;text-transform:uppercase;letter-spacing:3px}
+    .streak-popup.show{opacity:1;animation:streakBurst .5s cubic-bezier(.34,1.56,.64,1)}
+    @keyframes streakBurst{0%{transform:scale(.6);opacity:0}50%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+    .streak-popup .si{width:70px;height:70px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 6px 0 var(--gold-dark),0 0 40px rgba(245,158,11,.4)}
+    .streak-popup .si svg{width:34px;height:34px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+    .streak-popup .num{font-family:'Nunito',sans-serif;font-size:96px;font-weight:900;color:#fff;line-height:1;text-shadow:0 4px 0 rgba(0,0,0,.15)}
+    .streak-popup .txt{font-family:'Nunito',sans-serif;font-size:28px;font-weight:900;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:4px}
 
     .flash{position:fixed;inset:0;pointer-events:none;opacity:0;z-index:150}
-    .flash.green{background:radial-gradient(circle,rgba(34,197,94,.12)0%,transparent 70%)}
-    .flash.red{background:radial-gradient(circle,rgba(239,68,68,.1)0%,transparent 70%)}
-    .flash.show{animation:fl .35s}
-    @keyframes fl{0%{opacity:1}100%{opacity:0}}
+    .flash.green{background:radial-gradient(circle,rgba(34,197,94,.18)0%,transparent 65%)}
+    .flash.red{background:radial-gradient(circle,rgba(239,68,68,.15)0%,transparent 65%)}
+    .flash.show{animation:fl .4s}
+    @keyframes fl{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.05)}}
     .confetti{position:fixed;inset:0;pointer-events:none;z-index:160;overflow:hidden}
-    .confetti i{position:absolute;width:10px;height:10px;opacity:0;border-radius:3px}
-    .confetti i.fall{animation:cf 1.2s ease-out forwards}
-    @keyframes cf{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(100vh) rotate(720deg)}}
+    .confetti i{position:absolute;width:12px;height:12px;opacity:0;border-radius:3px}
+    .confetti i.fall{animation:cf 1.4s ease-out forwards}
+    @keyframes cf{0%{opacity:1;transform:translateY(0) rotate(0) scale(1)}50%{opacity:.9;transform:translateY(45vh) rotate(360deg) scale(.8)}100%{opacity:0;transform:translateY(100vh) rotate(720deg) scale(.4)}}
 
     /* ── MODALS ── */
     .modal{position:fixed;inset:0;background:rgba(4,116,252,.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center;z-index:300;padding:20px}
@@ -567,20 +569,26 @@
     .ws2-status{color:rgba(255,255,255,.7)!important}
     .ws2-layer.ws2-empty{background:transparent!important}
 
-    /* ── Pipe Connect — white cells ── */
-    .pc-grid{background:rgba(255,255,255,.08)!important;border:2px solid rgba(255,255,255,.12)!important;border-radius:14px!important}
-    .pc-cell{background:rgba(255,255,255,.08)!important;border-radius:8px!important}
-    .pc-cell:active{background:rgba(255,255,255,.2)!important}
-    .pc-cell.pc-wall{background:rgba(0,0,0,.15)!important}
-    .pc-cell.pc-src{background:rgba(34,197,94,.25)!important}
-    .pc-cell.pc-snk{background:rgba(239,68,68,.25)!important}
-    .pc-cell.pc-lit .pc-arm,.pc-cell.pc-lit .pc-dot{background:var(--green)!important}
+    /* ── Pipe Connect — PREMIUM pipe grid ── */
+    .pc-grid{background:rgba(255,255,255,.1)!important;border:3px solid rgba(255,255,255,.15)!important;border-radius:16px!important;padding:8px!important;gap:4px!important}
+    .pc-cell{background:rgba(255,255,255,.08)!important;border-radius:10px!important;border:1.5px solid rgba(255,255,255,.08)!important;transition:all .15s!important}
+    .pc-cell:active{background:rgba(255,255,255,.2)!important;transform:scale(.92)!important}
+    .pc-cell.pc-wall{background:rgba(0,0,0,.2)!important;border-color:transparent!important}
+    .pc-cell.pc-src{background:rgba(34,197,94,.3)!important;border-color:rgba(34,197,94,.4)!important}
+    .pc-cell.pc-snk{background:rgba(239,68,68,.3)!important;border-color:rgba(239,68,68,.4)!important}
+    .pc-cell.pc-lit{background:rgba(34,197,94,.15)!important;border-color:rgba(34,197,94,.3)!important}
+    .pc-cell.pc-lit .pc-arm{background:#22c55e!important}
+    .pc-cell.pc-lit .pc-dot{background:#22c55e!important;box-shadow:0 0 8px rgba(34,197,94,.6)!important}
     .pc-cell.pc-src.pc-lit{background:rgba(34,197,94,.4)!important}
-    .pc-arm{background:rgba(255,255,255,.5)!important}
-    .pc-dot{background:rgba(255,255,255,.6)!important}
-    .pc-label{color:#fff!important}
-    .pc-status{color:rgba(255,255,255,.7)!important}
-    .pc-moves{color:rgba(255,255,255,.4)!important}
+    .pc-arm{background:#fff!important;border-radius:3px!important}
+    .pc-arm.pn{width:30%!important;height:52%!important;left:35%!important}
+    .pc-arm.ps{width:30%!important;height:52%!important;left:35%!important}
+    .pc-arm.pe{height:30%!important;width:52%!important;top:35%!important}
+    .pc-arm.pw{height:30%!important;width:52%!important;top:35%!important}
+    .pc-dot{background:#fff!important;width:34%!important;height:34%!important;top:33%!important;left:33%!important;border-radius:50%!important}
+    .pc-label{color:#fff!important;font-size:16px!important}
+    .pc-status{color:rgba(255,255,255,.75)!important}
+    .pc-moves{color:rgba(255,255,255,.45)!important}
 
     /* ── Word Ladder — WHITE tiles and keyboard ── */
     .wl-ep-lbl{color:rgba(255,255,255,.5)!important}
@@ -706,175 +714,166 @@
 <script src="games/games.js"></script>
 <script>
 // ══════════════════════════════════════════════════════════════════════
-// GAMES.JS PATCH — fixes applied AFTER games.js loads
+// GAMES.JS PATCH v3 — surgical fixes after games.js loads
 // ══════════════════════════════════════════════════════════════════════
-
 (function(){
-  // ── FIX 1: No same game type 2x in a row + even distribution ──────
-  if(window.Q && Q.generate){
-    const _origGenerate = Q.generate.bind(Q);
-    let _lastType = null;
-    let _typeCounts = {};
-    Q.generate = function(diff){
-      let attempts = 0;
-      while(attempts < 20){
-        attempts++;
-        const q = _origGenerate(diff);
-        if(!q) continue;
-        // Skip if same type as last
-        if(q.type === _lastType && attempts < 15) continue;
-        // Track counts for even distribution
-        _typeCounts[q.type] = (_typeCounts[q.type]||0) + 1;
-        // Prefer underrepresented types
-        const avg = Object.values(_typeCounts).reduce((a,b)=>a+b,0) / Math.max(Object.keys(_typeCounts).length,1);
-        if(_typeCounts[q.type] > avg + 3 && attempts < 10) continue;
-        _lastType = q.type;
-        return q;
-      }
-      // Fallback
-      const q = _origGenerate(diff);
-      if(q) _lastType = q.type;
-      return q;
-    };
-  }
+if(!window.Q||!Q.register) return;
 
-  // ── FIX 2: Pipe Connect — more solvable puzzles ───────────────────
-  // Override the pipeConnect register with guaranteed-solvable puzzles
-  if(window.Q && Q.register){
-    // These puzzles are hand-verified: all pipes at rot=0 form a connected path
-    var GOOD_PUZZLES = [
-      // 4x4 zigzag: 0→1→5→4→8→9→13→12→...→15 won't work, use simple paths
-      // Path: 0(down+right)→1(left+down)→5(up+down)→9(up+right)→10(left+right)→11(left+down)→15
-      {size:4,cells:[{t:6},{t:10},{t:0},{t:0},{t:0},{t:3},{t:0},{t:0},{t:0},{t:5},{t:12},{t:9},{t:0},{t:0},{t:0},{t:5}],src:0,snk:15,d:0.8},
-      // Simple L-path down then right
-      {size:4,cells:[{t:3},{t:0},{t:0},{t:0},{t:3},{t:0},{t:0},{t:0},{t:6},{t:12},{t:12},{t:9},{t:0},{t:0},{t:0},{t:5}],src:0,snk:15,d:0.8},
-      // Serpentine 4x4
-      {size:4,cells:[{t:6},{t:12},{t:12},{t:10},{t:0},{t:0},{t:0},{t:3},{t:0},{t:0},{t:0},{t:6},{t:0},{t:0},{t:0},{t:5}],src:0,snk:15,d:0.9},
-      // 5x5 simple down-right
-      {size:5,cells:[
-        {t:3},{t:0},{t:0},{t:0},{t:0},
-        {t:3},{t:0},{t:0},{t:0},{t:0},
-        {t:6},{t:12},{t:9},{t:0},{t:0},
-        {t:0},{t:0},{t:3},{t:0},{t:0},
-        {t:0},{t:0},{t:6},{t:12},{t:5}
-      ],src:0,snk:24,d:1.1},
-      // 5x5 L-shape
-      {size:5,cells:[
-        {t:6},{t:12},{t:12},{t:12},{t:10},
-        {t:0},{t:0},{t:0},{t:0},{t:3},
-        {t:0},{t:0},{t:0},{t:0},{t:3},
-        {t:0},{t:0},{t:0},{t:0},{t:3},
-        {t:0},{t:0},{t:0},{t:0},{t:5}
-      ],src:0,snk:24,d:1.0},
-    ];
+// ── No same game 2x in a row + even distribution ────────────────────
+var _origGen=Q.generate.bind(Q),_lastT=null,_tc={};
+Q.generate=function(d){for(var i=0;i<25;i++){var q=_origGen(d);if(!q)continue;if(q.type===_lastT&&i<15)continue;_tc[q.type]=(_tc[q.type]||0)+1;var avg=Object.values(_tc).reduce(function(a,b){return a+b},0)/Math.max(Object.keys(_tc).length,1);if(_tc[q.type]>avg+3&&i<10)continue;_lastT=q.type;return q;}var q2=_origGen(d);if(q2)_lastT=q2.type;return q2;};
 
-    // Re-register with guaranteed puzzles
-    Q.register('pipeConnect', function(){
-      var puz = GOOD_PUZZLES[Math.floor(Math.random()*GOOD_PUZZLES.length)];
-      var cells = puz.cells.map(function(c,i){
-        if(i===puz.src||i===puz.snk||c.t===0) return {t:c.t, rot:0};
-        return {t:c.t, rot:Math.floor(Math.random()*4)};
-      });
-      return {
-        type:'pipeConnect',category:'spatialAwareness',categoryLabel:'Pipe Connect',
-        difficulty:puz.d,question:'Rotate pipes to connect source to drain!',
-        size:puz.size,cells:cells,src:puz.src,snk:puz.snk,
-        answer:'complete',options:[],explanation:'Rotate pipes by tapping — connect 🟢 to 🔴!',visual:'custom'
-      };
-    }, 3);
-  }
+// ── Water Sort — replace blue (#3a7df2) with cyan (#00BCD4) ─────────
+// Color sort stays ORIGINAL (untouched) — only water sort gets patched
+(function(){
+  var WS_PALETTE=['#e8443a','#00BCD4','#3fba4f','#e8a817','#6d4aed','#e87d1a','#e8557a','#00897B'];
+  function makePuzzle(nc,tc){var layers=[];for(var c=0;c<nc;c++)for(var l=0;l<4;l++)layers.push(c);for(var i=layers.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),tmp=layers[i];layers[i]=layers[j];layers[j]=tmp;}var tubes=[];for(var t=0;t<nc;t++)tubes.push(layers.slice(t*4,t*4+4));for(var e=0;e<tc-nc;e++)tubes.push([]);return tubes;}
+  Q.register('waterSort',function(){var lvl=Q.rand(0,1),nc=lvl===0?4:5,tc=nc+2,tubes=makePuzzle(nc,tc);return{type:'waterSort',category:'problemSolving',categoryLabel:'Water Sort',difficulty:lvl===0?1.1:1.5,question:'Sort the colors — one color per tube!',tubes:tubes,numColors:nc,answer:'complete',options:[],explanation:'Pour the top color into a matching or empty tube.',visual:'custom'};},3);
+  // Also patch the renderer palette reference
+  window._ws_palette_override=WS_PALETTE;
+  // DOM watcher: replace blue layers in water sort with cyan
+  new MutationObserver(function(muts){
+    document.querySelectorAll('.ws2-layer').forEach(function(l){
+      var bg=l.style.background||l.style.backgroundColor;
+      if(bg==='#3a7df2'||bg==='rgb(58, 125, 242)')l.style.background='#00BCD4';
+    });
+  }).observe(document.body,{childList:true,subtree:true});
+})();
 
-  // ── FIX 3: Color Sort — change blue to purple ─────────────────────
-  // The PALETTE in colorSort uses '#3a7df2' which blends with blue card
-  // We override the register to use purple instead
-  if(window.Q && Q.register){
-    var CS_PALETTES = [
-      {name:'Rainbow',colors:['#FF0000','#FF7700','#FFDD00','#00CC44','#8B5CF6','#EC4899'],labels:['Red','Orange','Yellow','Green','Purple','Pink']},
-      {name:'Warm→Cool',colors:['#FF2200','#FF6600','#FFAA00','#22C55E','#8B5CF6','#EC4899'],labels:['Hot Red','Orange','Warm','Green','Purple','Pink']},
-      {name:'Light→Dark',colors:['#FFFFFF','#CCCCCC','#999999','#666666','#333333','#111111'],labels:['White','Light','Silver','Gray','Dark','Black']}
-    ];
-    Q.register('colorSort', function(){
-      var size=Q.rand(0,1),pal=Q.pick(CS_PALETTES),count=size===0?4:6;
-      var correct=pal.colors.slice(0,count),labels=pal.labels.slice(0,count);
-      var scrambled=Q.shuffle(correct.map(function(c,i){return{color:c,label:labels[i],idx:i}}));
-      return{type:'colorSort',category:'patternRecognition',categoryLabel:'Color Sort',
-        difficulty:size===0?0.7:1.1,question:'Sort '+pal.name+' in order!',
-        scrambled:scrambled,correctOrder:correct,answer:'complete',options:[],
-        explanation:'Visual pattern recognition.',visual:'custom'};
-    }, 3);
-  }
+// ── Odd One Out — vivid saturated colors ────────────────────────────
+(function(){
+  // Override with richer saturation (80-95%) and constrained lightness
+  var VIVID_LEVELS=[
+    {g:3,hd:45,ld:0,d:0.5},{g:3,hd:30,ld:0,d:0.7},
+    {g:4,hd:22,ld:0,d:0.9},{g:4,hd:15,ld:0,d:1.1},
+    {g:4,hd:0,ld:16,d:1.2},{g:5,hd:12,ld:0,d:1.3},
+    {g:5,hd:0,ld:12,d:1.4},{g:5,hd:8,ld:0,d:1.6},
+    {g:5,hd:0,ld:8,d:1.7},{g:6,hd:6,ld:0,d:1.9}
+  ];
+  // Avoid blue hues (200-260) that blend with card
+  var GOOD_HUES=[0,15,30,45,60,90,120,150,170,280,300,320,340];
+  function hsl(h,s,l){return'hsl('+h+','+s+'%,'+l+'%)';}
+  Q.register('oddTileOut',function(){
+    var lv=VIVID_LEVELS[Q.rand(0,VIVID_LEVELS.length-1)],g=lv.g,total=g*g;
+    var baseH=GOOD_HUES[Q.rand(0,GOOD_HUES.length-1)];
+    var baseS=Q.rand(80,95),baseL=Q.rand(45,60);
+    var oddH=(baseH+(lv.hd||0)+360)%360,oddL=baseL+(lv.ld||0);
+    var oddIdx=Q.rand(0,total-1),tiles=[];
+    for(var i=0;i<total;i++)tiles.push(i===oddIdx?hsl(oddH,baseS,oddL):hsl(baseH,baseS,baseL));
+    return{type:'oddTileOut',category:'patternRecognition',categoryLabel:'Odd Tile Out',
+      difficulty:lv.d,question:'Find the different tile!',
+      tiles:tiles,oddIdx:oddIdx,gridSize:g,answer:'complete',options:[],
+      explanation:'Color perception & visual attention.',visual:'custom'};
+  },3);
+})();
 
-  // ── FIX 4: More riddles ───────────────────────────────────────────
-  if(window.Q && Q.register){
-    var RIDDLES = [
-      {q:'I have hands but cannot clap. What am I?',a:'A clock',w:['A person','A robot','A tree'],why:'Clock hands tell time.',d:0.6},
-      {q:'What has keys but no locks?',a:'A piano',w:['A door','A car','A safe'],why:'Piano has musical keys.',d:0.6},
-      {q:'What gets wetter the more it dries?',a:'A towel',w:['A sponge','Paper','The sun'],why:'Towels absorb water as they dry things.',d:0.7},
-      {q:'What has a head and tail but no body?',a:'A coin',w:['A snake','A fish','A ghost'],why:'Coins have heads and tails.',d:0.7},
-      {q:'What can you catch but not throw?',a:'A cold',w:['A ball','A fish','A wave'],why:'You catch a cold.',d:0.7},
-      {q:'What has teeth but cannot bite?',a:'A comb',w:['A shark','A dog','A saw'],why:'A comb has teeth for hair.',d:0.6},
-      {q:'What goes up but never comes down?',a:'Your age',w:['A balloon','A bird','Smoke'],why:'Age only increases.',d:0.7},
-      {q:'What has one eye but cannot see?',a:'A needle',w:['A pirate','A cyclops','A camera'],why:'Needle eye holds thread.',d:0.7},
-      {q:'What has words but never speaks?',a:'A book',w:['A parrot','A phone','A radio'],why:'Books have words but cannot talk.',d:0.6},
-      {q:'What runs but never walks?',a:'Water',w:['A dog','A car','Time'],why:'Water runs and flows.',d:0.7},
-      {q:'The more you take, the more you leave behind. What?',a:'Footsteps',w:['Money','Time','Breath'],why:'Walking leaves footsteps.',d:1.0},
-      {q:'What can fill a room but takes no space?',a:'Light',w:['Air','Water','Sound'],why:'Light fills space with no mass.',d:1.0},
-      {q:'What can travel the world while staying in a corner?',a:'A stamp',w:['A compass','The internet','A satellite'],why:'Stamps stay in envelope corners.',d:1.0},
-      {q:'I have cities but no houses. What am I?',a:'A map',w:['A planet','A dream','A story'],why:'Maps show geography without real objects.',d:1.0},
-      {q:'The more there is, the less you see. What am I?',a:'Darkness',w:['Light','Fog','Space'],why:'More darkness = less visibility.',d:1.0},
-      {q:'I speak without a mouth and hear without ears. What am I?',a:'An echo',w:['A ghost','Music','The wind'],why:'Echoes are sound reflections.',d:1.1},
-      {q:'What is so fragile that saying its name breaks it?',a:'Silence',w:['Glass','A dream','A secret'],why:'Speaking breaks silence.',d:1.3},
-      {q:'I have no life but I can die. What am I?',a:'A battery',w:['A robot','A flame','A ghost'],why:'Batteries die when drained.',d:1.3},
-      {q:'What gets sharper the more you use it?',a:'Your mind',w:['A knife','A pencil','A saw'],why:'Mental ability sharpens with practice.',d:1.2},
-      {q:'What has 13 hearts but no other organs?',a:'A deck of cards',w:['A hospital','A town','A garden'],why:'13 hearts in the suit.',d:1.4},
-      {q:'What tastes better than it smells?',a:'Your tongue',w:['Coffee','Perfume','Bacon'],why:'Your tongue tastes but cannot smell.',d:1.5},
-      {q:'What has a neck but no head?',a:'A bottle',w:['A shirt','A guitar','A giraffe'],why:'Bottles have a neck.',d:0.7},
-      {q:'What can you hold in your right hand but never in your left?',a:'Your left hand',w:['A pen','A coin','A ball'],why:'You cannot hold your left hand in your left hand.',d:1.0},
-      {q:'What is always in front of you but cannot be seen?',a:'The future',w:['Air','Glass','Your nose'],why:'The future is ahead but invisible.',d:1.1},
-      {q:'What can you break even if you never touch it?',a:'A promise',w:['Glass','A record','Ice'],why:'Promises break without physical contact.',d:1.3},
-      {q:'What invention lets you look right through a wall?',a:'A window',w:['A mirror','X-rays','A telescope'],why:'Windows are transparent walls.',d:0.8},
-      {q:'What comes once in a minute, twice in a moment, but never in a thousand years?',a:'The letter M',w:['A second','Silence','A heartbeat'],why:'"Minute" and "moment" have M.',d:1.4},
-      {q:'What has a ring but no finger?',a:'A telephone',w:['A planet','A boxing ring','A circus'],why:'Phones ring.',d:0.7},
-      {q:'What can be cracked, made, told, and played?',a:'A joke',w:['A record','An egg','A game'],why:'You crack, make, tell, and play jokes.',d:1.0},
-      {q:'What gets bigger when more is taken away?',a:'A hole',w:['A debt','A balloon','A sponge'],why:'Removing material makes a hole larger.',d:1.1},
-      {q:'What has branches but no fruit or leaves?',a:'A bank',w:['A dead tree','A road','A river'],why:'Banks have branches.',d:1.2},
-      {q:'What loses its head every morning?',a:'A pillow',w:['A candle','The sun','A coin'],why:'A pillow loses your head when you get up.',d:1.1},
-      {q:'What is full of holes but still holds water?',a:'A sponge',w:['A net','A bucket','A cloud'],why:'Sponges are porous yet absorb water.',d:0.8},
-      {q:'What word becomes shorter when you add two letters?',a:'Short',w:['Small','Tiny','Brief'],why:'"Short" + "er" = "shorter".',d:1.4},
-      {q:'I fly without wings. I cry without eyes. What am I?',a:'A cloud',w:['A bat','A ghost','Smoke'],why:'Clouds bring rain and move through sky.',d:1.2},
-      {q:'What can you never eat for breakfast?',a:'Dinner',w:['Eggs','Lunch','Cereal'],why:'Dinner is an evening meal.',d:0.6},
-      {q:'What belongs to you but others use more?',a:'Your name',w:['Your phone','Your money','Your house'],why:'People say your name more than you do.',d:1.1},
-      {q:'I shrink every time you use me. What am I?',a:'A bar of soap',w:['A sponge','A pencil','A candle'],why:'Soap wears down with each use.',d:0.8},
-      {q:'What has many keys but cannot open any door?',a:'A keyboard',w:['A key ring','A piano','A safe'],why:'Keyboards have keys but open nothing.',d:0.8},
-      // NEW riddles
-      {q:'What has ears but cannot hear?',a:'A cornfield',w:['A statue','A teddy bear','A painting'],why:'Corn has ears but cannot hear.',d:0.7},
-      {q:'What building has the most stories?',a:'A library',w:['A skyscraper','A hotel','A museum'],why:'Libraries have the most stories (books).',d:0.8},
-      {q:'What has a thumb and four fingers but is not alive?',a:'A glove',w:['A hand','A puppet','A statue'],why:'Gloves have fingers but are not alive.',d:0.7},
-      {q:'What month has 28 days?',a:'All of them',w:['February','None','Just February'],why:'Every month has at least 28 days.',d:0.9},
-      {q:'What can you keep after giving to someone?',a:'Your word',w:['A gift','A smile','Money'],why:'You keep your word even after giving it.',d:1.0},
-      {q:'What goes through cities and fields but never moves?',a:'A road',w:['The wind','A river','Sunlight'],why:'Roads go everywhere but stay put.',d:0.9},
-      {q:'What has a bed but never sleeps, and a mouth but never eats?',a:'A river',w:['A cave','A volcano','A hotel'],why:'Rivers have beds and mouths.',d:1.1},
-      {q:'What gets broken without being held?',a:'A promise',w:['Silence','A rule','A heart'],why:'Promises break without physical contact.',d:1.0},
-      {q:'What can run but never walks, has a mouth but never talks?',a:'A river',w:['A clock','The wind','A snake'],why:'Rivers run and have mouths.',d:1.0},
-      {q:'I have lakes with no water, mountains with no stone. What am I?',a:'A map',w:['A dream','A painting','A model'],why:'Maps represent geography abstractly.',d:1.1},
-      {q:'What 5-letter word becomes shorter when you add 2 letters?',a:'Short',w:['Small','Quick','Light'],why:'Short + er = shorter.',d:1.3},
-      {q:'What begins with T, ends with T, and has T in it?',a:'A teapot',w:['A toast','A tent','A test'],why:'Teapot starts/ends with T and has tea in it.',d:1.2},
-      {q:'What has four wheels and flies?',a:'A garbage truck',w:['An airplane','A helicopter','A drone'],why:'Garbage trucks have wheels and attract flies.',d:1.3},
-      {q:'What can you hear but not see or touch?',a:'Your voice',w:['The wind','Music','Thunder'],why:'Your voice is heard but intangible.',d:0.8},
-      {q:'What has legs but cannot walk?',a:'A table',w:['A chair','A bed','A stool'],why:'Tables have legs but cannot walk.',d:0.6},
-      {q:'What kind of room has no doors or windows?',a:'A mushroom',w:['A dark room','A sealed room','A virtual room'],why:'A mushroom is a room with no doors.',d:1.0},
-      {q:'The more you share me, the less you have. What am I?',a:'A secret',w:['Money','Time','Food'],why:'Sharing a secret means fewer people dont know.',d:1.1},
-      {q:'What goes up and down but doesnt move?',a:'A staircase',w:['An elevator','A seesaw','Temperature'],why:'Stairs go up and down but stay fixed.',d:0.9},
-      {q:'What has a face and two hands but no arms or legs?',a:'A clock',w:['A doll','A robot','A puppet'],why:'Clocks have faces and hands.',d:0.6},
-      {q:'What can be long or short, grown or bought, painted or left bare?',a:'Fingernails',w:['Hair','A rope','A story'],why:'Fingernails match all descriptions.',d:1.4},
-    ];
-    Q.register('riddle', function(){
-      var i = Q.pick(RIDDLES);
-      return {type:'riddle',category:'problemSolving',categoryLabel:'Riddle',
-        difficulty:i.d||1.1,question:i.q,answer:i.a,
-        options:Q.shuffle([i.a].concat(i.w)),explanation:i.why,visual:'text'};
-    }, 3);
-  }
+// ── Pipe Connect — guaranteed solvable, more variety ────────────────
+// Pipe types: 3=N+S(straight V), 5=N+E(bend), 6=S+E(bend), 9=N+W(bend),
+// 10=S+W(bend), 12=E+W(straight H), 15=cross
+(function(){
+  var P=[
+    // 4x4 #1: down-right L
+    {s:4,c:[3,0,0,0, 3,0,0,0, 6,12,12,9, 0,0,0,3],sr:0,sk:15,d:0.8},
+    // 4x4 #2: right then down
+    {s:4,c:[6,12,12,10, 0,0,0,3, 0,0,0,3, 0,0,0,3],sr:0,sk:15,d:0.8},
+    // 4x4 #3: zigzag
+    {s:4,c:[6,12,9,0, 0,0,3,0, 0,6,6,12, 0,3,0,0],sr:0,sk:13,d:0.9},
+    // 4x4 #4: S-curve
+    {s:4,c:[6,12,9,0, 3,0,6,12, 6,12,9,0, 0,0,6,12],sr:0,sk:15,d:1.0},
+    // 5x5 #1: down-right-down-right
+    {s:5,c:[3,0,0,0,0, 3,0,0,0,0, 6,12,9,0,0, 0,0,3,0,0, 0,0,6,12,12],sr:0,sk:24,d:1.1},
+    // 5x5 #2: right-down-right
+    {s:5,c:[6,12,12,9,0, 0,0,0,3,0, 0,0,0,6,9, 0,0,0,0,3, 0,0,0,0,3],sr:0,sk:24,d:1.1},
+    // 5x5 #3: serpentine
+    {s:5,c:[6,12,12,12,10, 0,0,0,0,3, 0,6,12,12,6, 0,3,0,0,0, 0,6,12,12,12],sr:0,sk:24,d:1.3},
+  ];
+  Q.register('pipeConnect',function(){
+    var puz=P[Math.floor(Math.random()*P.length)];
+    var cells=puz.c.map(function(t,i){
+      if(i===puz.sr||i===puz.sk||t===0)return{t:t,rot:0};
+      return{t:t,rot:Math.floor(Math.random()*4)};
+    });
+    return{type:'pipeConnect',category:'spatialAwareness',categoryLabel:'Pipe Connect',
+      difficulty:puz.d,question:'Rotate pipes to connect 🟢 → 🔴',
+      size:puz.s,cells:cells,src:puz.sr,snk:puz.sk,
+      answer:'complete',options:[],explanation:'Tap to rotate — connect source to drain!',visual:'custom'};
+  },3);
+})();
+
+// ── More riddles (70+) ──────────────────────────────────────────────
+(function(){
+  var R=[
+    {q:'I have hands but cannot clap. What am I?',a:'A clock',w:['A person','A robot','A tree'],why:'Clock hands tell time.',d:0.6},
+    {q:'What has keys but no locks?',a:'A piano',w:['A door','A car','A safe'],why:'Piano has musical keys.',d:0.6},
+    {q:'What gets wetter the more it dries?',a:'A towel',w:['A sponge','Paper','The sun'],why:'Towels absorb water.',d:0.7},
+    {q:'What has a head and tail but no body?',a:'A coin',w:['A snake','A fish','A ghost'],why:'Coins have heads and tails.',d:0.7},
+    {q:'What can you catch but not throw?',a:'A cold',w:['A ball','A fish','A wave'],why:'You catch a cold.',d:0.7},
+    {q:'What has teeth but cannot bite?',a:'A comb',w:['A shark','A dog','A saw'],d:0.6,why:'Combs have teeth.'},
+    {q:'What goes up but never comes down?',a:'Your age',w:['A balloon','A bird','Smoke'],d:0.7,why:'Age only increases.'},
+    {q:'What has one eye but cannot see?',a:'A needle',w:['A pirate','A cyclops','A camera'],d:0.7,why:'Needle eye.'},
+    {q:'What has words but never speaks?',a:'A book',w:['A parrot','A phone','A radio'],d:0.6,why:'Books have words.'},
+    {q:'What runs but never walks?',a:'Water',w:['A dog','A car','Time'],d:0.7,why:'Water runs.'},
+    {q:'The more you take, the more you leave behind.',a:'Footsteps',w:['Money','Time','Breath'],d:1.0,why:'Walking leaves footsteps.'},
+    {q:'What can fill a room but takes no space?',a:'Light',w:['Air','Water','Sound'],d:1.0,why:'Light has no mass.'},
+    {q:'What travels the world staying in a corner?',a:'A stamp',w:['A compass','The internet','A satellite'],d:1.0,why:'Stamps in envelope corners.'},
+    {q:'I have cities but no houses. What am I?',a:'A map',w:['A planet','A dream','A story'],d:1.0,why:'Maps show places without buildings.'},
+    {q:'The more there is, the less you see.',a:'Darkness',w:['Light','Fog','Space'],d:1.0,why:'Darkness reduces visibility.'},
+    {q:'I speak without a mouth. What am I?',a:'An echo',w:['A ghost','Music','The wind'],d:1.1,why:'Echoes repeat sound.'},
+    {q:'Saying my name breaks me. What am I?',a:'Silence',w:['Glass','A dream','A secret'],d:1.3,why:'Speaking breaks silence.'},
+    {q:'I have no life but I can die.',a:'A battery',w:['A robot','A flame','A ghost'],d:1.3,why:'Batteries die.'},
+    {q:'What gets sharper the more you use it?',a:'Your mind',w:['A knife','A pencil','A saw'],d:1.2,why:'Practice sharpens minds.'},
+    {q:'What has 13 hearts but no organs?',a:'A deck of cards',w:['A hospital','A town','A garden'],d:1.4,why:'13 heart cards.'},
+    {q:'What tastes better than it smells?',a:'Your tongue',w:['Coffee','Perfume','Bacon'],d:1.5,why:'Tongues taste, not smell.'},
+    {q:'What has a neck but no head?',a:'A bottle',w:['A shirt','A guitar','A giraffe'],d:0.7,why:'Bottles have necks.'},
+    {q:'What is always in front of you but unseen?',a:'The future',w:['Air','Glass','Your nose'],d:1.1,why:'The future is invisible.'},
+    {q:'What can you break without touching?',a:'A promise',w:['Glass','A record','Ice'],d:1.3,why:'Promises break without contact.'},
+    {q:'What invention lets you see through a wall?',a:'A window',w:['A mirror','X-rays','A telescope'],d:0.8,why:'Windows are transparent walls.'},
+    {q:'Once in a minute, twice in a moment, never in a thousand years.',a:'The letter M',w:['A second','Silence','A heartbeat'],d:1.4,why:'M appears in those words.'},
+    {q:'What has a ring but no finger?',a:'A telephone',w:['A planet','A boxing ring','A circus'],d:0.7,why:'Phones ring.'},
+    {q:'What can be cracked, made, told, and played?',a:'A joke',w:['A record','An egg','A game'],d:1.0,why:'Jokes do all four.'},
+    {q:'What gets bigger when more is taken away?',a:'A hole',w:['A debt','A balloon','A sponge'],d:1.1,why:'Digging makes holes bigger.'},
+    {q:'What has branches but no fruit?',a:'A bank',w:['A dead tree','A road','A river'],d:1.2,why:'Bank branches.'},
+    {q:'What loses its head every morning?',a:'A pillow',w:['A candle','The sun','A coin'],d:1.1,why:'You lift your head off.'},
+    {q:'Full of holes but holds water.',a:'A sponge',w:['A net','A bucket','A cloud'],d:0.8,why:'Sponges absorb.'},
+    {q:'What word becomes shorter adding two letters?',a:'Short',w:['Small','Tiny','Brief'],d:1.4,why:'Short + er = shorter.'},
+    {q:'I fly without wings, cry without eyes.',a:'A cloud',w:['A bat','A ghost','Smoke'],d:1.2,why:'Clouds rain and drift.'},
+    {q:'What can you never eat for breakfast?',a:'Dinner',w:['Eggs','Lunch','Cereal'],d:0.6,why:'Dinner is evening.'},
+    {q:'What belongs to you but others use more?',a:'Your name',w:['Your phone','Your money','Your house'],d:1.1,why:'Others say your name.'},
+    {q:'I shrink every time you use me.',a:'A bar of soap',w:['A sponge','A pencil','A candle'],d:0.8,why:'Soap wears down.'},
+    {q:'Many keys but opens no door.',a:'A keyboard',w:['A key ring','A piano','A safe'],d:0.8,why:'Keyboard keys.'},
+    {q:'What has ears but cannot hear?',a:'A cornfield',w:['A statue','A teddy bear','A painting'],d:0.7,why:'Corn has ears.'},
+    {q:'What building has the most stories?',a:'A library',w:['A skyscraper','A hotel','A museum'],d:0.8,why:'Books = stories.'},
+    {q:'Thumb and four fingers, not alive.',a:'A glove',w:['A hand','A puppet','A statue'],d:0.7,why:'Gloves.'},
+    {q:'What month has 28 days?',a:'All of them',w:['February','None','Just February'],d:0.9,why:'All months have 28+.'},
+    {q:'Keep after giving it away.',a:'Your word',w:['A gift','A smile','Money'],d:1.0,why:'You keep your word.'},
+    {q:'Goes through cities but never moves.',a:'A road',w:['The wind','A river','Sunlight'],d:0.9,why:'Roads are stationary.'},
+    {q:'Has a bed but never sleeps.',a:'A river',w:['A cave','A volcano','A hotel'],d:1.1,why:'Riverbeds.'},
+    {q:'Broken without being held.',a:'A promise',w:['Silence','A rule','A heart'],d:1.0,why:'Abstract breaking.'},
+    {q:'What begins and ends with T, has T in it?',a:'A teapot',w:['A toast','A tent','A test'],d:1.2,why:'Teapot has tea.'},
+    {q:'Four wheels and flies.',a:'A garbage truck',w:['An airplane','A helicopter','A drone'],d:1.3,why:'Attracts flies.'},
+    {q:'What has legs but cannot walk?',a:'A table',w:['A chair','A bed','A stool'],d:0.6,why:'Table legs.'},
+    {q:'A room with no doors or windows.',a:'A mushroom',w:['A dark room','A sealed room','A virtual room'],d:1.0,why:'Mush-room.'},
+    {q:'Share me and you have less.',a:'A secret',w:['Money','Time','Food'],d:1.1,why:'Sharing secrets.'},
+    {q:'Goes up and down but stays still.',a:'A staircase',w:['An elevator','A seesaw','Temperature'],d:0.9,why:'Stairs are fixed.'},
+    {q:'Face and two hands, no arms.',a:'A clock',w:['A doll','A robot','A puppet'],d:0.6,why:'Clock face and hands.'},
+    {q:'I have lakes with no water.',a:'A map',w:['A dream','A painting','A model'],d:1.1,why:'Map geography.'},
+    {q:'What has a heart that doesnt beat?',a:'An artichoke',w:['A robot','A teddy bear','A statue'],d:1.3,why:'Artichoke hearts.'},
+    {q:'What has an eye but has never seen?',a:'A hurricane',w:['A potato','A storm','A needle'],d:1.2,why:'Eye of a hurricane.'},
+    {q:'Im tall when young and short when old.',a:'A candle',w:['A person','A tree','A shadow'],d:0.8,why:'Candles melt shorter.'},
+    {q:'What has a spine but no bones?',a:'A book',w:['A cactus','A fish','A snake'],d:0.9,why:'Book spines.'},
+    {q:'What can be served but never eaten?',a:'A tennis ball',w:['A plate','Revenge','Justice'],d:1.2,why:'You serve in tennis.'},
+    {q:'What has a bank but no money?',a:'A river',w:['A piggybank','A vault','A casino'],d:0.9,why:'Riverbanks.'},
+    {q:'What coat is always wet when you put it on?',a:'A coat of paint',w:['A raincoat','A fur coat','A lab coat'],d:1.3,why:'Paint is wet when applied.'},
+    {q:'What gets answered but never asks questions?',a:'A doorbell',w:['A phone','A teacher','A riddle'],d:1.1,why:'You answer the door.'},
+  ];
+  Q.register('riddle',function(){
+    var i=Q.pick(R);
+    return{type:'riddle',category:'problemSolving',categoryLabel:'Riddle',
+      difficulty:i.d||1.1,question:i.q,answer:i.a,
+      options:Q.shuffle([i.a].concat(i.w)),explanation:i.why,visual:'text'};
+  },3);
+})();
+
 })();
 </script>
 <script src="games/logic.js"></script>
