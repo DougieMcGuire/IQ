@@ -21,43 +21,44 @@
     html,body{width:100%;height:100dvh;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
     body{display:flex;flex-direction:column}
 
-    /* ── HEADER ── */
+    /* ── HEADER — blue hero band ── */
     .top{
-      background:var(--bg);
+      background:#0474fc;
       padding:calc(env(safe-area-inset-top,20px) + 8px) 16px 0;
       flex-shrink:0;
-      border-bottom:3px solid var(--card-border);
+      position:relative;
     }
+    .top::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:22px;background:var(--bg);border-radius:22px 22px 0 0}
     .top-inner{max-width:420px;margin:0 auto}
     .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-    .hdr-title{font-family:'Chewy',cursive;font-size:24px;letter-spacing:.5px;color:var(--text)}
+    .hdr-title{font-family:'Chewy',cursive;font-size:24px;letter-spacing:.5px;color:#fff}
     .hdr-btns{display:flex;gap:6px}
     .hdr-btn{
-      background:var(--card);border:2.5px solid var(--card-border);border-radius:12px;
-      padding:7px 12px;color:var(--text-dim);cursor:pointer;
+      background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.28);border-radius:12px;
+      padding:7px 12px;color:rgba(255,255,255,.85);cursor:pointer;
       font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;
       display:flex;align-items:center;gap:5px;transition:all .15s;
-      box-shadow:0 3px 0 var(--card-border);
+      box-shadow:0 3px 0 rgba(0,0,0,.12);
     }
     .hdr-btn:active{transform:translateY(3px);box-shadow:none}
     .hdr-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-    .hdr-btn.hid-mode{background:rgba(239,68,68,.06);color:var(--red);border-color:rgba(239,68,68,.25)}
+    .hdr-btn.hid-mode{background:rgba(239,68,68,.15);color:#fca5a5;border-color:rgba(239,68,68,.35)}
 
     /* ── FILTERS ── */
-    .filters{display:flex;gap:6px;margin-bottom:16px}
+    .filters{display:flex;gap:6px;margin-bottom:26px}
     .ftab{
-      flex:1;background:var(--card);border:2.5px solid var(--card-border);
+      flex:1;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.25);
       border-radius:14px;padding:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;
-      color:var(--text-dim);cursor:pointer;text-align:center;transition:all .2s;
-      box-shadow:0 3px 0 var(--card-border);
+      color:rgba(255,255,255,.55);cursor:pointer;text-align:center;transition:all .2s;
+      box-shadow:0 3px 0 rgba(0,0,0,.1);
     }
     .ftab:active{transform:translateY(3px);box-shadow:none}
-    .ftab[data-sort="iq"].active{background:var(--purple);color:#fff;border-color:var(--purple);box-shadow:0 4px 0 #7c3aed}
-    .ftab[data-sort="bestStreak"].active{background:var(--gold);color:#fff;border-color:var(--gold);box-shadow:0 4px 0 var(--gold-dark)}
-    .ftab[data-sort="level"].active{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:var(--shadow-blue)}
+    .ftab[data-sort="iq"].active{background:#fff;color:var(--purple);border-color:#fff;box-shadow:0 4px 0 #e8e2d6}
+    .ftab[data-sort="bestStreak"].active{background:#fff;color:var(--gold-dark);border-color:#fff;box-shadow:0 4px 0 #e8e2d6}
+    .ftab[data-sort="level"].active{background:#fff;color:var(--blue);border-color:#fff;box-shadow:0 4px 0 #e8e2d6}
 
     /* ── PODIUM ── */
-    .podium{display:flex;align-items:flex-end;justify-content:center;gap:10px;padding:8px 8px 20px;max-width:380px;margin:0 auto}
+    .podium{display:flex;align-items:flex-end;justify-content:center;gap:10px;padding:8px 8px 16px;max-width:380px;margin:0 auto}
     .pod{flex:1;display:flex;flex-direction:column;align-items:center;max-width:120px}
     .pod.r1{order:2}.pod.r2{order:1}.pod.r3{order:3}
 
@@ -191,11 +192,11 @@
       <button class="ftab" data-sort="level">Level</button>
     </div>
   </div>
-  <div class="podium" id="podium"></div>
 </div>
 
 <div class="bottom">
   <div class="bottom-inner">
+    <div class="podium" id="podium"></div>
     <div class="hidden-notice" id="hidden-notice" style="display:none">
       <div class="hn-ic"><svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg></div>
       <div class="hn-text"><strong>Hidden</strong> — you won't appear on the board</div>
