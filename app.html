@@ -37,55 +37,52 @@
     .screen{position:absolute;inset:0;display:none;overflow:hidden}
     .screen.active{display:block}
     .screen iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;touch-action:manipulation}
-    body.has-nav .screen iframe{height:calc(100dvh - 72px - env(safe-area-inset-bottom,0px))}
 
-    /* ── NAV — Blooket style: cream card floating above bg, rounded top, chunky ── */
+
+    /* ── NAV ── */
     #nav{
       position:fixed;bottom:0;left:0;right:0;
-      height:calc(72px + env(safe-area-inset-bottom,0px));
+      height:calc(68px + env(safe-area-inset-bottom,0px));
       padding-bottom:env(safe-area-inset-bottom,0px);
-      /* The nav itself is the blue strip */
-      background:#0474fc;
-      /* Rounded top corners = Blooket vibe */
-      border-radius:24px 24px 0 0;
+      /* White card on cream — floats up from bottom */
+      background:#ffffff;
+      border-radius:20px 20px 0 0;
       display:none;justify-content:space-around;align-items:flex-start;
-      padding-top:8px;
+      padding-top:10px;
       z-index:100;
-      /* Hard shadow like a card sitting on screen */
-      box-shadow:0 -4px 0 #0358c4, 0 -8px 32px rgba(4,116,252,.4);
+      /* Hard bottom shadow = Blooket card feel */
+      box-shadow:0 -3px 0 #ddd5c4, 0 -8px 24px rgba(30,58,95,.12);
     }
     body.has-nav #nav{display:flex}
+    body.has-nav .screen iframe{height:calc(100dvh - 68px - env(safe-area-inset-bottom,0px))}
 
     .nb{
-      flex:1;padding:0;background:none;border:none;
-      display:flex;flex-direction:column;align-items:center;gap:4px;
-      color:rgba(255,255,255,.5);
+      flex:1;padding:0 4px;background:none;border:none;
+      display:flex;flex-direction:column;align-items:center;gap:3px;
+      color:#a0acc4;
       font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;
       cursor:pointer;position:relative;transition:color .15s;
       -webkit-tap-highlight-color:transparent;
     }
     .nb .ni{
-      width:38px;height:32px;
+      width:44px;height:30px;
       display:flex;align-items:center;justify-content:center;
-      border-radius:12px;
-      transition:all .18s cubic-bezier(.34,1.4,.64,1);
+      border-radius:10px;
+      transition:all .2s cubic-bezier(.34,1.4,.64,1);
     }
-    .nb .ni svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
-    /* Active: white pill with colored stroke */
-    .nb.active{color:#fff}
+    .nb .ni svg{
+      width:22px;height:22px;fill:none;stroke:currentColor;
+      stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
+    }
+    /* Active state: blue pill, white icon */
+    .nb.active{color:#0474fc}
     .nb.active .ni{
-      background:rgba(255,255,255,.22);
-      width:50px;
-      box-shadow:inset 0 -2px 0 rgba(0,0,0,.15);
+      background:#0474fc;
+      box-shadow:0 3px 0 #0358c4;
     }
     .nb.active .ni svg{stroke:#fff}
-    /* Each tab gets its own color accent on active */
-    .nb[data-page="leaderboard"].active .ni{background:rgba(245,158,11,.3)}
-    .nb[data-page="improve"].active .ni{background:rgba(255,255,255,.25)}
-    .nb[data-page="tasks"].active .ni{background:rgba(34,197,94,.3)}
-    .nb[data-page="profile"].active .ni{background:rgba(139,92,246,.3)}
-
-    .nbdg{position:absolute;top:0;right:calc(50% - 20px);width:9px;height:9px;border-radius:50%;background:#ef4444;border:2.5px solid #0474fc;display:none}
+    /* Badge */
+    .nbdg{position:absolute;top:0;right:calc(50% - 18px);width:8px;height:8px;border-radius:50%;background:#ef4444;border:2px solid #fff;display:none}
     .nbdg.show{display:block}
 
     /* ── AUTH WAIT ── */
