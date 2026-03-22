@@ -12,6 +12,7 @@
   .game-branding{width:100%;display:flex;justify-content:center;margin-top:8px;padding-top:10px;border-top:1px solid rgba(240,234,214,.06)}.game-branding a{display:inline-flex;align-items:center;gap:5px;background:rgba(240,234,214,.07);border:1px solid rgba(240,234,214,.12);border-radius:20px;padding:5px 12px 5px 8px;text-decoration:none;transition:all .15s}.game-branding a:active{transform:scale(.96)}.game-branding-bear{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}.game-branding-bear img{width:20px;height:20px;object-fit:contain}.game-branding-text{font-size:11px;font-weight:900;color:rgba(240,234,214,.5);letter-spacing:1.5px;text-transform:uppercase}
   .scroll-hint{position:absolute;bottom:14px;left:0;right:0;font-size:13px;font-weight:900;display:flex;flex-direction:column;align-items:center;gap:4px;transition:opacity .4s;pointer-events:none;opacity:0}.scroll-hint.show{opacity:1}.scroll-hint-inner{display:flex;align-items:center;gap:7px;background:rgba(240,234,214,.1);border:1px solid rgba(240,234,214,.15);border-radius:20px;padding:7px 16px;color:var(--cream)}.scroll-hint-inner svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:2.8;animation:bounce 1.2s infinite}.scroll-hint-inner span{font-size:12px;font-weight:900;color:rgba(240,234,214,.7);letter-spacing:.3px}@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}@keyframes pop{0%{transform:scale(1)}30%{transform:scale(1.12)}60%{transform:scale(.97)}100%{transform:scale(1)}}
   .pc3-grid{display:grid;gap:5px;background:#e2ddd4;padding:7px;border-radius:16px;margin:4px auto;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae}.pc3-cell{border-radius:10px;background:#fff;border:2.5px solid #e8e2d6;position:relative;cursor:pointer;user-select:none;transition:border-color .15s,background .15s,box-shadow .15s;box-shadow:0 3px 0 #d6cfc0;overflow:hidden;aspect-ratio:1}.pc3-cell:not([style*='pointer-events:none']):active{transform:translateY(3px);box-shadow:none}.pc3-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.6);min-height:18px}.pc3-moves{font-size:11px;font-weight:700;text-align:center;color:rgba(255,255,255,.3);min-height:14px}
+  .jig-board{display:grid;gap:4px;background:#e2ddd4;padding:6px;border-radius:16px;margin:0 auto;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae;width:min(250px,66vw)}.jig-gcell{aspect-ratio:1;border-radius:8px;background:#fff;border:2px solid #e8e2d6;cursor:pointer;user-select:none;transition:background .12s,border-color .12s,transform .1s;box-shadow:0 2px 0 #d6cfc0}.jig-gcell:active{transform:scale(.92)}.jig-gcell.jig-cell-filled{cursor:default;pointer-events:none}.jig-gcell.jig-hover{background:rgba(255,255,255,.7);border-color:#0474fc;transform:scale(1.05)}.jig-gcell.jig-hover-bad{background:#fee2e2;border-color:#ef4444}.jig-tray2{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:4px 0}.jig-piece{background:#fff;border:3px solid #e8e2d6;border-radius:12px;cursor:pointer;user-select:none;box-shadow:0 3px 0 #d6cfc0;transition:all .15s;padding:6px;display:flex;flex-direction:column;align-items:center;justify-content:center}.jig-piece:active{transform:translateY(3px);box-shadow:none}.jig-piece.jig-piece-sel{transform:translateY(-5px);box-shadow:0 8px 0 #d6cfc0;background:#e8f2ff}.jig-piece.jig-piece-used{opacity:.15;pointer-events:none;transform:none}.jig-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.55);min-height:18px}
   .jig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;background:#e2ddd4;padding:7px;border-radius:16px;margin:0 auto;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae;width:min(240px,63vw)}.jig-slot{aspect-ratio:1;border-radius:10px;border:2.5px solid rgba(255,255,255,.25);cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:center;transition:transform .15s,background .15s,border-color .15s;box-shadow:0 3px 0 rgba(0,0,0,.15)}.jig-slot:not(.jig-slot-fixed):not(.jig-slot-done){background:rgba(255,255,255,.12);border-style:dashed;border-color:rgba(255,255,255,.3)}.jig-slot:not(.jig-slot-fixed):not(.jig-slot-done):active{transform:scale(.92)}.jig-slot-fixed{pointer-events:none}.jig-slot-done{border-style:solid;pointer-events:none}.jig-tray{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:2px 0}.jig-piece{width:clamp(48px,13vw,60px);height:clamp(48px,13vw,60px);border-radius:12px;border:3px solid rgba(255,255,255,.4);cursor:pointer;user-select:none;box-shadow:0 4px 0 rgba(0,0,0,.25);transition:all .15s}.jig-piece:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.2)}.jig-piece.jig-piece-sel{border-color:#fff;transform:translateY(-5px);box-shadow:0 8px 0 rgba(0,0,0,.2),0 0 0 3px rgba(255,255,255,.5)}.jig-piece.jig-piece-used{opacity:.15;pointer-events:none;transform:none}.jig-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.55);min-height:18px}
   .jig-tray{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:4px 0}.jig-tray-piece{border-radius:12px;background:#fff;border:2.5px solid #e8e2d6;cursor:pointer;box-shadow:0 3px 0 #d6cfc0;transition:all .15s;user-select:none;overflow:visible;display:flex;align-items:center;justify-content:center;padding:2px}.jig-tray-piece:active{transform:translateY(3px)!important;box-shadow:none!important}.jig-tray-piece.jig-tray-sel{border-color:#0474fc;background:#e8f2ff;box-shadow:0 3px 0 #0358c4;transform:translateY(-4px)}.jig-tray-piece.jig-used{opacity:.12;pointer-events:none}.jig-slot-filled{pointer-events:none}.jig-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.6);min-height:18px}
   `;
@@ -366,118 +367,194 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
   });
 })();
 
-// ── Jigsaw Puzzle ─────────────────────────────────────────────────────────────
+// ── Jigsaw (Tetris-style) ─────────────────────────────────────────────────────
 (function(){
-  // Grid of colored tiles. Some are removed and shuffled into a tray.
-  // Player taps a tray piece then taps the correct empty slot in the grid.
-  // The "image" is a bold color-block pattern — simple, clear, satisfying.
+  var COLORS=['#e8443a','#3a7df2','#3fba4f','#e8a817','#8b5cf6'];
 
-  var PATTERNS=[
-    // Each pattern is a 3x3 array of colors making a simple image
-    {name:'Flag',colors:['#e8443a','#e8443a','#e8443a','#ffffff','#ffffff','#ffffff','#3a7df2','#3a7df2','#3a7df2']},
-    {name:'Gradient',colors:['#ff0000','#ff6600','#ffcc00','#ff6600','#ff9900','#ffcc00','#cc0000','#ff3300','#ff6600']},
-    {name:'Checkers',colors:['#1e293b','#f0eaD6','#1e293b','#f0ead6','#1e293b','#f0ead6','#1e293b','#f0ead6','#1e293b']},
-    {name:'Sunset',colors:['#1a1a2e','#16213e','#0f3460','#e94560','#f5a623','#ffdd57','#e94560','#f5a623','#ffdd57']},
-    {name:'Rainbow',colors:['#ff0000','#ff7700','#ffdd00','#00cc44','#0066ff','#8833ff','#ff0000','#ff7700','#ffdd00']},
-    {name:'Diamond',colors:['#3a7df2','#ffffff','#3a7df2','#ffffff','#e8a817','#ffffff','#3a7df2','#ffffff','#3a7df2']},
-    {name:'Stripes',colors:['#e8443a','#3a7df2','#3fba4f','#e8443a','#3a7df2','#3fba4f','#e8443a','#3a7df2','#3fba4f']},
-    {name:'Bullseye',colors:['#3a7df2','#3a7df2','#3a7df2','#3a7df2','#e8443a','#3a7df2','#3a7df2','#3a7df2','#3a7df2']},
-    {name:'Cross',colors:['#f0ead6','#3a7df2','#f0ead6','#3a7df2','#3a7df2','#3a7df2','#f0ead6','#3a7df2','#f0ead6']},
-    {name:'Quarters',colors:['#e8443a','#e8443a','#3fba4f','#e8443a','#e8a817','#3fba4f','#3a7df2','#3a7df2','#3a7df2']},
+  // Hand-verified puzzles: each piece has its solution cells
+  var PUZZLES=[
+    {sz:4,pieces:[
+      [[0,0],[0,1],[1,0],[1,1]],
+      [[0,2],[0,3],[1,2],[2,2]],
+      [[1,3],[2,3],[3,3],[3,2]],
+      [[2,0],[2,1],[3,0],[3,1]],
+    ]},
+    {sz:4,pieces:[
+      [[0,0],[0,1],[0,2],[0,3]],
+      [[1,0],[1,1],[2,0],[3,0]],
+      [[1,2],[1,3],[2,3],[3,3]],
+      [[2,1],[2,2],[3,1],[3,2]],
+    ]},
+    {sz:4,pieces:[
+      [[0,0],[1,0],[2,0],[3,0]],
+      [[0,1],[0,2],[0,3],[1,1]],
+      [[1,2],[1,3],[2,1],[2,2]],
+      [[2,3],[3,1],[3,2],[3,3]],
+    ]},
+    {sz:4,pieces:[
+      [[0,0],[0,1],[0,2],[1,2]],
+      [[0,3],[1,3],[2,3],[3,3]],
+      [[1,0],[1,1],[2,0],[2,1]],
+      [[2,2],[3,0],[3,1],[3,2]],
+    ]},
+    {sz:5,pieces:[
+      [[0,0],[0,1],[0,2],[0,3],[0,4]],
+      [[1,0],[2,0],[3,0],[4,0],[4,1]],
+      [[1,1],[1,2],[2,1],[2,2],[3,1]],
+      [[1,3],[1,4],[2,3],[2,4],[3,4]],
+      [[3,2],[3,3],[4,2],[4,3],[4,4]],
+    ]},
+    {sz:5,pieces:[
+      [[0,0],[1,0],[2,0],[3,0],[4,0]],
+      [[0,1],[0,2],[0,3],[0,4],[1,1]],
+      [[1,2],[1,3],[1,4],[2,4],[3,4]],
+      [[2,1],[2,2],[2,3],[3,3],[4,3]],
+      [[3,1],[3,2],[4,1],[4,2],[4,4]],
+    ]},
   ];
 
   Q.register('jigsaw',function(){
-    var pat=Q.pick(PATTERNS);
-    // Remove 4 pieces and shuffle them
-    var allIdx=[0,1,2,3,4,5,6,7,8];
-    var removed=Q.shuffle(allIdx.slice()).slice(0,4);
-    var tray=Q.shuffle(removed.slice()); // shuffled order in tray
-    return{type:'jigsaw',category:'patternRecognition',categoryLabel:'Jigsaw',
-      difficulty:1.0,question:'Complete the pattern!',
-      patternName:pat.name,colors:pat.colors,removed:removed,tray:tray,
-      answer:'complete',options:[],explanation:'Spatial pattern recognition.',visual:'custom'};
+    var puz=Q.pick(PUZZLES),sz=puz.sz;
+    var pieces=puz.pieces.map(function(cells,pi){
+      // Normalise cells to top-left origin
+      var minR=Math.min.apply(null,cells.map(function(c){return c[0];}));
+      var minC=Math.min.apply(null,cells.map(function(c){return c[1];}));
+      var norm=cells.map(function(c){return[c[0]-minR,c[1]-minC];});
+      return{cells:norm,solutionCells:cells,color:COLORS[pi%COLORS.length]};
+    });
+    return{type:'jigsaw',category:'spatialAwareness',categoryLabel:'Jigsaw',
+      difficulty:sz===4?0.9:1.2,question:'Fill the grid with all the pieces!',
+      sz:sz,pieces:pieces,answer:'complete',options:[],
+      explanation:'Tap a piece to select, tap the grid to place it.',visual:'custom'};
   },3);
 
   Q.registerRenderer('jigsaw',{
     render:function(q,idx){
-      var removedSet=new Set(q.removed);
-      // Build 3x3 puzzle grid
-      var gridCells='';
-      for(var i=0;i<9;i++){
-        if(removedSet.has(i)){
-          gridCells+='<div class="jig-slot" id="jigsl-'+idx+'-'+i+'" data-jsi="'+idx+'" data-jsp="'+i+'" data-jsexpect="'+q.colors[i]+'">'
-            +'<div style="width:60%;height:60%;border-radius:4px;background:rgba(255,255,255,.15)"></div>'
-            +'</div>';
-        }else{
-          gridCells+='<div class="jig-slot jig-slot-fixed" style="background:'+q.colors[i]+';cursor:default;border-color:rgba(255,255,255,.3)"></div>';
-        }
+      // Build empty grid
+      var cells='';
+      for(var r=0;r<q.sz;r++)for(var c=0;c<q.sz;c++){
+        cells+='<div class="jig-gcell" id="jig-'+idx+'-'+r+'-'+c+'" data-jgr="'+r+'" data-jgc="'+c+'" data-jgi="'+idx+'"></div>';
       }
-      // Build tray pieces
-      var trayPieces='';
-      q.tray.forEach(function(gridPos,trayIdx){
-        trayPieces+='<button class="jig-piece" id="jigp-'+idx+'-'+trayIdx+'" data-jpii="'+idx+'" data-jpti="'+trayIdx+'" data-jpgp="'+gridPos+'" data-jpcolor="'+q.colors[gridPos]+'" style="background:'+q.colors[gridPos]+'"></button>';
+      // Build piece previews in tray
+      var tray='';
+      q.pieces.forEach(function(p,pi){
+        var maxR=Math.max.apply(null,p.cells.map(function(c){return c[0];}));
+        var maxC=Math.max.apply(null,p.cells.map(function(c){return c[1];}));
+        var rows=maxR+1,cols=maxC+1;
+        var cellSet=new Set(p.cells.map(function(c){return c[0]+','+c[1];}));
+        var mini='';
+        for(var r=0;r<rows;r++){
+          mini+='<div style="display:flex">';
+          for(var c=0;c<cols;c++){
+            mini+='<div style="width:16px;height:16px;border-radius:3px;margin:1px;background:'+(cellSet.has(r+','+c)?p.color:'transparent')+'"></div>';
+          }
+          mini+='</div>';
+        }
+        tray+='<button class="jig-piece" id="jigp-'+idx+'-'+pi+'" data-jpii="'+idx+'" data-jpi="'+pi+'" style="border-color:'+p.color+'">'+mini+'</button>';
       });
-      return'<div class="qcard" style="gap:10px">'
+      return'<div class="qcard" style="gap:8px">'
         +'<div class="category">JIGSAW</div>'
         +'<div class="question">'+q.question+'</div>'
-        +'<div style="font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3)">'+q.patternName+'</div>'
-        +'<div class="jig-grid" id="jigg-'+idx+'">'+gridCells+'</div>'
-        +'<div style="font-size:11px;font-weight:800;color:rgba(255,255,255,.4);text-align:center">Pieces to place:</div>'
-        +'<div class="jig-tray" id="jigt-'+idx+'">'+trayPieces+'</div>'
-        +'<div class="jig-status" id="jigst-'+idx+'">Tap a piece, then tap its slot</div>'
+        +'<div class="jig-board" id="jig-board-'+idx+'" style="grid-template-columns:repeat('+q.sz+',1fr)">'+cells+'</div>'
+        +'<div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.4);text-align:center;letter-spacing:1px">SELECT A PIECE THEN TAP THE GRID</div>'
+        +'<div class="jig-tray2" id="jig-tray-'+idx+'">'+tray+'</div>'
+        +'<div class="jig-status" id="jig-st-'+idx+'">Tap a piece to select it</div>'
         +'<div id="wa-'+idx+'"></div><div class="explanation" id="exp-'+idx+'"></div>'
         +_gameBranding()+_scrollHint(idx)+'</div>';
     },
     attach:function(slideEl,q,idx,ctx){
       var H=ctx.Haptics||{};
       var actEl=slideEl.querySelector('#wa-'+idx);if(actEl&&ctx.addShareBtn)ctx.addShareBtn(actEl,q);
-      var statEl=document.getElementById('jigst-'+idx);
-      var selectedTray=null,placed=0,done=false,total=q.removed.length;
+      var board=document.getElementById('jig-board-'+idx),trayEl=document.getElementById('jig-tray-'+idx),statEl=document.getElementById('jig-st-'+idx);
+      if(!board)return;
 
-      function getPieceEl(ti){return document.getElementById('jigp-'+idx+'-'+ti);}
-      function getSlotEl(pos){return document.getElementById('jigsl-'+idx+'-'+pos);}
+      var selectedPiece=null,placed=0,done=false;
+      // Track what's in each grid cell: null or piece index
+      var grid=[];for(var i=0;i<q.sz*q.sz;i++)grid[i]=null;
+
+      function cellEl(r,c){return document.getElementById('jig-'+idx+'-'+r+'-'+c);}
+      function pieceEl(pi){return document.getElementById('jigp-'+idx+'-'+pi);}
 
       function clearSel(){
-        if(selectedTray!==null){var el=getPieceEl(selectedTray);if(el)el.classList.remove('jig-piece-sel');}
-        selectedTray=null;
+        if(selectedPiece!==null){var el=pieceEl(selectedPiece);if(el)el.classList.remove('jig-piece-sel');}
+        // Clear any hover preview
+        clearPreview();
+        selectedPiece=null;
+      }
+      function clearPreview(){
+        for(var r=0;r<q.sz;r++)for(var c=0;c<q.sz;c++){
+          var el=cellEl(r,c);if(el)el.classList.remove('jig-hover','jig-hover-bad');
+        }
       }
 
-      // Tap tray piece
-      var tray=document.getElementById('jigt-'+idx);
-      if(tray)tray.addEventListener('click',function(e){
+      function canPlace(pi,anchorR,anchorC){
+        var piece=q.pieces[pi];
+        for(var i=0;i<piece.cells.length;i++){
+          var tr=anchorR+piece.cells[i][0],tc=anchorC+piece.cells[i][1];
+          if(tr<0||tr>=q.sz||tc<0||tc>=q.sz)return false;
+          if(grid[tr*q.sz+tc]!==null)return false;
+        }
+        return true;
+      }
+
+      function placePiece(pi,anchorR,anchorC){
+        var piece=q.pieces[pi];
+        piece.cells.forEach(function(cell){
+          var tr=anchorR+cell[0],tc=anchorC+cell[1];
+          var el=cellEl(tr,tc);
+          if(el){
+            el.style.background=piece.color;
+            el.style.borderColor='rgba(255,255,255,.35)';
+            el.style.boxShadow='inset 0 1px 0 rgba(255,255,255,.3)';
+            el.classList.add('jig-cell-filled');
+          }
+          grid[tr*q.sz+tc]=pi;
+        });
+        pieceEl(pi).classList.add('jig-piece-used');
+        placed++;
+      }
+
+      // Hover preview on grid cells
+      board.addEventListener('mouseover',function(e){
+        if(selectedPiece===null||done)return;
+        var cell=e.target.closest('.jig-gcell');if(!cell)return;
+        var r=parseInt(cell.dataset.jgr),c=parseInt(cell.dataset.jgc);
+        clearPreview();
+        var ok=canPlace(selectedPiece,r,c);
+        q.pieces[selectedPiece].cells.forEach(function(dc){
+          var tr=r+dc[0],tc=c+dc[1];
+          var el=cellEl(tr,tc);if(el)el.classList.add(ok?'jig-hover':'jig-hover-bad');
+        });
+      });
+      board.addEventListener('mouseleave',clearPreview);
+
+      // Tap tray
+      trayEl.addEventListener('click',function(e){
         if(done)return;
         var btn=e.target.closest('.jig-piece');if(!btn||btn.classList.contains('jig-piece-used'))return;
-        var ti=parseInt(btn.dataset.jpti);H.light&&H.light();
-        if(selectedTray===ti){clearSel();statEl.textContent='Tap a piece, then tap its slot';}
-        else{clearSel();selectedTray=ti;btn.classList.add('jig-piece-sel');statEl.textContent='Now tap the empty slot where it belongs';}
+        var pi=parseInt(btn.dataset.jpi);H.light&&H.light();
+        if(selectedPiece===pi){clearSel();statEl.textContent='Tap a piece to select it';}
+        else{clearSel();selectedPiece=pi;btn.classList.add('jig-piece-sel');statEl.textContent='Now tap where to place it on the grid';}
       });
 
-      // Tap grid slot
-      var grid=document.getElementById('jigg-'+idx);
-      if(grid)grid.addEventListener('click',function(e){
+      // Tap grid
+      board.addEventListener('click',function(e){
         if(done)return;
-        var slot=e.target.closest('.jig-slot:not(.jig-slot-fixed):not(.jig-slot-done)');if(!slot)return;
-        if(selectedTray===null){statEl.textContent='Pick a piece from below first!';return;}
-        var pieceEl=getPieceEl(selectedTray);if(!pieceEl)return;
-        var pieceColor=pieceEl.dataset.jpcolor;
-        var expectedColor=slot.dataset.jsexpect;
-        if(pieceColor===expectedColor){
+        var cell=e.target.closest('.jig-gcell');if(!cell)return;
+        if(selectedPiece===null){statEl.textContent='Pick a piece first!';return;}
+        var r=parseInt(cell.dataset.jgr),c=parseInt(cell.dataset.jgc);
+        clearPreview();
+        if(canPlace(selectedPiece,r,c)){
           H.medium&&H.medium();
-          // Snap piece in — fill slot with color
-          slot.style.background=pieceColor;
-          slot.style.borderColor='rgba(255,255,255,.3)';
-          slot.innerHTML='';
-          slot.classList.add('jig-slot-done');
-          // Animate slot
-          slot.style.transform='scale(1.08)';setTimeout(function(){slot.style.transform='';},200);
-          pieceEl.classList.remove('jig-piece-sel');pieceEl.classList.add('jig-piece-used');
-          clearSel();placed++;
-          statEl.textContent=placed===total?'Complete! 🎉':placed+' / '+total+' placed';
-          if(placed===total)setTimeout(function(){finish(true);},350);
+          placePiece(selectedPiece,r,c);
+          clearSel();
+          statEl.textContent=placed+'/'+q.pieces.length+' pieces placed';
+          if(placed===q.pieces.length)setTimeout(function(){finish(true);},300);
         }else{
           H.error&&H.error();
-          pieceEl.style.transform='rotate(-8deg)';setTimeout(function(){pieceEl.style.transform='';},300);
-          statEl.textContent='Wrong spot! Look at the colors.';
+          var badCells=q.pieces[selectedPiece].cells;
+          badCells.forEach(function(dc){var el=cellEl(r+dc[0],r+dc[1]);if(el){el.classList.add('jig-hover-bad');setTimeout(function(){el.classList.remove('jig-hover-bad');},400);}});
+          statEl.textContent="Doesn\'t fit there!";
         }
       });
 
@@ -486,10 +563,10 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
         var ms=Date.now()-ctx.answerStartRef.get(),data=ctx.IQData.recordAnswer(q.category,won,q.difficulty,ms);
         if(ctx.notifyGamePlayed)ctx.notifyGamePlayed('jigsaw');
         if(ctx.onAnswer)ctx.onAnswer(won,ms);
-        if(won){H.streak&&H.streak();ctx.flashEl.className='flash green show';ctx.spawnConfetti(18);}
+        if(won){H.streak&&H.streak();statEl.textContent='Puzzle complete! 🎉';ctx.flashEl.className='flash green show';ctx.spawnConfetti(20);}
         setTimeout(function(){ctx.flashEl.className='flash';},350);
         var expEl=slideEl.querySelector('#exp-'+idx),hintEl=document.getElementById('hint-'+idx);
-        if(expEl){expEl.textContent=won?'Pattern complete!':'Match each color piece to its correct slot.';expEl.classList.add('show');}
+        if(expEl){expEl.textContent=won?'All pieces fit perfectly!':'Fill the grid with all pieces.';expEl.classList.add('show');}
         setTimeout(function(){if(hintEl)hintEl.classList.add('show');},500);
         ctx.updateUI(data);ctx.checkMore();ctx.answerStartRef.set(Date.now());
       }
