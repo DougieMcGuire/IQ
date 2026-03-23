@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,viewport-fit=cover">
   <title>Tasks — Cebear</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,42 +24,27 @@
     html{width:100%;height:100%;overflow:hidden}
     body{width:100%;height:100%;overflow:hidden;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column}
 
-    /* ── HERO — blue band ── */
     .hero{
       background:var(--blue);
       padding:calc(env(safe-area-inset-top,20px) + 10px) 16px 0;
-      flex-shrink:0;
-      position:relative;
+      flex-shrink:0;position:relative;
     }
     .hero::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:24px;background:var(--bg);border-radius:24px 24px 0 0}
     .hero-inner{max-width:460px;margin:0 auto}
-
     .hero-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
     .hero-title{font-family:'Chewy',cursive;font-size:26px;letter-spacing:.5px;color:#fff}
-    .hero-countdown{
-      display:flex;align-items:center;gap:6px;
-      background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.28);
-      border-radius:12px;padding:7px 12px;
-      box-shadow:0 3px 0 rgba(0,0,0,.1);
-    }
+    .hero-countdown{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.28);border-radius:12px;padding:7px 12px;box-shadow:0 3px 0 rgba(0,0,0,.1)}
     .hero-countdown svg{width:14px;height:14px;stroke:rgba(255,255,255,.7);fill:none;stroke-width:2;stroke-linecap:round}
     .cd-time{font-size:13px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums}
-
     .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px}
-    .hs{
-      background:var(--card);border-radius:var(--card-r);border:2.5px solid var(--card-border);
-      padding:16px 14px;display:flex;flex-direction:column;align-items:center;text-align:center;
-      box-shadow:var(--shadow-card);
-    }
+    .hs{background:var(--card);border-radius:var(--card-r);border:2.5px solid var(--card-border);padding:16px 14px;display:flex;flex-direction:column;align-items:center;text-align:center;box-shadow:var(--shadow-card)}
     .hs-icon{margin-bottom:6px}
     .hs-num{font-family:'Chewy',cursive;font-size:clamp(36px,10vw,46px);line-height:1}
     .hs-num.streak{color:var(--orange)}
     .hs-label{font-size:10px;font-weight:900;color:var(--text-light);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
-
     .streak-pips{display:flex;gap:4px;margin-top:10px;width:100%;justify-content:center}
     .streak-pip{flex:1;max-width:20px;height:6px;border-radius:3px;background:#e2e8f0;border:1px solid #d1d5db}
     .streak-pip.done{background:var(--green);border-color:var(--green-dark)}
-
     .prog-ring-wrap{position:relative;width:clamp(60px,15vw,72px);height:clamp(60px,15vw,72px);margin-bottom:4px}
     .prog-ring{width:100%;height:100%;transform:rotate(-90deg)}
     .prog-ring-bg{fill:none;stroke:#e2e8f0;stroke-width:5}
@@ -67,104 +52,58 @@
     .prog-ring-fill.alldone{stroke:var(--gold)}
     .prog-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Chewy',cursive;font-size:clamp(16px,4vw,20px);color:var(--text)}
 
-    /* ── BODY ── */
     .body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;min-height:0;background:var(--bg);padding:4px 16px 40px}
     .body::-webkit-scrollbar{display:none}
     .body-inner{max-width:460px;margin:0 auto}
 
-    /* ── ALL DONE BANNER ── */
-    .complete{
-      display:none;background:var(--green);border-radius:var(--card-r);border:2.5px solid var(--green-dark);
-      padding:16px;margin-bottom:14px;align-items:center;gap:12px;color:#fff;
-      box-shadow:0 4px 0 var(--green-dark);
-    }
+    .complete{display:none;background:var(--green);border-radius:var(--card-r);border:2.5px solid var(--green-dark);padding:16px;margin-bottom:14px;align-items:center;gap:12px;color:#fff;box-shadow:0 4px 0 var(--green-dark)}
     .complete.show{display:flex;animation:popIn .5s cubic-bezier(.34,1.56,.64,1)}
-    .complete-ic{
-      width:44px;height:44px;background:rgba(255,255,255,.25);border-radius:14px;
-      display:flex;align-items:center;justify-content:center;flex-shrink:0;
-    }
+    .complete-ic{width:44px;height:44px;background:rgba(255,255,255,.25);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .complete-ic svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
     .ct-title{font-family:'Chewy',cursive;font-size:17px;letter-spacing:.3px}
     .ct-sub{font-size:11px;font-weight:700;opacity:.85;margin-top:2px}
-
     .sec-lbl{font-size:10px;font-weight:900;color:var(--text-light);letter-spacing:2px;text-transform:uppercase;margin:0 0 10px;padding:0 4px}
 
-    /* ── TASK CARDS ── */
-    .task{
-      background:var(--card);border-radius:var(--card-r);border:2.5px solid var(--card-border);
-      padding:16px;margin-bottom:10px;position:relative;overflow:hidden;
-      box-shadow:var(--shadow-card);transition:all .3s;
-    }
+    .task{background:var(--card);border-radius:var(--card-r);border:2.5px solid var(--card-border);padding:16px;margin-bottom:10px;position:relative;overflow:hidden;box-shadow:var(--shadow-card);transition:all .3s}
     .task.claimed{opacity:.4;pointer-events:none}
     .task.ready{border-color:var(--gold);box-shadow:0 4px 0 var(--gold-dark)}
     .task-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-    .task-ic{
-      width:46px;height:46px;border-radius:14px;
-      display:flex;align-items:center;justify-content:center;flex-shrink:0;
-      box-shadow:0 3px 0 rgba(0,0,0,.1);
-    }
+    .task-ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 0 rgba(0,0,0,.1)}
     .task-ic svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
     .task-ic.ic-play{background:var(--blue);box-shadow:0 3px 0 var(--blue-dark)}
     .task-ic.ic-answer{background:var(--green);box-shadow:0 3px 0 var(--green-dark)}
     .task-ic.ic-streak{background:var(--orange);box-shadow:0 3px 0 #c2410c}
+    .task-ic.ic-fast{background:var(--purple);box-shadow:0 3px 0 #6d28d9}
+    .task-ic.ic-accuracy{background:var(--blue);box-shadow:0 3px 0 var(--blue-dark)}
     .task-ic.ic-done{background:var(--green);box-shadow:0 3px 0 var(--green-dark)}
     .task-name{font-size:14px;font-weight:800;color:var(--text);line-height:1.3}
     .task-meta{display:flex;align-items:center;gap:8px;margin-top:4px}
-    .task-xp{
-      font-size:11px;font-weight:900;color:var(--gold-dark);
-      background:rgba(245,158,11,.1);padding:2px 8px;border-radius:6px;
-      border:1.5px solid rgba(245,158,11,.2);
-    }
+    .task-xp{font-size:11px;font-weight:900;color:var(--gold-dark);background:rgba(245,158,11,.1);padding:2px 8px;border-radius:6px;border:1.5px solid rgba(245,158,11,.2)}
     .task-ct{font-size:11px;font-weight:800;color:var(--text-light)}
-
     .task-bar{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;border:1.5px solid #d1d5db}
     .task-fill{height:100%;border-radius:3px;background:var(--blue);transition:width .6s cubic-bezier(.34,1.56,.64,1)}
     .task-fill.tdone{background:var(--gold)}
-
     .task-action{display:flex;justify-content:flex-end;margin-top:10px}
-    .task-claim{
-      background:var(--gold);color:#fff;border:none;border-radius:14px;
-      padding:10px 22px;font-family:'Chewy',cursive;font-size:16px;letter-spacing:.3px;
-      cursor:pointer;box-shadow:0 4px 0 var(--gold-dark);transition:transform .1s;
-      display:flex;align-items:center;gap:6px;
-    }
+    .task-claim{background:var(--gold);color:#fff;border:none;border-radius:14px;padding:10px 22px;font-family:'Chewy',cursive;font-size:16px;letter-spacing:.3px;cursor:pointer;box-shadow:0 4px 0 var(--gold-dark);transition:transform .1s;display:flex;align-items:center;gap:6px}
     .task-claim:active:not(:disabled){transform:translateY(4px);box-shadow:none}
     .task-claim:disabled{opacity:.45;pointer-events:none}
     .task-claim svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5}
-    .task-go{
-      background:var(--blue);color:#fff;border:none;border-radius:14px;
-      padding:10px 22px;font-family:'Chewy',cursive;font-size:16px;letter-spacing:.3px;
-      cursor:pointer;box-shadow:var(--shadow-blue);transition:transform .1s;
-      display:flex;align-items:center;gap:6px;
-    }
+    .task-go{background:var(--blue);color:#fff;border:none;border-radius:14px;padding:10px 22px;font-family:'Chewy',cursive;font-size:16px;letter-spacing:.3px;cursor:pointer;box-shadow:var(--shadow-blue);transition:transform .1s;display:flex;align-items:center;gap:6px}
     .task-go:active{transform:translateY(4px);box-shadow:none}
     .task-go svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5}
     .task-check{display:flex;align-items:center;gap:6px;color:var(--green);font-size:13px;font-weight:900}
-    .task-check-circle{
-      width:28px;height:28px;background:var(--green);border-radius:50%;
-      display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 var(--green-dark);
-    }
+    .task-check-circle{width:28px;height:28px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 var(--green-dark)}
     .task-check-circle svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round}
 
-    /* ── XP TOAST ── */
-    .xp-toast{
-      position:fixed;top:calc(env(safe-area-inset-top,20px) + 16px);left:50%;
-      transform:translateX(-50%) translateY(-20px);
-      background:var(--gold);color:#fff;border-radius:20px;padding:10px 24px;
-      font-family:'Chewy',cursive;font-size:22px;letter-spacing:.5px;z-index:999;
-      opacity:0;pointer-events:none;box-shadow:0 4px 0 var(--gold-dark);
-      transition:opacity .25s,transform .35s cubic-bezier(.34,1.56,.64,1);
-    }
+    .xp-toast{position:fixed;top:calc(env(safe-area-inset-top,20px) + 16px);left:50%;transform:translateX(-50%) translateY(-20px);background:var(--gold);color:#fff;border-radius:20px;padding:10px 24px;font-family:'Chewy',cursive;font-size:22px;letter-spacing:.5px;z-index:999;opacity:0;pointer-events:none;box-shadow:0 4px 0 var(--gold-dark);transition:opacity .25s,transform .35s cubic-bezier(.34,1.56,.64,1)}
     .xp-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-    /* ── CONFETTI ── */
     .confetti{position:fixed;inset:0;pointer-events:none;z-index:800;overflow:hidden}
     .confetti i{position:absolute;width:10px;height:10px;opacity:0;border-radius:3px}
     .confetti i.fall{animation:cf 1.3s ease-out forwards}
+    .loading-msg{text-align:center;padding:40px 20px;color:var(--text-light);font-size:14px;font-weight:700}
 
     @keyframes popIn{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
     @keyframes cf{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(100vh) rotate(720deg)}}
-    @keyframes spin{to{transform:rotate(360deg)}}
     @keyframes su{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
     .anim{animation:su .3s ease both}
     .d1{animation-delay:.04s}.d2{animation-delay:.08s}.d3{animation-delay:.12s}.d4{animation-delay:.16s}.d5{animation-delay:.2s}
@@ -203,7 +142,7 @@
 
 <div class="body">
   <div class="body-inner" id="body-inner">
-    <!-- Rendered by JS -->
+    <div class="loading-msg">Loading tasks...</div>
   </div>
 </div>
 
@@ -223,16 +162,54 @@ try{
   }
 }catch(e){}
 
+// ── Date key — MUST match improve.html's getTodayKey() ──
+function getTodayKey(){
+  var n=new Date();
+  return n.getFullYear()+'-'+(n.getMonth()+1)+'-'+n.getDate();
+}
+var _todayKey=getTodayKey();
+
+// ── Firestore path — MUST match improve.html ──
+// improve.html: _tasksDb.collection('users').doc(_tasksUid).collection('dailyTasks').doc(getTodayKey())
+function getTasksRef(uid){
+  return db.collection('users').doc(uid).collection('dailyTasks').doc(_todayKey);
+}
+
 // ── Claim protection ──
 var _claimedIds=new Set(),_inFlight={};
-var _todayKey=(function(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()})();
 var _cacheKey='bd_claimed_'+_todayKey;
 function _loadClaimed(){try{var s=sessionStorage.getItem(_cacheKey);if(s)JSON.parse(s).forEach(function(id){_claimedIds.add(id)})}catch(e){}}
 function _setClaimed(id){_claimedIds.add(id);try{sessionStorage.setItem(_cacheKey,JSON.stringify(Array.from(_claimedIds)))}catch(e){}}
 _loadClaimed();
 
-function getTasksRef(uid){return db.collection('dailyTasks').doc(uid)}
+// ── Task definitions — EXACT SAME as improve.html's TASK_POOL + seeded picker ──
+var TASK_POOL=[
+  {id:'streak_5',type:'streak',target:5,label:'Get a streak of 5',icon:'🔥',xp:30},
+  {id:'streak_10',type:'streak',target:10,label:'Get a streak of 10',icon:'🔥',xp:60},
+  {id:'correct_10',type:'correct',target:10,label:'Get 10 correct',icon:'✅',xp:25},
+  {id:'correct_25',type:'correct',target:25,label:'Get 25 correct',icon:'✅',xp:50},
+  {id:'answer_20',type:'answered',target:20,label:'Answer 20 questions',icon:'🧠',xp:20},
+  {id:'answer_50',type:'answered',target:50,label:'Answer 50 questions',icon:'🧠',xp:45},
+  {id:'accuracy_70',type:'accuracy',target:70,label:'Hit 70% accuracy today',icon:'🎯',xp:35},
+  {id:'accuracy_80',type:'accuracy',target:80,label:'Hit 80% accuracy today',icon:'🎯',xp:55},
+  {id:'play_wordle',type:'game',game:'wordle',target:3,label:'Play 3 Wordle rounds',icon:'🟩',xp:40},
+  {id:'play_math',type:'game',game:'mathRush',target:3,label:'Play 3 Math Rush rounds',icon:'➕',xp:40},
+  {id:'play_memory',type:'game',game:'memory',target:2,label:'Play 2 Memory games',icon:'🃏',xp:35},
+  {id:'play_reaction',type:'game',game:'reaction',target:3,label:'Play 3 Reaction tests',icon:'⚡',xp:30},
+  {id:'play_ttt',type:'game',game:'ticTacToe',target:2,label:'Play 2 Tic Tac Toe games',icon:'⭕',xp:30},
+  {id:'play_simon',type:'game',game:'simon',target:2,label:'Play 2 Simon Says rounds',icon:'🔴',xp:35},
+  {id:'play_scramble',type:'game',game:'wordScramble',target:3,label:'Unscramble 3 words',icon:'🔤',xp:30},
+  {id:'fast_5',type:'fast',target:5,label:'Answer 5 in under 3.5s',icon:'⚡',xp:45}
+];
 
+function seededRandom(seed){var s=seed;return function(){s=(s*1664525+1013904223)&0xffffffff;return(s>>>0)/0xffffffff}}
+function getDailyTaskDefs(){
+  var dk=_todayKey,seed=dk.split('-').reduce(function(a,n){return a*31+parseInt(n)},0);
+  var rng=seededRandom(seed);
+  return TASK_POOL.slice().sort(function(){return rng()-0.5}).slice(0,3);
+}
+
+// ── Claim a task via Firestore transaction ──
 async function claimTask(uid,taskId){
   if(_inFlight[taskId])return null;
   _inFlight[taskId]=true;_setClaimed(taskId);
@@ -279,32 +256,32 @@ function spawnConfetti(n){
 }
 function showXpToast(m){var t=document.getElementById('xp-toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2400)}
 
-// ── FALLBACK TASKS — always show something ──
-function getLocalTasks(){
-  var d=null;
-  try{var raw=localStorage.getItem('iq_data');if(raw)d=JSON.parse(raw)}catch(e){}
-  var answered=d?.answered||0,correct=d?.correct||0,bestStreak=d?.bestStreak||0;
-  var tasks=[
-    {id:'t1_'+_todayKey,type:'game',label:'Play 3 Games',xp:15,target:3,progress:Math.min(3,Math.floor(answered/5)),done:false,claimed:false},
-    {id:'t2_'+_todayKey,type:'answer',label:'Answer 10 Questions',xp:25,target:10,progress:Math.min(10,answered%50),done:false,claimed:false},
-    {id:'t3_'+_todayKey,type:'streak',label:'Get a 3 Streak',xp:20,target:3,progress:Math.min(3,bestStreak>3?3:bestStreak%4),done:false,claimed:false},
-  ];
-  tasks.forEach(function(t){
-    if(t.progress>=t.target)t.done=true;
-    if(_claimedIds.has(t.id))t.claimed=true;
-  });
-  return{tasks:tasks,dailyStreak:d?.currentStreak||0,allDone:tasks.every(function(t){return t.done}),allClaimed:tasks.every(function(t){return t.claimed})};
+// ── Get icon class for task type ──
+function getIconClass(task){
+  if(task.done)return'ic-done';
+  if(task.type==='game')return'ic-play';
+  if(task.type==='streak')return'ic-streak';
+  if(task.type==='fast')return'ic-fast';
+  if(task.type==='accuracy')return'ic-accuracy';
+  return'ic-answer';
+}
+
+function getTaskIcon(task){
+  var t=task.type;
+  if(t==='game')return'<svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4M8 10v4"/><circle cx="16" cy="11" r=".5" fill="#fff"/><circle cx="18" cy="13" r=".5" fill="#fff"/></svg>';
+  if(t==='streak')return'<svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>';
+  if(t==='fast')return'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>';
+  if(t==='accuracy')return'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>';
+  return'<svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>';
 }
 
 // ── Hero update ──
 function updateHero(state){
   document.getElementById('streak-val').textContent=state.dailyStreak||0;
-  var pips=document.getElementById('streak-pips');
-  var days=state.dailyStreak||0,pipCount=7;
+  var pips=document.getElementById('streak-pips'),days=state.dailyStreak||0,pipCount=7;
   var filled=Math.min(days%pipCount||(days>0&&days%pipCount===0?pipCount:0),pipCount);
   pips.innerHTML='';
   for(var p=0;p<pipCount;p++){var pip=document.createElement('div');pip.className='streak-pip'+(p<filled?' done':'');pips.appendChild(pip)}
-
   var done=state.tasks.filter(function(t){return t.done}).length;
   var total=state.tasks.length,pct=total>0?done/total:0;
   var ring=document.getElementById('prog-ring-fill');
@@ -333,20 +310,17 @@ function render(state){
     var isClaimed=task.claimed||_claimedIds.has(task.id);
     var card=document.createElement('div');
     card.className='task anim d'+(Math.min(i+2,5))+(isClaimed?' claimed':(task.done?' ready':''));
-    var icClass=task.done?'ic-done':(task.type==='game'?'ic-play':(task.type==='streak'?'ic-streak':'ic-answer'));
     card.innerHTML=
-      '<div class="task-top">'+
-        '<div class="task-ic '+icClass+'">'+getTaskIcon(task.type)+'</div>'+
-        '<div>'+
-          '<div class="task-name">'+task.label+'</div>'+
-          '<div class="task-meta">'+
-            '<span class="task-xp">+'+task.xp+' XP</span>'+
-            '<span class="task-ct">'+task.progress+'/'+task.target+'</span>'+
-          '</div>'+
-        '</div>'+
-      '</div>'+
-      '<div class="task-bar"><div class="task-fill'+(task.done?' tdone':'')+'" style="width:'+pct+'%"></div></div>'+
-      '<div class="task-action" id="action-'+task.id+'"></div>';
+      '<div class="task-top">'
+      +'<div class="task-ic '+getIconClass(task)+'">'+getTaskIcon(task)+'</div>'
+      +'<div>'
+      +'<div class="task-name">'+task.label+'</div>'
+      +'<div class="task-meta">'
+      +'<span class="task-xp">+'+task.xp+' XP</span>'
+      +'<span class="task-ct">'+task.progress+'/'+task.target+(task.type==='accuracy'?'%':'')+'</span>'
+      +'</div></div></div>'
+      +'<div class="task-bar"><div class="task-fill'+(task.done?' tdone':'')+'" style="width:'+pct+'%"></div></div>'
+      +'<div class="task-action" id="action-'+task.id+'"></div>';
     inner.appendChild(card);
     renderAction(task.id,task,isClaimed);
   });
@@ -368,7 +342,9 @@ function renderAction(taskId,task,isClaimed){
       var c=el.closest('.task');if(c)c.classList.add('claimed');
       Haptics?.success?.();showXpToast('+'+task.xp+' XP!');spawnConfetti(30);awardXP(task.xp);
       if(_uid&&db){
-        claimTask(_uid,taskId).then(function(){try{window.parent.postMessage({type:'tasksUpdated'},'*')}catch(e){}});
+        claimTask(_uid,taskId).then(function(){
+          try{window.parent.postMessage({type:'tasksUpdated'},'*')}catch(e){}
+        });
       }
     });
     el.appendChild(btn);
@@ -383,56 +359,96 @@ function renderAction(taskId,task,isClaimed){
   }
 }
 
-function getTaskIcon(type){
-  var icons={
-    game:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4M8 10v4"/><circle cx="16" cy="11" r=".5" fill="#fff"/><circle cx="18" cy="13" r=".5" fill="#fff"/></svg>',
-    answer:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>',
-    streak:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
-  };
-  return icons[type]||icons.answer;
-}
-
-// ── Load ──
+// ── Load tasks — reads from the SAME path as improve.html ──
+var _lastState=null;
 async function loadTasks(){
-  // Always render immediately with local fallback
-  var localState=getLocalTasks();
-  render(localState);
+  if(!auth||!db){
+    // No Firebase — show empty state
+    document.getElementById('body-inner').innerHTML='<div class="loading-msg">Sign in to see your daily tasks</div>';
+    return;
+  }
 
-  // Then try Firebase overlay
-  if(!auth||!db){return}
   var user=auth.currentUser;
   if(!user){
-    // Wait briefly for auth
     await new Promise(function(resolve){
       var resolved=false;
       var unsub=auth.onAuthStateChanged(function(u){
         if(resolved)return;resolved=true;unsub();
-        if(u){_uid=u.uid}
+        if(u)_uid=u.uid;
         resolve();
       });
       setTimeout(function(){if(!resolved){resolved=true;unsub();resolve()}},3000);
     });
     user=auth.currentUser;
   }
-  if(!user){return}
+  if(!user){
+    document.getElementById('body-inner').innerHTML='<div class="loading-msg">Sign in to see your daily tasks</div>';
+    return;
+  }
   _uid=user.uid;
 
   try{
-    var snap=await getTasksRef(_uid).get();
+    var ref=getTasksRef(_uid);
+    var snap=await ref.get();
+
     if(snap.exists){
       var state=snap.data();
+      // Apply local claim cache
       state.tasks.forEach(function(t){if(_claimedIds.has(t.id))t.claimed=true});
+      _lastState=state;
       render(state);
+    } else {
+      // No task doc yet — improve.html creates it on first game played
+      // Generate the same tasks so user sees what they need to do
+      var defs=getDailyTaskDefs();
+      var freshState={
+        date:_todayKey,
+        tasks:defs.map(function(def){return Object.assign({},def,{progress:0,done:false,claimed:false})}),
+        allDone:false,allClaimed:false,dailyStreak:0
+      };
+      _lastState=freshState;
+      render(freshState);
     }
   }catch(e){
-    // Keep showing local tasks on error
+    console.warn('loadTasks error:',e);
+    // Show generated tasks as fallback
+    var defs=getDailyTaskDefs();
+    render({
+      date:_todayKey,
+      tasks:defs.map(function(def){return Object.assign({},def,{progress:0,done:false,claimed:false})}),
+      allDone:false,allClaimed:false,dailyStreak:0
+    });
   }
 }
 
+// ── Listen for updates from improve.html ──
 window.addEventListener('message',function(e){
-  if(e.data&&e.data.type==='tasksUpdated')loadTasks();
+  if(e.data&&e.data.type==='tasksUpdated'){
+    // Re-fetch from Firestore to get latest progress
+    loadTasks();
+  }
 });
-loadTasks();
+
+// ── Also set up a Firestore real-time listener for live updates ──
+async function setupListener(){
+  if(!db||!_uid)return;
+  try{
+    getTasksRef(_uid).onSnapshot(function(snap){
+      if(!snap.exists)return;
+      var state=snap.data();
+      state.tasks.forEach(function(t){if(_claimedIds.has(t.id))t.claimed=true});
+      // Only re-render if something actually changed
+      var newJson=JSON.stringify(state.tasks.map(function(t){return{id:t.id,p:t.progress,d:t.done,c:t.claimed}}));
+      var oldJson=_lastState?JSON.stringify(_lastState.tasks.map(function(t){return{id:t.id,p:t.progress,d:t.done,c:t.claimed}})):'';
+      if(newJson!==oldJson){
+        _lastState=state;
+        render(state);
+      }
+    });
+  }catch(e){}
+}
+
+loadTasks().then(setupListener);
 </script>
 </body>
 </html>
