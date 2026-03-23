@@ -40,7 +40,8 @@
     .av img{width:100%;height:100%;object-fit:cover;display:block}
     .av-badge{position:absolute;bottom:2px;right:2px;width:34px;height:34px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid #fff;pointer-events:none;box-shadow:0 3px 0 var(--gold-dark)}
     .av-badge svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
-    .av-edit-lbl{font-size:11px;font-weight:800;color:rgba(255,255,255,.65);margin-bottom:10px;cursor:pointer;letter-spacing:.5px;text-transform:uppercase;z-index:1}
+    .av-edit-lbl{font-size:13px;font-weight:800;color:rgba(255,255,255,.7);margin-bottom:2px;cursor:pointer;letter-spacing:.3px;z-index:1}
+    .hero-greeting{font-size:17px;font-weight:900;color:#fff;margin-bottom:10px;z-index:1;text-align:center;letter-spacing:.2px}
     .iq-num{font-family:'Chewy',cursive;font-size:clamp(72px,20vw,96px);line-height:1;color:#fff;letter-spacing:-1px;z-index:1}
     .iq-lbl{font-size:12px;font-weight:900;color:rgba(255,255,255,.5);letter-spacing:6px;text-transform:uppercase;margin-bottom:8px;z-index:1}
     .pct-badge{background:rgba(255,255,255,.2);color:#fff;font-size:12px;font-weight:900;padding:5px 16px;border-radius:20px;margin-bottom:16px;border:2px solid rgba(255,255,255,.3);z-index:1}
@@ -160,6 +161,8 @@
     body.dark .ab-row+.ab-row{border-top-color:#334155}
     body.dark .ab-bar{background:#334155;border-color:#475569}
     body.dark .pct-badge{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15)}
+    body.dark .set-input{background:#0f172a;border-color:#334155;color:#e2e8f0}
+    body.dark .set-row span[style*="background:#fff"]{background:#0f172a!important;color:#64748b!important;border-color:#334155!important}
 
     /* ── Page entrance animations ── */
     @keyframes avZoom{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
@@ -167,7 +170,9 @@
     @keyframes statPop{from{opacity:0;transform:scale(.85) translateY(8px)}to{opacity:1;transform:none}}
     @keyframes barGrow{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
     body.enter .av-wrap{animation:avZoom .4s cubic-bezier(.22,1,.36,1) .02s both}
-    body.enter .iq-num{animation:avZoom .35s cubic-bezier(.22,1,.36,1) .08s both}
+    body.enter .av-edit-lbl{animation:heroSlide .3s ease .06s both}
+    body.enter .hero-greeting{animation:heroSlide .3s ease .08s both}
+    body.enter .iq-num{animation:avZoom .35s cubic-bezier(.22,1,.36,1) .1s both}
     body.enter .iq-lbl{animation:heroSlide .3s ease .1s both}
     body.enter .pct-badge{animation:heroSlide .3s ease .12s both}
     body.enter .share-btn{animation:statPop .3s ease .14s both}
@@ -182,7 +187,7 @@
 <div class="scroll">
   <div class="hero">
     <div class="hero-hdr">
-      <div class="hero-name" id="username-display"></div>
+      <div style="flex:1"></div>
       <div class="hero-right">
         <button class="hero-gear" id="gear-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
         <button class="hero-out" id="signout-btn">Sign out</button>
@@ -192,7 +197,8 @@
       <div class="av"><img id="av-img" src="Avatars/Anonymous.png" alt="Your avatar" loading="lazy" decoding="async"></div>
       <div class="av-badge"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></div>
     </div>
-    <div class="av-edit-lbl" id="av-edit-lbl">Edit Avatar</div>
+    <div class="av-edit-lbl" id="av-edit-lbl">@username</div>
+    <div class="hero-greeting" id="hero-greeting"></div>
     <div class="iq-num" id="iq-num">--</div>
     <div class="iq-lbl">I Q</div>
     <div class="pct-badge" id="pct-badge" style="display:none"></div>
@@ -239,7 +245,10 @@
         <div class="set-row-ic s-blue"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
         <div class="set-row-mid">
           <div class="set-row-label">Username</div>
-          <input class="set-input" id="set-username" placeholder="Your display name" maxlength="24">
+          <div style="display:flex;align-items:center;gap:0">
+            <span style="font-size:14px;font-weight:800;color:var(--text-dim);padding:10px 0 10px 14px;background:#fff;border:2.5px solid var(--card-border);border-right:none;border-radius:12px 0 0 12px">@</span>
+            <input class="set-input" id="set-username" placeholder="username" maxlength="24" style="border-radius:0 12px 12px 0;border-left:none">
+          </div>
         </div>
       </div>
       <div class="set-row">
@@ -316,9 +325,22 @@ var AB=[
 
 function pToast(m,err){var t=document.getElementById('toast');t.textContent=m;t.style.background=err?'#ef4444':'#22c55e';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 
+function getGreeting(){
+  var h=new Date().getHours();
+  if(h<12)return'Good morning';
+  if(h<17)return'Good afternoon';
+  return'Good evening';
+}
+
 function loadProfile(){
-  var d=IQData.load();
-  document.getElementById('username-display').textContent=d.username?'@'+d.username:IQData.getCurrentUser()?.displayName||'';
+  var d=IQData.load(),u=IQData.getCurrentUser();
+  var uname=d.username||u?.displayName||'';
+  var displayName=d.displayName||u?.displayName||uname||'';
+  // @username under avatar
+  document.getElementById('av-edit-lbl').textContent=uname?'@'+uname.toLowerCase():'';
+  // Greeting
+  var firstName=displayName.split(' ')[0]||uname||'';
+  document.getElementById('hero-greeting').textContent=firstName?getGreeting()+', '+firstName+'!':getGreeting()+'!';
   if(d.iq){document.getElementById('iq-num').textContent=d.iq;var b=document.getElementById('pct-badge');b.textContent='Top '+formatPercentile(iqToPercentile(d.iq));b.style.display='inline-block';}
   document.getElementById('answered').textContent=d.answered||0;
   document.getElementById('accuracy').textContent=IQData.getAccuracy()+'%';
@@ -357,17 +379,16 @@ var _origUN='',_origName='';
 function openSettings(){
   Haptics.medium();
   var d=IQData.load(),u=IQData.getCurrentUser();
-  document.getElementById('set-username').value=d.username||'';
-  document.getElementById('set-name').value=u?.displayName||d.username||'';
-  _origUN=d.username||'';_origName=u?.displayName||d.username||'';
+  var un=d.username||'';
+  var nm=d.displayName||u?.displayName||'';
+  document.getElementById('set-username').value=un;
+  document.getElementById('set-name').value=nm;
+  _origUN=un;_origName=nm;
   document.getElementById('set-save-wrap').style.display='none';
-  // Haptics toggle
   var hapOn=localStorage.getItem('cb_haptics')!=='off';
   document.getElementById('set-haptics').checked=hapOn;
-  // Dark mode toggle
   var darkOn=localStorage.getItem('cb_dark')==='on';
   document.getElementById('set-dark').checked=darkOn;
-  // UID
   var uid=u?.uid||'';
   document.getElementById('set-uid').textContent=uid?'ID: '+uid:'';
   document.getElementById('set-overlay').classList.add('open');
@@ -398,16 +419,21 @@ document.getElementById('set-save').onclick=async function(){
   var nm=document.getElementById('set-name').value.trim();
   if(!un){pToast('Username can\'t be empty',true);return;}
   document.getElementById('set-username').value=un;
-  var d=IQData.load();d.username=un;IQData.save(d);
+  var d=IQData.load();d.username=un;d.displayName=nm;IQData.save(d);
+  // Update Firestore — use parent.JSON.parse for cross-frame compat
   try{
     var fb=window.parent!==window?window.parent.firebase:null;
     if(fb){var u=fb.auth().currentUser;if(u){
-      await fb.firestore().collection('users').doc(u.uid).set({username:un,displayName:nm},{merge:true});
+      var dataStr=JSON.stringify({username:un,displayName:nm});
+      var plainData=window.parent.JSON.parse(dataStr);
+      await fb.firestore().collection('users').doc(u.uid).set(plainData,{merge:true});
     }}
-  }catch(e){}
+  }catch(e){console.warn('save settings:',e);}
   _origUN=un;_origName=nm;
   document.getElementById('set-save-wrap').style.display='none';
-  document.getElementById('username-display').textContent='@'+un;
+  document.getElementById('av-edit-lbl').textContent='@'+un;
+  var firstName=nm.split(' ')[0]||un;
+  document.getElementById('hero-greeting').textContent=getGreeting()+', '+firstName+'!';
   Haptics.success();pToast('Saved!');
 };
 
