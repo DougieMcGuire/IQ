@@ -1,29 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
+
+  <!-- PWA / iOS standalone -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#0474fc">
+  <meta name="apple-mobile-web-app-title" content="Cebear">
+  <meta name="theme-color" content="#0474fc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0358c4" media="(prefers-color-scheme: dark)">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="description" content="Cebear — train your brain, track your IQ">
+  <meta name="color-scheme" content="light">
+  <meta name="format-detection" content="telephone=no">
+
+  <!-- SEO / Social -->
+  <meta name="description" content="Cebear — train your brain with mini-games, track your IQ, compete with friends.">
+  <meta name="keywords" content="brain training, IQ test, puzzle games, brain games, cognitive training">
+  <meta property="og:title" content="Cebear — Brain Training">
+  <meta property="og:description" content="Train your brain with mini-games, track your IQ, compete with friends.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://cebear.com">
+  <meta property="og:image" content="https://cebear.com/og-image.png">
+  <meta name="twitter:card" content="summary">
+
+  <!-- Manifest & icons -->
   <link rel="manifest" href="manifest.json">
-  <title>Cebear</title>
+  <link rel="icon" type="image/png" sizes="192x192" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+
+  <!-- Preconnect for speed -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+
+  <!-- Preload critical resources -->
+  <link rel="preload" href="logo.png" as="image">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Chewy&family=Nunito:wght@600;700;800;900&display=swap" as="style">
   <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <title>Cebear — Brain Training</title>
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Cebear","url":"https://cebear.com","description":"Train your brain with mini-games, track your IQ, compete with friends.","applicationCategory":"Game","operatingSystem":"All","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+  </script>
+
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    html,body{width:100%;height:100dvh;overflow:hidden;background:#f5f0e8;font-family:'Nunito',sans-serif;touch-action:manipulation}
+    html{
+      height:100%;
+      /* Prevent pull-to-refresh and overscroll bounce */
+      overscroll-behavior-y:none;
+    }
+    body{
+      width:100%;height:100dvh;overflow:hidden;
+      background:#f5f0e8;font-family:'Nunito',sans-serif;
+      touch-action:manipulation;
+      /* iOS standalone: extend behind status bar */
+      min-height:calc(100dvh + env(safe-area-inset-top,0px));
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* ── iOS status bar blur overlay ── */
+    @supports(padding:env(safe-area-inset-top)){
+      body::before{
+        content:'';position:fixed;top:calc(-1 * env(safe-area-inset-top,0px));
+        left:0;right:0;height:env(safe-area-inset-top,0px);
+        z-index:9998;pointer-events:none;
+        background:rgba(4,116,252,.85);
+        backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+      }
+    }
 
     /* ── SPLASH ── */
     #splash{position:fixed;inset:0;z-index:9999;background:#0474fc;display:flex;justify-content:center;align-items:center;overflow:hidden;-webkit-user-select:none;user-select:none}
     #splash.hide{opacity:0;pointer-events:none;transition:opacity .4s ease}
     #splash .container{text-align:center;color:#fff;pointer-events:none}
-    #splash .logo{width:clamp(120px,25vw,170px);display:block;margin:0 auto;opacity:0;transform:translateY(28px) scale(.6);animation:pop .8s cubic-bezier(.34,1.56,.64,1) forwards}
-    #splash .text{font-family:'Chewy',cursive;font-size:clamp(52px,14vw,92px);margin-top:6px;white-space:nowrap}
-    #splash .letter{display:inline-block;opacity:0;transform:translateY(28px) scale(.6);animation:popLetter cubic-bezier(.34,1.56,.64,1) forwards;will-change:transform}
+    /* Logo: object-fit to prevent stretching */
+    #splash .logo{
+      width:clamp(100px,22vw,150px);
+      height:auto;aspect-ratio:1;object-fit:contain;
+      display:block;margin:0 auto;
+      opacity:0;transform:translateY(28px) scale(.6);
+      animation:pop .8s cubic-bezier(.34,1.56,.64,1) forwards;
+    }
+    #splash .text{font-family:'Chewy',cursive;font-size:clamp(48px,13vw,84px);margin-top:6px;white-space:nowrap}
+    #splash .letter{display:inline-block;opacity:0;transform:translateY(28px) scale(.6);animation:popLetter cubic-bezier(.34,1.56,.64,1) forwards;will-change:transform,opacity}
     #splash .letter:nth-child(1){animation-delay:.15s;animation-duration:.65s}
     #splash .letter:nth-child(2){animation-delay:.19s;animation-duration:.61s}
     #splash .letter:nth-child(3){animation-delay:.23s;animation-duration:.57s}
@@ -34,57 +99,53 @@
     @keyframes popLetter{0%{opacity:0;transform:translateY(28px) scale(.6)}65%{opacity:1;transform:translateY(-6px) scale(1.08)}100%{opacity:1;transform:translateY(0) scale(1)}}
 
     /* ── SCREENS ── */
-    .screen{position:absolute;inset:0;display:none;overflow:hidden}
+    .screen{position:absolute;inset:0;display:none;overflow:hidden;contain:layout style}
     .screen.active{display:block}
-    .screen iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;touch-action:manipulation}
+    .screen iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;touch-action:manipulation;color-scheme:light}
 
-    /* ══════════════════════════════════════════════════════════
-       NAV — Solid blue footer, rounded top, frosted glass feel
-       ══════════════════════════════════════════════════════════ */
+    /* ── NAV ── */
     #nav{
       position:fixed;bottom:0;left:0;right:0;
-      height:calc(76px + env(safe-area-inset-bottom,0px));
+      height:calc(72px + env(safe-area-inset-bottom,0px));
       padding-bottom:env(safe-area-inset-bottom,0px);
       background:#0474fc;
-      border-radius:24px 24px 0 0;
+      border-radius:22px 22px 0 0;
       display:none;justify-content:space-around;align-items:center;
       z-index:100;
       box-shadow:0 -2px 0 #0358c4;
+      /* Prevent content flash behind nav */
+      will-change:transform;
     }
     body.has-nav #nav{display:flex}
-    body.has-nav .screen iframe{height:calc(100dvh - 76px - env(safe-area-inset-bottom,0px))}
+    body.has-nav .screen iframe{height:calc(100dvh - 72px - env(safe-area-inset-bottom,0px))}
 
     .nb{
       flex:1;padding:6px 4px 2px;background:none;border:none;
       display:flex;flex-direction:column;align-items:center;gap:3px;
-      color:rgba(255,255,255,.42);
+      color:rgba(255,255,255,.38);
       font-family:'Nunito',sans-serif;font-size:10px;font-weight:900;
       cursor:pointer;position:relative;transition:color .2s;
       -webkit-tap-highlight-color:transparent;
       letter-spacing:.4px;
     }
     .nb .ni{
-      width:46px;height:34px;
+      width:44px;height:32px;
       display:flex;align-items:center;justify-content:center;
-      border-radius:14px;
+      border-radius:12px;
       transition:all .25s cubic-bezier(.34,1.4,.64,1);
     }
     .nb .ni svg{
-      width:22px;height:22px;fill:none;stroke:currentColor;
+      width:21px;height:21px;fill:none;stroke:currentColor;
       stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
       transition:all .2s;
     }
-
-    /* Active — bright white pill */
     .nb.active{color:#fff}
     .nb.active .ni{
-      background:rgba(255,255,255,.22);
-      box-shadow:0 3px 0 rgba(0,0,0,.1);
+      background:rgba(255,255,255,.2);
+      box-shadow:0 2px 0 rgba(0,0,0,.1);
     }
     .nb.active .ni svg{stroke-width:2.6}
-
-    /* Press */
-    .nb:active .ni{transform:scale(.9);opacity:.8}
+    .nb:active .ni{transform:scale(.88);opacity:.7}
 
     /* Badge */
     .nbdg{position:absolute;top:2px;right:calc(50% - 20px);width:10px;height:10px;border-radius:50%;background:#ef4444;border:2.5px solid #0474fc;display:none;z-index:2}
@@ -101,42 +162,61 @@
     /* ── OFFLINE TOAST ── */
     #offline-toast{position:fixed;top:calc(env(safe-area-inset-top,20px) + 12px);left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;font-size:13px;font-weight:800;padding:10px 18px;border-radius:14px;z-index:9999;opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap;box-shadow:0 4px 0 #0f172a}
     #offline-toast.show{opacity:1}
+
+    /* ── Reduced motion ── */
+    @media(prefers-reduced-motion:reduce){
+      *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+      #splash .logo,#splash .letter{animation:none;opacity:1;transform:none}
+    }
+
+    /* ── Print (just in case) ── */
+    @media print{#nav,#splash{display:none!important}.screen{position:static;display:block!important}}
   </style>
 </head>
 <body>
 
-<div id="splash">
+<!-- Splash screen -->
+<div id="splash" role="status" aria-label="Loading Cebear">
   <div class="container">
-    <img src="logo.png" class="logo" draggable="false" alt="Cebear" width="170" height="170">
-    <div class="text" aria-label="cebear">
+    <img src="logo.png" class="logo" draggable="false" alt="Cebear logo" width="150" height="150" fetchpriority="high">
+    <div class="text" aria-hidden="true">
       <span class="letter">c</span><span class="letter">e</span><span class="letter">b</span><span class="letter">e</span><span class="letter">a</span><span class="letter">r</span>
     </div>
   </div>
 </div>
 
-<div id="offline-toast">No connection</div>
-<div class="screen" id="screen-auth"></div>
-<div class="screen" id="screen-improve"></div>
-<div class="screen" id="screen-profile"></div>
-<div class="screen" id="screen-leaderboard"></div>
-<div class="screen" id="screen-tasks"></div>
+<noscript>
+  <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0474fc;color:#fff;font-family:sans-serif;text-align:center;padding:20px">
+    <div><h1 style="font-size:24px;margin-bottom:8px">Cebear</h1><p>Please enable JavaScript to use Cebear.</p></div>
+  </div>
+</noscript>
 
-<nav id="nav" aria-label="Main navigation">
+<div id="offline-toast" role="alert" aria-live="polite">No connection</div>
+
+<main>
+  <div class="screen" id="screen-auth" role="region" aria-label="Authentication"></div>
+  <div class="screen" id="screen-improve" role="region" aria-label="Brain training"></div>
+  <div class="screen" id="screen-profile" role="region" aria-label="Profile"></div>
+  <div class="screen" id="screen-leaderboard" role="region" aria-label="Leaderboard"></div>
+  <div class="screen" id="screen-tasks" role="region" aria-label="Daily tasks"></div>
+</main>
+
+<nav id="nav" aria-label="Main navigation" role="navigation">
   <button class="nb" data-page="leaderboard" onclick="goTo('leaderboard')" aria-label="Rankings">
-    <span class="ni"><svg viewBox="0 0 24 24"><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
-    Ranks
+    <span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+    <span>Ranks</span>
   </button>
-  <button class="nb active" data-page="improve" onclick="goTo('improve')" aria-label="Train">
-    <span class="ni"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/><path d="M9 21h6"/><path d="M10 17v-2.5"/><path d="M14 17v-2.5"/></svg></span>
-    Train
+  <button class="nb active" data-page="improve" onclick="goTo('improve')" aria-label="Train your brain">
+    <span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/><path d="M9 21h6"/><path d="M10 17v-2.5"/><path d="M14 17v-2.5"/></svg></span>
+    <span>Train</span>
   </button>
-  <button class="nb" data-page="tasks" onclick="goTo('tasks')" aria-label="Tasks">
-    <span class="ni"><svg viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M9 12l2 2 4-4"/></svg></span>
-    Tasks<span class="nbdg" id="tasks-badge" aria-hidden="true"></span>
+  <button class="nb" data-page="tasks" onclick="goTo('tasks')" aria-label="Daily tasks">
+    <span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M9 12l2 2 4-4"/></svg></span>
+    <span>Tasks</span><span class="nbdg" id="tasks-badge" aria-hidden="true"></span>
   </button>
-  <button class="nb" data-page="profile" onclick="goTo('profile')" aria-label="Profile">
-    <span class="ni"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
-    Me
+  <button class="nb" data-page="profile" onclick="goTo('profile')" aria-label="Your profile">
+    <span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+    <span>Me</span>
   </button>
 </nav>
 
@@ -148,6 +228,7 @@ firebase.initializeApp({apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDom
 var WORKER_URL='https://cebear.com/api/redeem-install-token';
 var isStandalone=!!('standalone' in navigator&&navigator.standalone||window.matchMedia('(display-mode: standalone)').matches);
 
+// ── Splash ────────────────────────────────────────────────────────────────────
 var _splashDone=false;
 function _doHide(){
   if(_splashDone)return;_splashDone=true;
@@ -164,6 +245,7 @@ function _doHide(){
   setTimeout(function(){if(!_splashDone)_doHide();},1800);
 })();
 
+// ── Auth ──────────────────────────────────────────────────────────────────────
 var _isAuthed=false,_authResolved=false,_authWaiters=[];
 firebase.auth().onAuthStateChanged(function(u){
   _isAuthed=!!u;_authResolved=true;
@@ -179,11 +261,13 @@ function authReady(){
   if(_authResolved)return Promise.resolve(_isAuthed);
   return new Promise(function(r){_authWaiters.push(function(){r(_isAuthed);});});
 }
+
+// ── Cross-frame messaging ─────────────────────────────────────────────────────
 function _notifyImprove(type,extra){
   (function attempt(n){
     var f=document.querySelector('#screen-improve iframe');
-    if(f&&f.contentWindow){f.contentWindow.postMessage(Object.assign({type:type},extra||{}),'*');}
-    else if(n>0){setTimeout(function(){attempt(n-1);},100);}
+    if(f&&f.contentWindow)f.contentWindow.postMessage(Object.assign({type:type},extra||{}),'*');
+    else if(n>0)setTimeout(function(){attempt(n-1);},100);
   })(30);
 }
 function tryGuestWall(page){
@@ -207,8 +291,10 @@ window.addEventListener('message',function(e){
   if(t==='savePushSub')firebase.auth().onAuthStateChanged(function(u){if(u)firebase.firestore().collection('pushSubscriptions').doc(u.uid).set({subscription:e.data.sub,uid:u.uid,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){});});
   if(t==='tasksUpdated'){var f=document.querySelector('#screen-tasks iframe');f&&f.contentWindow&&f.contentWindow.postMessage({type:'tasksUpdated'},'*');}
   if(t==='xpAwarded'){var f2=document.querySelector('#screen-improve iframe');f2&&f2.contentWindow&&f2.contentWindow.postMessage({type:'xpAwarded',xp:e.data.xp},'*');}
+  if(t==='avatarEditorClose'||t==='avatarSaved'){/* handled by profile iframe */}
 });
 
+// ── Navigation ────────────────────────────────────────────────────────────────
 var currentScreen=null,screensLoaded={};
 var AUTH_PAGES=['profile','tasks','leaderboard'];
 var NETWORK_PAGES=['profile','tasks','leaderboard'];
@@ -216,12 +302,19 @@ function isOffline(){return!navigator.onLine;}
 var _offlineTimer=null;
 function showOfflineToast(){var t=document.getElementById('offline-toast');if(!t)return;t.classList.add('show');clearTimeout(_offlineTimer);_offlineTimer=setTimeout(function(){t.classList.remove('show');},2500);}
 function showNav(show){document.body.classList.toggle('has-nav',show);}
-function updateNavActive(page){document.querySelectorAll('.nb').forEach(function(b){b.classList.toggle('active',b.dataset.page===page);});}
+function updateNavActive(page){
+  document.querySelectorAll('.nb').forEach(function(b){
+    var isActive=b.dataset.page===page;
+    b.classList.toggle('active',isActive);
+    b.setAttribute('aria-current',isActive?'page':'false');
+  });
+}
 
 window.goTo=function(page){
   if(tryGuestWall(page))return;
   if(isOffline()&&NETWORK_PAGES.indexOf(page)!==-1){showOfflineToast();return;}
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  // Force-reload profile/leaderboard for fresh data
   if((page==='profile'||page==='leaderboard')&&screensLoaded[page]){var old=document.querySelector('#screen-'+page+' iframe');if(old)old.remove();screensLoaded[page]=false;}
   var sc=document.getElementById('screen-'+page);if(sc)sc.classList.add('active');
   currentScreen=page;showNav(page!=='auth');updateNavActive(page);
@@ -239,9 +332,14 @@ window.goTo=function(page){
 
 function _loadIframe(page,c){
   if(screensLoaded[page])return;
-  var f=document.createElement('iframe'),src=page+'.html';
+  var f=document.createElement('iframe');
+  f.title=page.charAt(0).toUpperCase()+page.slice(1)+' — Cebear';
+  var src=page+'.html';
   if(page==='improve'){var qs=sessionStorage.getItem('cebear_shared_qs');if(qs){src+=qs;sessionStorage.removeItem('cebear_shared_qs');}}
-  f.src=src;f.allow='web-share';c.appendChild(f);screensLoaded[page]=true;
+  f.src=src;f.allow='web-share';
+  // Lazy load non-critical iframes
+  if(page!=='improve')f.loading='lazy';
+  c.appendChild(f);screensLoaded[page]=true;
 }
 
 window.authCheck=function(){};
@@ -258,12 +356,19 @@ function redeemSessionToken(sid){
   });
 }
 
+// ── Online/offline listeners ──────────────────────────────────────────────────
+window.addEventListener('online',function(){
+  var t=document.getElementById('offline-toast');if(t)t.classList.remove('show');
+});
+window.addEventListener('offline',function(){showOfflineToast();});
+
+// ── Startup ───────────────────────────────────────────────────────────────────
 (function(){
   localStorage.removeItem('iq_guest');
   var p=new URLSearchParams(location.search),tT=p.get('t'),sI=p.get('session');
   if(tT||sI)history.replaceState({},'',location.pathname);
-  var qParam=p.get('q'),fromParam=p.get('from');
-  if(qParam||fromParam){var qs='?';if(qParam)qs+='q='+encodeURIComponent(qParam);if(fromParam)qs+=(qParam?'&':'')+'from='+encodeURIComponent(fromParam);sessionStorage.setItem('cebear_shared_qs',qs);history.replaceState({},'',location.pathname);}
+  var qParam=p.get('q'),fromParam=p.get('from'),sParam=p.get('s');
+  if(qParam||fromParam||sParam){var qs='?';if(sParam)qs+='s='+encodeURIComponent(sParam);if(qParam)qs+=(sParam?'&':'')+'q='+encodeURIComponent(qParam);if(fromParam)qs+=(qParam||sParam?'&':'')+'from='+encodeURIComponent(fromParam);sessionStorage.setItem('cebear_shared_qs',qs);history.replaceState({},'',location.pathname);}
   var gT=sessionStorage.getItem('bd_gis_token');
   if(gT){sessionStorage.removeItem('bd_gis_token');firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(gT)).then(function(r){ensureUser(r.user);}).then(function(){goTo('improve');}).catch(function(){start();});return;}
   if(sI){redeemSessionToken(sI).then(start).catch(start);return;}
@@ -272,9 +377,17 @@ function redeemSessionToken(sid){
   function start(){isStandalone?authReady().then(function(){if(!currentScreen)goTo(_isAuthed?'improve':'auth');}):goTo('improve');}
 })();
 
+// ── Install prompt ────────────────────────────────────────────────────────────
 var deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;});
 window.triggerInstall=function(){deferredPrompt&&deferredPrompt.prompt();};
+
+// ── Preload improve.html for instant nav ──────────────────────────────────────
+if('requestIdleCallback' in window){
+  requestIdleCallback(function(){
+    var link=document.createElement('link');link.rel='prefetch';link.href='improve.html';document.head.appendChild(link);
+  });
+}
 </script>
 </body>
 </html>
