@@ -335,13 +335,17 @@ window.goTo=function(page){
   if(tryGuestWall(page))return;
   if(isOffline()&&NETWORK_PAGES.indexOf(page)!==-1){showOfflineToast();return;}
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
-  // Force-reload profile/leaderboard for fresh data
-  if((page==='profile'||page==='leaderboard')&&screensLoaded[page]){var old=document.querySelector('#screen-'+page+' iframe');if(old)old.remove();screensLoaded[page]=false;}
   var sc=document.getElementById('screen-'+page);if(sc)sc.classList.add('active');
   currentScreen=page;showNav(page!=='auth');updateNavActive(page);
-  // Toggle body class for status bar color
   document.body.classList.toggle('page-improve',page==='improve');
-  if(screensLoaded[page])return;
+  if(screensLoaded[page]){
+    // Already loaded — send pageEnter so it can animate + refresh data
+    var iframe=document.querySelector('#screen-'+page+' iframe');
+    if(iframe&&iframe.contentWindow){
+      try{iframe.contentWindow.postMessage({type:'pageEnter'},'*');}catch(e){}
+    }
+    return;
+  }
   var c=document.getElementById('screen-'+page);if(!c)return;
   if(AUTH_PAGES.indexOf(page)!==-1&&isStandalone&&!_authResolved){
     var w=document.createElement('div');w.className='auth-wait';
