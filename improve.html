@@ -407,6 +407,20 @@
     @keyframes cardEnter{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
     body.enter .qcard{animation:cardEnter .3s cubic-bezier(.22,1,.36,1) both}
     body.enter .top-bar{animation:cardEnter .25s ease both}
+    /* Dark mode */
+    body.dark{background:#0f172a}
+    body.dark .top-bar{background:#0f172a;border-bottom-color:#334155}
+    body.dark .chip{background:#1e293b;border-color:#334155;box-shadow:0 4px 0 #0a0f1a}
+    body.dark .chip .cv{color:#e2e8f0}
+    body.dark .xp-bar-out{background:#334155;border-color:#475569}
+    body.dark .xp-lbl{color:#94a3b8}
+    body.dark .opt{background:#1e293b;border-color:#334155;color:#e2e8f0;box-shadow:0 4px 0 #0a0f1a}
+    body.dark .opt.dim{opacity:.08}
+    body.dark .install-card{background:#1e293b!important;border-color:#334155!important;box-shadow:0 6px 0 #0a0f1a!important}
+    body.dark .install-card .install-title{color:#e2e8f0}
+    body.dark .install-card .install-sub{color:#94a3b8}
+    body.dark .install-step{background:#0f172a;border-color:#334155}
+    body.dark .install-step-text{color:#94a3b8}
   </style>
 </head>
 <body>
@@ -453,7 +467,8 @@
 <script src="dopamine-loader.js?v=99"></script>
 <script src="games/logic.js?v=99"></script>
 <script type="module">
-import{IQData,getEncouragement}from'./data.js';import Haptics from'./haptics.js';
+import{IQData,getEncouragement}from'./data.js';import _Hap from'./haptics.js';
+var Haptics=new Proxy(_Hap||{},{get:function(t,p){if(typeof t[p]==='function')return function(){if(localStorage.getItem('cb_haptics')==='off')return;return t[p].apply(t,arguments)};return t[p]}});
 import{initializeApp,getApps}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,createUserWithEmailAndPassword,signInWithEmailAndPassword,updateProfile}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import{getFirestore,doc,setDoc,getDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -518,7 +533,7 @@ async function gwEnsure(u,extra={}){try{if(_fbDb.collection){const ref=_fbDb.col
 async function gwGoogleSignIn(){if(!_fbAuth)return;gwClear();gwSetLoad('gw-google-btn',true);if(inIframe){try{parent.postMessage({type:'googleAuthRequest'},'*');}catch{}return;}try{const gp=new GoogleAuthProvider();const result=await signInWithPopup(_fbAuth,gp);await gwEnsure(result.user);gwOnSuccess();}catch(e){if(e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request'){gwSetLoad('gw-google-btn',false);return}gwSetLoad('gw-google-btn',false);gwErr('Google sign-in failed. Try email instead.');}}
 function gwOnSuccess(){isAuthed=true;hideGuestWall();Haptics&&Haptics.success&&Haptics.success();guestQCount=0;handleScroll();if(inIframe)try{parent.postMessage({type:'authSuccess'},'*')}catch{}_syncUserProgress();}
 async function _syncUserProgress(){try{let uid=null;if(_fbAuth&&_fbAuth.currentUser)uid=_fbAuth.currentUser.uid;else if(inIframe){try{uid=window.parent.firebase?.auth().currentUser?.uid}catch{}}if(!uid)return;if(_fbDb&&_fbDb.collection){const snap=await _fbDb.collection('users').doc(uid).get();if(!snap.exists)return;const cd=snap.data(),d=IQData.load();if(cd.iq>d.iq)d.iq=cd.iq;if(cd.level>d.level)d.level=cd.level;if(cd.xp>d.xp)d.xp=cd.xp;if(cd.bestStreak>d.bestStreak)d.bestStreak=cd.bestStreak;if(cd.streak>d.streak)d.streak=cd.streak;if(cd.username)d.username=cd.username;if(cd.pic)d.pic=cd.pic;IQData.save(d);updateUI(d);}}catch{}}
-window.addEventListener('message',function(e){if(!e.data)return;if(e.data.type==='authSuccess'){if(!isAuthed)gwOnSuccess();return;}if(e.data.type==='authError'){gwSetLoad('gw-google-btn',false);gwErr(e.data.msg||'Sign-in failed.');return;}if(e.data.type==='xpAwarded'){const xp=e.data.xp;if(!xp)return;try{const d=IQData.load();d.xp+=xp;d.level=Math.floor(d.xp/150)+1;IQData.save(d);IQData._maybeSync?.();updateUI({xp:d.xp,level:d.level,streak:d.streak,iq:d.iq})}catch{}}if(e.data.type==='pageEnter'){playEntrance();}});
+window.addEventListener('message',function(e){if(!e.data)return;if(e.data.type==='authSuccess'){if(!isAuthed)gwOnSuccess();return;}if(e.data.type==='authError'){gwSetLoad('gw-google-btn',false);gwErr(e.data.msg||'Sign-in failed.');return;}if(e.data.type==='xpAwarded'){const xp=e.data.xp;if(!xp)return;try{const d=IQData.load();d.xp+=xp;d.level=Math.floor(d.xp/150)+1;IQData.save(d);IQData._maybeSync?.();updateUI({xp:d.xp,level:d.level,streak:d.streak,iq:d.iq})}catch{}}});
 document.getElementById('gw-google-btn').addEventListener('click',gwGoogleSignIn);
 window.gwSubmit=async function(){if(!_fbAuth)return;gwClear();const email=document.getElementById('gw-email').value.trim(),pw=document.getElementById('gw-password').value,un=document.getElementById('gw-username').value.trim();if(!email||!pw){gwErr('Please fill in all fields.');return}if(gwMode==='signup'&&pw.length<6){gwErr('Password needs at least 6 characters.');return}gwSetLoad('gw-submit',true);try{let user;if(_fbAuth.signInWithEmailAndPassword){if(gwMode==='login'){const c=await _fbAuth.signInWithEmailAndPassword(email,pw);user=c.user;}else{const c=await _fbAuth.createUserWithEmailAndPassword(email,pw);if(un)await c.user.updateProfile({displayName:un});user=c.user;}}else{if(gwMode==='login'){const c=await signInWithEmailAndPassword(_fbAuth,email,pw);user=c.user;}else{const c=await createUserWithEmailAndPassword(_fbAuth,email,pw);if(un)await updateProfile(c.user,{displayName:un});user=c.user;}}await gwEnsure(user,{username:un});gwOnSuccess();}catch(e){gwSetLoad('gw-submit',false);const msgs={'auth/user-not-found':'No account with that email.','auth/wrong-password':'Incorrect password.','auth/email-already-in-use':'Already registered — try signing in.','auth/invalid-email':'Invalid email address.','auth/weak-password':'Password too weak.','auth/too-many-requests':'Too many attempts. Please wait.','auth/invalid-credential':'Email or password is incorrect.'};gwErr(msgs[e.code]||'Something went wrong.');}};
 
@@ -673,6 +688,24 @@ function playEntrance(){
   void document.body.offsetWidth;
   document.body.classList.add('enter');
 }
+
+function applyDarkMode(on){
+  document.body.classList.toggle('dark',on);
+  if(on){
+    document.documentElement.style.setProperty('--bg','#0f172a');
+    document.documentElement.style.setProperty('--card-border','#334155');
+  }else{
+    ['--bg','--card-border'].forEach(function(v){document.documentElement.style.removeProperty(v);});
+  }
+}
+if(localStorage.getItem('cb_dark')==='on')applyDarkMode(true);
+
+// Listen for dark mode + pageEnter from parent
+window.addEventListener('message',function(msg){
+  if(!msg.data)return;
+  if(msg.data.type==='applyDarkMode')applyDarkMode(msg.data.on);
+  if(msg.data.type==='pageEnter')playEntrance();
+});
 
 init();
 </script>
