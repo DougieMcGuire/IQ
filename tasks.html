@@ -10,66 +10,69 @@
   <style>
     :root{
       --bg:#f5f0e8;--card:#fff;--card-border:#e8e2d6;
-      --blue:#0474fc;--blue-dark:#0358c4;--blue-light:#e8f2ff;
+      --blue:#0474fc;--blue-dark:#0358c4;
       --text:#1e293b;--text-dim:#64748b;--text-light:#94a3b8;
       --green:#22c55e;--green-dark:#16a34a;
-      --red:#ef4444;--red-dark:#dc2626;
       --gold:#f59e0b;--gold-dark:#d97706;
       --orange:#f97316;--purple:#8b5cf6;
       --shadow-card:0 4px 0 var(--card-border);
       --shadow-blue:0 4px 0 var(--blue-dark);
-      --card-r:20px;
+      --r:18px;
     }
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-    html{width:100%;height:100%;overflow:hidden}
-    body{width:100%;height:100%;overflow:hidden;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column}
+    html,body{width:100%;height:100%;overflow:hidden;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text)}
+    body{display:flex;flex-direction:column}
 
-    .hero{
-      background:var(--blue);
-      padding:calc(env(safe-area-inset-top,20px) + 10px) 16px 0;
-      flex-shrink:0;position:relative;
-    }
-    .hero::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:24px;background:var(--bg);border-radius:24px 24px 0 0}
+    /* ── HERO ── */
+    .hero{background:var(--blue);padding:calc(env(safe-area-inset-top,16px) + 12px) 16px 0;flex-shrink:0;position:relative}
+    .hero::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:20px;background:var(--bg);border-radius:20px 20px 0 0}
     .hero-inner{max-width:460px;margin:0 auto}
-    .hero-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-    .hero-title{font-family:'Chewy',cursive;font-size:26px;letter-spacing:.5px;color:#fff}
-    .hero-countdown{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.28);border-radius:12px;padding:7px 12px;box-shadow:0 3px 0 rgba(0,0,0,.1)}
-    .hero-countdown svg{width:14px;height:14px;stroke:rgba(255,255,255,.7);fill:none;stroke-width:2;stroke-linecap:round}
-    .cd-time{font-size:13px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums}
-    .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px}
-    .hs{background:var(--card);border-radius:var(--card-r);border:2.5px solid var(--card-border);padding:16px 14px;display:flex;flex-direction:column;align-items:center;text-align:center;box-shadow:var(--shadow-card)}
-    .hs-icon{margin-bottom:6px}
-    .hs-num{font-family:'Chewy',cursive;font-size:clamp(36px,10vw,46px);line-height:1}
-    .hs-num.streak{color:var(--orange)}
-    .hs-label{font-size:10px;font-weight:900;color:var(--text-light);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
-    .streak-pips{display:flex;gap:4px;margin-top:10px;width:100%;justify-content:center}
-    .streak-pip{flex:1;max-width:20px;height:6px;border-radius:3px;background:#e2e8f0;border:1px solid #d1d5db}
-    .streak-pip.done{background:var(--green);border-color:var(--green-dark)}
-    .prog-ring-wrap{position:relative;width:clamp(60px,15vw,72px);height:clamp(60px,15vw,72px);margin-bottom:4px}
-    .prog-ring{width:100%;height:100%;transform:rotate(-90deg)}
-    .prog-ring-bg{fill:none;stroke:#e2e8f0;stroke-width:5}
-    .prog-ring-fill{fill:none;stroke:var(--green);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.34,1.56,.64,1)}
-    .prog-ring-fill.alldone{stroke:var(--gold)}
-    .prog-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Chewy',cursive;font-size:clamp(16px,4vw,20px);color:var(--text)}
 
-    .body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;min-height:0;background:var(--bg);padding:4px 16px 40px}
+    .hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .hero-title{font-family:'Chewy',cursive;font-size:24px;letter-spacing:.4px;color:#fff}
+    .hero-cd{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.18);border-radius:20px;padding:5px 12px}
+    .hero-cd svg{width:13px;height:13px;stroke:rgba(255,255,255,.55);fill:none;stroke-width:2.2;stroke-linecap:round;flex-shrink:0}
+    .hero-cd span{font-size:12px;font-weight:900;color:rgba(255,255,255,.75);font-variant-numeric:tabular-nums}
+
+    .hero-stats{display:flex;align-items:center;justify-content:center;gap:28px;margin-bottom:26px;padding:0 8px}
+
+    .stat{display:flex;flex-direction:column;align-items:center;gap:2px}
+    .stat-val{font-family:'Chewy',cursive;font-size:clamp(32px,9vw,42px);color:#fff;line-height:1}
+    .stat-val.streak{color:#fbbf24}
+    .stat-lbl{font-size:9px;font-weight:900;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1.2px}
+
+    .ring-wrap{position:relative;width:60px;height:60px}
+    .ring-svg{width:100%;height:100%;transform:rotate(-90deg)}
+    .ring-bg{fill:none;stroke:rgba(255,255,255,.12);stroke-width:4.5}
+    .ring-fill{fill:none;stroke:#fff;stroke-width:4.5;stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.34,1.56,.64,1)}
+    .ring-fill.done{stroke:#fbbf24}
+    .ring-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Chewy',cursive;font-size:16px;color:#fff}
+
+    .stat-dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.18);flex-shrink:0}
+
+    .pips{display:flex;gap:3px;margin-top:5px}
+    .pip{width:14px;height:5px;border-radius:3px;background:rgba(255,255,255,.14)}
+    .pip.on{background:#fbbf24}
+
+    /* ── BODY ── */
+    .body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;min-height:0;padding:6px 16px 40px}
     .body::-webkit-scrollbar{display:none}
     .body-inner{max-width:460px;margin:0 auto}
 
-    .complete{display:none;background:var(--green);border-radius:var(--card-r);border:2.5px solid var(--green-dark);padding:16px;margin-bottom:14px;align-items:center;gap:12px;color:#fff;box-shadow:0 4px 0 var(--green-dark)}
+    .complete{display:none;background:var(--green);border-radius:var(--r);border:2.5px solid var(--green-dark);padding:14px 16px;margin-bottom:12px;align-items:center;gap:10px;color:#fff;box-shadow:0 4px 0 var(--green-dark)}
     .complete.show{display:flex;animation:popIn .5s cubic-bezier(.34,1.56,.64,1)}
-    .complete-ic{width:44px;height:44px;background:rgba(255,255,255,.25);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .complete-ic svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
-    .ct-title{font-family:'Chewy',cursive;font-size:17px;letter-spacing:.3px}
-    .ct-sub{font-size:11px;font-weight:700;opacity:.85;margin-top:2px}
+    .complete-ic{width:40px;height:40px;background:rgba(255,255,255,.25);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .complete-ic svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
+    .ct-title{font-family:'Chewy',cursive;font-size:16px;letter-spacing:.3px}
+    .ct-sub{font-size:11px;font-weight:700;opacity:.8;margin-top:2px}
     .sec-lbl{font-size:10px;font-weight:900;color:var(--text-light);letter-spacing:2px;text-transform:uppercase;margin:0 0 10px;padding:0 4px}
 
-    .task{background:var(--card);border-radius:var(--card-r);border:2.5px solid var(--card-border);padding:16px;margin-bottom:10px;position:relative;overflow:hidden;box-shadow:var(--shadow-card);transition:all .3s}
-    .task.claimed{opacity:.4;pointer-events:none}
+    .task{background:var(--card);border-radius:var(--r);border:2.5px solid var(--card-border);padding:14px;margin-bottom:10px;position:relative;overflow:hidden;box-shadow:var(--shadow-card);transition:all .3s}
+    .task.claimed{opacity:.35;pointer-events:none}
     .task.ready{border-color:var(--gold);box-shadow:0 4px 0 var(--gold-dark)}
-    .task-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-    .task-ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 0 rgba(0,0,0,.1)}
-    .task-ic svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+    .task-top{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+    .task-ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 0 rgba(0,0,0,.1)}
+    .task-ic svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
     .task-ic.ic-play{background:var(--blue);box-shadow:0 3px 0 var(--blue-dark)}
     .task-ic.ic-answer{background:var(--green);box-shadow:0 3px 0 var(--green-dark)}
     .task-ic.ic-streak{background:var(--orange);box-shadow:0 3px 0 #c2410c}
@@ -77,23 +80,23 @@
     .task-ic.ic-accuracy{background:var(--blue);box-shadow:0 3px 0 var(--blue-dark)}
     .task-ic.ic-done{background:var(--green);box-shadow:0 3px 0 var(--green-dark)}
     .task-name{font-size:14px;font-weight:800;color:var(--text);line-height:1.3}
-    .task-meta{display:flex;align-items:center;gap:8px;margin-top:4px}
+    .task-meta{display:flex;align-items:center;gap:8px;margin-top:3px}
     .task-xp{font-size:11px;font-weight:900;color:var(--gold-dark);background:rgba(245,158,11,.1);padding:2px 8px;border-radius:6px;border:1.5px solid rgba(245,158,11,.2)}
     .task-ct{font-size:11px;font-weight:800;color:var(--text-light)}
-    .task-bar{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;border:1.5px solid #d1d5db}
+    .task-bar{height:7px;background:#e2e8f0;border-radius:4px;overflow:hidden;border:1.5px solid #d1d5db}
     .task-fill{height:100%;border-radius:3px;background:var(--blue);transition:width .6s cubic-bezier(.34,1.56,.64,1)}
     .task-fill.tdone{background:var(--gold)}
     .task-action{display:flex;justify-content:flex-end;margin-top:10px}
-    .task-claim{background:var(--gold);color:#fff;border:none;border-radius:14px;padding:10px 22px;font-family:'Chewy',cursive;font-size:16px;letter-spacing:.3px;cursor:pointer;box-shadow:0 4px 0 var(--gold-dark);transition:transform .1s;display:flex;align-items:center;gap:6px}
+    .task-claim{background:var(--gold);color:#fff;border:none;border-radius:14px;padding:9px 20px;font-family:'Chewy',cursive;font-size:15px;letter-spacing:.3px;cursor:pointer;box-shadow:0 4px 0 var(--gold-dark);transition:transform .1s;display:flex;align-items:center;gap:6px}
     .task-claim:active:not(:disabled){transform:translateY(4px);box-shadow:none}
     .task-claim:disabled{opacity:.45;pointer-events:none}
-    .task-claim svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5}
-    .task-go{background:var(--blue);color:#fff;border:none;border-radius:14px;padding:10px 22px;font-family:'Chewy',cursive;font-size:16px;letter-spacing:.3px;cursor:pointer;box-shadow:var(--shadow-blue);transition:transform .1s;display:flex;align-items:center;gap:6px}
+    .task-claim svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5}
+    .task-go{background:var(--blue);color:#fff;border:none;border-radius:14px;padding:9px 20px;font-family:'Chewy',cursive;font-size:15px;letter-spacing:.3px;cursor:pointer;box-shadow:var(--shadow-blue);transition:transform .1s;display:flex;align-items:center;gap:6px}
     .task-go:active{transform:translateY(4px);box-shadow:none}
-    .task-go svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5}
+    .task-go svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5}
     .task-check{display:flex;align-items:center;gap:6px;color:var(--green);font-size:13px;font-weight:900}
-    .task-check-circle{width:28px;height:28px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 var(--green-dark)}
-    .task-check-circle svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round}
+    .task-check-circle{width:26px;height:26px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 var(--green-dark)}
+    .task-check-circle svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round}
 
     .xp-toast{position:fixed;top:calc(env(safe-area-inset-top,20px) + 16px);left:50%;transform:translateX(-50%) translateY(-20px);background:var(--gold);color:#fff;border-radius:20px;padding:10px 24px;font-family:'Chewy',cursive;font-size:22px;letter-spacing:.5px;z-index:999;opacity:0;pointer-events:none;box-shadow:0 4px 0 var(--gold-dark);transition:opacity .25s,transform .35s cubic-bezier(.34,1.56,.64,1)}
     .xp-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -112,29 +115,29 @@
 <body>
 <div class="hero">
   <div class="hero-inner">
-    <div class="hero-hdr">
+    <div class="hero-top">
       <div class="hero-title">Daily Tasks</div>
-      <div class="hero-countdown">
+      <div class="hero-cd">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        <span class="cd-time" id="countdown-text">--:--:--</span>
+        <span id="countdown-text">--:--:--</span>
       </div>
     </div>
     <div class="hero-stats">
-      <div class="hs">
-        <div class="hs-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#f97316" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
-        <div class="hs-num streak" id="streak-val">0</div>
-        <div class="hs-label">Day Streak</div>
-        <div class="streak-pips" id="streak-pips"></div>
+      <div class="stat">
+        <div class="stat-val streak" id="streak-val">0</div>
+        <div class="stat-lbl">Day Streak</div>
+        <div class="pips" id="streak-pips"></div>
       </div>
-      <div class="hs">
-        <div class="prog-ring-wrap">
-          <svg class="prog-ring" viewBox="0 0 36 36">
-            <circle class="prog-ring-bg" cx="18" cy="18" r="15"/>
-            <circle class="prog-ring-fill" id="prog-ring-fill" cx="18" cy="18" r="15" stroke-dasharray="94.25" stroke-dashoffset="94.25"/>
+      <div class="stat-dot"></div>
+      <div class="stat">
+        <div class="ring-wrap">
+          <svg class="ring-svg" viewBox="0 0 36 36">
+            <circle class="ring-bg" cx="18" cy="18" r="15"/>
+            <circle class="ring-fill" id="ring-fill" cx="18" cy="18" r="15" stroke-dasharray="94.25" stroke-dashoffset="94.25"/>
           </svg>
-          <div class="prog-center" id="prog-center">0/3</div>
+          <div class="ring-center" id="ring-center">0/3</div>
         </div>
-        <div class="hs-label">Completed</div>
+        <div class="stat-lbl">Done</div>
       </div>
     </div>
   </div>
@@ -153,337 +156,136 @@
 import Haptics from './haptics.js';
 if(window.parent!==window)parent.authCheck();
 
-// ── Firebase via parent ──
 var db=null,auth=null,_uid=null;
-try{
-  if(window.parent!==window&&window.parent.firebase){
-    db=window.parent.firebase.firestore();
-    auth=window.parent.firebase.auth();
-  }
-}catch(e){}
+try{if(window.parent!==window&&window.parent.firebase){db=window.parent.firebase.firestore();auth=window.parent.firebase.auth();}}catch(e){}
 
-// ── Date key — MUST match improve.html's getTodayKey() ──
-function getTodayKey(){
-  var n=new Date();
-  return n.getFullYear()+'-'+(n.getMonth()+1)+'-'+n.getDate();
-}
+function getTodayKey(){var n=new Date();return n.getFullYear()+'-'+(n.getMonth()+1)+'-'+n.getDate();}
 var _todayKey=getTodayKey();
+function getTasksRef(uid){return db.collection('users').doc(uid).collection('dailyTasks').doc(_todayKey);}
 
-// ── Firestore path — MUST match improve.html ──
-// improve.html: _tasksDb.collection('users').doc(_tasksUid).collection('dailyTasks').doc(getTodayKey())
-function getTasksRef(uid){
-  return db.collection('users').doc(uid).collection('dailyTasks').doc(_todayKey);
-}
-
-// ── Claim protection ──
 var _claimedIds=new Set(),_inFlight={};
 var _cacheKey='bd_claimed_'+_todayKey;
 function _loadClaimed(){try{var s=sessionStorage.getItem(_cacheKey);if(s)JSON.parse(s).forEach(function(id){_claimedIds.add(id)})}catch(e){}}
 function _setClaimed(id){_claimedIds.add(id);try{sessionStorage.setItem(_cacheKey,JSON.stringify(Array.from(_claimedIds)))}catch(e){}}
 _loadClaimed();
 
-// ── Task definitions — EXACT SAME as improve.html's TASK_POOL + seeded picker ──
 var TASK_POOL=[
-  {id:'streak_5',type:'streak',target:5,label:'Get a streak of 5',icon:'🔥',xp:30},
-  {id:'streak_10',type:'streak',target:10,label:'Get a streak of 10',icon:'🔥',xp:60},
-  {id:'correct_10',type:'correct',target:10,label:'Get 10 correct',icon:'✅',xp:25},
-  {id:'correct_25',type:'correct',target:25,label:'Get 25 correct',icon:'✅',xp:50},
-  {id:'answer_20',type:'answered',target:20,label:'Answer 20 questions',icon:'🧠',xp:20},
-  {id:'answer_50',type:'answered',target:50,label:'Answer 50 questions',icon:'🧠',xp:45},
-  {id:'accuracy_70',type:'accuracy',target:70,label:'Hit 70% accuracy today',icon:'🎯',xp:35},
-  {id:'accuracy_80',type:'accuracy',target:80,label:'Hit 80% accuracy today',icon:'🎯',xp:55},
-  {id:'play_wordle',type:'game',game:'wordle',target:3,label:'Play 3 Wordle rounds',icon:'🟩',xp:40},
-  {id:'play_math',type:'game',game:'mathRush',target:3,label:'Play 3 Math Rush rounds',icon:'➕',xp:40},
-  {id:'play_memory',type:'game',game:'memory',target:2,label:'Play 2 Memory games',icon:'🃏',xp:35},
-  {id:'play_reaction',type:'game',game:'reaction',target:3,label:'Play 3 Reaction tests',icon:'⚡',xp:30},
-  {id:'play_ttt',type:'game',game:'ticTacToe',target:2,label:'Play 2 Tic Tac Toe games',icon:'⭕',xp:30},
-  {id:'play_simon',type:'game',game:'simon',target:2,label:'Play 2 Simon Says rounds',icon:'🔴',xp:35},
-  {id:'play_scramble',type:'game',game:'wordScramble',target:3,label:'Unscramble 3 words',icon:'🔤',xp:30},
-  {id:'fast_5',type:'fast',target:5,label:'Answer 5 in under 3.5s',icon:'⚡',xp:45}
+  {id:'streak_5',type:'streak',target:5,label:'Get a streak of 5',xp:30},
+  {id:'streak_10',type:'streak',target:10,label:'Get a streak of 10',xp:60},
+  {id:'correct_10',type:'correct',target:10,label:'Get 10 correct',xp:25},
+  {id:'correct_25',type:'correct',target:25,label:'Get 25 correct',xp:50},
+  {id:'answer_20',type:'answered',target:20,label:'Answer 20 questions',xp:20},
+  {id:'answer_50',type:'answered',target:50,label:'Answer 50 questions',xp:45},
+  {id:'accuracy_70',type:'accuracy',target:70,label:'Hit 70% accuracy today',xp:35},
+  {id:'accuracy_80',type:'accuracy',target:80,label:'Hit 80% accuracy today',xp:55},
+  {id:'play_wordle',type:'game',game:'wordle',target:3,label:'Play 3 Wordle rounds',xp:40},
+  {id:'play_math',type:'game',game:'mathRush',target:3,label:'Play 3 Math Rush rounds',xp:40},
+  {id:'play_memory',type:'game',game:'memory',target:2,label:'Play 2 Memory games',xp:35},
+  {id:'play_reaction',type:'game',game:'reaction',target:3,label:'Play 3 Reaction tests',xp:30},
+  {id:'play_ttt',type:'game',game:'ticTacToe',target:2,label:'Play 2 Tic Tac Toe games',xp:30},
+  {id:'play_simon',type:'game',game:'simon',target:2,label:'Play 2 Simon Says rounds',xp:35},
+  {id:'play_scramble',type:'game',game:'wordScramble',target:3,label:'Unscramble 3 words',xp:30},
+  {id:'fast_5',type:'fast',target:5,label:'Answer 5 in under 3.5s',xp:45}
 ];
-
 function seededRandom(seed){var s=seed;return function(){s=(s*1664525+1013904223)&0xffffffff;return(s>>>0)/0xffffffff}}
-function getDailyTaskDefs(){
-  var dk=_todayKey,seed=dk.split('-').reduce(function(a,n){return a*31+parseInt(n)},0);
-  var rng=seededRandom(seed);
-  return TASK_POOL.slice().sort(function(){return rng()-0.5}).slice(0,3);
-}
+function getDailyTaskDefs(){var dk=_todayKey,seed=dk.split('-').reduce(function(a,n){return a*31+parseInt(n)},0);var rng=seededRandom(seed);return TASK_POOL.slice().sort(function(){return rng()-0.5}).slice(0,3);}
 
-// ── Claim a task via Firestore transaction ──
 async function claimTask(uid,taskId){
-  if(_inFlight[taskId])return null;
-  _inFlight[taskId]=true;_setClaimed(taskId);
-  try{
-    var ref=getTasksRef(uid),earnedXp=null;
-    await db.runTransaction(async function(tx){
-      var snap=await tx.get(ref);if(!snap.exists)return;
-      var st=snap.data();
-      var task=st.tasks.find(function(t){return t.id===taskId});
-      if(!task||!task.done||task.claimed){earnedXp=null;return}
-      task.claimed=true;earnedXp=task.xp;
-      if(st.tasks.every(function(t){return t.claimed}))st.allClaimed=true;
-      tx.set(ref,st);
-    });
+  if(_inFlight[taskId])return null;_inFlight[taskId]=true;_setClaimed(taskId);
+  try{var ref=getTasksRef(uid),earnedXp=null;
+    await db.runTransaction(async function(tx){var snap=await tx.get(ref);if(!snap.exists)return;var st=snap.data();var task=st.tasks.find(function(t){return t.id===taskId});if(!task||!task.done||task.claimed){earnedXp=null;return}task.claimed=true;earnedXp=task.xp;if(st.tasks.every(function(t){return t.claimed}))st.allClaimed=true;tx.set(ref,st);});
     return earnedXp;
-  }catch(e){return null}
-  finally{delete _inFlight[taskId]}
+  }catch(e){return null}finally{delete _inFlight[taskId]}
 }
-
 function awardXP(xp){try{if(window.parent!==window)window.parent.postMessage({type:'xpAwarded',xp:xp},'*')}catch(e){}}
 
-// ── Countdown ──
-function updateCountdown(){
-  var now=new Date(),mid=new Date(now);mid.setHours(24,0,0,0);
-  var d=mid-now,h=Math.floor(d/3600000),m=Math.floor((d%3600000)/60000),s=Math.floor((d%60000)/1000);
-  var pad=function(n){return String(n).padStart(2,'0')};
-  document.getElementById('countdown-text').textContent=pad(h)+':'+pad(m)+':'+pad(s);
-}
+function updateCountdown(){var now=new Date(),mid=new Date(now);mid.setHours(24,0,0,0);var d=mid-now,h=Math.floor(d/3600000),m=Math.floor((d%3600000)/60000),s=Math.floor((d%60000)/1000);var pad=function(n){return String(n).padStart(2,'0')};document.getElementById('countdown-text').textContent=pad(h)+':'+pad(m)+':'+pad(s);}
 setInterval(updateCountdown,1000);updateCountdown();
 
-// ── Effects ──
-function spawnConfetti(n){
-  var colors=['#22c55e','#f59e0b','#ef4444','#0474fc','#8b5cf6','#f97316'];
-  var el=document.getElementById('confetti');
-  for(var i=0;i<n;i++){
-    var p=document.createElement('i');
-    p.style.left=Math.random()*100+'%';p.style.top='-12px';
-    p.style.background=colors[Math.floor(Math.random()*colors.length)];
-    p.style.animationDelay=Math.random()*.3+'s';
-    el.appendChild(p);
-    setTimeout((function(el){return function(){el.classList.add('fall')}})(p),10);
-    setTimeout((function(el){return function(){el.remove()}})(p),1600);
-  }
-}
+function spawnConfetti(n){var colors=['#22c55e','#f59e0b','#ef4444','#0474fc','#8b5cf6','#f97316'],el=document.getElementById('confetti');for(var i=0;i<n;i++){var p=document.createElement('i');p.style.left=Math.random()*100+'%';p.style.top='-12px';p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDelay=Math.random()*.3+'s';el.appendChild(p);setTimeout((function(x){return function(){x.classList.add('fall')}})(p),10);setTimeout((function(x){return function(){x.remove()}})(p),1600);}}
 function showXpToast(m){var t=document.getElementById('xp-toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2400)}
 
-// ── Get icon class for task type ──
-function getIconClass(task){
-  if(task.done)return'ic-done';
-  if(task.type==='game')return'ic-play';
-  if(task.type==='streak')return'ic-streak';
-  if(task.type==='fast')return'ic-fast';
-  if(task.type==='accuracy')return'ic-accuracy';
-  return'ic-answer';
-}
+function getIconClass(task){if(task.done)return'ic-done';if(task.type==='game')return'ic-play';if(task.type==='streak')return'ic-streak';if(task.type==='fast')return'ic-fast';if(task.type==='accuracy')return'ic-accuracy';return'ic-answer';}
+function getTaskIcon(task){var t=task.type;if(t==='game')return'<svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4M8 10v4"/><circle cx="16" cy="11" r=".5" fill="#fff"/><circle cx="18" cy="13" r=".5" fill="#fff"/></svg>';if(t==='streak')return'<svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>';if(t==='fast')return'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>';if(t==='accuracy')return'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>';return'<svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>';}
 
-function getTaskIcon(task){
-  var t=task.type;
-  if(t==='game')return'<svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4M8 10v4"/><circle cx="16" cy="11" r=".5" fill="#fff"/><circle cx="18" cy="13" r=".5" fill="#fff"/></svg>';
-  if(t==='streak')return'<svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>';
-  if(t==='fast')return'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>';
-  if(t==='accuracy')return'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>';
-  return'<svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>';
-}
-
-// ── Hero update ──
 function updateHero(state){
   document.getElementById('streak-val').textContent=state.dailyStreak||0;
   var pips=document.getElementById('streak-pips'),days=state.dailyStreak||0,pipCount=7;
   var filled=Math.min(days%pipCount||(days>0&&days%pipCount===0?pipCount:0),pipCount);
-  pips.innerHTML='';
-  for(var p=0;p<pipCount;p++){var pip=document.createElement('div');pip.className='streak-pip'+(p<filled?' done':'');pips.appendChild(pip)}
-  var done=state.tasks.filter(function(t){return t.done}).length;
-  var total=state.tasks.length,pct=total>0?done/total:0;
-  var ring=document.getElementById('prog-ring-fill');
-  ring.style.strokeDashoffset=94.25-(94.25*pct);
-  ring.classList.toggle('alldone',!!state.allDone);
-  document.getElementById('prog-center').textContent=done+'/'+total;
+  pips.innerHTML='';for(var p=0;p<pipCount;p++){var pip=document.createElement('div');pip.className='pip'+(p<filled?' on':'');pips.appendChild(pip)}
+  var done=state.tasks.filter(function(t){return t.done}).length,total=state.tasks.length,pct=total>0?done/total:0;
+  var ring=document.getElementById('ring-fill');ring.style.strokeDashoffset=94.25-(94.25*pct);ring.classList.toggle('done',!!state.allDone);
+  document.getElementById('ring-center').textContent=done+'/'+total;
 }
 
-// ── Render ──
 function render(state){
-  var inner=document.getElementById('body-inner');
-  inner.innerHTML='';
-  updateHero(state);
-
-  if(state.allDone){
-    var cb=document.createElement('div');cb.className='complete show anim';
-    cb.innerHTML='<div class="complete-ic"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div><div><div class="ct-title">All tasks done! 🎉</div><div class="ct-sub">New tasks at midnight — keep the streak alive!</div></div>';
-    inner.appendChild(cb);
-  }
-
-  var lbl=document.createElement('div');lbl.className='sec-lbl anim d1';lbl.textContent="Today's Tasks";
-  inner.appendChild(lbl);
-
+  var inner=document.getElementById('body-inner');inner.innerHTML='';updateHero(state);
+  if(state.allDone){var cb=document.createElement('div');cb.className='complete show anim';cb.innerHTML='<div class="complete-ic"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div><div><div class="ct-title">All tasks done! 🎉</div><div class="ct-sub">New tasks at midnight — keep the streak alive!</div></div>';inner.appendChild(cb);}
+  var lbl=document.createElement('div');lbl.className='sec-lbl anim d1';lbl.textContent="Today's Tasks";inner.appendChild(lbl);
   state.tasks.forEach(function(task,i){
-    var pct=Math.min(100,Math.round(task.progress/task.target*100));
-    var isClaimed=task.claimed||_claimedIds.has(task.id);
-    var card=document.createElement('div');
-    card.className='task anim d'+(Math.min(i+2,5))+(isClaimed?' claimed':(task.done?' ready':''));
-    card.innerHTML=
-      '<div class="task-top">'
-      +'<div class="task-ic '+getIconClass(task)+'">'+getTaskIcon(task)+'</div>'
-      +'<div>'
-      +'<div class="task-name">'+task.label+'</div>'
-      +'<div class="task-meta">'
-      +'<span class="task-xp">+'+task.xp+' XP</span>'
-      +'<span class="task-ct">'+task.progress+'/'+task.target+(task.type==='accuracy'?'%':'')+'</span>'
-      +'</div></div></div>'
-      +'<div class="task-bar"><div class="task-fill'+(task.done?' tdone':'')+'" style="width:'+pct+'%"></div></div>'
-      +'<div class="task-action" id="action-'+task.id+'"></div>';
-    inner.appendChild(card);
-    renderAction(task.id,task,isClaimed);
+    var pct=Math.min(100,Math.round(task.progress/task.target*100)),isClaimed=task.claimed||_claimedIds.has(task.id);
+    var card=document.createElement('div');card.className='task anim d'+(Math.min(i+2,5))+(isClaimed?' claimed':(task.done?' ready':''));
+    card.innerHTML='<div class="task-top"><div class="task-ic '+getIconClass(task)+'">'+getTaskIcon(task)+'</div><div><div class="task-name">'+task.label+'</div><div class="task-meta"><span class="task-xp">+'+task.xp+' XP</span><span class="task-ct">'+task.progress+'/'+task.target+(task.type==='accuracy'?'%':'')+'</span></div></div></div><div class="task-bar"><div class="task-fill'+(task.done?' tdone':'')+'" style="width:'+pct+'%"></div></div><div class="task-action" id="action-'+task.id+'"></div>';
+    inner.appendChild(card);renderAction(task.id,task,isClaimed);
   });
 }
 
 function renderAction(taskId,task,isClaimed){
   var el=document.getElementById('action-'+taskId);if(!el)return;
-  if(isClaimed){
-    el.innerHTML='<div class="task-check"><div class="task-check-circle"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div>Claimed!</div>';
-    return;
-  }
+  if(isClaimed){el.innerHTML='<div class="task-check"><div class="task-check-circle"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div>Claimed!</div>';return;}
   if(task.done){
     var btn=document.createElement('button');btn.className='task-claim';
     btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Claim!';
     btn.addEventListener('click',function(){
-      if(_claimedIds.has(taskId)||_inFlight[taskId])return;
-      _setClaimed(taskId);
+      if(_claimedIds.has(taskId)||_inFlight[taskId])return;_setClaimed(taskId);
       el.innerHTML='<div class="task-check"><div class="task-check-circle"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div>Claimed!</div>';
       var c=el.closest('.task');if(c)c.classList.add('claimed');
       Haptics?.success?.();showXpToast('+'+task.xp+' XP!');spawnConfetti(30);awardXP(task.xp);
-      if(_uid&&db){
-        claimTask(_uid,taskId).then(function(){
-          try{window.parent.postMessage({type:'tasksUpdated'},'*')}catch(e){}
-        });
-      }
-    });
-    el.appendChild(btn);
+      if(_uid&&db){claimTask(_uid,taskId).then(function(){try{window.parent.postMessage({type:'tasksUpdated'},'*')}catch(e){}});}
+    });el.appendChild(btn);
   } else {
     var goBtn=document.createElement('button');goBtn.className='task-go';
     goBtn.innerHTML='<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg> Train';
-    goBtn.addEventListener('click',function(){
-      Haptics?.medium?.();
-      try{window.parent.goTo('improve')}catch(e){}
-    });
+    goBtn.addEventListener('click',function(){Haptics?.medium?.();try{window.parent.goTo('improve')}catch(e){}});
     el.appendChild(goBtn);
   }
 }
 
-// ── Load tasks — reads from the SAME path as improve.html ──
 var _lastState=null;
-var _dbg=[];
-function dbg(msg){_dbg.push(msg);console.log('[TASKS]',msg);var el=document.getElementById('dbg-panel');if(el)el.textContent=_dbg.join('\n');}
-
 async function loadTasks(){
-  dbg('loadTasks() called');
-  dbg('db='+(db?'YES':'NULL')+' auth='+(auth?'YES':'NULL'));
-  dbg('todayKey='+_todayKey);
-  
-  if(!auth||!db){
-    dbg('NO FIREBASE — showing sign in message');
-    dbg('window.parent.firebase='+(function(){try{return window.parent.firebase?'EXISTS':'UNDEF'}catch(e){return'CROSS_ORIGIN_ERR'}})());
-    document.getElementById('body-inner').innerHTML='<div class="loading-msg">Sign in to see your daily tasks</div><pre id="dbg-panel" style="font-size:9px;color:#94a3b8;margin:16px;white-space:pre-wrap;word-break:break-all">'+_dbg.join('\n')+'</pre>';
-    return;
-  }
-
+  if(!auth||!db){document.getElementById('body-inner').innerHTML='<div class="loading-msg">Sign in to see your daily tasks</div>';return;}
   var user=auth.currentUser;
-  dbg('auth.currentUser='+(user?user.uid:'NULL'));
-  
-  if(!user){
-    dbg('waiting for onAuthStateChanged...');
-    await new Promise(function(resolve){
-      var resolved=false;
-      var unsub=auth.onAuthStateChanged(function(u){
-        if(resolved)return;resolved=true;unsub();
-        dbg('onAuthStateChanged fired: '+(u?u.uid:'no user'));
-        if(u)_uid=u.uid;
-        resolve();
-      });
-      setTimeout(function(){if(!resolved){resolved=true;unsub();dbg('auth timed out after 3s');resolve()}},3000);
-    });
-    user=auth.currentUser;
-  }
-  if(!user){
-    dbg('STILL NO USER after waiting — showing sign in');
-    document.getElementById('body-inner').innerHTML='<div class="loading-msg">Sign in to see your daily tasks</div><pre id="dbg-panel" style="font-size:9px;color:#94a3b8;margin:16px;white-space:pre-wrap;word-break:break-all">'+_dbg.join('\n')+'</pre>';
-    return;
-  }
+  if(!user){await new Promise(function(resolve){var resolved=false;var unsub=auth.onAuthStateChanged(function(u){if(resolved)return;resolved=true;unsub();if(u)_uid=u.uid;resolve();});setTimeout(function(){if(!resolved){resolved=true;unsub();resolve()}},3000);});user=auth.currentUser;}
+  if(!user){document.getElementById('body-inner').innerHTML='<div class="loading-msg">Sign in to see your daily tasks</div>';return;}
   _uid=user.uid;
-  dbg('uid='+_uid);
-
   try{
-    var ref=getTasksRef(_uid);
-    var path='users/'+_uid+'/dailyTasks/'+_todayKey;
-    dbg('reading Firestore path: '+path);
-    var snap=await ref.get();
-    dbg('snap.exists='+snap.exists);
-
-    if(snap.exists){
-      var state=snap.data();
-      dbg('tasks found: '+state.tasks.length+' tasks');
-      dbg('task IDs: '+state.tasks.map(function(t){return t.id}).join(', '));
-      dbg('progress: '+state.tasks.map(function(t){return t.id+'='+t.progress+'/'+t.target+(t.done?' DONE':'')}).join(', '));
-      state.tasks.forEach(function(t){if(_claimedIds.has(t.id))t.claimed=true});
-      _lastState=state;
-      render(state);
-    } else {
-      dbg('NO DOC — creating it now');
-      var defs=getDailyTaskDefs();
-      var tasksArr=[];
-      defs.forEach(function(def){
-        tasksArr.push({id:def.id,type:def.type,target:def.target,label:def.label,icon:def.icon||'',xp:def.xp,game:def.game||'',progress:0,done:false,claimed:false});
-      });
-      // Cross-frame Firestore rejects iframe-created objects.
-      // Use parent's JSON to rebuild the object in parent's context.
+    var ref=getTasksRef(_uid),snap=await ref.get();
+    if(snap.exists){var state=snap.data();state.tasks.forEach(function(t){if(_claimedIds.has(t.id))t.claimed=true});_lastState=state;render(state);}
+    else{
+      var defs=getDailyTaskDefs(),tasksArr=[];
+      defs.forEach(function(def){tasksArr.push({id:def.id,type:def.type,target:def.target,label:def.label,icon:def.icon||'',xp:def.xp,game:def.game||'',progress:0,done:false,claimed:false});});
       var dataStr=JSON.stringify({date:_todayKey,tasks:tasksArr,allDone:false,allClaimed:false,dailyStreak:0});
       var plainData=window.parent.JSON.parse(dataStr);
-      try{
-        await ref.set(plainData);
-        dbg('Created doc at '+path+' ✓');
-      }catch(we){
-        dbg('Failed to create doc: '+we.message);
-      }
-      var freshState=JSON.parse(dataStr);
-      _lastState=freshState;
-      render(freshState);
+      try{await ref.set(plainData);}catch(e){}
+      var freshState=JSON.parse(dataStr);_lastState=freshState;render(freshState);
     }
   }catch(e){
-    dbg('ERROR: '+e.message);
-    dbg('error code: '+(e.code||'none'));
-    var defs=getDailyTaskDefs();
-    render({
-      date:_todayKey,
-      tasks:defs.map(function(def){return Object.assign({},def,{progress:0,done:false,claimed:false})}),
-      allDone:false,allClaimed:false,dailyStreak:0
-    });
-  }
-  
-  // Show debug panel at bottom of tasks
-  var inner=document.getElementById('body-inner');
-  if(inner){
-    var pre=document.createElement('pre');
-    pre.id='dbg-panel';
-    pre.style.cssText='font-size:9px;color:#94a3b8;margin:16px 0;white-space:pre-wrap;word-break:break-all;background:#f0ead6;padding:10px;border-radius:8px;border:1px solid #e2ddd4';
-    pre.textContent=_dbg.join('\n');
-    inner.appendChild(pre);
+    var defs2=getDailyTaskDefs();
+    render({date:_todayKey,tasks:defs2.map(function(d){return{id:d.id,type:d.type,target:d.target,label:d.label,icon:d.icon||'',xp:d.xp,game:d.game||'',progress:0,done:false,claimed:false}}),allDone:false,allClaimed:false,dailyStreak:0});
   }
 }
 
-// ── Listen for updates from improve.html ──
-window.addEventListener('message',function(e){
-  if(e.data&&e.data.type==='tasksUpdated'){
-    // Re-fetch from Firestore to get latest progress
-    loadTasks();
-  }
-});
+window.addEventListener('message',function(e){if(e.data&&e.data.type==='tasksUpdated')loadTasks();});
 
-// ── Also set up a Firestore real-time listener for live updates ──
 async function setupListener(){
   if(!db||!_uid)return;
-  try{
-    getTasksRef(_uid).onSnapshot(function(snap){
-      if(!snap.exists)return;
-      var state=snap.data();
-      state.tasks.forEach(function(t){if(_claimedIds.has(t.id))t.claimed=true});
-      // Only re-render if something actually changed
-      var newJson=JSON.stringify(state.tasks.map(function(t){return{id:t.id,p:t.progress,d:t.done,c:t.claimed}}));
-      var oldJson=_lastState?JSON.stringify(_lastState.tasks.map(function(t){return{id:t.id,p:t.progress,d:t.done,c:t.claimed}})):'';
-      if(newJson!==oldJson){
-        _lastState=state;
-        render(state);
-      }
-    });
-  }catch(e){}
+  try{getTasksRef(_uid).onSnapshot(function(snap){
+    if(!snap.exists)return;var state=snap.data();
+    state.tasks.forEach(function(t){if(_claimedIds.has(t.id))t.claimed=true});
+    var nj=JSON.stringify(state.tasks.map(function(t){return{i:t.id,p:t.progress,d:t.done,c:t.claimed}}));
+    var oj=_lastState?JSON.stringify(_lastState.tasks.map(function(t){return{i:t.id,p:t.progress,d:t.done,c:t.claimed}})):'';
+    if(nj!==oj){_lastState=state;render(state);}
+  });}catch(e){}
 }
 
 loadTasks().then(setupListener);
