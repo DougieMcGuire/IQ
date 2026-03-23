@@ -361,46 +361,66 @@ function renderAction(taskId,task,isClaimed){
 
 // ── Load tasks — reads from the SAME path as improve.html ──
 var _lastState=null;
+var _dbg=[];
+function dbg(msg){_dbg.push(msg);console.log('[TASKS]',msg);var el=document.getElementById('dbg-panel');if(el)el.textContent=_dbg.join('\n');}
+
 async function loadTasks(){
+  dbg('loadTasks() called');
+  dbg('db='+(db?'YES':'NULL')+' auth='+(auth?'YES':'NULL'));
+  dbg('todayKey='+_todayKey);
+  
   if(!auth||!db){
-    // No Firebase — show empty state
-    document.getElementById('body-inner').innerHTML='<div class="loading-msg">Sign in to see your daily tasks</div>';
+    dbg('NO FIREBASE — showing sign in message');
+    dbg('window.parent.firebase='+(function(){try{return window.parent.firebase?'EXISTS':'UNDEF'}catch(e){return'CROSS_ORIGIN_ERR'}})());
+    document.getElementById('body-inner').innerHTML='<div class="loading-msg">Sign in to see your daily tasks</div><pre id="dbg-panel" style="font-size:9px;color:#94a3b8;margin:16px;white-space:pre-wrap;word-break:break-all">'+_dbg.join('\n')+'</pre>';
     return;
   }
 
   var user=auth.currentUser;
+  dbg('auth.currentUser='+(user?user.uid:'NULL'));
+  
   if(!user){
+    dbg('waiting for onAuthStateChanged...');
     await new Promise(function(resolve){
       var resolved=false;
       var unsub=auth.onAuthStateChanged(function(u){
         if(resolved)return;resolved=true;unsub();
+        dbg('onAuthStateChanged fired: '+(u?u.uid:'no user'));
         if(u)_uid=u.uid;
         resolve();
       });
-      setTimeout(function(){if(!resolved){resolved=true;unsub();resolve()}},3000);
+      setTimeout(function(){if(!resolved){resolved=true;unsub();dbg('auth timed out after 3s');resolve()}},3000);
     });
     user=auth.currentUser;
   }
   if(!user){
-    document.getElementById('body-inner').innerHTML='<div class="loading-msg">Sign in to see your daily tasks</div>';
+    dbg('STILL NO USER after waiting — showing sign in');
+    document.getElementById('body-inner').innerHTML='<div class="loading-msg">Sign in to see your daily tasks</div><pre id="dbg-panel" style="font-size:9px;color:#94a3b8;margin:16px;white-space:pre-wrap;word-break:break-all">'+_dbg.join('\n')+'</pre>';
     return;
   }
   _uid=user.uid;
+  dbg('uid='+_uid);
 
   try{
     var ref=getTasksRef(_uid);
+    var path='users/'+_uid+'/dailyTasks/'+_todayKey;
+    dbg('reading Firestore path: '+path);
     var snap=await ref.get();
+    dbg('snap.exists='+snap.exists);
 
     if(snap.exists){
       var state=snap.data();
-      // Apply local claim cache
+      dbg('tasks found: '+state.tasks.length+' tasks');
+      dbg('task IDs: '+state.tasks.map(function(t){return t.id}).join(', '));
+      dbg('progress: '+state.tasks.map(function(t){return t.id+'='+t.progress+'/'+t.target+(t.done?' DONE':'')}).join(', '));
       state.tasks.forEach(function(t){if(_claimedIds.has(t.id))t.claimed=true});
       _lastState=state;
       render(state);
     } else {
-      // No task doc yet — improve.html creates it on first game played
-      // Generate the same tasks so user sees what they need to do
+      dbg('NO DOC at this path — generating fallback tasks');
+      dbg('(improve.html creates this doc when you play games while signed in)');
       var defs=getDailyTaskDefs();
+      dbg('generated task IDs: '+defs.map(function(d){return d.id}).join(', '));
       var freshState={
         date:_todayKey,
         tasks:defs.map(function(def){return Object.assign({},def,{progress:0,done:false,claimed:false})}),
@@ -410,14 +430,24 @@ async function loadTasks(){
       render(freshState);
     }
   }catch(e){
-    console.warn('loadTasks error:',e);
-    // Show generated tasks as fallback
+    dbg('ERROR: '+e.message);
+    dbg('error code: '+(e.code||'none'));
     var defs=getDailyTaskDefs();
     render({
       date:_todayKey,
       tasks:defs.map(function(def){return Object.assign({},def,{progress:0,done:false,claimed:false})}),
       allDone:false,allClaimed:false,dailyStreak:0
     });
+  }
+  
+  // Show debug panel at bottom of tasks
+  var inner=document.getElementById('body-inner');
+  if(inner){
+    var pre=document.createElement('pre');
+    pre.id='dbg-panel';
+    pre.style.cssText='font-size:9px;color:#94a3b8;margin:16px 0;white-space:pre-wrap;word-break:break-all;background:#f0ead6;padding:10px;border-radius:8px;border:1px solid #e2ddd4';
+    pre.textContent=_dbg.join('\n');
+    inner.appendChild(pre);
   }
 }
 
