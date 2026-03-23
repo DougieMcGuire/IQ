@@ -83,6 +83,13 @@
       }
     }
     body.page-improve{background:#f5f0e8}
+    /* Dark mode */
+    body.dark{background:#1e3a5f}
+    body.dark.page-improve{background:#0f172a}
+    body.dark #nav{background:#1e3a5f}
+    body.dark.has-nav::after{background:#1e3a5f}
+    body.dark::before{background:rgba(30,58,95,.85)!important}
+    body.dark.page-improve::before{background:rgba(15,23,42,.85)!important}
 
     /* ── SPLASH ── */
     #splash{position:fixed;inset:0;z-index:9999;background:#0474fc;display:flex;justify-content:center;align-items:center;overflow:hidden;-webkit-user-select:none;user-select:none;contain:strict}
@@ -408,6 +415,36 @@ window.addEventListener('offline',function(){showOfflineToast();});
 var deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;});
 window.triggerInstall=function(){deferredPrompt&&deferredPrompt.prompt();};
+
+// ── Dark mode: listen for changes from iframes and propagate to all ──────────
+function applyAppDarkMode(on){
+  document.body.classList.toggle('dark',on);
+  var nav=document.getElementById('nav');
+  if(nav)nav.style.background=on?'#1e3a5f':'#0474fc';
+  // Update body::after strip color
+  var style=document.documentElement.style;
+  if(on){
+    style.setProperty('--app-nav-bg','#1e3a5f');
+    document.body.style.background=on&&!document.body.classList.contains('page-improve')?'#1e3a5f':'';
+  }else{
+    style.removeProperty('--app-nav-bg');
+    document.body.style.background='';
+  }
+  // Propagate to all loaded iframes
+  document.querySelectorAll('.screen iframe').forEach(function(f){
+    try{f.contentWindow.postMessage({type:'applyDarkMode',on:on},'*');}catch(e){}
+  });
+}
+// Apply on load
+if(localStorage.getItem('cb_dark')==='on')applyAppDarkMode(true);
+// Listen for settings changes from profile iframe
+window.addEventListener('message',function(e){
+  if(!e.data)return;
+  if(e.data.type==='darkModeChanged'){
+    localStorage.setItem('cb_dark',e.data.on?'on':'off');
+    applyAppDarkMode(e.data.on);
+  }
+});
 
 // ── Preload improve.html for instant nav ──────────────────────────────────────
 if('requestIdleCallback' in window){
