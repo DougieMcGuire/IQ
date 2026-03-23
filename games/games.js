@@ -12,6 +12,7 @@
   .game-branding{width:100%;display:flex;justify-content:center;margin-top:8px;padding-top:10px;border-top:1px solid rgba(240,234,214,.06)}.game-branding a{display:inline-flex;align-items:center;gap:5px;background:rgba(240,234,214,.07);border:1px solid rgba(240,234,214,.12);border-radius:20px;padding:5px 12px 5px 8px;text-decoration:none;transition:all .15s}.game-branding a:active{transform:scale(.96)}.game-branding-bear{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}.game-branding-bear img{width:20px;height:20px;object-fit:contain}.game-branding-text{font-size:11px;font-weight:900;color:rgba(240,234,214,.5);letter-spacing:1.5px;text-transform:uppercase}
   .scroll-hint{position:absolute;bottom:14px;left:0;right:0;font-size:13px;font-weight:900;display:flex;flex-direction:column;align-items:center;gap:4px;transition:opacity .4s;pointer-events:none;opacity:0}.scroll-hint.show{opacity:1}.scroll-hint-inner{display:flex;align-items:center;gap:7px;background:rgba(240,234,214,.1);border:1px solid rgba(240,234,214,.15);border-radius:20px;padding:7px 16px;color:var(--cream)}.scroll-hint-inner svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:2.8;animation:bounce 1.2s infinite}.scroll-hint-inner span{font-size:12px;font-weight:900;color:rgba(240,234,214,.7);letter-spacing:.3px}@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}@keyframes pop{0%{transform:scale(1)}30%{transform:scale(1.12)}60%{transform:scale(.97)}100%{transform:scale(1)}}
   .pc3-grid{display:grid;gap:5px;background:#e2ddd4;padding:7px;border-radius:16px;margin:4px auto;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae}.pc3-cell{border-radius:10px;background:#fff;border:2.5px solid #e8e2d6;position:relative;cursor:pointer;user-select:none;transition:border-color .15s,background .15s,box-shadow .15s;box-shadow:0 3px 0 #d6cfc0;overflow:hidden;aspect-ratio:1}.pc3-cell:not([style*='pointer-events:none']):active{transform:translateY(3px);box-shadow:none}.pc3-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.6);min-height:18px}.pc3-moves{font-size:11px;font-weight:700;text-align:center;color:rgba(255,255,255,.3);min-height:14px}
+  .jig-pw{cursor:grab;user-select:none;touch-action:none;transition:opacity .15s}.jig-pw:active{cursor:grabbing}.jig-pw.jig-pw-placed{opacity:.15;pointer-events:none}.jig-tray2{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:4px 0}.jig-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.55);min-height:18px}
   .jig-board{display:grid;gap:4px;background:#e2ddd4;padding:6px;border-radius:16px;margin:0 auto;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae;width:min(250px,66vw)}.jig-gcell{aspect-ratio:1;border-radius:8px;background:#fff;border:2px solid #e8e2d6;cursor:pointer;user-select:none;transition:background .12s,border-color .12s,transform .1s;box-shadow:0 2px 0 #d6cfc0}.jig-gcell:active{transform:scale(.92)}.jig-gcell.jig-cell-filled{cursor:default;pointer-events:none}.jig-gcell.jig-hover{background:rgba(255,255,255,.7);border-color:#0474fc;transform:scale(1.05)}.jig-gcell.jig-hover-bad{background:#fee2e2;border-color:#ef4444}.jig-tray2{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:4px 0}.jig-piece{background:#fff;border:3px solid #e8e2d6;border-radius:12px;cursor:pointer;user-select:none;box-shadow:0 3px 0 #d6cfc0;transition:all .15s;padding:6px;display:flex;flex-direction:column;align-items:center;justify-content:center}.jig-piece:active{transform:translateY(3px);box-shadow:none}.jig-piece.jig-piece-sel{transform:translateY(-5px);box-shadow:0 8px 0 #d6cfc0;background:#e8f2ff}.jig-piece.jig-piece-used{opacity:.15;pointer-events:none;transform:none}.jig-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.55);min-height:18px}
   .jig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;background:#e2ddd4;padding:7px;border-radius:16px;margin:0 auto;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae;width:min(240px,63vw)}.jig-slot{aspect-ratio:1;border-radius:10px;border:2.5px solid rgba(255,255,255,.25);cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:center;transition:transform .15s,background .15s,border-color .15s;box-shadow:0 3px 0 rgba(0,0,0,.15)}.jig-slot:not(.jig-slot-fixed):not(.jig-slot-done){background:rgba(255,255,255,.12);border-style:dashed;border-color:rgba(255,255,255,.3)}.jig-slot:not(.jig-slot-fixed):not(.jig-slot-done):active{transform:scale(.92)}.jig-slot-fixed{pointer-events:none}.jig-slot-done{border-style:solid;pointer-events:none}.jig-tray{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:2px 0}.jig-piece{width:clamp(48px,13vw,60px);height:clamp(48px,13vw,60px);border-radius:12px;border:3px solid rgba(255,255,255,.4);cursor:pointer;user-select:none;box-shadow:0 4px 0 rgba(0,0,0,.25);transition:all .15s}.jig-piece:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.2)}.jig-piece.jig-piece-sel{border-color:#fff;transform:translateY(-5px);box-shadow:0 8px 0 rgba(0,0,0,.2),0 0 0 3px rgba(255,255,255,.5)}.jig-piece.jig-piece-used{opacity:.15;pointer-events:none;transform:none}.jig-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.55);min-height:18px}
   .jig-tray{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:4px 0}.jig-tray-piece{border-radius:12px;background:#fff;border:2.5px solid #e8e2d6;cursor:pointer;box-shadow:0 3px 0 #d6cfc0;transition:all .15s;user-select:none;overflow:visible;display:flex;align-items:center;justify-content:center;padding:2px}.jig-tray-piece:active{transform:translateY(3px)!important;box-shadow:none!important}.jig-tray-piece.jig-tray-sel{border-color:#0474fc;background:#e8f2ff;box-shadow:0 3px 0 #0358c4;transform:translateY(-4px)}.jig-tray-piece.jig-used{opacity:.12;pointer-events:none}.jig-slot-filled{pointer-events:none}.jig-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.6);min-height:18px}
@@ -369,6 +370,8 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
 
 // ── Jigsaw Puzzle ─────────────────────────────────────────────────────────────
 (function(){
+  var CELL=56;
+  var SNAP_DIST=CELL*0.6;
   var COLORS=['#e8443a','#3a7df2','#3fba4f','#e8a817','#8b5cf6'];
   var PUZZLES=[
     {sz:4,pieces:[[[0,0],[0,1],[1,0],[1,1]],[[0,2],[0,3],[1,2],[2,2]],[[1,3],[2,3],[3,3],[3,2]],[[2,0],[2,1],[3,0],[3,1]]]},
@@ -378,113 +381,203 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
     {sz:5,pieces:[[[0,0],[0,1],[0,2],[0,3],[0,4]],[[1,0],[2,0],[3,0],[4,0],[4,1]],[[1,1],[1,2],[2,1],[2,2],[3,1]],[[1,3],[1,4],[2,3],[2,4],[3,4]],[[3,2],[3,3],[4,2],[4,3],[4,4]]]},
     {sz:5,pieces:[[[0,0],[1,0],[2,0],[3,0],[4,0]],[[0,1],[0,2],[0,3],[0,4],[1,1]],[[1,2],[1,3],[1,4],[2,4],[3,4]],[[2,1],[2,2],[2,3],[3,3],[4,3]],[[3,1],[3,2],[4,1],[4,2],[4,4]]]},
   ];
-  function normP(cells){
-    var minR=Math.min.apply(null,cells.map(function(c){return c[0];}));
-    var minC=Math.min.apply(null,cells.map(function(c){return c[1];}));
-    return cells.map(function(c){return[c[0]-minR,c[1]-minC];});
+
+  function edgeSeg(x1,y1,x2,y2,tab){
+    if(!tab)return'L'+x2+','+y2;
+    var mx=(x1+x2)/2,my=(y1+y2)/2,dx=x2-x1,dy=y2-y1,len=Math.sqrt(dx*dx+dy*dy);
+    var nx=-dy/len*tab*len*0.22,ny=dx/len*tab*len*0.22;
+    var t=0.28;
+    return'C'+(x1+dx*t+nx*.5)+','+(y1+dy*t+ny*.5)+' '+(mx+nx*1.2)+','+(my+ny*1.2)+' '+(mx+nx*1.35)+','+(my+ny*1.35)+
+          ' C'+(mx+nx*1.2)+','+(my+ny*1.2)+' '+(x2-dx*t+nx*.5)+','+(y2-dy*t+ny*.5)+' '+x2+','+y2;
   }
+
+  function buildPath(cells,hC,vC){
+    var cs=new Set(cells.map(function(c){return c[0]+','+c[1];}));
+    function has(r,c){return cs.has(r+','+c);}
+    var segs=[];
+    cells.forEach(function(rc){
+      var r=rc[0],c=rc[1];
+      if(!has(r-1,c))segs.push({r1:r,c1:c,r2:r,c2:c+1,dir:'T'});
+      if(!has(r,c+1))segs.push({r1:r,c1:c+1,r2:r+1,c2:c+1,dir:'R'});
+      if(!has(r+1,c))segs.push({r1:r+1,c1:c+1,r2:r+1,c2:c,dir:'B'});
+      if(!has(r,c-1))segs.push({r1:r+1,c1:c,r2:r,c2:c,dir:'L'});
+    });
+    var segMap={};
+    segs.forEach(function(s){var k=s.r1+','+s.c1;if(!segMap[k])segMap[k]=[];segMap[k].push(s);});
+    var used=new Set(),parts=[];
+    segs.forEach(function(start){
+      var sk=JSON.stringify(start);if(used.has(sk))return;
+      var path='M'+(start.c1*CELL)+','+(start.r1*CELL);
+      var cur=start,safety=0;
+      do{
+        used.add(JSON.stringify(cur));
+        var x1=cur.c1*CELL,y1=cur.r1*CELL,x2=cur.c2*CELL,y2=cur.r2*CELL,tab=0;
+        if(cur.dir==='T'&&cur.r1>0){tab=-(hC[cur.r1-1]&&hC[cur.r1-1][cur.c1]||0);}
+        else if(cur.dir==='B'){tab=hC[cur.r1-1]&&hC[cur.r1-1][cur.c2]||0;}
+        else if(cur.dir==='R'){tab=vC[cur.r1]&&vC[cur.r1][cur.c1-1]||0;}
+        else if(cur.dir==='L'){tab=-(vC[cur.r2]&&vC[cur.r2][cur.c1]||0);}
+        path+=edgeSeg(x1,y1,x2,y2,tab);
+        var nk=cur.r2+','+cur.c2;
+        var cands=(segMap[nk]||[]).filter(function(s){return!used.has(JSON.stringify(s));});
+        cur=cands[0];safety++;
+      }while(cur&&safety<300);
+      path+='Z';parts.push(path);
+    });
+    return parts.join(' ');
+  }
+
   Q.register('jigsaw',function(){
-    var puz=Q.pick(PUZZLES);
+    var puz=Q.pick(PUZZLES),sz=puz.sz;
+    var hC={},vC={};
+    for(var r=0;r<sz-1;r++){hC[r]={};for(var c=0;c<sz;c++)hC[r][c]=Math.random()>.5?1:-1;}
+    for(var r=0;r<sz;r++){vC[r]={};for(var c=0;c<sz-1;c++)vC[r][c]=Math.random()>.5?1:-1;}
     return{type:'jigsaw',category:'spatialAwareness',categoryLabel:'Jigsaw',
-      difficulty:puz.sz===4?0.9:1.2,question:'Fill the grid with all the pieces!',
-      sz:puz.sz,pieces:puz.pieces,answer:'complete',options:[],
-      explanation:'Tap a piece then tap the grid to place it.',visual:'custom'};
+      difficulty:sz===4?0.9:1.2,question:'Drag the pieces into the grid!',
+      sz:sz,pieces:puz.pieces,hC:hC,vC:vC,
+      answer:'complete',options:[],explanation:'Drag each piece to its correct position.',visual:'custom'};
   },3);
+
   Q.registerRenderer('jigsaw',{
     render:function(q,idx){
-      var gcells='';
-      for(var r=0;r<q.sz;r++)for(var c=0;c<q.sz;c++){
-        gcells+='<div class="jig-gcell" id="jgc-'+idx+'-'+r+'-'+c+'" data-ji="'+idx+'" data-jr="'+r+'" data-jc="'+c+'"></div>';
+      var sz=q.sz,svgW=sz*CELL;
+      var svgSize=Math.min(230,Math.round(window.innerWidth*0.6));
+      var scale=svgSize/svgW;
+      // Ghost slots in drop zone
+      var slots='';
+      q.pieces.forEach(function(cells,pi){
+        var d=buildPath(cells,q.hC,q.vC);
+        slots+='<path d="'+d+'" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-dasharray="5,3" id="jslot-'+idx+'-'+pi+'"/>';
+      });
+      // Grid lines
+      var lines='';
+      for(var i=0;i<=sz;i++){
+        lines+='<line x1="0" y1="'+(i*CELL)+'" x2="'+svgW+'" y2="'+(i*CELL)+'" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';
+        lines+='<line x1="'+(i*CELL)+'" y1="0" x2="'+(i*CELL)+'" y2="'+svgW+'" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';
       }
+      // Piece tray SVGs
       var tray='';
-      q.pieces.forEach(function(pcells,pi){
-        var n=normP(pcells);
-        var maxR=Math.max.apply(null,n.map(function(c){return c[0];}));
-        var maxC=Math.max.apply(null,n.map(function(c){return c[1];}));
-        var cs=new Set(n.map(function(c){return c[0]+','+c[1];}));
+      q.pieces.forEach(function(cells,pi){
+        var d=buildPath(cells,q.hC,q.vC);
         var color=COLORS[pi%COLORS.length];
-        var mini='';
-        for(var r=0;r<=maxR;r++){
-          mini+='<div style="display:flex;gap:2px">';
-          for(var c=0;c<=maxC;c++){
-            mini+='<div style="width:14px;height:14px;border-radius:3px;background:'+(cs.has(r+','+c)?color:'transparent')+'"></div>';
-          }
-          mini+='</div>';
-        }
-        tray+='<button class="jig-piece" id="jgp-'+idx+'-'+pi+'" data-ji="'+idx+'" data-jp="'+pi+'" style="border-color:'+color+'">'+mini+'</button>';
+        var rs=cells.map(function(c){return c[0];}),cs2=cells.map(function(c){return c[1];});
+        var minR=Math.min.apply(null,rs),maxR=Math.max.apply(null,rs);
+        var minC=Math.min.apply(null,cs2),maxC=Math.max.apply(null,cs2);
+        var pad=CELL*0.38;
+        var vx=minC*CELL-pad,vy=minR*CELL-pad,vw=(maxC-minC+1)*CELL+pad*2,vh=(maxR-minR+1)*CELL+pad*2;
+        var ps=Math.min(72,Math.max(44,vw*0.52*scale*1.8));
+        var ph=ps*(vh/vw);
+        tray+='<div class="jig-pw" id="jpw-'+idx+'-'+pi+'" data-ji="'+idx+'" data-jp="'+pi+'" data-color="'+color+'" style="touch-action:none">'
+          +'<svg width="'+ps.toFixed(0)+'" height="'+ph.toFixed(0)+'" viewBox="'+vx+' '+vy+' '+vw+' '+vh+'" style="display:block;filter:drop-shadow(0 3px 6px rgba(0,0,0,.35))">'
+          +'<path d="'+d+'" fill="'+color+'" stroke="rgba(255,255,255,0.55)" stroke-width="2.5"/>'
+          +'</svg></div>';
       });
       return'<div class="qcard" style="gap:8px">'
         +'<div class="category">JIGSAW</div>'
         +'<div class="question">'+q.question+'</div>'
-        +'<div class="jig-board" id="jgb-'+idx+'" style="grid-template-columns:repeat('+q.sz+',1fr)">'+gcells+'</div>'
-        +'<div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.4);text-align:center;letter-spacing:1px">SELECT A PIECE THEN TAP THE GRID</div>'
-        +'<div class="jig-tray2" id="jgt-'+idx+'">'+tray+'</div>'
-        +'<div class="jig-status" id="jgs-'+idx+'">Tap a piece to select it</div>'
+        +'<div style="background:#e2ddd4;border-radius:14px;padding:6px;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae;display:inline-block" id="jdz-'+idx+'">'
+          +'<svg id="jsvg-'+idx+'" width="'+svgSize+'" height="'+svgSize+'" viewBox="0 0 '+svgW+' '+svgW+'" style="display:block;border-radius:8px">'+lines+slots+'</svg>'
+        +'</div>'
+        +'<div class="jig-tray2" id="jtray-'+idx+'">'+tray+'</div>'
+        +'<div class="jig-status" id="jst-'+idx+'">Drag a piece onto the grid</div>'
         +'<div id="wa-'+idx+'"></div><div class="explanation" id="exp-'+idx+'"></div>'
         +_gameBranding()+_scrollHint(idx)+'</div>';
     },
     attach:function(slideEl,q,idx,ctx){
       var H=ctx.Haptics||{};
       var actEl=slideEl.querySelector('#wa-'+idx);if(actEl&&ctx.addShareBtn)ctx.addShareBtn(actEl,q);
-      var board=document.getElementById('jgb-'+idx),trayEl=document.getElementById('jgt-'+idx),statEl=document.getElementById('jgs-'+idx);
-      if(!board)return;
-      var grid=new Array(q.sz*q.sz).fill(null),placed=0,sel=null,done=false;
-      function gcEl(r,c){return document.getElementById('jgc-'+idx+'-'+r+'-'+c);}
-      function gpEl(pi){return document.getElementById('jgp-'+idx+'-'+pi);}
-      function anchored(pi,ar,ac){return normP(q.pieces[pi]).map(function(c){return[ar+c[0],ac+c[1]];});}
-      function canPlace(pi,ar,ac){return anchored(pi,ar,ac).every(function(c){return c[0]>=0&&c[0]<q.sz&&c[1]>=0&&c[1]<q.sz&&grid[c[0]*q.sz+c[1]]===null;});}
-      function clearHover(){board.querySelectorAll('.jig-gcell').forEach(function(el){el.classList.remove('jig-hover','jig-hover-bad');});}
-      function clearSel(){if(sel!==null){var el=gpEl(sel);if(el)el.classList.remove('jig-piece-sel');}sel=null;clearHover();}
-      trayEl.addEventListener('click',function(e){
-        if(done)return;
-        var btn=e.target.closest('.jig-piece');if(!btn||btn.classList.contains('jig-piece-used'))return;
-        var pi=parseInt(btn.dataset.jp);H.light&&H.light();
-        if(sel===pi){clearSel();statEl.textContent='Tap a piece to select it';}
-        else{clearSel();sel=pi;btn.classList.add('jig-piece-sel');statEl.textContent='Now tap the grid to place it';}
+      var svgEl=document.getElementById('jsvg-'+idx),dzEl=document.getElementById('jdz-'+idx),statEl=document.getElementById('jst-'+idx);
+      if(!svgEl)return;
+      var sz=q.sz,svgW=sz*CELL;
+      var placed=0,done=false;
+      var drag=null;
+
+      function getXY(e){var t=e.touches?e.touches[0]:(e.changedTouches?e.changedTouches[0]:e);return{x:t.clientX,y:t.clientY};}
+
+      slideEl.querySelectorAll('.jig-pw[data-ji="'+idx+'"]').forEach(function(pw){
+        pw.addEventListener('mousedown',startDrag);
+        pw.addEventListener('touchstart',startDrag,{passive:false});
       });
-      board.addEventListener('mouseover',function(e){
-        if(sel===null||done)return;
-        var cell=e.target.closest('.jig-gcell');if(!cell)return;
-        var r=parseInt(cell.dataset.jr),c=parseInt(cell.dataset.jc);
-        clearHover();var ok=canPlace(sel,r,c);
-        anchored(sel,r,c).forEach(function(tc){
-          if(tc[0]>=0&&tc[0]<q.sz&&tc[1]>=0&&tc[1]<q.sz){var el=gcEl(tc[0],tc[1]);if(el)el.classList.add(ok?'jig-hover':'jig-hover-bad');}
-        });
-      });
-      board.addEventListener('mouseleave',clearHover);
-      board.addEventListener('click',function(e){
-        if(done)return;
-        var cell=e.target.closest('.jig-gcell');if(!cell)return;
-        if(sel===null){statEl.textContent='Pick a piece first!';return;}
-        var r=parseInt(cell.dataset.jr),c=parseInt(cell.dataset.jc);
-        clearHover();
-        if(canPlace(sel,r,c)){
-          H.medium&&H.medium();
-          var color=COLORS[sel%COLORS.length];
-          anchored(sel,r,c).forEach(function(tc){
-            grid[tc[0]*q.sz+tc[1]]=sel;
-            var el=gcEl(tc[0],tc[1]);
-            if(el){el.style.background=color;el.style.borderColor='rgba(255,255,255,.3)';el.classList.add('jig-gcell-filled');}
-          });
-          gpEl(sel).classList.add('jig-piece-used');placed++;clearSel();
-          statEl.textContent=placed+' / '+q.pieces.length+' placed';
-          if(placed===q.pieces.length)setTimeout(function(){finish(true);},300);
+
+      function startDrag(e){
+        e.preventDefault();e.stopPropagation();
+        var pw=e.currentTarget;if(pw.classList.contains('jig-pw-placed'))return;
+        var pi=parseInt(pw.dataset.jp);
+        var xy=getXY(e);
+        var rect=pw.getBoundingClientRect();
+        // Clone for floating
+        var clone=pw.cloneNode(true);
+        clone.style.cssText='position:fixed;z-index:9999;pointer-events:none;transform:scale(1.12);transform-origin:center;filter:drop-shadow(0 8px 16px rgba(0,0,0,.45))';
+        clone.style.left=rect.left+'px';clone.style.top=rect.top+'px';
+        document.body.appendChild(clone);
+        pw.style.opacity='0.25';
+        drag={pi:pi,pw:pw,clone:clone,offX:xy.x-rect.left,offY:xy.y-rect.top};
+        document.addEventListener('mousemove',onMove);
+        document.addEventListener('touchmove',onMove,{passive:false});
+        document.addEventListener('mouseup',onUp);
+        document.addEventListener('touchend',onUp);
+      }
+
+      function onMove(e){
+        if(!drag)return;e.preventDefault();
+        var xy=getXY(e);
+        drag.clone.style.left=(xy.x-drag.offX)+'px';
+        drag.clone.style.top=(xy.y-drag.offY)+'px';
+        var dzRect=dzEl.getBoundingClientRect();
+        var over=xy.x>dzRect.left&&xy.x<dzRect.right&&xy.y>dzRect.top&&xy.y<dzRect.bottom;
+        dzEl.style.boxShadow=over?'0 5px 0 #22c55e,0 0 0 2px #22c55e':'0 5px 0 #c0b9ae';
+      }
+
+      function onUp(e){
+        if(!drag)return;
+        document.removeEventListener('mousemove',onMove);document.removeEventListener('touchmove',onMove);
+        document.removeEventListener('mouseup',onUp);document.removeEventListener('touchend',onUp);
+        dzEl.style.boxShadow='0 5px 0 #c0b9ae';
+        var xy=getXY(e);
+        drag.clone.remove();drag.pw.style.opacity='1';
+        // Convert to SVG coords
+        var svgRect=svgEl.getBoundingClientRect();
+        var scale=svgRect.width/svgW;
+        var svgX=(xy.x-svgRect.left)/scale,svgY=(xy.y-svgRect.top)/scale;
+        // Check snap — piece should land at offset 0,0 (solution position)
+        var cells=q.pieces[drag.pi];
+        var avgC=cells.reduce(function(s,c){return s+c[1];},0)/cells.length;
+        var avgR=cells.reduce(function(s,c){return s+c[0];},0)/cells.length;
+        var centX=(avgC+0.5)*CELL,centY=(avgR+0.5)*CELL;
+        var dist=Math.sqrt((svgX-centX)*(svgX-centX)+(svgY-centY)*(svgY-centY));
+        if(dist<SNAP_DIST){
+          snapIn(drag.pi,drag.pw);
         }else{
-          H.error&&H.error();
-          var btn=gpEl(sel);btn.style.transform='rotate(-8deg)';
-          setTimeout(function(){btn.style.transform='';if(sel!==null)btn.classList.add('jig-piece-sel');},300);
-          statEl.textContent="Doesn't fit there!";
+          var dzRect=dzEl.getBoundingClientRect();
+          if(xy.x>dzRect.left&&xy.x<dzRect.right&&xy.y>dzRect.top&&xy.y<dzRect.bottom){
+            statEl.textContent="Not quite — try a different spot!";
+            H.error&&H.error();
+          }
         }
-      });
+        drag=null;
+      }
+
+      function snapIn(pi,pw){
+        H.medium&&H.medium();
+        var cells=q.pieces[pi],color=COLORS[pi%COLORS.length];
+        var pathD=buildPath(cells,q.hC,q.vC);
+        var p=document.createElementNS('http://www.w3.org/2000/svg','path');
+        p.setAttribute('d',pathD);p.setAttribute('fill',color);
+        p.setAttribute('stroke','rgba(255,255,255,0.5)');p.setAttribute('stroke-width','2');
+        svgEl.appendChild(p);
+        var slot=document.getElementById('jslot-'+idx+'-'+pi);if(slot)slot.style.display='none';
+        pw.classList.add('jig-pw-placed');
+        placed++;statEl.textContent=placed+' / '+q.pieces.length+' placed';
+        if(placed===q.pieces.length)setTimeout(function(){finish(true);},300);
+      }
+
       function finish(won){
         done=true;
         var ms=Date.now()-ctx.answerStartRef.get(),data=ctx.IQData.recordAnswer(q.category,won,q.difficulty,ms);
-        if(ctx.notifyGamePlayed)ctx.notifyGamePlayed('jigsaw');
-        if(ctx.onAnswer)ctx.onAnswer(won,ms);
+        if(ctx.notifyGamePlayed)ctx.notifyGamePlayed('jigsaw');if(ctx.onAnswer)ctx.onAnswer(won,ms);
         if(won){H.streak&&H.streak();statEl.textContent='Puzzle complete!';ctx.flashEl.className='flash green show';ctx.spawnConfetti(20);}
         setTimeout(function(){ctx.flashEl.className='flash';},350);
         var expEl=slideEl.querySelector('#exp-'+idx),hintEl=document.getElementById('hint-'+idx);
-        if(expEl){expEl.textContent=won?'All pieces fit perfectly!':'Tap a piece then tap the grid.';expEl.classList.add('show');}
+        if(expEl){expEl.textContent=won?'All pieces locked in!':'Drag each piece to its correct slot.';expEl.classList.add('show');}
         setTimeout(function(){if(hintEl)hintEl.classList.add('show');},500);
         ctx.updateUI(data);ctx.checkMore();ctx.answerStartRef.set(Date.now());
       }
@@ -495,9 +588,14 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
 
 // ── Word Ladder ───────────────────────────────────────────────────────────────
 (function(){
-  var VALID3=new Set(["AID","AIM","AIR","ALE","ANT","APE","ARM","ART","ASH","AXE","BAD","BAG","BAN","BAR","BAT","BAY","BID","BIG","BIN","BIT","BOW","BOX","BOY","BUD","BUG","BUN","BUS","BUT","CAB","CAN","CAP","CAR","CAT","COB","COD","COG","COT","COW","CRY","CUP","CUT","DAM","DEN","DIG","DIM","DIP","DOG","DOT","DRY","DUG","EAR","EAT","EGG","ELK","FAD","FAN","FAR","FAT","FIG","FIN","FIT","FLY","FOG","FRO","FRY","FUN","GAS","GEL","GEM","GUN","GUT","HAM","HAT","HEM","HEN","HIM","HIT","HOG","HOP","HOT","HUG","HUM","ICE","JAB","JAM","JAW","JOG","JOY","JUG","KIT","LAD","LAP","LAW","LAY","LEG","LID","LIP","LIT","LOG","LOT","MAD","MAN","MAP","MAR","MOP","MUD","MUG","NAB","NAP","NUT","OAK","OAR","PAD","PAN","PAT","PAW","PAY","PEA","PEG","PEN","PET","PIG","PIN","PIT","POD","POT","PRO","PUB","PUN","PUP","PUT","RAM","RAN","RAP","RAT","RAW","RAY","RIB","RID","RIG","RIM","RIP","ROD","ROT","ROW","RUG","RUN","SAP","SAT","SAW","SAY","SIP","SIT","SOD","SON","SUN","TAB","TAN","TAP","TAR","TAX","TEN","TIN","TIP","TON","TOP","TOY","TRY","TUB","TUG","VAN","VAT","WAR","WAX","WAY","WIG","WIN","WIT"]);
-  var VALID4=new Set(["ABLE","ARCH","ARMY","AUNT","AWAY","BABY","BACK","BAKE","BALD","BALE","BALL","BAND","BANE","BANK","BARE","BARK","BARN","BASE","BATH","BEAD","BEAM","BEAN","BEAR","BEAT","BELL","BELT","BILL","BIND","BIRD","BITE","BLED","BLEW","BLUE","BOAR","BOAT","BODY","BOLD","BOLT","BOND","BONE","BOOK","BOOT","BORE","BORN","BUCK","BURN","CALL","CAME","CANE","CARD","CARE","CART","CAVE","CELL","CHIP","CLAP","CLAY","CLIP","COAL","COAT","CODE","COLD","COME","COOK","COOL","CORD","CORE","CORN","CUBE","CURE","CUTE","DAME","DARE","DARK","DATE","DAWN","DEAD","DEAL","DEAN","DEEP","DEER","DICE","DIET","DIKE","DIME","DING","DIRE","DISH","DIVE","DOCK","DOME","DOOR","DRAW","DRIP","DROP","DRUM","DUCK","DUKE","DULL","DUMP","DUSK","DUST","EACH","EARN","EAST","EDGE","EPIC","EVEN","EVER","EVIL","FACE","FACT","FADE","FAIL","FAIR","FALL","FAME","FARE","FARM","FAST","FATE","FELT","FILE","FILL","FILM","FIND","FINE","FIRE","FIRM","FISH","FIST","FIVE","FLAT","FLEW","FLIP","FLOW","FOND","FOOD","FOOL","FOOT","FORD","FORE","FORK","FORM","FORT","FOUR","FREE","FUEL","FULL","FUME","FUND","GAME","GANG","GAVE","GAZE","GEAR","GIFT","GIST","GIVE","GLAD","GLOW","GLUE","GOAL","GOAT","GOLD","GONE","GUSH","GUST","HALL","HAND","HARD","HARE","HARM","HATE","HAVE","HEAD","HEAL","HEAP","HEAR","HEAT","HEEL","HELD","HELM","HELP","HERE","HIDE","HIGH","HILL","HIRE","HIVE","HOLD","HOLE","HOME","HOOK","HOPE","HORN","HOUR","HUGE","HULL","HUNT","IDEA","INCH","INTO","IRON","JACK","JAIL","JEST","JOLT","JUMP","JURY","JUST","KEEN","KEEP","KICK","KILL","KIND","KING","KNEE","KNEW","LACE","LACK","LAKE","LAME","LAND","LANE","LAST","LATE","LEAD","LEAN","LEAP","LEFT","LEND","LESS","LICK","LIFT","LIKE","LIME","LINE","LINK","LION","LIVE","LOAD","LOCK","LONE","LONG","LOOK","LORE","LURE","LUST","LUTE","MADE","MAIL","MAIN","MALE","MANE","MARE","MARK","MICE","MILD","MILE","MILK","MILL","MINE","MIRE","MISS","MIST","MOLE","MOOD","MOON","MORE","MOST","MOVE","MULE","MUST","NAIL","NAME","NAVY","NEAR","NECK","NEED","NEST","NICE","NINE","NODE","NONE","NORM","NOTE","NOUN","OATH","ONCE","OPEN","OVER","PACE","PACK","PAGE","PAIN","PAIR","PALE","PALM","PARK","PART","PASS","PATH","PEAK","PEAR","PEER","PICK","PILE","PINE","PINK","PINT","PIPE","PLAN","PLAY","PLUS","POLE","POND","POOL","POOR","PORT","POUR","PRAY","PREY","PULL","PUMP","PURE","PUSH","RACE","RACK","RAGE","RAID","RAIL","RAIN","RANK","RARE","RATE","READ","REAL","REED","REEF","REIN","RENT","REST","RICE","RICH","RIDE","RILE","RING","RINK","RIOT","RISE","RISK","ROAD","ROAM","ROAR","ROBE","ROCK","RODE","ROLE","ROLL","ROOF","ROPE","ROSE","RUIN","RULE","RUSH","RUST","SAFE","SAGE","SAIL","SAKE","SALE","SALT","SAME","SAND","SCAR","SEAL","SHED","SHIN","SHIP","SHOP","SHOT","SHOW","SICK","SIDE","SILK","SING","SIRE","SITE","SIZE","SLAB","SLAP","SLED","SLIM","SLIP","SLOW","SOAR","SOCK","SOFT","SOIL","SOLD","SOLE","SOME","SONG","SORE","SORT","SOUL","SOUP","SOUR","SPAN","SPIN","SPOT","STAB","STAR","STAY","STEM","STEP","STIR","STOP","SUIT","SURE","TALE","TALL","TANK","TAPE","TEAM","TELL","TEST","THIN","TIDE","TILE","TIME","TOAD","TOLD","TONE","TOOL","TORN","TOUR","TOWN","TRAP","TRAY","TREE","TRIM","TRIP","TRUE","TUBE","TUNE","TURN","TWIN","TYPE","UNIT","UPON","URGE","VAIN","VALE","VARY","VASE","VEIL","VEIN","VINE","VOID","WADE","WAGE","WAIT","WAKE","WALK","WALL","WANT","WARD","WARE","WARM","WARN","WAVE","WEAK","WEED","WEEK","WELL","WENT","WEST","WIDE","WIFE","WILL","WIND","WINE","WING","WIRE","WISE","WISH","WOLF","WOOD","WORD","WORK","WORM","YARN","YAWN","YEAR","ZEAL","ZONE"]);
-  function isValidWord(w){if(w.length===3)return VALID3.has(w);if(w.length===4)return VALID4.has(w);return true;}
+  // Load valid words from words.txt — fallback to hardcoded seeds
+  var _WL_WORDS=new Set(["CAT","COT","COG","DOG","HOT","COD","BOY","BAY","BAN","MAN","PIG","BIG","BAG","BAT","COLD","CORD","WORD","WARD","WARM","FOUR","POUR","SOUR","TOUR","HIDE","TIDE","TILE","TIME","LIME","RAIN","REIN","VEIN","VAIN","BOOT","BOOK","COOK","COOL","FOOL","BOLD","BALD","BALL","BELL","BELT","STAR","SCAR","SOAR","BOAR","BEAR","GOAL","COAL","COAT","GOAT","BOAT","FAST","LAST","LUST","JUST","PINK","RINK","RING","DING"]);
+  (function(){
+    fetch('/words.txt').then(function(r){return r.text();}).then(function(t){
+      t.trim().split(/\r?\n/).forEach(function(w){var x=w.trim().toUpperCase();if(x.length>=3&&x.length<=6&&/^[A-Z]+$/.test(x))_WL_WORDS.add(x);});
+    }).catch(function(){});
+  })();
+  function isValidWord(w){return _WL_WORDS.has(w.toUpperCase());}
   function diffLetters(a,b){if(a.length!==b.length)return 999;var d=0;for(var i=0;i<a.length;i++)if(a[i]!==b[i])d++;return d;}
   var LADDERS=[
     {start:'CAT',end:'DOG',path:['CAT','COT','COG','DOG'],hint:'Feline to canine'},
