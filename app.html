@@ -8,8 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Cebear">
-  <meta name="theme-color" content="#0474fc" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0358c4" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" id="theme-color-meta" content="#0474fc">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="color-scheme" content="light">
   <meta name="format-detection" content="telephone=no">
@@ -72,6 +71,10 @@
         z-index:9998;pointer-events:none;
         background:rgba(4,116,252,.85);
         backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+        transition:background .2s;
+      }
+      body.page-improve::before{
+        background:rgba(245,240,232,.85);
       }
     }
 
@@ -109,15 +112,20 @@
       height:calc(72px + env(safe-area-inset-bottom,0px));
       padding-bottom:env(safe-area-inset-bottom,0px);
       background:#0474fc;
-      border-radius:22px 22px 0 0;
+      border-radius:0;
       display:none;justify-content:space-around;align-items:center;
       z-index:100;
-      box-shadow:0 -2px 0 #0358c4;
-      /* Prevent content flash behind nav */
       will-change:transform;
     }
     body.has-nav #nav{display:flex}
-    body.has-nav .screen iframe{height:calc(100dvh - 72px - env(safe-area-inset-bottom,0px))}
+    /* Extend iframe 2px past nav to eliminate any sub-pixel gap */
+    body.has-nav .screen iframe{height:calc(100dvh - 72px - env(safe-area-inset-bottom,0px) + 2px)}
+    /* Blue strip behind nav area so any gap shows blue not beige */
+    body.has-nav::after{
+      content:'';position:fixed;bottom:0;left:0;right:0;
+      height:calc(74px + env(safe-area-inset-bottom,0px));
+      background:#0474fc;z-index:99;pointer-events:none;
+    }
 
     .nb{
       flex:1;padding:6px 4px 2px;background:none;border:none;
@@ -308,6 +316,9 @@ function updateNavActive(page){
     b.classList.toggle('active',isActive);
     b.setAttribute('aria-current',isActive?'page':'false');
   });
+  // Status bar color: beige for improve (content has beige bg), blue for everything else
+  var tc=document.getElementById('theme-color-meta');
+  if(tc)tc.setAttribute('content',page==='improve'?'#f5f0e8':'#0474fc');
 }
 
 window.goTo=function(page){
@@ -318,6 +329,8 @@ window.goTo=function(page){
   if((page==='profile'||page==='leaderboard')&&screensLoaded[page]){var old=document.querySelector('#screen-'+page+' iframe');if(old)old.remove();screensLoaded[page]=false;}
   var sc=document.getElementById('screen-'+page);if(sc)sc.classList.add('active');
   currentScreen=page;showNav(page!=='auth');updateNavActive(page);
+  // Toggle body class for status bar color
+  document.body.classList.toggle('page-improve',page==='improve');
   if(screensLoaded[page])return;
   var c=document.getElementById('screen-'+page);if(!c)return;
   if(AUTH_PAGES.indexOf(page)!==-1&&isStandalone&&!_authResolved){
