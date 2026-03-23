@@ -165,8 +165,24 @@
     .toast.show{opacity:1}
 
     @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+    @keyframes zoomIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+    @keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+    @keyframes podRise{from{opacity:0;transform:translateY(20px) scale(.95)}to{opacity:1;transform:none}}
     .an{animation:fadeUp .3s ease both}
     .d1{animation-delay:.05s}.d2{animation-delay:.1s}.d3{animation-delay:.15s}
+    body.enter .podium .pod{animation:podRise .4s cubic-bezier(.22,1,.36,1) both}
+    body.enter .podium .pod.r2{animation-delay:.02s}
+    body.enter .podium .pod.r1{animation-delay:.08s}
+    body.enter .podium .pod.r3{animation-delay:.14s}
+    body.enter .yr{animation:zoomIn .3s cubic-bezier(.22,1,.36,1) .05s both}
+    body.enter .hid-b{animation:zoomIn .3s cubic-bezier(.22,1,.36,1) both}
+    body.enter .row{animation:slideUp .28s ease both}
+    body.enter .row:nth-child(1){animation-delay:.02s}
+    body.enter .row:nth-child(2){animation-delay:.05s}
+    body.enter .row:nth-child(3){animation-delay:.08s}
+    body.enter .row:nth-child(4){animation-delay:.11s}
+    body.enter .row:nth-child(5){animation-delay:.14s}
+    body.enter .row:nth-child(n+6){animation-delay:.16s}
   </style>
 </head>
 <body>
@@ -351,7 +367,23 @@ function esc(s){return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;').repla
 async function init(){
   await authReady;myUid=IQData.getCurrentUser()?.uid||null;
   loadPrivacy();await pushMe();await fetchSnapshot();
+  playEntrance();
 }
+
+function playEntrance(){
+  document.body.classList.remove('enter');
+  void document.body.offsetWidth;
+  document.body.classList.add('enter');
+}
+
+window.addEventListener('message',function(e){
+  if(e.data&&e.data.type==='pageEnter'){
+    playEntrance();
+    // Background refresh if stale
+    if(cacheAge()>STALE)fetchSnapshot(true);
+  }
+});
+
 init();
 </script>
 </body>
