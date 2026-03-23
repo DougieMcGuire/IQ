@@ -241,11 +241,12 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
   var COLORS = ['#e8443a','#3a7df2','#3fba4f','#e8a817','#8b5cf6','#f97316','#ec4899','#06b6d4'];
 
   var PUZZLES = [
-    {sz:4, pieces:[[[0,0],[0,1],[1,0],[1,1]],[[0,2],[0,3],[1,2],[1,3]],[[2,0],[2,1],[3,0],[3,1]],[[2,2],[2,3],[3,2],[3,3]]]},
-    {sz:4, pieces:[[[0,0],[0,1],[0,2],[0,3]],[[1,0],[1,1],[2,0],[2,1]],[[1,2],[1,3],[2,2],[2,3]],[[3,0],[3,1],[3,2],[3,3]]]},
+    // 4x4 with interesting tetromino shapes
     {sz:4, pieces:[[[0,0],[1,0],[2,0],[3,0]],[[0,1],[0,2],[0,3],[1,1]],[[1,2],[1,3],[2,1],[2,2]],[[2,3],[3,1],[3,2],[3,3]]]},
+    {sz:4, pieces:[[[0,0],[0,1],[0,2],[1,1]],[[0,3],[1,2],[1,3],[2,3]],[[1,0],[2,0],[2,1],[2,2]],[[3,0],[3,1],[3,2],[3,3]]]},
     {sz:4, pieces:[[[0,0],[0,1],[1,0],[2,0]],[[0,2],[0,3],[1,3],[2,3]],[[1,1],[1,2],[2,1],[2,2]],[[3,0],[3,1],[3,2],[3,3]]]},
-    {sz:4, pieces:[[[0,0],[0,1],[0,2],[1,0]],[[0,3],[1,1],[1,2],[1,3]],[[2,0],[2,1],[3,0],[3,1]],[[2,2],[2,3],[3,2],[3,3]]]},
+    {sz:4, pieces:[[[0,0],[0,1],[1,1],[1,2]],[[0,2],[0,3],[1,3],[2,3]],[[1,0],[2,0],[2,1],[2,2]],[[3,0],[3,1],[3,2],[3,3]]]},
+    // 5x5 pentomino puzzles
     {sz:5, pieces:[[[0,0],[0,1],[0,2],[0,3],[0,4]],[[1,0],[1,1],[2,0],[2,1],[3,0]],[[1,2],[1,3],[1,4],[2,2],[3,2]],[[2,3],[2,4],[3,3],[3,4],[4,4]],[[3,1],[4,0],[4,1],[4,2],[4,3]]]},
     {sz:5, pieces:[[[0,0],[1,0],[2,0],[3,0],[4,0]],[[0,1],[0,2],[0,3],[0,4],[1,1]],[[1,2],[1,3],[1,4],[2,4],[3,4]],[[2,1],[2,2],[2,3],[3,1],[3,2]],[[3,3],[4,1],[4,2],[4,3],[4,4]]]},
   ];
@@ -289,8 +290,8 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
       // Board SVG — just grid lines, NO outlines showing where pieces go
       var svgContent='';
       for(var i=0;i<=sz;i++){
-        svgContent+='<line x1="'+(i*CS)+'" y1="0" x2="'+(i*CS)+'" y2="'+gridW+'" stroke="rgba(255,255,255,.15)" stroke-width="1"/>';
-        svgContent+='<line x1="0" y1="'+(i*CS)+'" x2="'+gridW+'" y2="'+(i*CS)+'" stroke="rgba(255,255,255,.15)" stroke-width="1"/>';
+        svgContent+='<line x1="'+(i*CS)+'" y1="0" x2="'+(i*CS)+'" y2="'+gridW+'" stroke="rgba(0,0,0,.12)" stroke-width="1"/>';
+        svgContent+='<line x1="0" y1="'+(i*CS)+'" x2="'+gridW+'" y2="'+(i*CS)+'" stroke="rgba(0,0,0,.12)" stroke-width="1"/>';
       }
       // Tray pieces
       var trayHtml='';
@@ -301,8 +302,8 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
         trayHtml+='<div class="jig-pw" id="jpw-'+idx+'-'+pi+'" data-ji="'+idx+'" data-jp="'+pi+'" style="display:inline-block;touch-action:none;user-select:none;-webkit-user-select:none"><svg width="'+pw+'" height="'+ph+'" viewBox="'+vx+' '+vy+' '+vw+' '+vh+'" style="display:block;overflow:visible;filter:drop-shadow(0 2px 4px rgba(0,0,0,.25))"><path d="'+d+'" fill="'+color+'" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linejoin="round"/></svg></div>';
       });
       return'<div class="qcard" style="gap:5px;padding:12px 10px"><div class="category">JIGSAW</div><div class="question" style="font-size:13px">'+q.question+'</div>'
-        +'<div id="jdz-'+idx+'" style="background:rgba(255,255,255,.1);border-radius:14px;padding:6px;border:2px solid rgba(255,255,255,.15);display:inline-block">'
-        +'<svg id="jsvg-'+idx+'" width="'+dispW+'" height="'+dispW+'" viewBox="0 0 '+gridW+' '+gridW+'" style="display:block;border-radius:10px;background:rgba(255,255,255,.06)">'+svgContent+'</svg></div>'
+        +'<div id="jdz-'+idx+'" style="background:rgba(0,0,0,.1);border-radius:14px;padding:6px;border:2px solid rgba(0,0,0,.12);display:inline-block">'
+        +'<svg id="jsvg-'+idx+'" width="'+dispW+'" height="'+dispW+'" viewBox="0 0 '+gridW+' '+gridW+'" style="display:block;border-radius:10px;background:rgba(0,0,0,.12)">'+svgContent+'</svg></div>'
         +'<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:4px 0" id="jtray-'+idx+'">'+trayHtml+'</div>'
         +'<div class="jig-status" id="jst-'+idx+'" style="color:rgba(255,255,255,.5);font-size:12px">Drag a piece onto the grid</div>'
         +'<div id="wa-'+idx+'"></div><div class="explanation" id="exp-'+idx+'"></div>'
