@@ -371,7 +371,7 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
 // ── Jigsaw Puzzle ─────────────────────────────────────────────────────────────
 (function(){
   var CELL=56;
-  var SNAP_DIST=CELL*0.6;
+  var SNAP_DIST=CELL*0.65;
   var COLORS=['#e8443a','#3a7df2','#3fba4f','#e8a817','#8b5cf6'];
   var PUZZLES=[
     {sz:4,pieces:[[[0,0],[0,1],[1,0],[1,1]],[[0,2],[0,3],[1,2],[2,2]],[[1,3],[2,3],[3,3],[3,2]],[[2,0],[2,1],[3,0],[3,1]]]},
@@ -441,20 +441,15 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
     render:function(q,idx){
       var sz=q.sz,svgW=sz*CELL;
       var svgSize=Math.min(230,Math.round(window.innerWidth*0.6));
-      var scale=svgSize/svgW;
-      // Ghost slots in drop zone
-      var slots='';
+      var slots='',lines='';
       q.pieces.forEach(function(cells,pi){
         var d=buildPath(cells,q.hC,q.vC);
         slots+='<path d="'+d+'" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-dasharray="5,3" id="jslot-'+idx+'-'+pi+'"/>';
       });
-      // Grid lines
-      var lines='';
       for(var i=0;i<=sz;i++){
         lines+='<line x1="0" y1="'+(i*CELL)+'" x2="'+svgW+'" y2="'+(i*CELL)+'" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';
         lines+='<line x1="'+(i*CELL)+'" y1="0" x2="'+(i*CELL)+'" y2="'+svgW+'" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';
       }
-      // Piece tray SVGs
       var tray='';
       q.pieces.forEach(function(cells,pi){
         var d=buildPath(cells,q.hC,q.vC);
@@ -462,11 +457,10 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
         var rs=cells.map(function(c){return c[0];}),cs2=cells.map(function(c){return c[1];});
         var minR=Math.min.apply(null,rs),maxR=Math.max.apply(null,rs);
         var minC=Math.min.apply(null,cs2),maxC=Math.max.apply(null,cs2);
-        var pad=CELL*0.38;
+        var pad=CELL*0.38,scale=svgSize/svgW;
         var vx=minC*CELL-pad,vy=minR*CELL-pad,vw=(maxC-minC+1)*CELL+pad*2,vh=(maxR-minR+1)*CELL+pad*2;
-        var ps=Math.min(72,Math.max(44,vw*0.52*scale*1.8));
-        var ph=ps*(vh/vw);
-        tray+='<div class="jig-pw" id="jpw-'+idx+'-'+pi+'" data-ji="'+idx+'" data-jp="'+pi+'" data-color="'+color+'" style="touch-action:none">'
+        var ps=Math.min(72,Math.max(44,vw*scale*1.6)),ph=ps*(vh/vw);
+        tray+='<div class="jig-pw" id="jpw-'+idx+'-'+pi+'" data-ji="'+idx+'" data-jp="'+pi+'" style="touch-action:none">'
           +'<svg width="'+ps.toFixed(0)+'" height="'+ph.toFixed(0)+'" viewBox="'+vx+' '+vy+' '+vw+' '+vh+'" style="display:block;filter:drop-shadow(0 3px 6px rgba(0,0,0,.35))">'
           +'<path d="'+d+'" fill="'+color+'" stroke="rgba(255,255,255,0.55)" stroke-width="2.5"/>'
           +'</svg></div>';
@@ -487,24 +481,16 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
       var actEl=slideEl.querySelector('#wa-'+idx);if(actEl&&ctx.addShareBtn)ctx.addShareBtn(actEl,q);
       var svgEl=document.getElementById('jsvg-'+idx),dzEl=document.getElementById('jdz-'+idx),statEl=document.getElementById('jst-'+idx);
       if(!svgEl)return;
-      var sz=q.sz,svgW=sz*CELL;
-      var placed=0,done=false;
-      var drag=null;
-
+      var sz=q.sz,svgW=sz*CELL,placed=0,done=false,drag=null;
       function getXY(e){var t=e.touches?e.touches[0]:(e.changedTouches?e.changedTouches[0]:e);return{x:t.clientX,y:t.clientY};}
-
       slideEl.querySelectorAll('.jig-pw[data-ji="'+idx+'"]').forEach(function(pw){
         pw.addEventListener('mousedown',startDrag);
         pw.addEventListener('touchstart',startDrag,{passive:false});
       });
-
       function startDrag(e){
         e.preventDefault();e.stopPropagation();
         var pw=e.currentTarget;if(pw.classList.contains('jig-pw-placed'))return;
-        var pi=parseInt(pw.dataset.jp);
-        var xy=getXY(e);
-        var rect=pw.getBoundingClientRect();
-        // Clone for floating
+        var pi=parseInt(pw.dataset.jp),xy=getXY(e),rect=pw.getBoundingClientRect();
         var clone=pw.cloneNode(true);
         clone.style.cssText='position:fixed;z-index:9999;pointer-events:none;transform:scale(1.12);transform-origin:center;filter:drop-shadow(0 8px 16px rgba(0,0,0,.45))';
         clone.style.left=rect.left+'px';clone.style.top=rect.top+'px';
@@ -516,17 +502,15 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
         document.addEventListener('mouseup',onUp);
         document.addEventListener('touchend',onUp);
       }
-
       function onMove(e){
         if(!drag)return;e.preventDefault();
         var xy=getXY(e);
         drag.clone.style.left=(xy.x-drag.offX)+'px';
         drag.clone.style.top=(xy.y-drag.offY)+'px';
-        var dzRect=dzEl.getBoundingClientRect();
-        var over=xy.x>dzRect.left&&xy.x<dzRect.right&&xy.y>dzRect.top&&xy.y<dzRect.bottom;
+        var r=dzEl.getBoundingClientRect();
+        var over=xy.x>r.left&&xy.x<r.right&&xy.y>r.top&&xy.y<r.bottom;
         dzEl.style.boxShadow=over?'0 5px 0 #22c55e,0 0 0 2px #22c55e':'0 5px 0 #c0b9ae';
       }
-
       function onUp(e){
         if(!drag)return;
         document.removeEventListener('mousemove',onMove);document.removeEventListener('touchmove',onMove);
@@ -534,11 +518,8 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
         dzEl.style.boxShadow='0 5px 0 #c0b9ae';
         var xy=getXY(e);
         drag.clone.remove();drag.pw.style.opacity='1';
-        // Convert to SVG coords
-        var svgRect=svgEl.getBoundingClientRect();
-        var scale=svgRect.width/svgW;
+        var svgRect=svgEl.getBoundingClientRect(),scale=svgRect.width/svgW;
         var svgX=(xy.x-svgRect.left)/scale,svgY=(xy.y-svgRect.top)/scale;
-        // Check snap — piece should land at offset 0,0 (solution position)
         var cells=q.pieces[drag.pi];
         var avgC=cells.reduce(function(s,c){return s+c[1];},0)/cells.length;
         var avgR=cells.reduce(function(s,c){return s+c[0];},0)/cells.length;
@@ -547,29 +528,26 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
         if(dist<SNAP_DIST){
           snapIn(drag.pi,drag.pw);
         }else{
-          var dzRect=dzEl.getBoundingClientRect();
-          if(xy.x>dzRect.left&&xy.x<dzRect.right&&xy.y>dzRect.top&&xy.y<dzRect.bottom){
+          var r=dzEl.getBoundingClientRect();
+          if(xy.x>r.left&&xy.x<r.right&&xy.y>r.top&&xy.y<r.bottom){
             statEl.textContent="Not quite — try a different spot!";
             H.error&&H.error();
           }
         }
         drag=null;
       }
-
       function snapIn(pi,pw){
         H.medium&&H.medium();
         var cells=q.pieces[pi],color=COLORS[pi%COLORS.length];
-        var pathD=buildPath(cells,q.hC,q.vC);
         var p=document.createElementNS('http://www.w3.org/2000/svg','path');
-        p.setAttribute('d',pathD);p.setAttribute('fill',color);
-        p.setAttribute('stroke','rgba(255,255,255,0.5)');p.setAttribute('stroke-width','2');
+        p.setAttribute('d',buildPath(cells,q.hC,q.vC));
+        p.setAttribute('fill',color);p.setAttribute('stroke','rgba(255,255,255,0.5)');p.setAttribute('stroke-width','2');
         svgEl.appendChild(p);
         var slot=document.getElementById('jslot-'+idx+'-'+pi);if(slot)slot.style.display='none';
         pw.classList.add('jig-pw-placed');
         placed++;statEl.textContent=placed+' / '+q.pieces.length+' placed';
         if(placed===q.pieces.length)setTimeout(function(){finish(true);},300);
       }
-
       function finish(won){
         done=true;
         var ms=Date.now()-ctx.answerStartRef.get(),data=ctx.IQData.recordAnswer(q.category,won,q.difficulty,ms);
@@ -720,198 +698,6 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
       }
       function finish(won){done=true;subBtn.disabled=true;var ms=Date.now()-ctx.answerStartRef.get(),data=ctx.IQData.recordAnswer(q.category,won,q.difficulty,ms);if(ctx.notifyGamePlayed)ctx.notifyGamePlayed('connections');if(ctx.onAnswer)ctx.onAnswer(won,ms);if(won){H.streak&&H.streak();ctx.flashEl.className='flash green show';ctx.spawnConfetti(20);}else ctx.flashEl.className='flash red show';setTimeout(function(){ctx.flashEl.className='flash';},350);var expEl=slideEl.querySelector('#exp-'+idx);if(expEl){expEl.textContent=won?'Sharp! All 4 groups found.':'Connections: '+q.categories.map(function(c){return c.name;}).join(' / ');expEl.classList.add('show');}ctx.updateUI(data);var hintEl2=document.getElementById('hint-'+idx);setTimeout(function(){if(hintEl2)hintEl2.classList.add('show');},400);ctx.checkMore();ctx.answerStartRef.set(Date.now());}
       refreshLives();refreshSub();ctx.answerStartRef.set(Date.now());
-    }
-  });
-})();
-
-// ── Jigsaw Puzzle — REAL SVG PIECES ──────────────────────────────────────────
-(function(){
-  // Color palettes for the puzzle image mosaic
-  var THEMES=[
-    {name:'Sunset',colors:['#ff6b35','#f7c59f','#efefd0','#004e89','#1a936f','#c84b31','#f4a261','#e76f51','#264653']},
-    {name:'Ocean',colors:['#03045e','#023e8a','#0077b6','#0096c7','#00b4d8','#48cae4','#90e0ef','#ade8f4','#caf0f8']},
-    {name:'Forest',colors:['#1b4332','#2d6a4f','#40916c','#52b788','#74c69d','#95d5b2','#b7e4c7','#d8f3dc','#081c15']},
-    {name:'Candy',colors:['#ff0a54','#ff477e','#ff5c8a','#ff7096','#ff85a1','#fbb1bd','#f9bec7','#f9c6cf','#ffb3c6']},
-    {name:'Galaxy',colors:['#10002b','#240046','#3c096c','#5a189a','#7b2d8b','#9d4edd','#c77dff','#e0aaff','#f72585']},
-    {name:'Earth',colors:['#6b4226','#8b5e3c','#a0522d','#c68642','#deb887','#f5deb3','#4a7c59','#2d5016','#1a3a1a']},
-  ];
-
-  // Build jigsaw connector path for one edge
-  // dir: 0=right edge of cell, 1=bottom edge
-  // tab: 1=tab out, -1=blank in, 0=flat
-  function edgePath(x1,y1,x2,y2,tab){
-    if(tab===0)return'L'+x2+' '+y2;
-    var mx=(x1+x2)/2,my=(y1+y2)/2;
-    var dx=x2-x1,dy=y2-y1;
-    var len=Math.sqrt(dx*dx+dy*dy);
-    var nx=-dy/len,ny=dx/len; // normal
-    var bumpSize=len*0.22;
-    var bumpOut=tab*bumpSize;
-    // Control points for the tab/blank bump
-    var p1x=x1+dx*0.3+nx*bumpOut*0.5, p1y=y1+dy*0.3+ny*bumpOut*0.5;
-    var p2x=mx+nx*bumpOut*1.1, p2y=my+ny*bumpOut*1.1;
-    var p3x=x1+dx*0.5+nx*bumpOut*1.1, p3y=y1+dy*0.5+ny*bumpOut*1.1;
-    var p4x=x1+dx*0.7+nx*bumpOut*0.5, p4y=y1+dy*0.7+ny*bumpOut*0.5;
-    return'C'+p1x.toFixed(1)+' '+p1y.toFixed(1)+' '+p2x.toFixed(1)+' '+p2y.toFixed(1)+' '+p3x.toFixed(1)+' '+p3y.toFixed(1)+
-           'C'+p4x.toFixed(1)+' '+p4y.toFixed(1)+' '+x2.toFixed(1)+' '+y2.toFixed(1)+' '+x2.toFixed(1)+' '+y2.toFixed(1);
-  }
-
-  function makePuzzle(gridN,theme){
-    var cs=80; // cell size in SVG units
-    var totalW=gridN*cs, totalH=gridN*cs;
-    var pieces=[];
-    // Generate connector directions: 1=tab, -1=blank
-    // For each internal edge, one side is tab and other is blank
-    var hEdges=[]; // horizontal connectors [row][col] = tab value for TOP of cell (row,col)
-    var vEdges=[]; // vertical connectors [row][col] = tab value for LEFT of cell (row,col)
-    for(var r=0;r<gridN;r++){
-      hEdges[r]=[];vEdges[r]=[];
-      for(var c=0;c<gridN;c++){
-        hEdges[r][c]=0; // top edge (r=0 = flat, else random)
-        vEdges[r][c]=0; // left edge (c=0 = flat, else random)
-      }
-    }
-    for(var r=1;r<gridN;r++)for(var c=0;c<gridN;c++){var t=(Math.random()>0.5)?1:-1;hEdges[r][c]=t;}
-    for(var r=0;r<gridN;r++)for(var c=1;c<gridN;c++){var t=(Math.random()>0.5)?1:-1;vEdges[r][c]=t;}
-
-    for(var r=0;r<gridN;r++){for(var c=0;c<gridN;c++){
-      var x=c*cs,y=r*cs;
-      var topTab   = r===0?0:hEdges[r][c];
-      var botTab   = r===gridN-1?0:-hEdges[r+1][c];
-      var leftTab  = c===0?0:vEdges[r][c];
-      var rightTab = c===gridN-1?0:-vEdges[r][c+1];
-      // Build clip path for this piece
-      var path='M'+x+' '+y;
-      // Top edge (left to right)
-      path+=edgePath(x,y,x+cs,y,topTab);
-      // Right edge (top to bottom)
-      path+=edgePath(x+cs,y,x+cs,y+cs,rightTab);
-      // Bottom edge (right to left)
-      path+=edgePath(x+cs,y+cs,x,y+cs,-botTab);
-      // Left edge (bottom to top)
-      path+=edgePath(x,y+cs,x,y,-leftTab);
-      path+='Z';
-      pieces.push({r:r,c:c,x:x,y:y,path:path,color:theme.colors[(r*gridN+c)%theme.colors.length]});
-    }}
-    return{pieces:pieces,totalW:totalW,totalH:totalH,cs:cs};
-  }
-
-  Q.register('jigsaw',function(){
-    var gridN=Q.rand(0,1)?3:3; // always 3x3 for now, feels right
-    var theme=Q.pick(THEMES);
-    var puz=makePuzzle(3,theme);
-    // Holes: always remove 3-5 pieces
-    var numHoles=Q.rand(3,5);
-    var allIdx=Q.shuffle([0,1,2,3,4,5,6,7,8]);
-    var holes=allIdx.slice(0,numHoles);
-    return{type:'jigsaw',category:'spatialAwareness',categoryLabel:'Jigsaw',
-      difficulty:numHoles<=3?0.8:1.1,
-      question:'Place the missing pieces!',
-      theme:theme.name,gridN:3,pieces:puz.pieces,holes:holes,
-      totalW:puz.totalW,totalH:puz.totalH,cs:puz.cs,
-      answer:'complete',options:[],explanation:'Spatial reasoning and pattern matching.',visual:'custom'};
-  },3);
-
-  Q.registerRenderer('jigsaw',{
-    render:function(q,idx){
-      var holesSet=new Set(q.holes);
-      var vb='0 0 '+q.totalW+' '+q.totalH;
-      var svgSize='width:min(230px,60vw);height:min(230px,60vw)';
-      // Build SVG showing the puzzle with holes empty
-      var pieceSVG='';
-      q.pieces.forEach(function(p,i){
-        if(holesSet.has(i)){
-          // Ghost outline for empty slot
-          pieceSVG+='<path d="'+p.path+'" fill="rgba(200,200,200,0.15)" stroke="#ccc" stroke-width="1.5" stroke-dasharray="4,3" class="jig-slot" data-jslot="'+i+'" data-ji="'+idx+'"/>';
-        }else{
-          pieceSVG+='<path d="'+p.path+'" fill="'+p.color+'" stroke="#fff" stroke-width="2"/>';
-        }
-      });
-
-      // Build the tray pieces (scrambled order, shown below)
-      var trayPieces='';
-      var trayW=Math.max(q.cs*1.4,112),trayH=q.cs*1.4;
-      q.holes.forEach(function(pi,ti){
-        var p=q.pieces[pi];
-        // Each tray piece: small SVG centered on the piece
-        var pad=q.cs*0.35;
-        var tvb=(p.x-pad)+' '+(p.y-pad)+' '+(q.cs+pad*2)+' '+(q.cs+pad*2);
-        trayPieces+='<div class="jig-tray-piece" id="jtp-'+idx+'-'+ti+'" data-jti="'+idx+'" data-jtp="'+ti+'" data-jtpi="'+pi+'">'
-          +'<svg viewBox="'+tvb+'" xmlns="http://www.w3.org/2000/svg" style="width:'+trayW+'px;height:'+trayH+'px;display:block">'
-          +'<path d="'+p.path+'" fill="'+p.color+'" stroke="#fff" stroke-width="2"/>'
-          +'</svg></div>';
-      });
-
-      return'<div class="qcard" style="gap:8px">'
-        +'<div class="category">JIGSAW</div>'
-        +'<div class="question">'+q.question+'</div>'
-        +'<div style="font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.35)">'+q.theme+' theme</div>'
-        +'<div style="background:#e2ddd4;border-radius:16px;padding:8px;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae;display:inline-block">'
-          +'<svg id="jig-svg-'+idx+'" viewBox="'+vb+'" xmlns="http://www.w3.org/2000/svg" style="'+svgSize+';display:block;border-radius:8px">'
-          +pieceSVG
-          +'</svg>'
-        +'</div>'
-        +'<div class="jig-tray" id="jig-tray-'+idx+'">'+trayPieces+'</div>'
-        +'<div class="jig-status" id="jig-s-'+idx+'">Tap a piece, then tap its slot</div>'
-        +'<div id="wa-'+idx+'"></div><div class="explanation" id="exp-'+idx+'"></div>'
-        +_gameBranding()+_scrollHint(idx)+'</div>';
-    },
-    attach:function(slideEl,q,idx,ctx){
-      var H=ctx.Haptics||{};
-      var actEl=slideEl.querySelector('#wa-'+idx);if(actEl&&ctx.addShareBtn)ctx.addShareBtn(actEl,q);
-      var svg=document.getElementById('jig-svg-'+idx),tray=document.getElementById('jig-tray-'+idx),statEl=document.getElementById('jig-s-'+idx);
-      if(!svg)return;
-      var selectedTrayIdx=null,placed=0,totalHoles=q.holes.length,done=false;
-
-      function getTrayEl(ti){return tray.querySelector('[data-jtp="'+ti+'"]');}
-      function clearSel(){
-        if(selectedTrayIdx!==null){var el=getTrayEl(selectedTrayIdx);if(el)el.classList.remove('jig-tray-sel');}
-        selectedTrayIdx=null;
-      }
-
-      // Tap tray piece
-      tray.addEventListener('click',function(e){
-        if(done)return;
-        var el=e.target.closest('.jig-tray-piece');if(!el||el.classList.contains('jig-used'))return;
-        var ti=parseInt(el.dataset.jtp);H.light&&H.light();
-        if(selectedTrayIdx===ti){clearSel();statEl.textContent='Tap a piece, then tap its slot';}
-        else{clearSel();selectedTrayIdx=ti;el.classList.add('jig-tray-sel');statEl.textContent='Now tap the matching slot in the puzzle';}
-      });
-
-      // Tap slot in SVG
-      svg.addEventListener('click',function(e){
-        if(done)return;
-        var slot=e.target.closest('[data-jslot]');if(!slot)return;
-        if(selectedTrayIdx===null){statEl.textContent='Pick a piece from below first!';return;}
-        var slotIdx=parseInt(slot.dataset.jslot);
-        var trayEl=getTrayEl(selectedTrayIdx);
-        var pieceIdx=parseInt(trayEl.dataset.jtpi);
-        if(pieceIdx===slotIdx){
-          // Correct!
-          H.medium&&H.medium();
-          var p=q.pieces[slotIdx];
-          // Replace ghost with real colored piece
-          slot.setAttribute('fill',p.color);
-          slot.setAttribute('stroke','#fff');
-          slot.setAttribute('stroke-width','2');
-          slot.removeAttribute('stroke-dasharray');
-          slot.classList.add('jig-slot-filled');
-          // Animate
-          slot.style.transition='fill 0.2s';
-          trayEl.classList.add('jig-used');
-          clearSel();placed++;
-          statEl.textContent=placed+'/'+totalHoles+' placed';
-          if(placed===totalHoles)setTimeout(function(){finish(true);},400);
-        }else{
-          // Wrong
-          H.error&&H.error();
-          trayEl.style.transform='translateX(-6px)';setTimeout(function(){trayEl.style.transform='';},350);
-          statEl.textContent='Wrong slot! Try another.';
-        }
-      });
-
-      function finish(won){done=true;var ms=Date.now()-ctx.answerStartRef.get(),data=ctx.IQData.recordAnswer(q.category,won,q.difficulty,ms);if(ctx.notifyGamePlayed)ctx.notifyGamePlayed('jigsaw');if(ctx.onAnswer)ctx.onAnswer(won,ms);if(won){H.streak&&H.streak();statEl.textContent='Puzzle solved! 🎉';ctx.flashEl.className='flash green show';ctx.spawnConfetti(20);}else{ctx.flashEl.className='flash red show';}setTimeout(function(){ctx.flashEl.className='flash';},350);var expEl=slideEl.querySelector('#exp-'+idx),hintEl=document.getElementById('hint-'+idx);if(expEl){expEl.textContent=won?'Spatial master!':'Fit each piece into its matching slot.';expEl.classList.add('show');}setTimeout(function(){if(hintEl)hintEl.classList.add('show');},500);ctx.updateUI(data);ctx.checkMore();ctx.answerStartRef.set(Date.now());}
-      ctx.answerStartRef.set(Date.now());
     }
   });
 })();
