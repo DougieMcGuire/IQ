@@ -12,7 +12,6 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="color-scheme" content="light">
   <meta name="format-detection" content="telephone=no">
-  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
 
   <!-- SEO / Social -->
   <meta name="description" content="Cebear — train your brain with mini-games, track your IQ, compete with friends.">
@@ -23,6 +22,8 @@
   <meta property="og:url" content="https://cebear.com">
   <meta property="og:image" content="https://cebear.com/og-image.png">
   <meta name="twitter:card" content="summary">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://cebear.com/app">
 
   <!-- Manifest & icons -->
   <link rel="manifest" href="manifest.json">
@@ -36,6 +37,9 @@
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 
   <!-- Preload critical resources -->
+  <link rel="preload" href="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" as="script">
+  <link rel="preload" href="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js" as="script">
+  <link rel="preload" href="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js" as="script">
   <link rel="preload" href="applogo.png" as="image">
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Chewy&family=Nunito:wght@600;700;800;900&display=swap" as="style">
   <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
@@ -81,7 +85,7 @@
     body.page-improve{background:#f5f0e8}
 
     /* ── SPLASH ── */
-    #splash{position:fixed;inset:0;z-index:9999;background:#0474fc;display:flex;justify-content:center;align-items:center;overflow:hidden;-webkit-user-select:none;user-select:none}
+    #splash{position:fixed;inset:0;z-index:9999;background:#0474fc;display:flex;justify-content:center;align-items:center;overflow:hidden;-webkit-user-select:none;user-select:none;contain:strict}
     #splash.hide{opacity:0;pointer-events:none;transition:opacity .4s ease}
     #splash .container{text-align:center;color:#fff;pointer-events:none}
     /* Logo: object-fit to prevent stretching */
@@ -132,7 +136,7 @@
     .nb{
       flex:1;padding:6px 4px 2px;background:none;border:none;
       display:flex;flex-direction:column;align-items:center;gap:3px;
-      color:rgba(255,255,255,.55);
+      color:rgba(255,255,255,.65);
       font-family:'Nunito',sans-serif;font-size:10px;font-weight:900;
       cursor:pointer;position:relative;transition:color .2s;
       -webkit-tap-highlight-color:transparent;
@@ -156,6 +160,7 @@
     }
     .nb.active .ni svg{stroke-width:2.6}
     .nb:active .ni{transform:scale(.88);opacity:.7}
+    .nb:focus-visible{outline:2px solid #fff;outline-offset:2px;border-radius:12px}
 
     /* Badge */
     .nbdg{position:absolute;top:2px;right:calc(50% - 20px);width:10px;height:10px;border-radius:50%;background:#ef4444;border:2.5px solid #0474fc;display:none;z-index:2}
@@ -184,6 +189,7 @@
   </style>
 </head>
 <body>
+<h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">Cebear — Brain Training Games & IQ Tracker</h1>
 
 <!-- Splash screen -->
 <div id="splash" role="status" aria-label="Loading Cebear">
@@ -222,7 +228,7 @@
   </button>
   <button class="nb" data-page="tasks" onclick="goTo('tasks')" aria-label="Daily tasks">
     <span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M9 12l2 2 4-4"/></svg></span>
-    <span>Tasks</span><span class="nbdg" id="tasks-badge" aria-hidden="true"></span>
+    <span>Tasks</span><span class="nbdg" id="tasks-badge" role="status" aria-label="New tasks available"></span>
   </button>
   <button class="nb" data-page="profile" onclick="goTo('profile')" aria-label="Your profile">
     <span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
@@ -251,8 +257,8 @@ function _doHide(){
   var last=letters[letters.length-1];
   if(!last){setTimeout(_doHide,1800);return;}
   var held=false;
-  last.addEventListener('animationend',function(){if(held)return;held=true;setTimeout(_doHide,800);});
-  setTimeout(function(){if(!_splashDone)_doHide();},1800);
+  last.addEventListener('animationend',function(){if(held)return;held=true;setTimeout(_doHide,500);});
+  setTimeout(function(){if(!_splashDone)_doHide();},1400);
 })();
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
