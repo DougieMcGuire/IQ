@@ -28,8 +28,12 @@
     .hero::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:28px;background:var(--bg);border-radius:28px 28px 0 0}
     .hero-hdr{width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;z-index:1}
     .hero-name{font-size:18px;font-weight:900;letter-spacing:.3px;color:#fff}
+    .hero-right{display:flex;gap:6px;align-items:center}
     .hero-out{background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.35);padding:7px 14px;border-radius:12px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:#fff;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.15)}
     .hero-out:active{transform:translateY(3px);box-shadow:none}
+    .hero-gear{background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.35);width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.15)}
+    .hero-gear:active{transform:translateY(3px);box-shadow:none}
+    .hero-gear svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
     .av-wrap{position:relative;margin-bottom:10px;cursor:pointer;z-index:1}
     .av{width:clamp(110px,28vw,130px);height:clamp(110px,28vw,130px);border-radius:50%;overflow:hidden;border:5px solid #fff;box-shadow:0 6px 0 var(--blue-dark);transition:transform .12s}
     .av:active{transform:scale(.93)}
@@ -94,6 +98,46 @@
     .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--green);color:#fff;padding:10px 20px;border-radius:14px;font-size:14px;font-weight:800;opacity:0;transition:all .3s;z-index:400;white-space:nowrap;pointer-events:none;box-shadow:0 4px 0 var(--green-dark)}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+    /* ── Settings sheet ── */
+    .set-overlay{position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:flex-end;justify-content:center}
+    .set-overlay.open{display:flex}
+    .set-sheet{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:480px;max-height:85dvh;overflow-y:auto;padding:20px 20px calc(24px + env(safe-area-inset-bottom,0px));animation:sheetUp .3s cubic-bezier(.22,1,.36,1) both}
+    .set-sheet::-webkit-scrollbar{display:none}
+    @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .set-handle{width:36px;height:5px;background:#e2e8f0;border-radius:3px;margin:0 auto 16px}
+    .set-title{font-size:20px;font-weight:900;color:var(--text);margin-bottom:16px;text-align:center}
+    .set-section{font-size:10px;font-weight:900;color:var(--text-light);letter-spacing:2px;text-transform:uppercase;margin:18px 0 8px;padding:0 2px}
+    .set-card{background:#f8fafc;border:2.5px solid var(--card-border);border-radius:16px;overflow:hidden;margin-bottom:8px}
+    .set-row{display:flex;align-items:center;gap:12px;padding:14px 16px}
+    .set-row+.set-row{border-top:2px solid var(--card-border)}
+    .set-row-ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .set-row-ic svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+    .set-row-ic.s-blue{background:var(--blue);box-shadow:0 2px 0 var(--blue-dark)}
+    .set-row-ic.s-purple{background:var(--purple);box-shadow:0 2px 0 #7c3aed}
+    .set-row-ic.s-orange{background:var(--orange);box-shadow:0 2px 0 #c2410c}
+    .set-row-ic.s-green{background:var(--green);box-shadow:0 2px 0 var(--green-dark)}
+    .set-row-ic.s-dark{background:#1e293b;box-shadow:0 2px 0 #0f172a}
+    .set-row-ic.s-red{background:#ef4444;box-shadow:0 2px 0 #dc2626}
+    .set-row-mid{flex:1;min-width:0}
+    .set-row-label{font-size:14px;font-weight:800;color:var(--text)}
+    .set-row-sub{font-size:11px;font-weight:700;color:var(--text-light);margin-top:1px}
+    .set-row-val{font-size:13px;font-weight:800;color:var(--text-light);flex-shrink:0}
+    .set-input{width:100%;padding:10px 14px;border:2.5px solid var(--card-border);border-radius:12px;background:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--text);outline:none;transition:border-color .2s;-webkit-appearance:none}
+    .set-input:focus{border-color:var(--blue)}
+    .set-save-row{display:flex;gap:8px;margin-top:4px}
+    .set-save-btn{flex:1;padding:10px;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer;transition:transform .1s}
+    .set-save-btn:active{transform:translateY(3px);box-shadow:none}
+    .set-save-btn.primary{background:var(--blue);color:#fff;box-shadow:0 3px 0 var(--blue-dark)}
+    .set-save-btn.cancel{background:#f1f5f9;color:var(--text-dim);box-shadow:0 3px 0 #e2e8f0}
+    /* Toggle switch */
+    .set-toggle{position:relative;width:48px;height:28px;flex-shrink:0;cursor:pointer}
+    .set-toggle input{display:none}
+    .set-toggle-track{position:absolute;inset:0;background:#e2e8f0;border-radius:14px;border:2px solid #d1d5db;transition:all .2s}
+    .set-toggle input:checked+.set-toggle-track{background:var(--green);border-color:var(--green-dark)}
+    .set-toggle-knob{position:absolute;top:3px;left:3px;width:22px;height:22px;background:#fff;border-radius:50%;box-shadow:0 2px 0 rgba(0,0,0,.1);transition:transform .2s}
+    .set-toggle input:checked~.set-toggle-knob{transform:translateX(20px)}
+    .set-uid{font-size:9px;font-weight:600;color:var(--text-light);opacity:.4;text-align:center;margin-top:14px;word-break:break-all;padding:0 10px}
+
     /* ── Page entrance animations ── */
     @keyframes avZoom{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
     @keyframes heroSlide{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
@@ -116,7 +160,10 @@
   <div class="hero">
     <div class="hero-hdr">
       <div class="hero-name" id="username-display"></div>
-      <button class="hero-out" id="signout-btn">Sign out</button>
+      <div class="hero-right">
+        <button class="hero-gear" id="gear-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
+        <button class="hero-out" id="signout-btn">Sign out</button>
+      </div>
     </div>
     <div class="av-wrap" id="av-wrap">
       <div class="av"><img id="av-img" src="Avatars/Anonymous.png" alt="Your avatar" loading="lazy" decoding="async"></div>
@@ -142,7 +189,6 @@
     </div>
     <div class="section-title">Abilities</div>
     <div class="ab-card" id="abilities"></div>
-    <button class="reset-btn" id="reset-btn">Reset all progress</button>
   </div>
 </div>
 <div class="av-overlay" id="av-overlay">
@@ -157,6 +203,71 @@
     </div>
     <div class="share-lbl">Share to</div>
     <div class="share-grid" id="share-grid"></div>
+  </div>
+</div>
+<div class="set-overlay" id="set-overlay">
+  <div class="set-sheet">
+    <div class="set-handle"></div>
+    <div class="set-title">Settings</div>
+
+    <div class="set-section">Profile</div>
+    <div class="set-card">
+      <div class="set-row">
+        <div class="set-row-ic s-blue"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="set-row-mid">
+          <div class="set-row-label">Username</div>
+          <input class="set-input" id="set-username" placeholder="Your display name" maxlength="24">
+        </div>
+      </div>
+      <div class="set-row">
+        <div class="set-row-ic s-purple"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></div>
+        <div class="set-row-mid">
+          <div class="set-row-label">Name</div>
+          <input class="set-input" id="set-name" placeholder="Display name" maxlength="32">
+        </div>
+      </div>
+      <div class="set-row" id="set-save-wrap" style="display:none">
+        <div style="flex:1">
+          <div class="set-save-row">
+            <button class="set-save-btn cancel" id="set-cancel">Cancel</button>
+            <button class="set-save-btn primary" id="set-save">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="set-section">Preferences</div>
+    <div class="set-card">
+      <div class="set-row">
+        <div class="set-row-ic s-orange"><svg viewBox="0 0 24 24"><path d="M5.5 12H18"/><path d="M12 5.5V18"/><circle cx="12" cy="12" r="10"/></svg></div>
+        <div class="set-row-mid">
+          <div class="set-row-label">Haptics</div>
+          <div class="set-row-sub">Vibration feedback on actions</div>
+        </div>
+        <label class="set-toggle"><input type="checkbox" id="set-haptics" checked><div class="set-toggle-track"></div><div class="set-toggle-knob"></div></label>
+      </div>
+      <div class="set-row">
+        <div class="set-row-ic s-dark"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></div>
+        <div class="set-row-mid">
+          <div class="set-row-label">Dark Mode</div>
+          <div class="set-row-sub">Navy theme across the app</div>
+        </div>
+        <label class="set-toggle"><input type="checkbox" id="set-dark"><div class="set-toggle-track"></div><div class="set-toggle-knob"></div></label>
+      </div>
+    </div>
+
+    <div class="set-section">Danger Zone</div>
+    <div class="set-card">
+      <div class="set-row" id="set-reset-row" style="cursor:pointer">
+        <div class="set-row-ic s-red"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></div>
+        <div class="set-row-mid">
+          <div class="set-row-label" style="color:#ef4444">Reset all progress</div>
+          <div class="set-row-sub">This cannot be undone</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="set-uid" id="set-uid"></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -215,7 +326,109 @@ window.addEventListener('message',function(e){
   if(e.data.type==='pageEnter'){playEntrance();loadProfile();loadAvatar();}
 });
 document.getElementById('signout-btn').onclick=()=>{Haptics.warning();IQData.signOut();};
-document.getElementById('reset-btn').onclick=()=>{Haptics.warning();if(confirm('Reset all progress?')){Haptics.error();IQData.reset();location.reload();}};
+
+// ── Settings ──
+var _origUN='',_origName='';
+function openSettings(){
+  Haptics.medium();
+  var d=IQData.load(),u=IQData.getCurrentUser();
+  document.getElementById('set-username').value=d.username||'';
+  document.getElementById('set-name').value=u?.displayName||d.username||'';
+  _origUN=d.username||'';_origName=u?.displayName||d.username||'';
+  document.getElementById('set-save-wrap').style.display='none';
+  // Haptics toggle
+  var hapOn=localStorage.getItem('cb_haptics')!=='off';
+  document.getElementById('set-haptics').checked=hapOn;
+  // Dark mode toggle
+  var darkOn=localStorage.getItem('cb_dark')==='on';
+  document.getElementById('set-dark').checked=darkOn;
+  // UID
+  var uid=u?.uid||'';
+  document.getElementById('set-uid').textContent=uid?'ID: '+uid:'';
+  document.getElementById('set-overlay').classList.add('open');
+}
+function closeSettings(){document.getElementById('set-overlay').classList.remove('open');}
+document.getElementById('gear-btn').onclick=openSettings;
+document.getElementById('set-overlay').addEventListener('click',function(e){if(e.target===this)closeSettings();});
+
+// Show save row when inputs change
+['set-username','set-name'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',function(){
+    var un=document.getElementById('set-username').value.trim();
+    var nm=document.getElementById('set-name').value.trim();
+    var changed=un!==_origUN||nm!==_origName;
+    document.getElementById('set-save-wrap').style.display=changed?'flex':'none';
+  });
+});
+
+document.getElementById('set-cancel').onclick=function(){
+  document.getElementById('set-username').value=_origUN;
+  document.getElementById('set-name').value=_origName;
+  document.getElementById('set-save-wrap').style.display='none';
+};
+
+document.getElementById('set-save').onclick=async function(){
+  var un=document.getElementById('set-username').value.trim();
+  var nm=document.getElementById('set-name').value.trim();
+  if(!un){pToast('Username can\'t be empty',true);return;}
+  var d=IQData.load();d.username=un;IQData.save(d);
+  // Update Firestore
+  try{
+    var fb=window.parent!==window?window.parent.firebase:null;
+    if(fb){var u=fb.auth().currentUser;if(u){
+      await fb.firestore().collection('users').doc(u.uid).set({username:un,displayName:nm},{merge:true});
+    }}
+  }catch(e){}
+  _origUN=un;_origName=nm;
+  document.getElementById('set-save-wrap').style.display='none';
+  document.getElementById('username-display').textContent=un;
+  Haptics.success();pToast('Saved!');
+};
+
+// Haptics toggle
+document.getElementById('set-haptics').addEventListener('change',function(){
+  var on=this.checked;
+  localStorage.setItem('cb_haptics',on?'on':'off');
+  if(on)Haptics.medium();
+  // Broadcast to parent so all iframes know
+  try{window.parent.postMessage({type:'settingsChanged',haptics:on},'*');}catch(e){}
+});
+
+// Dark mode toggle
+document.getElementById('set-dark').addEventListener('change',function(){
+  var on=this.checked;
+  localStorage.setItem('cb_dark',on?'on':'off');
+  Haptics.medium();
+  applyDarkMode(on);
+  try{window.parent.postMessage({type:'settingsChanged',darkMode:on},'*');}catch(e){}
+});
+
+function applyDarkMode(on){
+  if(on){
+    document.documentElement.style.setProperty('--bg','#0f172a');
+    document.documentElement.style.setProperty('--card','#1e293b');
+    document.documentElement.style.setProperty('--card-border','#334155');
+    document.documentElement.style.setProperty('--text','#f1f5f9');
+    document.documentElement.style.setProperty('--text-dim','#94a3b8');
+    document.documentElement.style.setProperty('--text-light','#64748b');
+    document.documentElement.style.setProperty('--blue','#1e3a5f');
+    document.documentElement.style.setProperty('--blue-dark','#0f2744');
+    document.documentElement.style.setProperty('--shadow-card','0 4px 0 #0f172a');
+  }else{
+    ['--bg','--card','--card-border','--text','--text-dim','--text-light','--blue','--blue-dark','--shadow-card'].forEach(function(v){document.documentElement.style.removeProperty(v);});
+  }
+}
+
+// Apply dark mode on load if saved
+if(localStorage.getItem('cb_dark')==='on')applyDarkMode(true);
+
+// Reset from settings
+document.getElementById('set-reset-row').onclick=function(){
+  Haptics.warning();
+  if(confirm('Reset ALL progress? This cannot be undone.')){
+    Haptics.error();IQData.reset();location.reload();
+  }
+};
 
 var shareCanvas=null,shareUrl='';
 function getShareUrl(){var u=IQData.getCurrentUser();return u?'https://cebear.com/@'+u.uid:'https://cebear.com';}
