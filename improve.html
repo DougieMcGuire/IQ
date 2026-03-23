@@ -400,8 +400,6 @@
     .pc3-moves{font-size:11px;font-weight:700;text-align:center;color:rgba(255,255,255,.3);min-height:14px}
 
 
-    /* ── Jigsaw ── */
-    .jig-board{display:grid;gap:4px;background:#e2ddd4;padding:6px;border-radius:16px;margin:0 auto;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae;width:min(250px,66vw)}
     .jig-gcell{aspect-ratio:1;border-radius:8px;background:#fff;border:2px solid #e8e2d6;cursor:pointer;user-select:none;transition:background .12s,border-color .12s,transform .1s;box-shadow:0 2px 0 #d6cfc0}
     .jig-gcell:active{transform:scale(.92)}
     .jig-gcell.jig-cell-filled{cursor:default;pointer-events:none}
@@ -412,6 +410,13 @@
     .jig-piece:active{transform:translateY(3px);box-shadow:none}
     .jig-piece.jig-piece-sel{transform:translateY(-5px);box-shadow:0 8px 0 #d6cfc0;background:#e8f2ff;border-color:#0474fc}
     .jig-piece.jig-piece-used{opacity:.15;pointer-events:none;transform:none}
+    .jig-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.55);min-height:18px}
+
+    /* ── Jigsaw drag pieces ── */
+    .jig-pw{cursor:grab;user-select:none;touch-action:none;transition:opacity .15s;-webkit-user-select:none}
+    .jig-pw:active{cursor:grabbing}
+    .jig-pw.jig-pw-placed{opacity:.15;pointer-events:none}
+    .jig-tray2{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:4px 0}
     .jig-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.55);min-height:18px}
   </style>
 </head>
@@ -454,10 +459,10 @@
   location.replace(location.origin+'/app.html'+location.search);
 })();
 </script>
-<script src="questions.js"></script>
-<script src="games/games.js"></script>
-<script src="dopamine-loader.js"></script>
-<script src="games/logic.js"></script>
+<script src="questions.js?v=3"></script>
+<script src="games/games.js?v=3"></script>
+<script src="dopamine-loader.js?v=3"></script>
+<script src="games/logic.js?v=3"></script>
 <script type="module">
 import{IQData,getEncouragement}from'./data.js';import Haptics from'./haptics.js';
 import{initializeApp,getApps}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
