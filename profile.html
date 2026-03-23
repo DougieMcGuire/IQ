@@ -50,7 +50,7 @@
     .share-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5;flex-shrink:0}
     .share-nudge{font-size:11px;font-weight:700;color:rgba(255,255,255,.45);z-index:1;margin-bottom:0}
     .content{padding:12px 16px 80px;max-width:480px;margin:0 auto;width:100%}
-    .content-bg{background:var(--bg);padding-bottom:9999px;margin-bottom:-9999px}
+    .content-bg{background:var(--bg)}
     .section-title{font-size:18px;font-weight:900;letter-spacing:.3px;color:var(--text);margin-bottom:12px;padding:0 4px}
     .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
     .sg{background:var(--card);border-radius:var(--card-r);border:2.5px solid var(--card-border);padding:16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-card)}
@@ -559,6 +559,23 @@ function playEntrance(){
 }
 
 loadProfile();loadAvatar();playEntrance();
+
+// Clamp scroll — prevent scrolling past content in either direction
+var _sc=document.querySelector('.scroll');
+_sc.addEventListener('scroll',function(){
+  var maxScroll=_sc.scrollHeight-_sc.clientHeight;
+  if(_sc.scrollTop<0)_sc.scrollTop=0;
+  if(_sc.scrollTop>maxScroll)_sc.scrollTop=maxScroll;
+},{passive:false});
+// Also prevent touchmove from going past bounds
+var _lastY=0;
+_sc.addEventListener('touchstart',function(e){_lastY=e.touches[0].clientY;},{passive:true});
+_sc.addEventListener('touchmove',function(e){
+  var y=e.touches[0].clientY,dy=y-_lastY;
+  var atTop=_sc.scrollTop<=0,atBottom=_sc.scrollTop>=_sc.scrollHeight-_sc.clientHeight;
+  if((atTop&&dy>0)||(atBottom&&dy<0))e.preventDefault();
+  _lastY=y;
+},{passive:false});
 </script>
 </body>
 </html>
