@@ -389,37 +389,32 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
     var C = CS;
     var set = new Set(cells.map(function(c){return c[0]+','+c[1];}));
     function has(r,c){return set.has(r+','+c);}
-    // Collect all boundary edges as line segments [x1,y1 -> x2,y2]
-    // Direction: always trace so interior is on the left
     var edges = [];
     cells.forEach(function(rc){
-      var r=rc[0], c=rc[1];
-      // top edge (going right)
-      if(!has(r-1,c)) edges.push([c*C, r*C, (c+1)*C, r*C]);
-      // right edge (going down)
-      if(!has(r,c+1)) edges.push([(c+1)*C, r*C, (c+1)*C, (r+1)*C]);
-      // bottom edge (going left)
-      if(!has(r+1,c)) edges.push([(c+1)*C, (r+1)*C, c*C, (r+1)*C]);
-      // left edge (going up)
-      if(!has(r,c-1)) edges.push([c*C, (r+1)*C, c*C, r*C]);
+      var r=rc[0],c=rc[1];
+      if(!has(r-1,c)) edges.push([c*C,r*C,(c+1)*C,r*C]);
+      if(!has(r,c+1)) edges.push([(c+1)*C,r*C,(c+1)*C,(r+1)*C]);
+      if(!has(r+1,c)) edges.push([(c+1)*C,(r+1)*C,c*C,(r+1)*C]);
+      if(!has(r,c-1)) edges.push([c*C,(r+1)*C,c*C,r*C]);
     });
-    // Build adjacency: end point -> next edge
+    // Key adjacency by START point of each edge
     var adj = {};
     edges.forEach(function(e){
-      var k = e[2]+','+e[3];
-      if(!adj[k]) adj[k] = [];
+      var k=e[0]+','+e[1];
+      if(!adj[k])adj[k]=[];
       adj[k].push(e);
     });
-    // Chain edges into polygon
-    var start = edges[0];
-    var pts = [[start[0],start[1]]];
-    var cur = start;
+    var start=edges[0],cur=start;
+    var used=new Set([start[0]+','+start[1]+','+start[2]+','+start[3]]);
+    var pts=[[start[0],start[1]]];
     for(var i=0;i<edges.length-1;i++){
-      var k = cur[2]+','+cur[3];
-      var next = adj[k] && adj[k][0];
-      if(!next) break;
-      pts.push([next[0],next[1]]);
-      cur = next;
+      var k=cur[2]+','+cur[3];
+      var cands=(adj[k]||[]).filter(function(e){return!used.has(e[0]+','+e[1]+','+e[2]+','+e[3]);});
+      if(!cands.length)break;
+      var nxt=cands[0];
+      used.add(nxt[0]+','+nxt[1]+','+nxt[2]+','+nxt[3]);
+      pts.push([nxt[0],nxt[1]]);
+      cur=nxt;
     }
     return 'M'+pts.map(function(p){return p[0]+','+p[1];}).join('L')+'Z';
   }
