@@ -417,15 +417,20 @@ async function loadTasks(){
       _lastState=state;
       render(state);
     } else {
-      dbg('NO DOC at this path — generating fallback tasks');
-      dbg('(improve.html creates this doc when you play games while signed in)');
+      dbg('NO DOC — creating it now so improve.html can update it');
       var defs=getDailyTaskDefs();
-      dbg('generated task IDs: '+defs.map(function(d){return d.id}).join(', '));
       var freshState={
         date:_todayKey,
         tasks:defs.map(function(def){return Object.assign({},def,{progress:0,done:false,claimed:false})}),
         allDone:false,allClaimed:false,dailyStreak:0
       };
+      // WRITE it to Firestore so improve.html finds it and updates progress
+      try{
+        await ref.set(freshState);
+        dbg('Created doc at '+path+' ✓');
+      }catch(we){
+        dbg('Failed to create doc: '+we.message);
+      }
       _lastState=freshState;
       render(freshState);
     }
