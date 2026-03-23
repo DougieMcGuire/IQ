@@ -8,58 +8,89 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#0474fc;--navy:#0358c4;--navyM:#0245a0;--cream:#F0EAD6;--green:#22c55e;--gd:#16a34a;--red:#ef4444;--gold:#f59e0b;--goldd:#d97706;--blue:#0474fc;--dim:rgba(255,255,255,.45);--dimmer:rgba(255,255,255,.12)}
+    :root{
+      --bg:#f5f0e8;--card:#fff;--card-border:#e8e2d6;
+      --blue:#0474fc;--blue-dark:#0358c4;--blue-deep:#0245a0;
+      --text:#1e293b;--text-dim:#64748b;--text-light:#94a3b8;
+      --green:#22c55e;--green-dark:#16a34a;
+      --red:#ef4444;--gold:#f59e0b;--gold-dark:#d97706;
+    }
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-    html,body{width:100%;height:100%;overflow:hidden;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--cream)}
-    .editor{display:flex;flex-direction:column;height:100%;overflow:hidden}
-    .hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--navy);border-bottom:1px solid var(--dimmer);flex-shrink:0;gap:8px}
-    .hdr-title{font-family:'Chewy',cursive;font-size:18px;letter-spacing:.5px;flex:1;text-align:center}
-    .btn-x{background:var(--dimmer);border:none;border-radius:10px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:var(--cream);cursor:pointer;display:flex;align-items:center;gap:6px;flex-shrink:0}
-    .btn-x:active{opacity:.6}
-    .btn-save{background:#fff;border:none;border-radius:10px;padding:8px 18px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;color:var(--blue);cursor:pointer;box-shadow:0 3px 0 rgba(255,255,255,.3);flex-shrink:0;display:flex;align-items:center;gap:6px}
-    .btn-save:active{transform:translateY(3px);box-shadow:none}
-    .btn-save:disabled{opacity:.4;pointer-events:none}
-    .hdr svg,.btn-save svg,.btn-x svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-    .preview-row{display:flex;justify-content:center;padding:14px 16px 10px;background:var(--navyM);flex-shrink:0}
-    .av-ring{width:140px;height:140px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,.25);background:var(--navyM)}
-    .av-ring canvas{width:100%;height:100%;display:block}
-    .cat-row{display:flex;gap:6px;overflow-x:auto;padding:8px 14px;flex-shrink:0}
-    .cat-row::-webkit-scrollbar{display:none}
-    .cat-tab{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;cursor:pointer;padding:8px 10px;border-radius:12px;background:var(--dimmer);border:2px solid transparent;min-width:54px;transition:all .12s}
-    .cat-tab.active{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.6)}
-    .cat-tab:active{opacity:.65}
-    .cat-icon svg{width:18px;height:18px;stroke:var(--dim);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block}
-    .cat-tab.active .cat-icon svg{stroke:#fff}
-    .cat-lbl{font-size:9px;font-weight:800;color:var(--dim);white-space:nowrap}
-    .cat-tab.active .cat-lbl{color:#fff}
-    .color-row{flex-shrink:0;padding:6px 14px 2px;display:none}
-    .color-row.show{display:block}
-    .color-title{font-size:9px;font-weight:900;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
-    .dots{display:flex;flex-wrap:wrap;gap:7px;padding-bottom:4px}
+    html,body{width:100%;height:100%;overflow:hidden;font-family:'Nunito',sans-serif;background:var(--blue);color:#fff;-webkit-font-smoothing:antialiased}
 
-    .dot{width:28px;height:28px;border-radius:50%;flex-shrink:0;cursor:pointer;border:3px solid transparent;transition:transform .1s,border-color .1s}
-    .dot.on{border-color:#fff;transform:scale(1.18)}
+    .editor{display:flex;flex-direction:column;height:100dvh}
+
+    /* ── Header ── */
+    .hdr{display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top,8px) + 8px) 14px 10px;flex-shrink:0;gap:8px}
+    .btn-x{background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2);border-radius:12px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:rgba(255,255,255,.7);cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0;transition:all .1s}
+    .btn-x:active{background:rgba(255,255,255,.2)}
+    .hdr-title{font-family:'Chewy',cursive;font-size:20px;letter-spacing:.5px;flex:1;text-align:center}
+    .btn-save{background:#fff;border:none;border-radius:12px;padding:8px 18px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;color:var(--blue);cursor:pointer;box-shadow:0 4px 0 var(--card-border);flex-shrink:0;display:flex;align-items:center;gap:6px;transition:all .1s}
+    .btn-save:active{transform:translateY(4px);box-shadow:none}
+    .btn-save:disabled{opacity:.35;pointer-events:none}
+    .hdr svg,.btn-save svg,.btn-x svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+    /* ── Preview ── */
+    .preview-row{display:flex;justify-content:center;padding:8px 16px 12px;flex-shrink:0}
+    .av-ring{width:120px;height:120px;border-radius:50%;overflow:hidden;border:4px solid rgba(255,255,255,.3);box-shadow:0 6px 20px rgba(0,0,0,.15);position:relative}
+    .av-ring canvas{width:100%;height:100%;display:block}
+    .av-ring::after{content:'';position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(255,255,255,.1);pointer-events:none}
+
+    /* ── Category tabs ── */
+    .cat-row{display:flex;gap:4px;overflow-x:auto;padding:0 12px 8px;flex-shrink:0;-webkit-overflow-scrolling:touch}
+    .cat-row::-webkit-scrollbar{display:none}
+    .cat-tab{display:flex;align-items:center;gap:5px;flex-shrink:0;cursor:pointer;padding:7px 12px;border-radius:20px;background:rgba(255,255,255,.1);border:2px solid transparent;transition:all .12s;white-space:nowrap}
+    .cat-tab.active{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.5)}
+    .cat-tab:active{opacity:.65}
+    .cat-icon svg{width:15px;height:15px;stroke:rgba(255,255,255,.5);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;flex-shrink:0}
+    .cat-tab.active .cat-icon svg{stroke:#fff}
+    .cat-lbl{font-size:11px;font-weight:800;color:rgba(255,255,255,.5)}
+    .cat-tab.active .cat-lbl{color:#fff}
+
+    /* ── Content panel (white card) ── */
+    .panel{flex:1;background:var(--card);border-radius:24px 24px 0 0;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 -4px 20px rgba(0,0,0,.1)}
+
+    /* ── Color row ── */
+    .color-row{flex-shrink:0;padding:12px 16px 8px;display:none;border-bottom:2px solid var(--card-border)}
+    .color-row.show{display:block}
+    .color-title{font-size:10px;font-weight:900;color:var(--text-light);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px}
+    .dots{display:flex;flex-wrap:wrap;gap:6px}
+    .dot{width:30px;height:30px;border-radius:50%;flex-shrink:0;cursor:pointer;border:3px solid transparent;transition:transform .1s,border-color .1s,box-shadow .1s}
+    .dot.on{border-color:var(--blue);transform:scale(1.15);box-shadow:0 0 0 2px rgba(4,116,252,.3)}
     .dot:active{transform:scale(.85)}
-    .items-wrap{flex:1;overflow-y:auto;padding:8px 14px 20px;-webkit-overflow-scrolling:touch}
+
+    /* ── Items grid ── */
+    .items-wrap{flex:1;overflow-y:auto;padding:12px 14px calc(env(safe-area-inset-bottom,8px) + 12px);-webkit-overflow-scrolling:touch}
     .items-wrap::-webkit-scrollbar{display:none}
-    .items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:7px}
-    .icard{aspect-ratio:1;border-radius:12px;background:var(--dimmer);border:2.5px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;transition:border-color .1s}
-    .icard:active{opacity:.65}
-    .icard.on{border-color:var(--gold);background:rgba(232,168,23,.1)}
-    .icard canvas{width:100%;height:100%;display:block}
-    .none-lbl{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:800;color:var(--dim)}
-    .none-lbl svg{width:16px;height:16px;stroke:var(--dim);fill:none;stroke-width:2;stroke-linecap:round;display:block}
-    .icheck{position:absolute;bottom:3px;right:3px;width:15px;height:15px;background:var(--gold);border-radius:50%;display:none;align-items:center;justify-content:center}
+    .items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px}
+    .icard{aspect-ratio:1;border-radius:14px;background:#f8fafc;border:2.5px solid var(--card-border);cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;transition:all .12s;box-shadow:0 3px 0 #d6cfc0}
+    .icard:active{transform:translateY(3px);box-shadow:none}
+    .icard.on{border-color:var(--blue);background:#e8f2ff;box-shadow:0 3px 0 var(--blue-dark)}
+    .icard canvas{width:100%;height:100%;display:block;border-radius:10px}
+    .none-lbl{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:800;color:var(--text-light)}
+    .none-lbl svg{width:16px;height:16px;stroke:var(--text-light);fill:none;stroke-width:2;stroke-linecap:round;display:block}
+    .icheck{position:absolute;bottom:4px;right:4px;width:18px;height:18px;background:var(--blue);border-radius:50%;display:none;align-items:center;justify-content:center;box-shadow:0 2px 0 var(--blue-dark)}
     .icard.on .icheck{display:flex}
-    .icheck svg{width:9px;height:9px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
-    .saving{position:fixed;inset:0;background:rgba(15,22,44,.9);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:99;backdrop-filter:blur(6px)}
+    .icheck svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+
+    /* ── Overlays ── */
+    .saving{position:fixed;inset:0;background:rgba(4,116,252,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:99}
     .saving.show{display:flex}
-    .saving-lbl{font-size:15px;font-weight:800}
+    .saving-lbl{font-size:15px;font-weight:800;color:#fff}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .spin{border:4px solid var(--dimmer);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
-    .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--green);color:#fff;border-radius:12px;padding:9px 20px;font-size:13px;font-weight:800;opacity:0;pointer-events:none;transition:all .28s;z-index:200;white-space:nowrap}
+    .spin{border:4px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+    .toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,8px) + 14px);left:50%;transform:translateX(-50%) translateY(10px);border-radius:14px;padding:10px 22px;font-size:13px;font-weight:800;opacity:0;pointer-events:none;transition:all .28s;z-index:200;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.15)}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    .toast.err{background:var(--red)}
+    .toast.ok{background:var(--green);color:#fff}
+    .toast.err{background:var(--red);color:#fff}
+
+    /* ── Loading skeleton ── */
+    .skel{background:linear-gradient(90deg,#e8e2d6 25%,#f0ead6 50%,#e8e2d6 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:10px}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+    /* ── Animations ── */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fadeUp .25s ease both}
   </style>
 </head>
 <body>
@@ -70,18 +101,20 @@
     </button>
     <div class="hdr-title">Edit Avatar</div>
     <button class="btn-save" id="save-btn">
-      <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Save
     </button>
   </div>
   <div class="preview-row">
     <div class="av-ring"><canvas id="pv" width="280" height="280"></canvas></div>
   </div>
   <div class="cat-row" id="cat-row"></div>
-  <div class="color-row" id="color-row">
-    <div class="color-title" id="color-title">Color</div>
-    <div class="dots" id="dots"></div>
+  <div class="panel">
+    <div class="color-row" id="color-row">
+      <div class="color-title" id="color-title">Color</div>
+      <div class="dots" id="dots"></div>
+    </div>
+    <div class="items-wrap"><div class="items-grid" id="grid"></div></div>
   </div>
-  <div class="items-wrap"><div class="items-grid" id="grid"></div></div>
 </div>
 <div class="saving" id="saving"><div class="spin" style="width:40px;height:40px"></div><div class="saving-lbl">Saving...</div></div>
 <div class="toast" id="toast"></div>
@@ -103,13 +136,7 @@ var _auth, _db, _user = null;
 
 // ── Config ────────────────────────────────────────────────────────────────────
 var BASE='/Avatars/';
-
-// Correct anatomical order:
-// skin → hair (behind face) → eyes → brows → nose → mouth
-// → neck chain (over skin, under shirt collar) → tops → glasses → hats
 var LAYERS=['bases','hair','eyes','brows','noses','mouths','neck','tops','glasses','hats'];
-
-// No colorable green in these layers
 var NO_COL={brows:true,noses:true};
 
 var CATS=[
@@ -175,98 +202,52 @@ var IC={};
 function loadImg(src){
   if(src in IC)return Promise.resolve(IC[src]);
   return new Promise(function(res){
-    var img=new Image();
-    img.crossOrigin='anonymous';
+    var img=new Image();img.crossOrigin='anonymous';
     img.onload=function(){IC[src]=img;res(img);};
     img.onerror=function(){IC[src]=null;res(null);};
     img.src=src;
   });
 }
 
-// ── Green replacement — the RIGHT way ─────────────────────────────────────────
-//
-// Root cause of green fringe: if you replace pixels AFTER scaling down the image,
-// the browser's bilinear filter blends the replaced pixels back with the original
-// green pixels at the edges, producing green fringe.
-//
-// Fix: ALWAYS replace at the image's NATIVE pixel dimensions.
-// Then draw the result to whatever target size — scaling happens AFTER replacement,
-// so edge pixels are already in the target color and any blending is color→transparent,
-// not green→transparent.
-//
-// Detection: ratio-based (G must be > R*1.4 AND > B*1.4 AND > 80).
-// This catches pure green and lime while ignoring teal (B≈G), yellow (R≈G), skin, hair.
-// Smooth blend for anti-aliased edges based on how dominant green is.
-//
-// Cache: keyed by "src|hex" — size-independent because native dims are fixed.
-
+// ── Green replacement ─────────────────────────────────────────────────────────
 var NC={};
 function replaceGreen(img,hex){
   if(!img)return null;
   var key=img.src+'|'+hex;
   if(NC[key])return NC[key];
-
-  // Always use naturalWidth — never 0 because img is already loaded
   var W=img.naturalWidth||img.width||256;
   var H=img.naturalHeight||img.height||256;
-
-  var c=document.createElement('canvas');
-  c.width=W; c.height=H;
-  var ctx=c.getContext('2d');
-  ctx.drawImage(img,0,0,W,H);
-
-  var id=ctx.getImageData(0,0,W,H);
-  var px=id.data;
-  var tr=parseInt(hex.slice(1,3),16);
-  var tg=parseInt(hex.slice(3,5),16);
-  var tb=parseInt(hex.slice(5,7),16);
-
+  var c=document.createElement('canvas');c.width=W;c.height=H;
+  var ctx=c.getContext('2d');ctx.drawImage(img,0,0,W,H);
+  var id=ctx.getImageData(0,0,W,H);var px=id.data;
+  var tr=parseInt(hex.slice(1,3),16),tg=parseInt(hex.slice(3,5),16),tb=parseInt(hex.slice(5,7),16);
   for(var i=0;i<px.length;i+=4){
-    if(px[i+3]===0)continue; // fully transparent: skip
+    if(px[i+3]===0)continue;
     var R=px[i],G=px[i+1],B=px[i+2];
-    // Green must dominate both channels by a ratio — ignores teal, yellow, skin
-    if(G>80 && G>R*1.4 && G>B*1.4){
-      // Strength: how purely green is this pixel (1.0=pure, lower=edge blend)
-      var maxOther=Math.max(R,B);
-      var strength=Math.min(1,(G-maxOther)/60);
-      px[i]  =(R+(tr-R)*strength+0.5)|0;
+    if(G>80&&G>R*1.4&&G>B*1.4){
+      var maxOther=Math.max(R,B);var strength=Math.min(1,(G-maxOther)/60);
+      px[i]=(R+(tr-R)*strength+0.5)|0;
       px[i+1]=(G+(tg-G)*strength+0.5)|0;
       px[i+2]=(B+(tb-B)*strength+0.5)|0;
-      // Alpha preserved: semi-transparent edges stay semi-transparent
-      // but now in the target color, so they blend to transparent not to green
     }
   }
-  ctx.putImageData(id,0,0);
-  NC[key]=c;
-  return c;
+  ctx.putImageData(id,0,0);NC[key]=c;return c;
 }
 
-// ── Draw one layer to a context ───────────────────────────────────────────────
 function drawLayer(ctx,img,col,lk,sz){
   if(!img)return;
-  if(col&&!NO_COL[lk]){
-    var colored=replaceGreen(img,col);
-    if(colored)ctx.drawImage(colored,0,0,sz,sz);
-  }else{
-    ctx.drawImage(img,0,0,sz,sz);
-  }
+  if(col&&!NO_COL[lk]){var colored=replaceGreen(img,col);if(colored)ctx.drawImage(colored,0,0,sz,sz);}
+  else ctx.drawImage(img,0,0,sz,sz);
 }
 
 // ── Preview ───────────────────────────────────────────────────────────────────
 var _pvPending=false;
-function queuePreview(){
-  if(_pvPending)return;
-  _pvPending=true;
-  requestAnimationFrame(function(){_pvPending=false;drawPreview();});
-}
+function queuePreview(){if(_pvPending)return;_pvPending=true;requestAnimationFrame(function(){_pvPending=false;drawPreview();});}
 
 async function drawPreview(){
   var cv=document.getElementById('pv');if(!cv)return;
-  var ctx=cv.getContext('2d');
-  var N=280;
-  ctx.clearRect(0,0,N,N);
-  ctx.fillStyle=S.colors.bg||'#1b2d5b';
-  ctx.fillRect(0,0,N,N);
+  var ctx=cv.getContext('2d');var N=280;
+  ctx.clearRect(0,0,N,N);ctx.fillStyle=S.colors.bg||'#1b2d5b';ctx.fillRect(0,0,N,N);
   for(var i=0;i<LAYERS.length;i++){
     var lk=LAYERS[i],part=S.parts[lk];if(!part)continue;
     var cat=CATS.find(function(c){return c.lk===lk;});
@@ -282,12 +263,9 @@ async function drawPreview(){
 async function drawThumb(cvId,lk,item,col){
   var cv=document.getElementById(cvId);if(!cv)return;
   var key=lk+'|'+item+'|'+(col||'_');
-  if(cv.dataset.k===key)return;
-  cv.dataset.k=key;
-  var SZ=100;
-  cv.width=SZ;cv.height=SZ;
-  var ctx=cv.getContext('2d');
-  ctx.clearRect(0,0,SZ,SZ);
+  if(cv.dataset.k===key)return;cv.dataset.k=key;
+  var SZ=100;cv.width=SZ;cv.height=SZ;
+  var ctx=cv.getContext('2d');ctx.clearRect(0,0,SZ,SZ);
   var img=await loadImg(BASE+lk+'/'+item);
   if(!img){cv.dataset.k='';return;}
   drawLayer(ctx,img,col,lk,SZ);
@@ -299,9 +277,9 @@ async function drawThumb(cvId,lk,item,col){
 function buildTabs(){
   var el=document.getElementById('cat-row');
   el.innerHTML=CATS.map(function(c){
-    return '<div class="cat-tab" id="ctab-'+c.id+'">' +
-      '<div class="cat-icon"><svg viewBox="0 0 24 24">'+c.svg+'</svg></div>' +
-      '<span class="cat-lbl">'+c.lbl+'</span></div>';
+    return '<div class="cat-tab" id="ctab-'+c.id+'">'
+      +'<div class="cat-icon"><svg viewBox="0 0 24 24">'+c.svg+'</svg></div>'
+      +'<span class="cat-lbl">'+c.lbl+'</span></div>';
   }).join('');
   el.addEventListener('click',function(e){
     var tab=e.target.closest('.cat-tab');
@@ -320,18 +298,18 @@ function switchCat(id){
     crow.classList.add('show');
     document.getElementById('color-title').textContent=cat.lbl+' Color';
     buildDots(cat.ck,id==='bg'?BG_COLORS:COLORS);
-  }else{crow.classList.remove('show');}
+  }else crow.classList.remove('show');
   buildGrid(id);
 }
 
-// ── Dots ──────────────────────────────────────────────────────────────────────
+// ── Color dots ────────────────────────────────────────────────────────────────
 function buildDots(ck,palette){
   var curCol=(S.colors[ck]||'').toLowerCase();
   var el=document.getElementById('dots');
   el.innerHTML=palette.map(function(c){
     var lc=c.toLowerCase();
-    var isLight=(lc==='#ffffff'||lc==='#ffd700'||lc==='#f5deb3'||lc==='#ffeb3b'||lc==='#fdbcb4'||lc==='#f4c2a1'||lc==='#e8b982'||lc==='#ffeee6'||lc==='#f5d5c4'||lc==='#ebcca2');
-    var style='background:'+c+';'+(isLight?'outline:1.5px solid rgba(0,0,0,.2);outline-offset:-2px;':'');
+    var isLight=lc==='#ffffff'||lc==='#ffd700'||lc==='#f5deb3'||lc==='#ffeb3b'||lc==='#fdbcb4'||lc==='#f4c2a1'||lc==='#e8b982'||lc==='#ffeee6'||lc==='#f5d5c4'||lc==='#ebcca2';
+    var style='background:'+c+';'+(isLight?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,.12);':'');
     return '<div class="dot'+(lc===curCol?' on':'')+'" data-ck="'+ck+'" data-col="'+c+'" style="'+style+'"></div>';
   }).join('');
   el.onclick=function(e){var dot=e.target.closest('.dot');if(dot)pickColor(dot.dataset.ck,dot.dataset.col);};
@@ -360,27 +338,20 @@ function redrawThumbs(lk,col){
 // ── Grid ──────────────────────────────────────────────────────────────────────
 function safeId(s){return s.replace(/[^a-zA-Z0-9]/g,'_');}
 
-// Color-only grid (for BG and any category with no item shapes)
 function buildColorGrid(grid,ck,palette){
   var curCol=(S.colors[ck]||'').toLowerCase();
-  // Build a styled grid of color swatches directly in the items area
-  var html='<div style="display:flex;flex-wrap:wrap;gap:8px;padding:4px 0;">';
+  var html='<div style="display:flex;flex-wrap:wrap;gap:8px;padding:4px 0">';
   palette.forEach(function(c){
-    var lc=c.toLowerCase();
-    var isLight=(lc==='#ffffff'||lc==='#ffd700'||lc==='#f5deb3'||lc==='#ffeb3b'||lc==='#fdbcb4'||lc==='#f4c2a1'||lc==='#e8b982'||lc==='#ffeee6');
-    var outline=isLight?'outline:1.5px solid rgba(0,0,0,.2);outline-offset:-2px;':'';
-    var selected=lc===curCol;
-    var border=selected?'border:3px solid #fff;':'border:3px solid transparent;';
-    var scale=selected?'transform:scale(1.18);':'';
-    html+='<div data-cgck="'+ck+'" data-cgcol="'+c+'" style="width:36px;height:36px;border-radius:50%;cursor:pointer;background:'+c+';'+border+outline+scale+'transition:transform .1s,border-color .1s;flex-shrink:0;"></div>';
+    var lc=c.toLowerCase(),sel=lc===curCol;
+    var isLight=lc==='#ffffff'||lc==='#ffd700'||lc==='#f5deb3'||lc==='#ffeb3b'||lc==='#fdbcb4';
+    var bdr=sel?'border:3px solid var(--blue);':'border:3px solid transparent;';
+    var shd=isLight?'box-shadow:inset 0 0 0 1px rgba(0,0,0,.1);':'';
+    html+='<div data-cgck="'+ck+'" data-cgcol="'+c+'" style="width:36px;height:36px;border-radius:50%;cursor:pointer;background:'+c+';'+bdr+shd+(sel?'transform:scale(1.15);':'')+'transition:all .1s;flex-shrink:0"></div>';
   });
-  html+='</div>';
-  grid.innerHTML=html;
+  html+='</div>';grid.innerHTML=html;
   grid.onclick=function(e){
-    var dot=e.target.closest('[data-cgck]');
-    if(!dot)return;
+    var dot=e.target.closest('[data-cgck]');if(!dot)return;
     pickColor(dot.dataset.cgck,dot.dataset.cgcol);
-    // Refresh this grid
     buildColorGrid(grid,dot.dataset.cgck,dot.dataset.cgck==='bg'?BG_COLORS:COLORS);
   };
 }
@@ -388,33 +359,29 @@ function buildColorGrid(grid,ck,palette){
 function buildGrid(catId){
   var cat=CATS.find(function(c){return c.id===catId;});if(!cat)return;
   var grid=document.getElementById('grid');
-  if(catId==='bg'){
-    // BG is color-only — show color swatches inline in the grid area, no blank space
-    buildColorGrid(grid,'bg',BG_COLORS);
-    return;
-  }
+  if(catId==='bg'){buildColorGrid(grid,'bg',BG_COLORS);return;}
   var lk=cat.lk;
   var items=(manifest[lk]||[]).filter(function(f){return f.indexOf('overlay')===-1;});
   var sel=S.parts[lk]||'';
   var col=(cat.ck&&!NO_COL[lk])?S.colors[cat.ck]:null;
   var html='';
   if(OPTIONAL[catId]){
-    html+='<div class="icard'+(sel===''?' on':'')+'" data-lk="'+lk+'" data-item="">'+
-      '<div class="none-lbl"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>None</div>'+
-      '<div class="icheck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>';
+    html+='<div class="icard'+(sel===''?' on':'')+'" data-lk="'+lk+'" data-item="">'
+      +'<div class="none-lbl"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>None</div>'
+      +'<div class="icheck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>';
   }
   items.forEach(function(item){
     var cid='ic-'+lk+'-'+safeId(item);
-    html+='<div class="icard'+(sel===item?' on':'')+'" data-lk="'+lk+'" data-item="'+encodeURIComponent(item)+'">'+
-      '<canvas id="'+cid+'" width="100" height="100"></canvas>'+
-      '<div class="icheck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>';
+    html+='<div class="icard'+(sel===item?' on':'')+'" data-lk="'+lk+'" data-item="'+encodeURIComponent(item)+'">'
+      +'<canvas id="'+cid+'" width="100" height="100"></canvas>'
+      +'<div class="icheck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>';
   });
   grid.innerHTML=html;
   grid.onclick=function(e){
     var card=e.target.closest('.icard');
     if(card)selPart(card.dataset.lk,decodeURIComponent(card.dataset.item));
   };
-  // Fire ALL thumbnails in parallel — images load simultaneously, not one-by-one
+  // Fire ALL thumbnails in parallel
   items.forEach(function(item){drawThumb('ic-'+lk+'-'+safeId(item),lk,item,col);});
 }
 
@@ -428,11 +395,9 @@ function selPart(lk,item){
 
 // ── Bake ──────────────────────────────────────────────────────────────────────
 async function bake(size){
-  var cv=document.createElement('canvas');
-  cv.width=size;cv.height=size;
+  var cv=document.createElement('canvas');cv.width=size;cv.height=size;
   var ctx=cv.getContext('2d');
-  ctx.fillStyle=S.colors.bg||'#1b2d5b';
-  ctx.fillRect(0,0,size,size);
+  ctx.fillStyle=S.colors.bg||'#1b2d5b';ctx.fillRect(0,0,size,size);
   for(var i=0;i<LAYERS.length;i++){
     var lk=LAYERS[i],part=S.parts[lk];if(!part)continue;
     var cat=CATS.find(function(c){return c.lk===lk;});
@@ -451,8 +416,7 @@ document.getElementById('save-btn').onclick=async function(){
   if(!_user){toast('Please sign in first',true);return;}
   var saveBtn=document.getElementById('save-btn');
   var savingEl=document.getElementById('saving');
-  saveBtn.disabled=true;
-  savingEl.classList.add('show');
+  saveBtn.disabled=true;savingEl.classList.add('show');
   try{
     var bakedImg=await bake(400);
     await _db.collection('users').doc(_user.uid).set({
@@ -460,15 +424,12 @@ document.getElementById('save-btn').onclick=async function(){
       avatarIMG:bakedImg,
       lastSeen:firebase.firestore.FieldValue.serverTimestamp()
     },{merge:true});
-    savingEl.classList.remove('show');
-    saveBtn.disabled=false; // re-enable BEFORE close so saving twice in a row works
+    savingEl.classList.remove('show');saveBtn.disabled=false;
     toast('Saved! ✓');
     try{window.parent.postMessage({type:'avatarSaved',avatarIMG:bakedImg},'*');}catch(e){}
     setTimeout(doClose,600);
   }catch(e){
-    console.error('save:',e);
-    savingEl.classList.remove('show');
-    saveBtn.disabled=false;
+    console.error('save:',e);savingEl.classList.remove('show');saveBtn.disabled=false;
     toast('Save failed: '+e.message,true);
   }
 };
@@ -479,21 +440,36 @@ document.getElementById('close-btn').onclick=doClose;
 var _tt=null;
 function toast(msg,err){
   var t=document.getElementById('toast');
-  t.textContent=msg;t.className='toast'+(err?' err':'')+' show';
+  t.textContent=msg;t.className='toast'+(err?' err':' ok')+' show';
   clearTimeout(_tt);_tt=setTimeout(function(){t.classList.remove('show');},2200);
+}
+
+// ── Preload critical images ───────────────────────────────────────────────────
+function preloadDefaults(){
+  var loads=[];
+  LAYERS.forEach(function(lk){
+    var part=S.parts[lk];if(!part)return;
+    loads.push(loadImg(BASE+lk+'/'+part));
+    loads.push(loadImg(BASE+lk+'/'+part.replace('.png','overlay.png')));
+  });
+  return Promise.all(loads);
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 (async function init(){
-  try{var r=await fetch('/Avatars/manifest.json');manifest=await r.json();}
-  catch(e){toast('Could not load avatar assets',true);return;}
-
-  await new Promise(function(res){
+  // Start loading manifest + auth + default images in parallel
+  var manifestP=fetch('/Avatars/manifest.json').then(function(r){return r.json();}).catch(function(){toast('Could not load assets',true);return{};});
+  var authP=new Promise(function(res){
     if(_auth.currentUser){_user=_auth.currentUser;return res();}
     var unsub=_auth.onAuthStateChanged(function(u){_user=u;unsub();res();});
     setTimeout(res,3000);
   });
 
+  // Wait for both
+  var results=await Promise.all([manifestP,authP]);
+  manifest=results[0]||{};
+
+  // Load user config if signed in
   if(_user){
     try{
       var snap=await _db.collection('users').doc(_user.uid).get();
@@ -506,6 +482,9 @@ function toast(msg,err){
       }
     }catch(e){console.warn('loadConfig:',e);}
   }
+
+  // Preload default images while building UI
+  preloadDefaults();
 
   buildTabs();
   switchCat('skin');
