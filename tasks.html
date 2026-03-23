@@ -173,6 +173,20 @@
     body.enter .bi>.tk:nth-child(2){animation:slideUp .3s ease .08s both}
     body.enter .bi>.tk:nth-child(3){animation:slideUp .3s ease .12s both}
     body.enter .bi>.done-banner{animation:zoomIn .35s cubic-bezier(.22,1,.36,1) both}
+    /* Dark mode */
+    body.dark .hero{background:#1e3a5f}
+    body.dark .hero::after{background:#0f172a}
+    body.dark .body{background:#0f172a}
+    body.dark .badge{background:linear-gradient(135deg,#b45309,#d97706);border-color:#92400e;box-shadow:0 5px 0 #78350f}
+    body.dark .prog{background:#1e293b;border-color:#334155;box-shadow:0 5px 0 #0a0f1a}
+    body.dark .prog-ring .rbg{stroke:#334155}
+    body.dark .prog-ring span{color:#e2e8f0}
+    body.dark .prog-lbl{color:#64748b}
+    body.dark .prog-sub{color:#22c55e}
+    body.dark .tk{background:#1e293b;border-color:#334155;box-shadow:0 4px 0 #0a0f1a}
+    body.dark .tk-name{color:#e2e8f0}
+    body.dark .tk-bar{background:#334155;border-color:#475569}
+    body.dark .sec{color:#64748b}
   </style>
 </head>
 <body>
@@ -215,7 +229,8 @@
 <div class="confetti" id="confetti"></div>
 
 <script type="module">
-import Haptics from './haptics.js';
+import _Hap from './haptics.js';
+var Haptics=new Proxy(_Hap||{},{get:function(t,p){if(typeof t[p]==='function')return function(){if(localStorage.getItem('cb_haptics')==='off')return;return t[p].apply(t,arguments)};return t[p]}});
 if(window.parent!==window)parent.authCheck();
 
 var db=null,auth=null,_uid=null;
@@ -350,7 +365,22 @@ async function load(){
 window.addEventListener('message',function(e){
   if(e.data&&e.data.type==='tasksUpdated')load();
   if(e.data&&e.data.type==='pageEnter')playEntrance();
+  if(e.data&&e.data.type==='applyDarkMode')applyDarkMode(e.data.on);
 });
+
+function applyDarkMode(on){
+  document.body.classList.toggle('dark',on);
+  if(on){
+    document.documentElement.style.setProperty('--bg','#0f172a');
+    document.documentElement.style.setProperty('--card','#fff');
+    document.documentElement.style.setProperty('--card-border','#e8e2d6');
+    document.documentElement.style.setProperty('--blue','#1e3a5f');
+    document.documentElement.style.setProperty('--blue-dark','#0f2744');
+  }else{
+    ['--bg','--card','--card-border','--blue','--blue-dark'].forEach(function(v){document.documentElement.style.removeProperty(v);});
+  }
+}
+if(localStorage.getItem('cb_dark')==='on')applyDarkMode(true);
 
 function playEntrance(){
   document.body.classList.remove('enter');
