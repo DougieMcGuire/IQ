@@ -165,8 +165,8 @@ function getTasksRef(uid){return db.collection('users').doc(uid).collection('dai
 
 var _claimedIds=new Set(),_inFlight={};
 var _cacheKey='bd_claimed_'+_todayKey;
-function _loadClaimed(){try{var s=sessionStorage.getItem(_cacheKey);if(s)JSON.parse(s).forEach(function(id){_claimedIds.add(id)})}catch(e){}}
-function _setClaimed(id){_claimedIds.add(id);try{sessionStorage.setItem(_cacheKey,JSON.stringify(Array.from(_claimedIds)))}catch(e){}}
+function _loadClaimed(){try{var s=localStorage.getItem(_cacheKey);if(s)JSON.parse(s).forEach(function(id){_claimedIds.add(id)});/* clean old days */try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.startsWith('bd_claimed_')&&k!==_cacheKey)localStorage.removeItem(k);}}catch(e){}}catch(e){}}
+function _setClaimed(id){_claimedIds.add(id);try{localStorage.setItem(_cacheKey,JSON.stringify(Array.from(_claimedIds)))}catch(e){}}
 _loadClaimed();
 
 var TASK_POOL=[
@@ -281,7 +281,20 @@ async function setupListener(){
   if(!db||!_uid)return;
   try{getTasksRef(_uid).onSnapshot(function(snap){
     if(!snap.exists)return;var state=snap.data();
-    state.tasks.forEach(function(t){if(_claimedIds.has(t.id))t.claimed=true});
+    // Check if improve.html overwrote any claimed flags
+    var needsRepair=false;
+    state.tasks.forEach(function(t){
+      if(_claimedIds.has(t.id)){
+        if(!t.claimed)needsRepair=true;
+        t.claimed=true;
+      }
+    });
+    // If improve.html reset claimed flags, write them back
+    if(needsRepair&&_uid){
+      var fixStr=JSON.stringify(state);
+      var fixData=window.parent.JSON.parse(fixStr);
+      getTasksRef(_uid).set(fixData).catch(function(){});
+    }
     var nj=JSON.stringify(state.tasks.map(function(t){return{i:t.id,p:t.progress,d:t.done,c:t.claimed}}));
     var oj=_lastState?JSON.stringify(_lastState.tasks.map(function(t){return{i:t.id,p:t.progress,d:t.done,c:t.claimed}})):'';
     if(nj!==oj){_lastState=state;render(state);}
