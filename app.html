@@ -268,9 +268,11 @@ firebase.auth().onAuthStateChanged(function(u){
   if(u)ensureUser(u);
   _authWaiters.forEach(function(fn){fn();});_authWaiters=[];
   if(u){
-    firebase.firestore().collection('dailyTasks').doc(u.uid).get()
-      .then(function(s){if(s.exists&&s.data()&&!s.data().allClaimed){var tb=document.getElementById('tasks-badge');if(tb)tb.classList.add('show');}})
-      .catch(function(){});
+    (function(){var d=new Date(),dk=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+      firebase.firestore().collection('users').doc(u.uid).collection('dailyTasks').doc(dk).get()
+        .then(function(s){if(s.exists&&s.data()){var td=s.data();if(!td.allClaimed&&td.tasks&&td.tasks.some(function(t){return t.done&&!t.claimed})){var tb=document.getElementById('tasks-badge');if(tb)tb.classList.add('show');}}})
+        .catch(function(){});
+    })();
   }
 });
 function authReady(){
