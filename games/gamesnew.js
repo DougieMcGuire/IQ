@@ -428,32 +428,31 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
 
   Q.register('flappy', function(){
     var speeds = [
-      { label: 'Chill',  pipeSpeed: 1.8, gap: 120, d: 0.8 },
-      { label: 'Normal', pipeSpeed: 2.0, gap: 115, d: 1.1 },
-      { label: 'Hard',   pipeSpeed: 2.2, gap: 110, d: 1.5 },
+      { label: 'Chill',  speed: 1.0, gap: 130, interval: 170, d: 0.8 },
+      { label: 'Normal', speed: 1.3, gap: 120, interval: 150, d: 1.1 },
+      { label: 'Hard',   speed: 1.6, gap: 110, interval: 135, d: 1.5 },
     ];
     var tier = Q.rand(0, 2), s = speeds[tier];
     return {
       type: 'flappy', category: 'mentalAgility', categoryLabel: 'Flappy Bird',
-      difficulty: s.d, question: 'Score ' + TARGET + ' to win! (' + s.label + ')',
+      difficulty: s.d, question: 'Get past ' + TARGET + ' pipes! (' + s.label + ')',
       answer: 'complete', options: [], explanation: 'Timing and rhythm.',
-      visual: 'custom', pipeSpeed: s.pipeSpeed, gap: s.gap, tierLabel: s.label
+      visual: 'custom', ps: s.speed, gap: s.gap, pi: s.interval
     };
   }, 3);
 
   Q.registerRenderer('flappy', {
     render: function(q, idx){
-      return '<div class="qcard" style="gap:8px;padding:10px 10px">'
+      return '<div class="qcard" style="gap:6px;padding:10px">'
         + '<div class="category">FLAPPY BIRD</div>'
         + '<div class="question" style="font-size:13px">' + q.question + '</div>'
-        + '<div id="fb-wrap-' + idx + '" style="position:relative;display:flex;justify-content:center">'
-        +   '<canvas id="fb-c-' + idx + '" style="border-radius:14px;cursor:pointer;touch-action:manipulation;width:100%;max-width:280px;background:rgba(255,255,255,.12);border:2.5px solid rgba(255,255,255,.25)"></canvas>'
-        +   '<div id="fb-ov-' + idx + '" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer">'
-        +     '<div style="font-size:14px;font-weight:900;color:#fff;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.35);border-radius:20px;padding:4px 14px;letter-spacing:1px">SCORE ' + TARGET + ' TO WIN</div>'
-        +     '<div style="background:#fff;color:#0474fc;border:none;border-radius:12px;padding:10px 28px;font-family:Nunito,sans-serif;font-size:15px;font-weight:900;box-shadow:0 4px 0 #d6cfc0">Tap to Play!</div>'
+        + '<div style="position:relative;display:flex;justify-content:center">'
+        +   '<canvas id="fbc-' + idx + '" style="border-radius:14px;touch-action:manipulation;width:100%;max-width:280px"></canvas>'
+        +   '<div id="fbo-' + idx + '" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;border-radius:14px">'
+        +     '<div style="background:#fff;color:var(--blue,#0474fc);border:none;border-radius:14px;padding:11px 30px;font-family:Nunito,sans-serif;font-size:15px;font-weight:900;box-shadow:0 4px 0 #d6cfc0;cursor:pointer">Tap to Play!</div>'
         +   '</div>'
         + '</div>'
-        + '<div id="fb-st-' + idx + '" style="font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.6);min-height:18px"></div>'
+        + '<div id="fbs-' + idx + '" style="font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.6);min-height:18px"></div>'
         + '<div id="wa-' + idx + '"></div>'
         + '<div class="explanation" id="exp-' + idx + '"></div>'
         + _fullGameBtn('Play Endless Flappy', 'flappy')
@@ -462,225 +461,216 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
     },
 
     attach: function(slideEl, q, idx, ctx){
-      var Hap = ctx.Haptics || {};
+      var Hp = ctx.Haptics || {};
       var actEl = slideEl.querySelector('#wa-' + idx);
       if (actEl && ctx.addShareBtn) ctx.addShareBtn(actEl, q);
 
-      var canvas  = slideEl.querySelector('#fb-c-' + idx);
-      var overlay = slideEl.querySelector('#fb-ov-' + idx);
-      var statEl  = slideEl.querySelector('#fb-st-' + idx);
-      if (!canvas) return;
+      var cv = slideEl.querySelector('#fbc-' + idx);
+      var ov = slideEl.querySelector('#fbo-' + idx);
+      var st = slideEl.querySelector('#fbs-' + idx);
+      if (!cv) return;
 
-      var W = 280, HP = 360;
-      canvas.width = W * 2; canvas.height = HP * 2;
-      canvas.style.maxWidth = W + 'px';
-      canvas.style.aspectRatio = W + '/' + HP;
-      var c = canvas.getContext('2d');
-      c.scale(2, 2);
+      var W = 280, H = 340;
+      cv.width = W * 2; cv.height = H * 2;
+      cv.style.maxWidth = W + 'px';
+      cv.style.aspectRatio = W + '/' + H;
+      cv.style.cursor = 'pointer';
+      var g = cv.getContext('2d');
+      g.scale(2, 2);
 
-      // ── Physics ──
-      var GRAV = 0.35, FLAP = -5.0, MAXV = 7;
-      var PW = 40, PS = q.pipeSpeed, GAP = q.gap;
-      var PI_INT = Math.round(140 / PS);
-      var BX = 55, BR = 12, GH = 36;
+      var GRAV = 0.18, FLP = -3.4, MXV = 4;
+      var PW = 42, PS = q.ps, GAP = q.gap, PII = q.pi;
+      var BX = 60, BR = 13;
 
-      // ── Colors — match qcard blue ──
-      var BG = '#0468e0';       // slightly darker than card for depth
-      var PIPE_C = '#fff';      // white pipes
-      var PIPE_S = 'rgba(255,255,255,.3)'; // pipe shadow
-      var GROUND_C = 'rgba(0,0,0,.15)';
-      var BIRD_C = '#fff';      // white bird circle
-      var SCORE_C = '#fff';
+      var by, bv, ba, pp, sc, fc, dead, won, raf, on;
 
-      var by, bv, ba, pipes, score, fc, dead, won, raf, going;
-
-      function reset(){ by = HP * 0.38; bv = 0; ba = 0; pipes = []; score = 0; fc = 0; dead = false; won = false; going = false; }
+      function reset(){ by = H * 0.4; bv = 0; ba = 0; pp = []; sc = 0; fc = 0; dead = false; won = false; on = false; }
       reset();
 
-      function doFlap(){ if (dead || won) return; bv = FLAP; Hap.light && Hap.light(); }
+      function flap(){ if (!dead && !won){ bv = FLP; Hp.light && Hp.light(); } }
 
-      function addPipe(){
-        var minT = 55, maxT = HP - GH - GAP - 55;
-        pipes.push({ x: W, t: minT + Math.random() * (maxT - minT), s: false });
+      function addP(){
+        var mn = 50, mx = H - GAP - 50;
+        pp.push({ x: W, t: mn + Math.random() * (mx - mn), s: false });
       }
 
-      // Simple bird — white circle with eye and tiny wing
-      function drawBird(x, y, ang){
-        c.save(); c.translate(x, y); c.rotate(ang);
-        // Body
-        c.fillStyle = BIRD_C;
-        c.beginPath(); c.arc(0, 0, BR, 0, Math.PI * 2); c.fill();
-        // Wing
-        var wy = Math.sin(fc * 0.3) * 2;
-        c.fillStyle = 'rgba(255,255,255,.6)';
-        c.beginPath(); c.ellipse(-3, wy + 1, BR * 0.5, BR * 0.3, -0.2, 0, Math.PI * 2); c.fill();
+      // ── Drawing ──
+
+      function drawBird(x, y, a){
+        g.save(); g.translate(x, y); g.rotate(a);
+
+        // Shadow
+        g.fillStyle = 'rgba(0,0,0,.1)';
+        g.beginPath(); g.arc(1, 2, BR, 0, Math.PI * 2); g.fill();
+
+        // Body — white circle
+        g.fillStyle = '#fff';
+        g.beginPath(); g.arc(0, 0, BR, 0, Math.PI * 2); g.fill();
+
+        // Wing flap
+        var wy = Math.sin(fc * 0.25) * 2.5;
+        g.fillStyle = 'rgba(4,116,252,.2)';
+        g.beginPath(); g.ellipse(-4, wy, 8, 5, -0.15, 0, Math.PI * 2); g.fill();
+
         // Eye
-        c.fillStyle = '#0474fc';
-        c.beginPath(); c.arc(4, -3, 3.5, 0, Math.PI * 2); c.fill();
-        c.fillStyle = '#fff';
-        c.beginPath(); c.arc(5, -4, 1.3, 0, Math.PI * 2); c.fill();
+        g.fillStyle = '#1e293b';
+        g.beginPath(); g.arc(4, -3, 3, 0, Math.PI * 2); g.fill();
+        g.fillStyle = '#fff';
+        g.beginPath(); g.arc(5, -4, 1.2, 0, Math.PI * 2); g.fill();
+
         // Beak
-        c.fillStyle = '#f59e0b';
-        c.beginPath(); c.moveTo(BR - 3, -1); c.lineTo(BR + 6, 1.5); c.lineTo(BR - 3, 4); c.closePath(); c.fill();
-        c.restore();
+        g.fillStyle = '#f59e0b';
+        g.beginPath();
+        g.moveTo(BR - 4, -2);
+        g.lineTo(BR + 5, 1);
+        g.lineTo(BR - 4, 4);
+        g.closePath();
+        g.fill();
+
+        g.restore();
       }
 
-      function drawPipe(x, topH){
-        var botY = topH + GAP, capH = 7, capOv = 3;
-        c.fillStyle = BIRD_C;
-        // Top pipe
-        c.beginPath(); c.roundRect(x, -2, PW, topH - capH + 2, 4); c.fill();
-        c.beginPath(); c.roundRect(x - capOv, topH - capH, PW + capOv * 2, capH, [0, 0, 5, 5]); c.fill();
-        // Bottom pipe
-        c.beginPath(); c.roundRect(x, botY + capH, PW, HP - botY - capH + 2, 4); c.fill();
-        c.beginPath(); c.roundRect(x - capOv, botY, PW + capOv * 2, capH, [5, 5, 0, 0]); c.fill();
-        // Subtle shadow stripe
-        c.fillStyle = 'rgba(0,0,0,.08)';
-        c.fillRect(x + PW - 6, 0, 6, topH - capH);
-        c.fillRect(x + PW - 6, botY + capH, 6, HP);
+      function drawPipe(x, top){
+        var bot = top + GAP, cap = 8, ov = 4, r = 6;
+
+        // White pipe with shadow — matches the white button/card style
+        // Shadow first
+        g.fillStyle = 'rgba(0,0,0,.08)';
+        g.beginPath(); g.roundRect(x + 2, -4, PW, top - cap + 6, r); g.fill();
+        g.beginPath(); g.roundRect(x + 2, bot + cap - 2, PW, H - bot - cap + 6, r); g.fill();
+
+        // Top pipe body
+        g.fillStyle = '#fff';
+        g.beginPath(); g.roundRect(x, -4, PW, top - cap + 4, r); g.fill();
+        // Top cap — wider
+        g.beginPath(); g.roundRect(x - ov, top - cap, PW + ov * 2, cap, [0, 0, r, r]); g.fill();
+
+        // Bottom pipe body
+        g.beginPath(); g.roundRect(x, bot + cap, PW, H - bot - cap + 4, r); g.fill();
+        // Bottom cap
+        g.beginPath(); g.roundRect(x - ov, bot, PW + ov * 2, cap, [r, r, 0, 0]); g.fill();
+
+        // Subtle inner line for depth
+        g.fillStyle = 'rgba(4,116,252,.06)';
+        g.fillRect(x + 3, 0, 2, top - cap);
+        g.fillRect(x + 3, bot + cap, 2, H);
       }
 
       function draw(){
-        // Background — solid blue matching card
-        c.fillStyle = BG;
-        c.fillRect(0, 0, W, HP);
+        // Clear — same blue as the qcard
+        g.fillStyle = '#0474fc';
+        g.fillRect(0, 0, W, H);
 
-        // Faint dots pattern
-        c.fillStyle = 'rgba(255,255,255,.04)';
-        for (var dx = 0; dx < W; dx += 16)
-          for (var dy = 0; dy < HP - GH; dy += 16)
-            c.fillRect(dx + ((dy / 16) % 2) * 8, dy, 2, 2);
+        // Subtle inner shadow at edges
+        g.fillStyle = 'rgba(0,0,0,.06)';
+        g.fillRect(0, 0, W, 3);
+        g.fillRect(0, H - 3, W, 3);
 
         // Pipes
-        pipes.forEach(function(p){ drawPipe(p.x, p.t); });
+        for (var i = 0; i < pp.length; i++) drawPipe(pp[i].x, pp[i].t);
 
-        // Ground
-        c.fillStyle = GROUND_C;
-        c.fillRect(0, HP - GH, W, GH);
-        c.fillStyle = 'rgba(255,255,255,.08)';
-        c.fillRect(0, HP - GH, W, 3);
+        // Floor line
+        g.fillStyle = 'rgba(255,255,255,.12)';
+        g.fillRect(0, H - 2, W, 2);
 
         // Bird
-        var ta = Math.min(Math.max(bv * 0.07, -0.45), 1.1);
-        ba += (ta - ba) * 0.15;
+        var ta = Math.min(Math.max(bv * 0.09, -0.4), 0.9);
+        ba += (ta - ba) * 0.12;
         drawBird(BX, by, ba);
 
-        // Score
-        c.font = '900 20px Nunito, sans-serif';
-        c.textAlign = 'center';
-        c.fillStyle = 'rgba(0,0,0,.2)';
-        c.fillText(score + '/' + TARGET, W / 2 + 1, 28 + 1);
-        c.fillStyle = SCORE_C;
-        c.fillText(score + '/' + TARGET, W / 2, 28);
+        // Score — top center
+        g.textAlign = 'center';
+        g.font = '900 18px Nunito, sans-serif';
+        g.fillStyle = 'rgba(255,255,255,.3)';
+        g.fillText(sc + ' / ' + TARGET, W / 2, 24);
       }
 
-      // Draw preview
-      function drawPreview(){
-        fc = 0; by = HP * 0.38; bv = 0; ba = 0;
-        pipes = [{ x: 130, t: 90, s: false }, { x: 230, t: 140, s: false }];
-        score = 0;
-        draw();
-        pipes = [];
-      }
-      drawPreview();
+      // Static preview
+      pp = [{ x: 120, t: 80, s: false }, { x: 220, t: 150, s: false }];
+      draw();
+      pp = [];
 
-      function checkHit(){
-        var bT = by - BR * 0.65, bB = by + BR * 0.65;
-        var bL = BX - BR, bR = BX + BR;
-        if (bB >= HP - GH || bT <= 2) return true;
-        for (var i = 0; i < pipes.length; i++){
-          var p = pipes[i];
-          if (bR < p.x || bL > p.x + PW) continue;
+      function hit(){
+        var bT = by - BR * 0.6, bB = by + BR * 0.6;
+        if (bB >= H - 4 || bT <= 2) return true;
+        for (var i = 0; i < pp.length; i++){
+          var p = pp[i];
+          if (BX + BR < p.x || BX - BR > p.x + PW) continue;
           if (bT < p.t || bB > p.t + GAP) return true;
         }
         return false;
       }
 
-      function update(){
-        if (!going || dead || won) return;
+      function tick(){
+        if (!on || dead || won) return;
         fc++;
-        bv = Math.min(bv + GRAV, MAXV);
+        bv = Math.min(bv + GRAV, MXV);
         by += bv;
-        // Ceiling clamp
         if (by < BR + 2){ by = BR + 2; bv = 0; }
 
-        if (fc % PI_INT === 0) addPipe();
-        for (var i = pipes.length - 1; i >= 0; i--){
-          pipes[i].x -= PS;
-          if (!pipes[i].s && pipes[i].x + PW < BX){
-            pipes[i].s = true; score++;
-            Hap.medium && Hap.medium();
-            if (score >= TARGET){ won = true; finish(true); return; }
+        if (fc % PII === 0) addP();
+        for (var i = pp.length - 1; i >= 0; i--){
+          pp[i].x -= PS;
+          if (!pp[i].s && pp[i].x + PW < BX){
+            pp[i].s = true; sc++;
+            Hp.medium && Hp.medium();
+            if (sc >= TARGET){ won = true; end(true); return; }
           }
-          if (pipes[i].x < -PW - 10) pipes.splice(i, 1);
+          if (pp[i].x < -PW - 10) pp.splice(i, 1);
         }
-        if (checkHit()){ dead = true; Hap.error && Hap.error(); finish(false); }
+        if (hit()){ dead = true; Hp.error && Hp.error(); end(false); }
       }
 
-      function loop(){ update(); draw(); if (!dead && !won) raf = requestAnimationFrame(loop); else drawEnd(); }
+      function loop(){ tick(); draw(); if (!dead && !won) raf = requestAnimationFrame(loop); else drawOver(); }
 
-      function drawEnd(){
-        c.fillStyle = dead ? 'rgba(0,0,0,.35)' : 'rgba(255,255,255,.15)';
-        c.fillRect(0, 0, W, HP);
-        c.textAlign = 'center';
-        c.font = '900 24px Nunito, sans-serif';
-        c.fillStyle = '#fff';
-        c.fillText(won ? 'Nice! 🎉' : 'Game Over', W / 2, HP * 0.38);
-        c.font = '800 14px Nunito, sans-serif';
-        c.fillStyle = 'rgba(255,255,255,.7)';
-        c.fillText(score + ' / ' + TARGET, W / 2, HP * 0.38 + 24);
+      function drawOver(){
+        g.fillStyle = dead ? 'rgba(0,0,0,.3)' : 'rgba(255,255,255,.12)';
+        g.fillRect(0, 0, W, H);
+        g.textAlign = 'center';
+        g.font = '900 22px Nunito, sans-serif';
+        g.fillStyle = '#fff';
+        g.fillText(won ? 'Nice! 🎉' : 'Game Over', W / 2, H * 0.4);
+        g.font = '800 13px Nunito, sans-serif';
+        g.fillStyle = 'rgba(255,255,255,.6)';
+        g.fillText(sc + ' / ' + TARGET, W / 2, H * 0.4 + 22);
       }
 
-      function finish(w){
+      function end(w){
         var ms = Date.now() - ctx.answerStartRef.get();
-        var data = ctx.IQData.recordAnswer(q.category, w, q.difficulty, ms);
+        var d = ctx.IQData.recordAnswer(q.category, w, q.difficulty, ms);
         if (ctx.notifyGamePlayed) ctx.notifyGamePlayed('flappy');
         if (ctx.onAnswer) ctx.onAnswer(w, ms);
-        if (w){
-          Hap.streak && Hap.streak();
-          statEl.textContent = '🎉 Score ' + TARGET + '!';
-          statEl.style.color = 'var(--green)';
-          ctx.flashEl.className = 'flash green show';
-          ctx.spawnConfetti(22);
-        } else {
-          statEl.textContent = 'Scored ' + score + ' — try again!';
-          statEl.style.color = 'var(--red)';
-          ctx.flashEl.className = 'flash red show';
-        }
+        if (w){ Hp.streak && Hp.streak(); st.textContent = '🎉 Score ' + TARGET + '!'; st.style.color = 'var(--green)'; ctx.flashEl.className = 'flash green show'; ctx.spawnConfetti(20); }
+        else { st.textContent = 'Scored ' + sc + ' — try again!'; st.style.color = 'var(--red)'; ctx.flashEl.className = 'flash red show'; }
         setTimeout(function(){ ctx.flashEl.className = 'flash'; }, 350);
-        var expEl = slideEl.querySelector('#exp-' + idx);
-        var hintEl = document.getElementById('hint-' + idx);
-        if (expEl){ expEl.textContent = w ? 'Got ' + TARGET + ' pipes!' : 'Got ' + score + '. Tap to the rhythm!'; expEl.classList.add('show'); }
+        var expEl = slideEl.querySelector('#exp-' + idx), hintEl = document.getElementById('hint-' + idx);
+        if (expEl){ expEl.textContent = w ? 'Got past ' + TARGET + ' pipes!' : 'Got ' + sc + '. Tap steady!'; expEl.classList.add('show'); }
         setTimeout(function(){ if (hintEl) hintEl.classList.add('show'); }, 500);
-        ctx.updateUI(data); ctx.checkMore(); ctx.answerStartRef.set(Date.now());
+        ctx.updateUI(d); ctx.checkMore(); ctx.answerStartRef.set(Date.now());
       }
 
-      function onTap(e){ e.preventDefault(); e.stopPropagation(); if (!dead && !won) doFlap(); }
+      function tap(e){ e.preventDefault(); e.stopPropagation(); if (!dead && !won) flap(); }
 
-      function startGame(e){
-        if (e) { e.preventDefault(); e.stopPropagation(); }
-        Hap.medium && Hap.medium();
-        overlay.style.display = 'none';
-        reset(); going = true;
+      function go(e){
+        if (e){ e.preventDefault(); e.stopPropagation(); }
+        Hp.medium && Hp.medium();
+        ov.style.display = 'none';
+        reset(); on = true;
         ctx.answerStartRef.set(Date.now());
-        doFlap();
+        flap();
         loop();
-        canvas.addEventListener('click', onTap);
-        canvas.addEventListener('touchstart', onTap, { passive: false });
+        cv.addEventListener('click', tap);
+        cv.addEventListener('touchstart', tap, { passive: false });
       }
 
-      overlay.addEventListener('click', startGame);
-      overlay.addEventListener('touchstart', startGame, { passive: false });
+      ov.addEventListener('click', go);
+      ov.addEventListener('touchstart', go, { passive: false });
 
       document.addEventListener('keydown', function(e){
         if (dead || won) return;
         var vi = Math.round(ctx.feed.scrollTop / (ctx.feed.clientHeight || 1));
         if (ctx.feed.children[vi] !== slideEl) return;
-        if (e.code === 'Space' || e.code === 'ArrowUp'){
-          e.preventDefault();
-          if (!going) startGame();
-          else doFlap();
-        }
+        if (e.code === 'Space' || e.code === 'ArrowUp'){ e.preventDefault(); if (!on) go(); else flap(); }
       });
 
       ctx.answerStartRef.set(Date.now());
