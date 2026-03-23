@@ -421,12 +421,13 @@ async function loadTasks(){
       var defs=getDailyTaskDefs();
       var freshState={
         date:_todayKey,
-        tasks:defs.map(function(def){return Object.assign({},def,{progress:0,done:false,claimed:false})}),
+        tasks:defs.map(function(def){
+          return{id:def.id,type:def.type,target:def.target,label:def.label,icon:def.icon||'',xp:def.xp,game:def.game||'',progress:0,done:false,claimed:false};
+        }),
         allDone:false,allClaimed:false,dailyStreak:0
       };
-      // WRITE it to Firestore so improve.html finds it and updates progress
       try{
-        await ref.set(freshState);
+        await ref.set(JSON.parse(JSON.stringify(freshState)));
         dbg('Created doc at '+path+' ✓');
       }catch(we){
         dbg('Failed to create doc: '+we.message);
