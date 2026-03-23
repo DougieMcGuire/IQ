@@ -183,6 +183,17 @@
     body.enter .row:nth-child(4){animation-delay:.11s}
     body.enter .row:nth-child(5){animation-delay:.14s}
     body.enter .row:nth-child(n+6){animation-delay:.16s}
+    /* Dark mode */
+    body.dark .top{background:#1e3a5f}
+    body.dark .top::after{background:#0f172a}
+    body.dark .bottom{background:#0f172a}
+    body.dark .yr{background:#1e293b;border-color:#334155;box-shadow:0 5px 0 #0a0f1a}
+    body.dark .yr-num{color:#e2e8f0}
+    body.dark .row{background:#1e293b;border-color:#334155;box-shadow:0 4px 0 #0a0f1a}
+    body.dark .row-name{color:#e2e8f0}
+    body.dark .row-sub{color:#64748b}
+    body.dark .sec{color:#64748b}
+    body.dark .skel{background:#1e293b;border-color:#334155}
   </style>
 </head>
 <body>
@@ -228,7 +239,8 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import{IQData,db,authReady}from'./data.js';import Haptics from'./haptics.js';
+import{IQData,db,authReady}from'./data.js';import _Hap from'./haptics.js';
+var Haptics=new Proxy(_Hap||{},{get:function(t,p){if(typeof t[p]==='function')return function(){if(localStorage.getItem('cb_haptics')==='off')return;return t[p].apply(t,arguments)};return t[p]}});
 import{doc,getDoc,setDoc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 if(window.parent!==window)parent.authCheck();
 
@@ -379,10 +391,24 @@ function playEntrance(){
 window.addEventListener('message',function(e){
   if(e.data&&e.data.type==='pageEnter'){
     playEntrance();
-    // Background refresh if stale
     if(cacheAge()>STALE)fetchSnapshot(true);
   }
+  if(e.data&&e.data.type==='applyDarkMode')applyDarkMode(e.data.on);
 });
+
+function applyDarkMode(on){
+  document.body.classList.toggle('dark',on);
+  if(on){
+    document.documentElement.style.setProperty('--bg','#0f172a');
+    document.documentElement.style.setProperty('--card','#fff');
+    document.documentElement.style.setProperty('--cb','#e8e2d6');
+    document.documentElement.style.setProperty('--blue','#1e3a5f');
+    document.documentElement.style.setProperty('--blue-dk','#0f2744');
+  }else{
+    ['--bg','--card','--cb','--blue','--blue-dk'].forEach(function(v){document.documentElement.style.removeProperty(v);});
+  }
+}
+if(localStorage.getItem('cb_dark')==='on')applyDarkMode(true);
 
 init();
 </script>
