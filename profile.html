@@ -138,6 +138,29 @@
     .set-toggle input:checked~.set-toggle-knob{transform:translateX(20px)}
     .set-uid{font-size:9px;font-weight:600;color:var(--text-light);opacity:.4;text-align:center;margin-top:14px;word-break:break-all;padding:0 10px}
 
+    /* ── Dark mode overrides ── */
+    body.dark .hero{background:#1e3a5f}
+    body.dark .hero::after{background:#0f172a}
+    body.dark .set-sheet{background:#1e293b}
+    body.dark .set-card{background:#0f172a;border-color:#334155}
+    body.dark .set-row+.set-row{border-top-color:#334155}
+    body.dark .set-input{background:#0f172a;border-color:#334155;color:#e2e8f0}
+    body.dark .set-input:focus{border-color:#3b82f6}
+    body.dark .set-title{color:#e2e8f0}
+    body.dark .set-row-label{color:#e2e8f0}
+    body.dark .set-row-sub{color:#64748b}
+    body.dark .set-handle{background:#334155}
+    body.dark .set-toggle-track{background:#334155;border-color:#475569}
+    body.dark .set-save-btn.cancel{background:#334155;color:#94a3b8}
+    body.dark .modal-box{background:#1e293b;border-color:#334155}
+    body.dark .share-link-url{background:#0f172a;border-color:#334155;color:#e2e8f0}
+    body.dark .share-dest{background:#0f172a;border-color:#334155;color:#e2e8f0}
+    body.dark .section-title{color:#e2e8f0}
+    body.dark .sg{background:#1e293b;border-color:#334155;box-shadow:0 4px 0 #0a0f1a}
+    body.dark .ab-row+.ab-row{border-top-color:#334155}
+    body.dark .ab-bar{background:#334155;border-color:#475569}
+    body.dark .pct-badge{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15)}
+
     /* ── Page entrance animations ── */
     @keyframes avZoom{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
     @keyframes heroSlide{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
@@ -274,7 +297,9 @@
 
 <script type="module">
 import{IQData,iqToPercentile,formatPercentile}from'./data.js';
-import Haptics from'./haptics.js';
+import _Haptics from'./haptics.js';
+// Wrap haptics to respect settings toggle
+var Haptics=new Proxy(_Haptics||{},{get:function(t,p){if(typeof t[p]==='function')return function(){if(localStorage.getItem('cb_haptics')==='off')return;return t[p].apply(t,arguments)};return t[p]}});
 if(window.parent!==window)parent.authCheck();
 window.navGo=function(p){Haptics.light();parent.goTo(p);};
 
@@ -293,7 +318,7 @@ function pToast(m,err){var t=document.getElementById('toast');t.textContent=m;t.
 
 function loadProfile(){
   var d=IQData.load();
-  document.getElementById('username-display').textContent=d.username||IQData.getCurrentUser()?.displayName||'';
+  document.getElementById('username-display').textContent=d.username?'@'+d.username:IQData.getCurrentUser()?.displayName||'';
   if(d.iq){document.getElementById('iq-num').textContent=d.iq;var b=document.getElementById('pct-badge');b.textContent='Top '+formatPercentile(iqToPercentile(d.iq));b.style.display='inline-block';}
   document.getElementById('answered').textContent=d.answered||0;
   document.getElementById('accuracy').textContent=IQData.getAccuracy()+'%';
@@ -354,6 +379,7 @@ document.getElementById('set-overlay').addEventListener('click',function(e){if(e
 // Show save row when inputs change
 ['set-username','set-name'].forEach(function(id){
   document.getElementById(id).addEventListener('input',function(){
+    if(id==='set-username')this.value=this.value.toLowerCase().replace(/[^a-z0-9._]/g,'');
     var un=document.getElementById('set-username').value.trim();
     var nm=document.getElementById('set-name').value.trim();
     var changed=un!==_origUN||nm!==_origName;
@@ -368,11 +394,11 @@ document.getElementById('set-cancel').onclick=function(){
 };
 
 document.getElementById('set-save').onclick=async function(){
-  var un=document.getElementById('set-username').value.trim();
+  var un=document.getElementById('set-username').value.trim().toLowerCase().replace(/[^a-z0-9._]/g,'');
   var nm=document.getElementById('set-name').value.trim();
   if(!un){pToast('Username can\'t be empty',true);return;}
+  document.getElementById('set-username').value=un;
   var d=IQData.load();d.username=un;IQData.save(d);
-  // Update Firestore
   try{
     var fb=window.parent!==window?window.parent.firebase:null;
     if(fb){var u=fb.auth().currentUser;if(u){
@@ -381,7 +407,7 @@ document.getElementById('set-save').onclick=async function(){
   }catch(e){}
   _origUN=un;_origName=nm;
   document.getElementById('set-save-wrap').style.display='none';
-  document.getElementById('username-display').textContent=un;
+  document.getElementById('username-display').textContent='@'+un;
   Haptics.success();pToast('Saved!');
 };
 
@@ -404,19 +430,23 @@ document.getElementById('set-dark').addEventListener('change',function(){
 });
 
 function applyDarkMode(on){
+  document.body.classList.toggle('dark',on);
   if(on){
     document.documentElement.style.setProperty('--bg','#0f172a');
     document.documentElement.style.setProperty('--card','#1e293b');
     document.documentElement.style.setProperty('--card-border','#334155');
-    document.documentElement.style.setProperty('--text','#f1f5f9');
+    document.documentElement.style.setProperty('--text','#e2e8f0');
     document.documentElement.style.setProperty('--text-dim','#94a3b8');
     document.documentElement.style.setProperty('--text-light','#64748b');
     document.documentElement.style.setProperty('--blue','#1e3a5f');
     document.documentElement.style.setProperty('--blue-dark','#0f2744');
-    document.documentElement.style.setProperty('--shadow-card','0 4px 0 #0f172a');
+    document.documentElement.style.setProperty('--shadow-card','0 4px 0 #0a0f1a');
   }else{
+    document.body.classList.remove('dark');
     ['--bg','--card','--card-border','--text','--text-dim','--text-light','--blue','--blue-dark','--shadow-card'].forEach(function(v){document.documentElement.style.removeProperty(v);});
   }
+  // Tell parent to propagate to all pages
+  try{window.parent.postMessage({type:'darkModeChanged',on:on},'*');}catch(e){}
 }
 
 // Apply dark mode on load if saved
