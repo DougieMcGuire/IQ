@@ -233,7 +233,8 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
   });
 })();
 
-// ── Jigsaw Puzzle (FIXED) ─────────────────────────────────────────────────────
+
+// ── Jigsaw Puzzle (v3 — tap-to-place, mobile-first) ──────────────────────────
 (function(){
   var CS = 48;
   var COLORS = ['#e8443a','#3a7df2','#3fba4f','#e8a817','#8b5cf6','#f97316','#ec4899','#06b6d4'];
@@ -278,7 +279,7 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
     var puz=Q.pick(PUZZLES),order=[];
     for(var i=0;i<puz.pieces.length;i++)order.push(i);
     order=Q.shuffle(order);
-    return{type:'jigsaw',category:'spatialAwareness',categoryLabel:'Jigsaw',difficulty:puz.sz===4?0.9:1.2,question:'Drag pieces into the grid!',sz:puz.sz,pieces:puz.pieces,trayOrder:order,answer:'complete',options:[],explanation:'Fit each piece into its matching outline.',visual:'custom'};
+    return{type:'jigsaw',category:'spatialAwareness',categoryLabel:'Jigsaw',difficulty:puz.sz===4?0.9:1.2,question:'Tap a piece, then tap its spot!',sz:puz.sz,pieces:puz.pieces,trayOrder:order,answer:'complete',options:[],explanation:'Fit each piece into its matching outline.',visual:'custom'};
   },3);
 
   Q.registerRenderer('jigsaw',{
@@ -286,28 +287,507 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
       var sz=q.sz,gridW=sz*CS,maxW=Math.min(240,Math.floor(window.innerWidth*0.62)),scale=maxW/gridW,dispW=Math.round(gridW*scale);
       var svgContent='';
       for(var i=0;i<=sz;i++){svgContent+='<line x1="'+(i*CS)+'" y1="0" x2="'+(i*CS)+'" y2="'+gridW+'" stroke="#d6cfc0" stroke-width="1"/>';svgContent+='<line x1="0" y1="'+(i*CS)+'" x2="'+gridW+'" y2="'+(i*CS)+'" stroke="#d6cfc0" stroke-width="1"/>';}
-      q.pieces.forEach(function(cells,pi){var d=buildOutline(cells);if(d)svgContent+='<path d="'+d+'" fill="rgba(0,0,0,0.04)" stroke="rgba(0,0,0,0.15)" stroke-width="2" stroke-dasharray="6,4" id="jslot-'+idx+'-'+pi+'"/>';});
+      // Ghost outlines — each gets a clickable overlay
+      q.pieces.forEach(function(cells,pi){var d=buildOutline(cells);if(d)svgContent+='<path d="'+d+'" fill="rgba(0,0,0,0.04)" stroke="rgba(0,0,0,0.15)" stroke-width="2" stroke-dasharray="6,4" id="jslot-'+idx+'-'+pi+'" data-jslot="'+pi+'" style="cursor:pointer"/>';});
       var trayHtml='';
       q.trayOrder.forEach(function(pi){
         var cells=q.pieces[pi],color=COLORS[pi%COLORS.length],d=buildOutline(cells);if(!d)return;
         var bb=bbox(cells),pad=4,vx=bb.minC*CS-pad,vy=bb.minR*CS-pad,vw=(bb.maxC-bb.minC+1)*CS+pad*2,vh=(bb.maxR-bb.minR+1)*CS+pad*2;
         var trayScale=scale*0.85,pw=Math.round(vw*trayScale),ph=Math.round(vh*trayScale);
-        trayHtml+='<div class="jig-pw" id="jpw-'+idx+'-'+pi+'" data-ji="'+idx+'" data-jp="'+pi+'" style="display:inline-block;cursor:grab;touch-action:none;user-select:none"><svg width="'+pw+'" height="'+ph+'" viewBox="'+vx+' '+vy+' '+vw+' '+vh+'" style="display:block;overflow:visible;filter:drop-shadow(0 3px 6px rgba(0,0,0,.3))"><path d="'+d+'" fill="'+color+'" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/></svg></div>';
+        trayHtml+='<div class="jig-pw" id="jpw-'+idx+'-'+pi+'" data-ji="'+idx+'" data-jp="'+pi+'" style="display:inline-block;cursor:pointer;touch-action:manipulation;user-select:none;transition:all .15s;border-radius:8px;padding:4px"><svg width="'+pw+'" height="'+ph+'" viewBox="'+vx+' '+vy+' '+vw+' '+vh+'" style="display:block;overflow:visible;filter:drop-shadow(0 3px 6px rgba(0,0,0,.3))"><path d="'+d+'" fill="'+color+'" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/></svg></div>';
       });
-      return'<div class="qcard" style="gap:10px"><div class="category">JIGSAW</div><div class="question" style="font-size:14px">'+q.question+'</div><div id="jdz-'+idx+'" style="background:#e2ddd4;border-radius:16px;padding:8px;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae;display:inline-block"><svg id="jsvg-'+idx+'" width="'+dispW+'" height="'+dispW+'" viewBox="0 0 '+gridW+' '+gridW+'" style="display:block;border-radius:10px;background:#f5f0e8">'+svgContent+'</svg></div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:6px 0" id="jtray-'+idx+'">'+trayHtml+'</div><div class="jig-status" id="jst-'+idx+'" style="color:rgba(255,255,255,.6)">Drag pieces onto the board</div><div id="wa-'+idx+'"></div><div class="explanation" id="exp-'+idx+'"></div>'+_gameBranding()+_scrollHint(idx)+'</div>';
+      return'<div class="qcard" style="gap:10px"><div class="category">JIGSAW</div><div class="question" style="font-size:14px">'+q.question+'</div><div id="jdz-'+idx+'" style="background:#e2ddd4;border-radius:16px;padding:8px;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae;display:inline-block"><svg id="jsvg-'+idx+'" width="'+dispW+'" height="'+dispW+'" viewBox="0 0 '+gridW+' '+gridW+'" style="display:block;border-radius:10px;background:#f5f0e8">'+svgContent+'</svg></div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:6px 0" id="jtray-'+idx+'">'+trayHtml+'</div><div class="jig-status" id="jst-'+idx+'" style="color:rgba(255,255,255,.6)">Tap a piece below</div><div id="wa-'+idx+'"></div><div class="explanation" id="exp-'+idx+'"></div>'+_gameBranding()+_scrollHint(idx)+'</div>';
     },
     attach:function(slideEl,q,idx,ctx){
       var H=ctx.Haptics||{};var actEl=slideEl.querySelector('#wa-'+idx);if(actEl&&ctx.addShareBtn)ctx.addShareBtn(actEl,q);
       var svgEl=document.getElementById('jsvg-'+idx),dzEl=document.getElementById('jdz-'+idx),statEl=document.getElementById('jst-'+idx);
       if(!svgEl)return;
-      var sz=q.sz,gridW=sz*CS,placed=0,totalPieces=q.pieces.length,done=false,drag=null,SNAP_DIST=CS*0.9;
-      function getXY(e){var t=e.touches?e.touches[0]:(e.changedTouches?e.changedTouches[0]:e);return{x:t.clientX,y:t.clientY};}
-      function startDrag(e){if(done)return;e.preventDefault();e.stopPropagation();var pw=e.currentTarget;if(pw.classList.contains('jig-pw-placed'))return;var pi=parseInt(pw.dataset.jp),xy=getXY(e),rect=pw.getBoundingClientRect();var clone=pw.cloneNode(true);clone.style.cssText='position:fixed;z-index:9999;pointer-events:none;opacity:0.9;transform:scale(1.1);transition:none';clone.style.left=rect.left+'px';clone.style.top=rect.top+'px';document.body.appendChild(clone);pw.style.opacity='0.25';drag={pi:pi,pw:pw,clone:clone,offX:xy.x-rect.left,offY:xy.y-rect.top};H.light&&H.light();document.addEventListener('mousemove',onMove,{passive:false});document.addEventListener('touchmove',onMove,{passive:false});document.addEventListener('mouseup',onUp);document.addEventListener('touchend',onUp);}
-      function onMove(e){if(!drag)return;e.preventDefault();var xy=getXY(e);drag.clone.style.left=(xy.x-drag.offX)+'px';drag.clone.style.top=(xy.y-drag.offY)+'px';var r=dzEl.getBoundingClientRect(),over=xy.x>r.left&&xy.x<r.right&&xy.y>r.top&&xy.y<r.bottom;dzEl.style.borderColor=over?'#22c55e':'#d6cfc0';dzEl.style.boxShadow=over?'0 5px 0 #16a34a,0 0 0 2px #22c55e':'0 5px 0 #c0b9ae';}
-      function onUp(e){if(!drag)return;document.removeEventListener('mousemove',onMove);document.removeEventListener('touchmove',onMove);document.removeEventListener('mouseup',onUp);document.removeEventListener('touchend',onUp);dzEl.style.borderColor='#d6cfc0';dzEl.style.boxShadow='0 5px 0 #c0b9ae';var xy=getXY(e);drag.clone.remove();drag.pw.style.opacity='1';var svgRect=svgEl.getBoundingClientRect(),scaleX=gridW/svgRect.width,svgX=(xy.x-svgRect.left)*scaleX,svgY=(xy.y-svgRect.top)*scaleX;var cells=q.pieces[drag.pi],centX=0,centY=0;cells.forEach(function(c){centX+=c[1]*CS+CS/2;centY+=c[0]*CS+CS/2;});centX/=cells.length;centY/=cells.length;var dist=Math.sqrt((svgX-centX)*(svgX-centX)+(svgY-centY)*(svgY-centY));if(dist<SNAP_DIST){snapIn(drag.pi,drag.pw);}else if(svgX>=0&&svgX<=gridW&&svgY>=0&&svgY<=gridW){H.error&&H.error();statEl.textContent="Not the right spot!";statEl.style.color='rgba(239,68,68,.8)';setTimeout(function(){if(!done){statEl.textContent=placed+' / '+totalPieces+' placed';statEl.style.color='rgba(255,255,255,.6)';}},1200);}drag=null;}
-      function snapIn(pi,pw){H.medium&&H.medium();var cells=q.pieces[pi],color=COLORS[pi%COLORS.length],d=buildOutline(cells);var path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d',d);path.setAttribute('fill',color);path.setAttribute('stroke','#fff');path.setAttribute('stroke-width','2.5');path.setAttribute('stroke-linejoin','round');path.style.opacity='0';svgEl.appendChild(path);requestAnimationFrame(function(){path.style.transition='opacity 0.2s';path.style.opacity='1';});var slot=document.getElementById('jslot-'+idx+'-'+pi);if(slot)slot.style.display='none';pw.classList.add('jig-pw-placed');pw.style.opacity='0.15';pw.style.pointerEvents='none';placed++;statEl.textContent=placed+' / '+totalPieces+' placed';statEl.style.color='rgba(255,255,255,.6)';if(placed===totalPieces)setTimeout(function(){finish(true);},350);}
-      function finish(won){done=true;var ms=Date.now()-ctx.answerStartRef.get(),data=ctx.IQData.recordAnswer(q.category,won,q.difficulty,ms);if(ctx.notifyGamePlayed)ctx.notifyGamePlayed('jigsaw');if(ctx.onAnswer)ctx.onAnswer(won,ms);if(won){H.streak&&H.streak();statEl.textContent='🎉 Puzzle complete!';statEl.style.color='var(--green)';ctx.flashEl.className='flash green show';ctx.spawnConfetti(22);}setTimeout(function(){ctx.flashEl.className='flash';},350);var expEl=slideEl.querySelector('#exp-'+idx),hintEl=document.getElementById('hint-'+idx);if(expEl){expEl.textContent=won?'All pieces fit perfectly!':'Drag each piece to its matching outline.';expEl.classList.add('show');}setTimeout(function(){if(hintEl)hintEl.classList.add('show');},500);ctx.updateUI(data);ctx.checkMore();ctx.answerStartRef.set(Date.now());}
-      slideEl.querySelectorAll('.jig-pw[data-ji="'+idx+'"]').forEach(function(pw){pw.addEventListener('mousedown',startDrag);pw.addEventListener('touchstart',startDrag,{passive:false});});
+      var sz=q.sz,gridW=sz*CS,placed=0,totalPieces=q.pieces.length,done=false;
+      var selectedPi=-1; // which tray piece is selected
+      var placedSet={}; // track placed piece indices
+
+      // ── Tap a tray piece to SELECT it ──
+      var trayEl=document.getElementById('jtray-'+idx);
+      trayEl.addEventListener('click',function(e){
+        if(done)return;
+        var pw=e.target.closest('.jig-pw[data-ji="'+idx+'"]');
+        if(!pw)return;
+        var pi=parseInt(pw.dataset.jp);
+        if(placedSet[pi])return; // already placed
+        H.light&&H.light();
+
+        // Deselect previous
+        if(selectedPi>=0){
+          var prev=document.getElementById('jpw-'+idx+'-'+selectedPi);
+          if(prev){prev.style.background='';prev.style.transform='';prev.style.boxShadow='';}
+        }
+
+        if(selectedPi===pi){
+          // Tap same piece = deselect
+          selectedPi=-1;
+          statEl.textContent='Tap a piece below';
+          return;
+        }
+
+        selectedPi=pi;
+        pw.style.background='rgba(4,116,252,.15)';
+        pw.style.transform='translateY(-4px)';
+        pw.style.boxShadow='0 6px 12px rgba(4,116,252,.25)';
+        statEl.textContent='Now tap where it goes on the board';
+        statEl.style.color='rgba(255,255,255,.6)';
+      });
+
+      // ── Tap on the board SVG to PLACE the selected piece ──
+      svgEl.addEventListener('click',function(e){
+        if(done||selectedPi<0)return;
+        if(placedSet[selectedPi])return;
+
+        // Get click position in SVG coordinates
+        var svgRect=svgEl.getBoundingClientRect();
+        var scaleX=gridW/svgRect.width;
+        var svgX=(e.clientX-svgRect.left)*scaleX;
+        var svgY=(e.clientY-svgRect.top)*scaleX;
+
+        // Find which unplaced slot the click is inside
+        var bestPi=-1,bestDist=Infinity;
+        q.pieces.forEach(function(cells,pi){
+          if(placedSet[pi])return; // slot already filled
+          var centX=0,centY=0;
+          cells.forEach(function(c){centX+=c[1]*CS+CS/2;centY+=c[0]*CS+CS/2;});
+          centX/=cells.length;centY/=cells.length;
+          var dist=Math.sqrt((svgX-centX)*(svgX-centX)+(svgY-centY)*(svgY-centY));
+          if(dist<bestDist){bestDist=dist;bestPi=pi;}
+        });
+
+        if(bestPi<0||bestDist>CS*1.5)return; // too far from any slot
+
+        // Check if selected piece matches this slot
+        if(selectedPi===bestPi){
+          snapIn(selectedPi);
+        }else{
+          H.error&&H.error();
+          statEl.textContent="Wrong spot — try another!";
+          statEl.style.color='rgba(239,68,68,.8)';
+          setTimeout(function(){
+            if(!done&&selectedPi>=0){statEl.textContent='Now tap where it goes';statEl.style.color='rgba(255,255,255,.6)';}
+          },1000);
+        }
+      });
+
+      function snapIn(pi){
+        H.medium&&H.medium();
+        placedSet[pi]=true;
+
+        var cells=q.pieces[pi],color=COLORS[pi%COLORS.length],d=buildOutline(cells);
+        var path=document.createElementNS('http://www.w3.org/2000/svg','path');
+        path.setAttribute('d',d);path.setAttribute('fill',color);
+        path.setAttribute('stroke','#fff');path.setAttribute('stroke-width','2.5');
+        path.setAttribute('stroke-linejoin','round');
+        path.style.opacity='0';
+        svgEl.appendChild(path);
+        requestAnimationFrame(function(){path.style.transition='opacity 0.25s';path.style.opacity='1';});
+
+        // Hide ghost slot
+        var slot=document.getElementById('jslot-'+idx+'-'+pi);
+        if(slot)slot.style.display='none';
+
+        // Grey out tray piece
+        var pw=document.getElementById('jpw-'+idx+'-'+pi);
+        if(pw){pw.style.opacity='0.15';pw.style.pointerEvents='none';pw.style.transform='scale(0.9)';pw.style.background='';pw.style.boxShadow='';}
+
+        selectedPi=-1;
+        placed++;
+        statEl.textContent=placed+' / '+totalPieces+' placed';
+        statEl.style.color='rgba(255,255,255,.6)';
+
+        if(placed===totalPieces)setTimeout(function(){finish(true);},350);
+        else statEl.textContent=placed+' / '+totalPieces+' — tap next piece';
+      }
+
+      function finish(won){
+        done=true;
+        var ms=Date.now()-ctx.answerStartRef.get(),data=ctx.IQData.recordAnswer(q.category,won,q.difficulty,ms);
+        if(ctx.notifyGamePlayed)ctx.notifyGamePlayed('jigsaw');if(ctx.onAnswer)ctx.onAnswer(won,ms);
+        if(won){H.streak&&H.streak();statEl.textContent='🎉 Puzzle complete!';statEl.style.color='var(--green)';ctx.flashEl.className='flash green show';ctx.spawnConfetti(22);}
+        setTimeout(function(){ctx.flashEl.className='flash';},350);
+        var expEl=slideEl.querySelector('#exp-'+idx),hintEl=document.getElementById('hint-'+idx);
+        if(expEl){expEl.textContent=won?'All pieces fit perfectly!':'Drag each piece to its matching outline.';expEl.classList.add('show');}
+        setTimeout(function(){if(hintEl)hintEl.classList.add('show');},500);
+        ctx.updateUI(data);ctx.checkMore();ctx.answerStartRef.set(Date.now());
+      }
+
+      ctx.answerStartRef.set(Date.now());
+    }
+  });
+})();
+
+// ── Flappy Bird (dark theme + preview) ────────────────────────────────────────
+(function(){
+  var TARGET = 10;
+
+  Q.register('flappy', function(){
+    var speeds = [
+      { label: 'Chill',  pipeSpeed: 1.8, gap: 120, d: 0.8 },
+      { label: 'Normal', pipeSpeed: 2.0, gap: 115, d: 1.1 },
+      { label: 'Hard',   pipeSpeed: 2.2, gap: 110, d: 1.5 },
+    ];
+    var tier = Q.rand(0, 2), s = speeds[tier];
+    return {
+      type: 'flappy', category: 'mentalAgility', categoryLabel: 'Flappy Bird',
+      difficulty: s.d, question: 'Score ' + TARGET + ' to win! (' + s.label + ')',
+      answer: 'complete', options: [], explanation: 'Timing and rhythm.',
+      visual: 'custom', pipeSpeed: s.pipeSpeed, gap: s.gap, tierLabel: s.label
+    };
+  }, 3);
+
+  Q.registerRenderer('flappy', {
+    render: function(q, idx){
+      // Static preview canvas drawn on render
+      return '<div class="qcard" style="gap:8px;padding:10px 10px">'
+        + '<div class="category">FLAPPY BIRD</div>'
+        + '<div class="question" style="font-size:13px">' + q.question + '</div>'
+        + '<div id="fb-preview-' + idx + '" style="position:relative;display:flex;justify-content:center">'
+        +   '<canvas id="fb-canvas-' + idx + '" style="border-radius:16px;cursor:pointer;touch-action:manipulation;width:100%;max-width:320px;border:3px solid rgba(255,255,255,.15);box-shadow:0 5px 0 rgba(0,0,0,.3)"></canvas>'
+        +   '<div id="fb-overlay-' + idx + '" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-radius:16px;cursor:pointer">'
+        +     '<div style="font-size:36px">🐻</div>'
+        +     '<div style="background:#fff;color:var(--blue,#0474fc);border:none;border-radius:14px;padding:10px 28px;font-family:Nunito,sans-serif;font-size:16px;font-weight:900;box-shadow:0 4px 0 rgba(0,0,0,.15)">Tap to Play!</div>'
+        +   '</div>'
+        + '</div>'
+        + '<div id="fb-status-' + idx + '" style="font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.6);min-height:18px"></div>'
+        + '<div id="wa-' + idx + '"></div>'
+        + '<div class="explanation" id="exp-' + idx + '"></div>'
+        + _fullGameBtn('Play Endless Flappy', 'flappy')
+        + _gameBranding() + _scrollHint(idx)
+        + '</div>';
+    },
+
+    attach: function(slideEl, q, idx, ctx){
+      var H = ctx.Haptics || {};
+      var actEl = slideEl.querySelector('#wa-' + idx);
+      if (actEl && ctx.addShareBtn) ctx.addShareBtn(actEl, q);
+
+      var canvas   = slideEl.querySelector('#fb-canvas-' + idx);
+      var overlay  = slideEl.querySelector('#fb-overlay-' + idx);
+      var statusEl = slideEl.querySelector('#fb-status-' + idx);
+      if (!canvas) return;
+
+      // ── Canvas setup ──
+      var W = 320, H_PX = 400;
+      canvas.width = W * 2;
+      canvas.height = H_PX * 2;
+      canvas.style.maxWidth = W + 'px';
+      canvas.style.aspectRatio = W + '/' + H_PX;
+      var cc = canvas.getContext('2d');
+      cc.scale(2, 2);
+
+      // ── Dark theme colors matching Cebear ──
+      var SKY1 = '#0a1628', SKY2 = '#162544';
+      var GROUND_TOP = '#1a3a5c', GROUND = '#0f2440';
+      var PIPE_BODY = '#0474fc', PIPE_DARK = '#0358c4', PIPE_LIGHT = '#3a9aff', PIPE_CAP = '#0468e0';
+      var BIRD_BODY = '#f59e0b', BIRD_DARK = '#d97706', BIRD_WING = '#fbbf24', BIRD_EYE = '#fff', BIRD_PUPIL = '#1e293b';
+      var BIRD_BEAK = '#ff8c00';
+      var CLOUD_COL = 'rgba(255,255,255,0.06)';
+      var STAR_COL = 'rgba(255,255,255,0.35)';
+
+      // ── Physics ──
+      var GRAVITY = 0.30, FLAP_VEL = -4.5, MAX_VEL = 6;
+      var PIPE_W = 44, PIPE_SPEED = q.pipeSpeed, GAP = q.gap, PIPE_INTERVAL = 110;
+      var BIRD_X = 60, BIRD_R = 14;
+      var GROUND_H = 40;
+
+      // ── State ──
+      var birdY, birdVel, birdAngle, pipes, score, frameCount, dead, won, raf, gameStarted;
+      var clouds = [], stars = [];
+      for (var ci = 0; ci < 3; ci++) clouds.push({ x: Math.random() * W, y: 30 + Math.random() * 100, w: 50 + Math.random() * 40 });
+      for (var si = 0; si < 30; si++) stars.push({ x: Math.random() * W, y: Math.random() * (H_PX - GROUND_H - 20), r: 0.5 + Math.random() * 1.5 });
+
+      function reset(){
+        birdY = H_PX * 0.4; birdVel = 0; birdAngle = 0;
+        pipes = []; score = 0; frameCount = 0; dead = false; won = false; gameStarted = false;
+      }
+      reset();
+
+      function flap(){
+        if (dead || won) return;
+        birdVel = FLAP_VEL;
+        H.light && H.light();
+      }
+
+      function addPipe(){
+        var minTop = 60, maxTop = H_PX - GROUND_H - GAP - 60;
+        var topH = minTop + Math.random() * (maxTop - minTop);
+        pipes.push({ x: W, topH: topH, scored: false });
+      }
+
+      function drawStars(){
+        stars.forEach(function(s){
+          var twinkle = 0.4 + Math.sin(frameCount * 0.03 + s.x) * 0.3;
+          cc.fillStyle = 'rgba(255,255,255,' + twinkle + ')';
+          cc.beginPath(); cc.arc(s.x, s.y, s.r, 0, Math.PI * 2); cc.fill();
+        });
+      }
+
+      function drawCloud(x, y, w){
+        cc.fillStyle = CLOUD_COL;
+        cc.beginPath();
+        cc.ellipse(x, y, w * 0.5, w * 0.25, 0, 0, Math.PI * 2);
+        cc.ellipse(x - w * 0.25, y + 4, w * 0.3, w * 0.18, 0, 0, Math.PI * 2);
+        cc.ellipse(x + w * 0.2, y + 3, w * 0.35, w * 0.2, 0, 0, Math.PI * 2);
+        cc.fill();
+      }
+
+      function drawBird(x, y, angle){
+        cc.save();
+        cc.translate(x, y);
+        cc.rotate(angle);
+
+        // Body — gold bear
+        cc.fillStyle = BIRD_BODY;
+        cc.beginPath();
+        cc.ellipse(0, 0, BIRD_R, BIRD_R * 0.82, 0, 0, Math.PI * 2);
+        cc.fill();
+
+        // Ears (bear!)
+        cc.fillStyle = BIRD_DARK;
+        cc.beginPath(); cc.arc(-8, -11, 5, 0, Math.PI * 2); cc.fill();
+        cc.beginPath(); cc.arc(4, -12, 5, 0, Math.PI * 2); cc.fill();
+        cc.fillStyle = BIRD_BODY;
+        cc.beginPath(); cc.arc(-8, -11, 3, 0, Math.PI * 2); cc.fill();
+        cc.beginPath(); cc.arc(4, -12, 3, 0, Math.PI * 2); cc.fill();
+
+        // Body shadow
+        cc.fillStyle = BIRD_DARK;
+        cc.beginPath();
+        cc.ellipse(0, 3, BIRD_R * 0.85, BIRD_R * 0.4, 0, 0, Math.PI);
+        cc.fill();
+
+        // Belly
+        cc.fillStyle = '#fde68a';
+        cc.beginPath();
+        cc.ellipse(0, 2, BIRD_R * 0.55, BIRD_R * 0.45, 0, 0, Math.PI * 2);
+        cc.fill();
+
+        // Wing
+        var wingY = Math.sin(frameCount * 0.3) * 3;
+        cc.fillStyle = BIRD_WING;
+        cc.beginPath();
+        cc.ellipse(-4, wingY + 1, BIRD_R * 0.5, BIRD_R * 0.32, -0.3, 0, Math.PI * 2);
+        cc.fill();
+
+        // Eye white
+        cc.fillStyle = BIRD_EYE;
+        cc.beginPath(); cc.arc(6, -3, 5, 0, Math.PI * 2); cc.fill();
+        // Pupil
+        cc.fillStyle = BIRD_PUPIL;
+        cc.beginPath(); cc.arc(7.5, -2.5, 2.3, 0, Math.PI * 2); cc.fill();
+        // Highlight
+        cc.fillStyle = '#fff';
+        cc.beginPath(); cc.arc(8.5, -4, 1.1, 0, Math.PI * 2); cc.fill();
+
+        // Nose (bear snout)
+        cc.fillStyle = '#92400e';
+        cc.beginPath(); cc.ellipse(9, 2, 3.5, 2.5, 0, 0, Math.PI * 2); cc.fill();
+        cc.fillStyle = '#1e293b';
+        cc.beginPath(); cc.ellipse(10, 1.5, 1.8, 1.2, 0, 0, Math.PI * 2); cc.fill();
+
+        cc.restore();
+      }
+
+      function drawPipe(x, topH){
+        var botY = topH + GAP;
+        var capH = 8, capOverhang = 4;
+        // Gradient — blue pipes
+        var tGrad = cc.createLinearGradient(x, 0, x + PIPE_W, 0);
+        tGrad.addColorStop(0, PIPE_DARK);
+        tGrad.addColorStop(0.3, PIPE_LIGHT);
+        tGrad.addColorStop(0.7, PIPE_BODY);
+        tGrad.addColorStop(1, PIPE_DARK);
+
+        // Top pipe
+        cc.fillStyle = tGrad;
+        cc.fillRect(x, 0, PIPE_W, topH - capH);
+        cc.fillStyle = PIPE_CAP;
+        cc.beginPath(); cc.roundRect(x - capOverhang, topH - capH, PIPE_W + capOverhang * 2, capH, [0, 0, 4, 4]); cc.fill();
+        cc.fillStyle = PIPE_LIGHT;
+        cc.fillRect(x - capOverhang, topH - capH, PIPE_W + capOverhang * 2, 2);
+
+        // Bottom pipe
+        cc.fillStyle = tGrad;
+        cc.fillRect(x, botY + capH, PIPE_W, H_PX - botY - capH);
+        cc.fillStyle = PIPE_CAP;
+        cc.beginPath(); cc.roundRect(x - capOverhang, botY, PIPE_W + capOverhang * 2, capH, [4, 4, 0, 0]); cc.fill();
+        cc.fillStyle = PIPE_LIGHT;
+        cc.fillRect(x - capOverhang, botY, PIPE_W + capOverhang * 2, 2);
+      }
+
+      function drawScore(){
+        var txt = score + ' / ' + TARGET;
+        cc.font = '900 22px Nunito, sans-serif';
+        cc.textAlign = 'center';
+        cc.fillStyle = 'rgba(0,0,0,0.4)';
+        cc.fillText(txt, W / 2 + 1, 32 + 1);
+        cc.fillStyle = '#fff';
+        cc.fillText(txt, W / 2, 32);
+      }
+
+      function draw(){
+        // Sky
+        var skyGrad = cc.createLinearGradient(0, 0, 0, H_PX - GROUND_H);
+        skyGrad.addColorStop(0, SKY1);
+        skyGrad.addColorStop(1, SKY2);
+        cc.fillStyle = skyGrad;
+        cc.fillRect(0, 0, W, H_PX);
+
+        drawStars();
+        clouds.forEach(function(c){ drawCloud(c.x, c.y, c.w); });
+        pipes.forEach(function(p){ drawPipe(p.x, p.topH); });
+
+        // Ground
+        cc.fillStyle = GROUND_TOP;
+        cc.fillRect(0, H_PX - GROUND_H, W, 4);
+        cc.fillStyle = GROUND;
+        cc.fillRect(0, H_PX - GROUND_H + 4, W, GROUND_H - 4);
+        // Ground dots
+        cc.fillStyle = 'rgba(255,255,255,0.06)';
+        for (var gi = 0; gi < W; gi += 20){
+          var gx = (gi - (frameCount * PIPE_SPEED) % 20 + 20) % (W + 20) - 10;
+          cc.fillRect(gx, H_PX - GROUND_H + 8, 8, 2);
+        }
+
+        // Bird
+        var targetAngle = Math.min(Math.max(birdVel * 0.08, -0.5), 1.2);
+        birdAngle += (targetAngle - birdAngle) * 0.15;
+        drawBird(BIRD_X, birdY, birdAngle);
+
+        drawScore();
+      }
+
+      // Draw static preview immediately
+      function drawPreview(){
+        frameCount = 0;
+        birdY = H_PX * 0.4; birdVel = 0; birdAngle = 0;
+        // Add some static preview pipes
+        pipes = [
+          { x: 140, topH: 100, scored: false },
+          { x: 260, topH: 160, scored: false }
+        ];
+        score = 0;
+        draw();
+        pipes = [];
+      }
+      drawPreview();
+
+      function checkCollision(){
+        var bTop = birdY - BIRD_R * 0.7, bBot = birdY + BIRD_R * 0.7;
+        var bLeft = BIRD_X - BIRD_R, bRight = BIRD_X + BIRD_R;
+        if (bBot >= H_PX - GROUND_H || bTop <= 0) return true;
+        for (var i = 0; i < pipes.length; i++){
+          var p = pipes[i];
+          if (bRight < p.x || bLeft > p.x + PIPE_W) continue;
+          if (bTop < p.topH || bBot > p.topH + GAP) return true;
+        }
+        return false;
+      }
+
+      function update(){
+        if (!gameStarted || dead || won) return;
+        frameCount++;
+        birdVel = Math.min(birdVel + GRAVITY, MAX_VEL);
+        birdY += birdVel;
+        clouds.forEach(function(c){
+          c.x -= PIPE_SPEED * 0.2;
+          if (c.x < -80){ c.x = W + 60; c.y = 30 + Math.random() * 100; c.w = 50 + Math.random() * 40; }
+        });
+        if (frameCount % PIPE_INTERVAL === 0) addPipe();
+        for (var i = pipes.length - 1; i >= 0; i--){
+          pipes[i].x -= PIPE_SPEED;
+          if (!pipes[i].scored && pipes[i].x + PIPE_W < BIRD_X){
+            pipes[i].scored = true; score++;
+            H.medium && H.medium();
+            if (score >= TARGET){ won = true; finish(true); return; }
+          }
+          if (pipes[i].x < -PIPE_W - 10) pipes.splice(i, 1);
+        }
+        if (checkCollision()){ dead = true; H.error && H.error(); finish(false); return; }
+      }
+
+      function gameLoop(){
+        update(); draw();
+        if (!dead && !won) raf = requestAnimationFrame(gameLoop);
+        else drawResult();
+      }
+
+      function drawResult(){
+        cc.fillStyle = dead ? 'rgba(0,0,0,0.45)' : 'rgba(34,197,94,0.15)';
+        cc.fillRect(0, 0, W, H_PX);
+        cc.textAlign = 'center';
+        cc.font = '900 26px Nunito, sans-serif';
+        cc.fillStyle = '#fff';
+        cc.fillText(won ? '🎉 You did it!' : '💥 Game Over', W / 2, H_PX * 0.38);
+        cc.font = '800 15px Nunito, sans-serif';
+        cc.fillStyle = 'rgba(255,255,255,0.7)';
+        cc.fillText('Score: ' + score + ' / ' + TARGET, W / 2, H_PX * 0.38 + 28);
+      }
+
+      function finish(won2){
+        var ms = Date.now() - ctx.answerStartRef.get();
+        var data = ctx.IQData.recordAnswer(q.category, won2, q.difficulty, ms);
+        if (ctx.notifyGamePlayed) ctx.notifyGamePlayed('flappy');
+        if (ctx.onAnswer) ctx.onAnswer(won2, ms);
+        if (won2){
+          H.streak && H.streak();
+          statusEl.textContent = '🎉 Score ' + TARGET + '! Nice reflexes!';
+          statusEl.style.color = 'var(--green)';
+          ctx.flashEl.className = 'flash green show';
+          ctx.spawnConfetti(22);
+        } else {
+          statusEl.textContent = 'Scored ' + score + ' — so close!';
+          statusEl.style.color = 'var(--red)';
+          ctx.flashEl.className = 'flash red show';
+        }
+        setTimeout(function(){ ctx.flashEl.className = 'flash'; }, 350);
+        var expEl = slideEl.querySelector('#exp-' + idx);
+        var hintEl = document.getElementById('hint-' + idx);
+        if (expEl){ expEl.textContent = won2 ? 'Reached ' + TARGET + ' pipes!' : 'Got ' + score + '. Tap to the rhythm!'; expEl.classList.add('show'); }
+        setTimeout(function(){ if (hintEl) hintEl.classList.add('show'); }, 500);
+        ctx.updateUI(data); ctx.checkMore(); ctx.answerStartRef.set(Date.now());
+      }
+
+      function onTap(e){
+        e.preventDefault(); e.stopPropagation();
+        if (dead || won) return;
+        flap();
+      }
+
+      function startGame(){
+        H.medium && H.medium();
+        overlay.style.display = 'none';
+        reset();
+        pipes = [];
+        gameStarted = true;
+        ctx.answerStartRef.set(Date.now());
+        flap();
+        gameLoop();
+        canvas.addEventListener('click', onTap);
+        canvas.addEventListener('touchstart', onTap, { passive: false });
+      }
+
+      // Overlay click starts game
+      overlay.addEventListener('click', function(e){ e.preventDefault(); startGame(); });
+      overlay.addEventListener('touchstart', function(e){ e.preventDefault(); startGame(); }, { passive: false });
+
+      // Keyboard
+      document.addEventListener('keydown', function(e){
+        if (dead || won) return;
+        var vi = Math.round(ctx.feed.scrollTop / (ctx.feed.clientHeight || 1));
+        if (ctx.feed.children[vi] !== slideEl) return;
+        if (e.code === 'Space' || e.code === 'ArrowUp'){
+          e.preventDefault();
+          if (!gameStarted) startGame();
+          else flap();
+        }
+      });
+
       ctx.answerStartRef.set(Date.now());
     }
   });
@@ -345,440 +825,5 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
     function revealAll(){q.categories.forEach(function(cat){var tier=cat.tier,row=document.createElement('div');row.style.cssText='background:'+TBG[tier]+';border:1.5px solid '+TBD[tier]+';border-radius:10px;padding:9px 12px;margin-bottom:4px';row.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px"><span style="font-size:11px;font-weight:900;letter-spacing:.7px;text-transform:uppercase;color:'+TC[tier]+'">'+cat.name+'</span><span style="font-size:9px;font-weight:800;color:'+TC[tier]+';opacity:.8">'+TLBL[tier]+'</span></div><div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.55);letter-spacing:.3px">'+cat.words.join('  ·  ')+'</div>';solved.appendChild(row);});while(grid.firstChild)grid.removeChild(grid.firstChild);msg('Here are the groups:','rgba(255,255,255,0.35)');}
     function finish(won){done=true;subBtn.disabled=true;var ms=Date.now()-ctx.answerStartRef.get(),data=ctx.IQData.recordAnswer(q.category,won,q.difficulty,ms);if(ctx.notifyGamePlayed)ctx.notifyGamePlayed('connections');if(ctx.onAnswer)ctx.onAnswer(won,ms);if(won){H.streak&&H.streak();ctx.flashEl.className='flash green show';ctx.spawnConfetti(20);}else ctx.flashEl.className='flash red show';setTimeout(function(){ctx.flashEl.className='flash';},350);var expEl=slideEl.querySelector('#exp-'+idx);if(expEl){expEl.textContent=won?'Sharp! All 4 groups found.':'Connections: '+q.categories.map(function(c){return c.name;}).join(' / ');expEl.classList.add('show');}ctx.updateUI(data);var hintEl2=document.getElementById('hint-'+idx);setTimeout(function(){if(hintEl2)hintEl2.classList.add('show');},400);ctx.checkMore();ctx.answerStartRef.set(Date.now());}
     refreshLives();refreshSub();ctx.answerStartRef.set(Date.now());}
-  });
-})();
-
-// ── Flappy Bird ───────────────────────────────────────────────────────────────
-(function(){
-  var TARGET = 10;
-
-  Q.register('flappy', function(){
-    var speeds = [
-      { label: 'Chill',  pipeSpeed: 1.8, gap: 120, d: 0.8 },
-      { label: 'Normal', pipeSpeed: 2.0, gap: 115, d: 1.1 },
-      { label: 'Hard',   pipeSpeed: 2.2, gap: 110, d: 1.5 },
-    ];
-    var tier = Q.rand(0, 2), s = speeds[tier];
-    return {
-      type: 'flappy', category: 'mentalAgility', categoryLabel: 'Flappy Bird',
-      difficulty: s.d, question: 'Score ' + TARGET + ' to win! (' + s.label + ')',
-      answer: 'complete', options: [], explanation: 'Timing and rhythm.',
-      visual: 'custom', pipeSpeed: s.pipeSpeed, gap: s.gap, tierLabel: s.label
-    };
-  }, 3);
-
-  Q.registerRenderer('flappy', {
-    render: function(q, idx){
-      return '<div class="qcard" style="gap:8px;padding:10px 10px">'
-        + '<div class="category">FLAPPY BIRD</div>'
-        + '<div class="question" style="font-size:13px">' + q.question + '</div>'
-        + '<div id="fb-ready-wrap-' + idx + '" style="display:flex;justify-content:center;margin:4px 0">'
-        +   '<button id="fb-ready-' + idx + '" style="background:var(--gold);color:#2a1800;border:none;border-radius:14px;padding:12px 32px;font-family:Nunito,sans-serif;font-size:17px;font-weight:900;cursor:pointer;box-shadow:0 4px 0 var(--goldd);">Tap to Play!</button>'
-        + '</div>'
-        + '<canvas id="fb-canvas-' + idx + '" style="display:none;border-radius:16px;cursor:pointer;touch-action:manipulation;width:100%;max-width:320px;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae"></canvas>'
-        + '<div id="fb-status-' + idx + '" style="font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.6);min-height:18px"></div>'
-        + '<div id="wa-' + idx + '"></div>'
-        + '<div class="explanation" id="exp-' + idx + '"></div>'
-        + _fullGameBtn('Play Endless Flappy', 'flappy')
-        + _gameBranding() + _scrollHint(idx)
-        + '</div>';
-    },
-
-    attach: function(slideEl, q, idx, ctx){
-      var H = ctx.Haptics || {};
-      var actEl = slideEl.querySelector('#wa-' + idx);
-      if (actEl && ctx.addShareBtn) ctx.addShareBtn(actEl, q);
-
-      var readyWrap = slideEl.querySelector('#fb-ready-wrap-' + idx);
-      var readyBtn  = slideEl.querySelector('#fb-ready-' + idx);
-      var canvas    = slideEl.querySelector('#fb-canvas-' + idx);
-      var statusEl  = slideEl.querySelector('#fb-status-' + idx);
-      if (!canvas) return;
-
-      // ── Canvas setup ──
-      var W = 320, H_PX = 400;
-      canvas.width = W * 2;   // 2x for retina
-      canvas.height = H_PX * 2;
-      canvas.style.maxWidth = W + 'px';
-      canvas.style.aspectRatio = W + '/' + H_PX;
-      var cc = canvas.getContext('2d');
-      cc.scale(2, 2);
-
-      // ── Colors ──
-      var SKY1 = '#87CEEB', SKY2 = '#E0F0FF', GROUND_TOP = '#8BC34A', GROUND = '#6B8E23';
-      var PIPE_BODY = '#4CAF50', PIPE_DARK = '#388E3C', PIPE_LIGHT = '#66BB6A', PIPE_CAP = '#43A047';
-      var BIRD_BODY = '#FFD54F', BIRD_DARK = '#F9A825', BIRD_WING = '#FF8F00', BIRD_EYE = '#fff', BIRD_PUPIL = '#333';
-      var BIRD_BEAK = '#FF6D00';
-      var CLOUD = 'rgba(255,255,255,0.7)';
-
-      // ── Physics ──
-      var GRAVITY = 0.30, FLAP = -4.5, MAX_VEL = 6;
-      var PIPE_W = 44, PIPE_SPEED = q.pipeSpeed, GAP = q.gap, PIPE_INTERVAL = 110;
-      var BIRD_X = 60, BIRD_R = 14;
-      var GROUND_H = 40;
-
-      // ── State ──
-      var birdY, birdVel, birdAngle, pipes, score, frameCount, dead, won, raf, started;
-      var clouds = [];
-      for (var ci = 0; ci < 4; ci++) clouds.push({ x: Math.random() * W, y: 20 + Math.random() * 80, w: 40 + Math.random() * 30 });
-
-      function reset(){
-        birdY = H_PX * 0.4; birdVel = 0; birdAngle = 0;
-        pipes = []; score = 0; frameCount = 0; dead = false; won = false; started = false;
-      }
-      reset();
-
-      function flap(){
-        if (dead || won) return;
-        birdVel = FLAP;
-        H.light && H.light();
-      }
-
-      function addPipe(){
-        var minTop = 60, maxTop = H_PX - GROUND_H - GAP - 60;
-        var topH = minTop + Math.random() * (maxTop - minTop);
-        pipes.push({ x: W, topH: topH, scored: false });
-      }
-
-      function drawCloud(x, y, w){
-        cc.fillStyle = CLOUD;
-        cc.beginPath();
-        cc.ellipse(x, y, w * 0.5, w * 0.25, 0, 0, Math.PI * 2);
-        cc.ellipse(x - w * 0.25, y + 4, w * 0.3, w * 0.18, 0, 0, Math.PI * 2);
-        cc.ellipse(x + w * 0.2, y + 3, w * 0.35, w * 0.2, 0, 0, Math.PI * 2);
-        cc.fill();
-      }
-
-      function drawBird(x, y, angle){
-        cc.save();
-        cc.translate(x, y);
-        cc.rotate(angle);
-
-        // Body
-        cc.fillStyle = BIRD_BODY;
-        cc.beginPath();
-        cc.ellipse(0, 0, BIRD_R, BIRD_R * 0.82, 0, 0, Math.PI * 2);
-        cc.fill();
-
-        // Body shadow
-        cc.fillStyle = BIRD_DARK;
-        cc.beginPath();
-        cc.ellipse(0, 3, BIRD_R * 0.85, BIRD_R * 0.45, 0, 0, Math.PI);
-        cc.fill();
-
-        // Wing
-        var wingY = Math.sin(frameCount * 0.25) * 3;
-        cc.fillStyle = BIRD_WING;
-        cc.beginPath();
-        cc.ellipse(-3, wingY + 2, BIRD_R * 0.55, BIRD_R * 0.38, -0.3, 0, Math.PI * 2);
-        cc.fill();
-
-        // Eye white
-        cc.fillStyle = BIRD_EYE;
-        cc.beginPath();
-        cc.arc(6, -4, 5.5, 0, Math.PI * 2);
-        cc.fill();
-
-        // Pupil
-        cc.fillStyle = BIRD_PUPIL;
-        cc.beginPath();
-        cc.arc(7.5, -3.5, 2.5, 0, Math.PI * 2);
-        cc.fill();
-
-        // Eye highlight
-        cc.fillStyle = '#fff';
-        cc.beginPath();
-        cc.arc(8.5, -5, 1.2, 0, Math.PI * 2);
-        cc.fill();
-
-        // Beak
-        cc.fillStyle = BIRD_BEAK;
-        cc.beginPath();
-        cc.moveTo(BIRD_R - 2, -2);
-        cc.lineTo(BIRD_R + 8, 1);
-        cc.lineTo(BIRD_R - 2, 5);
-        cc.closePath();
-        cc.fill();
-
-        cc.restore();
-      }
-
-      function drawPipe(x, topH){
-        var botY = topH + GAP;
-        var capH = 8, capOverhang = 4;
-
-        // Top pipe body
-        var tGrad = cc.createLinearGradient(x, 0, x + PIPE_W, 0);
-        tGrad.addColorStop(0, PIPE_DARK);
-        tGrad.addColorStop(0.3, PIPE_LIGHT);
-        tGrad.addColorStop(0.7, PIPE_BODY);
-        tGrad.addColorStop(1, PIPE_DARK);
-        cc.fillStyle = tGrad;
-        cc.fillRect(x, 0, PIPE_W, topH - capH);
-
-        // Top cap
-        cc.fillStyle = PIPE_CAP;
-        cc.beginPath();
-        cc.roundRect(x - capOverhang, topH - capH, PIPE_W + capOverhang * 2, capH, [0, 0, 4, 4]);
-        cc.fill();
-        cc.fillStyle = PIPE_LIGHT;
-        cc.fillRect(x - capOverhang, topH - capH, PIPE_W + capOverhang * 2, 2);
-
-        // Bottom pipe body
-        cc.fillStyle = tGrad;
-        cc.fillRect(x, botY + capH, PIPE_W, H_PX - botY - capH);
-
-        // Bottom cap
-        cc.fillStyle = PIPE_CAP;
-        cc.beginPath();
-        cc.roundRect(x - capOverhang, botY, PIPE_W + capOverhang * 2, capH, [4, 4, 0, 0]);
-        cc.fill();
-        cc.fillStyle = PIPE_LIGHT;
-        cc.fillRect(x - capOverhang, botY, PIPE_W + capOverhang * 2, 2);
-      }
-
-      function drawScore(){
-        var txt = score + ' / ' + TARGET;
-        cc.font = '900 22px Nunito, sans-serif';
-        cc.textAlign = 'center';
-
-        // Shadow
-        cc.fillStyle = 'rgba(0,0,0,0.25)';
-        cc.fillText(txt, W / 2 + 1, 32 + 1);
-
-        // White text
-        cc.fillStyle = '#fff';
-        cc.fillText(txt, W / 2, 32);
-
-        // Outline for readability
-        cc.strokeStyle = 'rgba(0,0,0,0.15)';
-        cc.lineWidth = 1;
-        cc.strokeText(txt, W / 2, 32);
-      }
-
-      function draw(){
-        // Sky gradient
-        var skyGrad = cc.createLinearGradient(0, 0, 0, H_PX - GROUND_H);
-        skyGrad.addColorStop(0, SKY1);
-        skyGrad.addColorStop(1, SKY2);
-        cc.fillStyle = skyGrad;
-        cc.fillRect(0, 0, W, H_PX);
-
-        // Clouds
-        clouds.forEach(function(c){ drawCloud(c.x, c.y, c.w); });
-
-        // Pipes
-        pipes.forEach(function(p){ drawPipe(p.x, p.topH); });
-
-        // Ground
-        cc.fillStyle = GROUND_TOP;
-        cc.fillRect(0, H_PX - GROUND_H, W, 6);
-        cc.fillStyle = GROUND;
-        cc.fillRect(0, H_PX - GROUND_H + 6, W, GROUND_H - 6);
-
-        // Ground stripe
-        cc.fillStyle = '#5A7A1E';
-        for (var gi = 0; gi < W; gi += 24){
-          var gx = (gi - (frameCount * PIPE_SPEED) % 24 + 24) % (W + 24) - 12;
-          cc.fillRect(gx, H_PX - GROUND_H + 6, 12, 3);
-        }
-
-        // Bird
-        var targetAngle = Math.min(Math.max(birdVel * 0.08, -0.5), 1.2);
-        birdAngle += (targetAngle - birdAngle) * 0.15;
-        drawBird(BIRD_X, birdY, birdAngle);
-
-        // Score
-        drawScore();
-      }
-
-      function checkCollision(){
-        var bTop = birdY - BIRD_R * 0.7;
-        var bBot = birdY + BIRD_R * 0.7;
-        var bLeft = BIRD_X - BIRD_R;
-        var bRight = BIRD_X + BIRD_R;
-
-        // Ground / ceiling
-        if (bBot >= H_PX - GROUND_H || bTop <= 0) return true;
-
-        // Pipes
-        for (var i = 0; i < pipes.length; i++){
-          var p = pipes[i];
-          if (bRight < p.x || bLeft > p.x + PIPE_W) continue;
-          if (bTop < p.topH || bBot > p.topH + GAP) return true;
-        }
-        return false;
-      }
-
-      function update(){
-        if (!started || dead || won) return;
-        frameCount++;
-
-        // Bird physics
-        birdVel = Math.min(birdVel + GRAVITY, MAX_VEL);
-        birdY += birdVel;
-
-        // Clouds
-        clouds.forEach(function(c){
-          c.x -= PIPE_SPEED * 0.3;
-          if (c.x < -60){ c.x = W + 40; c.y = 20 + Math.random() * 80; c.w = 40 + Math.random() * 30; }
-        });
-
-        // Pipes
-        if (frameCount % PIPE_INTERVAL === 0) addPipe();
-        for (var i = pipes.length - 1; i >= 0; i--){
-          pipes[i].x -= PIPE_SPEED;
-          // Score when bird passes pipe
-          if (!pipes[i].scored && pipes[i].x + PIPE_W < BIRD_X){
-            pipes[i].scored = true;
-            score++;
-            H.medium && H.medium();
-            if (score >= TARGET){
-              won = true;
-              finish(true);
-              return;
-            }
-          }
-          // Remove off-screen
-          if (pipes[i].x < -PIPE_W - 10) pipes.splice(i, 1);
-        }
-
-        // Collision
-        if (checkCollision()){
-          dead = true;
-          H.error && H.error();
-          finish(false);
-          return;
-        }
-      }
-
-      function gameLoop(){
-        update();
-        draw();
-
-        if (!dead && !won){
-          raf = requestAnimationFrame(gameLoop);
-        } else {
-          // Draw one final frame with result overlay
-          drawResult();
-        }
-      }
-
-      function drawResult(){
-        // Dim overlay
-        cc.fillStyle = dead ? 'rgba(0,0,0,0.35)' : 'rgba(34,197,94,0.2)';
-        cc.fillRect(0, 0, W, H_PX);
-
-        cc.textAlign = 'center';
-        cc.font = '900 28px Nunito, sans-serif';
-        cc.fillStyle = '#fff';
-        cc.fillText(won ? '🎉 You did it!' : '💥 Game Over', W / 2, H_PX * 0.4);
-        cc.font = '800 16px Nunito, sans-serif';
-        cc.fillStyle = 'rgba(255,255,255,0.75)';
-        cc.fillText('Score: ' + score + ' / ' + TARGET, W / 2, H_PX * 0.4 + 30);
-      }
-
-      function finish(won2){
-        var ms = Date.now() - ctx.answerStartRef.get();
-        var data = ctx.IQData.recordAnswer(q.category, won2, q.difficulty, ms);
-        if (ctx.notifyGamePlayed) ctx.notifyGamePlayed('flappy');
-        if (ctx.onAnswer) ctx.onAnswer(won2, ms);
-
-        if (won2){
-          H.streak && H.streak();
-          statusEl.textContent = '🎉 Score ' + TARGET + '! Nice reflexes!';
-          statusEl.style.color = 'var(--green)';
-          ctx.flashEl.className = 'flash green show';
-          ctx.spawnConfetti(22);
-        } else {
-          statusEl.textContent = 'Scored ' + score + ' — so close!';
-          statusEl.style.color = 'var(--red)';
-          ctx.flashEl.className = 'flash red show';
-        }
-        setTimeout(function(){ ctx.flashEl.className = 'flash'; }, 350);
-
-        var expEl = slideEl.querySelector('#exp-' + idx);
-        var hintEl = document.getElementById('hint-' + idx);
-        if (expEl){
-          expEl.textContent = won2 ? 'Reached ' + TARGET + ' pipes! Timing is everything.' : 'Got ' + score + '. Tap to the rhythm!';
-          expEl.classList.add('show');
-        }
-        setTimeout(function(){ if (hintEl) hintEl.classList.add('show'); }, 500);
-        ctx.updateUI(data);
-        ctx.checkMore();
-        ctx.answerStartRef.set(Date.now());
-      }
-
-      // ── Input handlers ──
-      function onTap(e){
-        e.preventDefault();
-        e.stopPropagation();
-        if (dead || won) return;
-        if (!started){
-          started = true;
-          flap();
-          return;
-        }
-        flap();
-      }
-
-      readyBtn.addEventListener('click', function(){
-        H.medium && H.medium();
-        readyWrap.style.display = 'none';
-        canvas.style.display = 'block';
-        reset();
-        ctx.answerStartRef.set(Date.now());
-
-        // Draw initial frame with "Tap to fly" prompt
-        draw();
-        cc.fillStyle = 'rgba(0,0,0,0.2)';
-        cc.fillRect(0, 0, W, H_PX);
-        cc.textAlign = 'center';
-        cc.font = '900 20px Nunito, sans-serif';
-        cc.fillStyle = '#fff';
-        cc.fillText('Tap to fly!', W / 2, H_PX * 0.35);
-        cc.font = '700 13px Nunito, sans-serif';
-        cc.fillStyle = 'rgba(255,255,255,0.6)';
-        cc.fillText('Dodge pipes — reach ' + TARGET, W / 2, H_PX * 0.35 + 24);
-
-        // Now wait for first tap to start the game loop
-        canvas.addEventListener('click', function firstTap(e2){
-          e2.preventDefault();
-          canvas.removeEventListener('click', firstTap);
-          started = true;
-          flap();
-          gameLoop();
-          // Attach ongoing input
-          canvas.addEventListener('click', onTap);
-          canvas.addEventListener('touchstart', onTap, { passive: false });
-        });
-        canvas.addEventListener('touchstart', function firstTouch(e2){
-          e2.preventDefault();
-          canvas.removeEventListener('touchstart', firstTouch);
-          started = true;
-          flap();
-          gameLoop();
-          canvas.addEventListener('click', onTap);
-          canvas.addEventListener('touchstart', onTap, { passive: false });
-        }, { passive: false });
-      });
-
-      // Keyboard support (space/up arrow)
-      document.addEventListener('keydown', function(e){
-        if (dead || won) return;
-        var vi = Math.round(ctx.feed.scrollTop / (ctx.feed.clientHeight || 1));
-        if (ctx.feed.children[vi] !== slideEl) return;
-        if (e.code === 'Space' || e.code === 'ArrowUp'){
-          e.preventDefault();
-          if (!started){
-            readyBtn.click();
-          } else {
-            flap();
-          }
-        }
-      });
-
-      ctx.answerStartRef.set(Date.now());
-    }
   });
 })();
