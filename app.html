@@ -342,11 +342,17 @@ window.goTo=function(page){
   if(tryGuestWall(page))return;
   if(isOffline()&&NETWORK_PAGES.indexOf(page)!==-1){showOfflineToast();return;}
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  // Profile & leaderboard: reload for fresh auth/data, but only if already loaded before
+  var RELOAD_PAGES=['profile','leaderboard'];
+  if(RELOAD_PAGES.indexOf(page)!==-1&&screensLoaded[page]){
+    var old=document.querySelector('#screen-'+page+' iframe');if(old)old.remove();
+    screensLoaded[page]=false;
+  }
   var sc=document.getElementById('screen-'+page);if(sc)sc.classList.add('active');
   currentScreen=page;showNav(page!=='auth');updateNavActive(page);
   document.body.classList.toggle('page-improve',page==='improve');
   if(screensLoaded[page]){
-    // Already loaded — send pageEnter so it can animate + refresh data
+    // Improve & tasks stay alive — just send pageEnter
     var iframe=document.querySelector('#screen-'+page+' iframe');
     if(iframe&&iframe.contentWindow){
       try{iframe.contentWindow.postMessage({type:'pageEnter'},'*');}catch(e){}
