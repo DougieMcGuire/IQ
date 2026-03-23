@@ -370,10 +370,11 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
 
 // ── Jigsaw Puzzle ─────────────────────────────────────────────────────────────
 (function(){
-  var CELL=56;
-  var SNAP_DIST=CELL*0.65;
-  var COLORS=['#e8443a','#3a7df2','#3fba4f','#e8a817','#8b5cf6'];
-  var PUZZLES=[
+  var CS = 52; // cell size in px
+  var SNAP = CS * 0.75;
+  var COLORS = ['#e8443a','#3a7df2','#3fba4f','#e8a817','#8b5cf6'];
+
+  var PUZZLES = [
     {sz:4,pieces:[[[0,0],[0,1],[1,0],[1,1]],[[0,2],[0,3],[1,2],[2,2]],[[1,3],[2,3],[3,3],[3,2]],[[2,0],[2,1],[3,0],[3,1]]]},
     {sz:4,pieces:[[[0,0],[0,1],[0,2],[0,3]],[[1,0],[1,1],[2,0],[3,0]],[[1,2],[1,3],[2,3],[3,3]],[[2,1],[2,2],[3,1],[3,2]]]},
     {sz:4,pieces:[[[0,0],[1,0],[2,0],[3,0]],[[0,1],[0,2],[0,3],[1,1]],[[1,2],[1,3],[2,1],[2,2]],[[2,3],[3,1],[3,2],[3,3]]]},
@@ -382,97 +383,99 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
     {sz:5,pieces:[[[0,0],[1,0],[2,0],[3,0],[4,0]],[[0,1],[0,2],[0,3],[0,4],[1,1]],[[1,2],[1,3],[1,4],[2,4],[3,4]],[[2,1],[2,2],[2,3],[3,3],[4,3]],[[3,1],[3,2],[4,1],[4,2],[4,4]]]},
   ];
 
-  function edgeSeg(x1,y1,x2,y2,tab){
-    if(!tab)return'L'+x2+','+y2;
-    var mx=(x1+x2)/2,my=(y1+y2)/2,dx=x2-x1,dy=y2-y1,len=Math.sqrt(dx*dx+dy*dy);
-    var nx=-dy/len*tab*len*0.22,ny=dx/len*tab*len*0.22;
-    var t=0.28;
-    return'C'+(x1+dx*t+nx*.5)+','+(y1+dy*t+ny*.5)+' '+(mx+nx*1.2)+','+(my+ny*1.2)+' '+(mx+nx*1.35)+','+(my+ny*1.35)+
-          ' C'+(mx+nx*1.2)+','+(my+ny*1.2)+' '+(x2-dx*t+nx*.5)+','+(y2-dy*t+ny*.5)+' '+x2+','+y2;
-  }
-
-  function buildPath(cells,hC,vC){
-    var cs=new Set(cells.map(function(c){return c[0]+','+c[1];}));
-    function has(r,c){return cs.has(r+','+c);}
-    var segs=[];
+  // Build a clean polygon path for a piece by unioning its grid cells
+  // Uses simple march: find all outer edges and chain them into a polygon
+  function makePath(cells) {
+    var C = CS;
+    var set = new Set(cells.map(function(c){return c[0]+','+c[1];}));
+    function has(r,c){return set.has(r+','+c);}
+    // Collect all boundary edges as line segments [x1,y1 -> x2,y2]
+    // Direction: always trace so interior is on the left
+    var edges = [];
     cells.forEach(function(rc){
-      var r=rc[0],c=rc[1];
-      if(!has(r-1,c))segs.push({r1:r,c1:c,r2:r,c2:c+1,dir:'T'});
-      if(!has(r,c+1))segs.push({r1:r,c1:c+1,r2:r+1,c2:c+1,dir:'R'});
-      if(!has(r+1,c))segs.push({r1:r+1,c1:c+1,r2:r+1,c2:c,dir:'B'});
-      if(!has(r,c-1))segs.push({r1:r+1,c1:c,r2:r,c2:c,dir:'L'});
+      var r=rc[0], c=rc[1];
+      // top edge (going right)
+      if(!has(r-1,c)) edges.push([c*C, r*C, (c+1)*C, r*C]);
+      // right edge (going down)
+      if(!has(r,c+1)) edges.push([(c+1)*C, r*C, (c+1)*C, (r+1)*C]);
+      // bottom edge (going left)
+      if(!has(r+1,c)) edges.push([(c+1)*C, (r+1)*C, c*C, (r+1)*C]);
+      // left edge (going up)
+      if(!has(r,c-1)) edges.push([c*C, (r+1)*C, c*C, r*C]);
     });
-    var segMap={};
-    segs.forEach(function(s){var k=s.r1+','+s.c1;if(!segMap[k])segMap[k]=[];segMap[k].push(s);});
-    var used=new Set(),parts=[];
-    segs.forEach(function(start){
-      var sk=JSON.stringify(start);if(used.has(sk))return;
-      var path='M'+(start.c1*CELL)+','+(start.r1*CELL);
-      var cur=start,safety=0;
-      do{
-        used.add(JSON.stringify(cur));
-        var x1=cur.c1*CELL,y1=cur.r1*CELL,x2=cur.c2*CELL,y2=cur.r2*CELL,tab=0;
-        if(cur.dir==='T'&&cur.r1>0){tab=-(hC[cur.r1-1]&&hC[cur.r1-1][cur.c1]||0);}
-        else if(cur.dir==='B'){tab=hC[cur.r1-1]&&hC[cur.r1-1][cur.c2]||0;}
-        else if(cur.dir==='R'){tab=vC[cur.r1]&&vC[cur.r1][cur.c1-1]||0;}
-        else if(cur.dir==='L'){tab=-(vC[cur.r2]&&vC[cur.r2][cur.c1]||0);}
-        path+=edgeSeg(x1,y1,x2,y2,tab);
-        var nk=cur.r2+','+cur.c2;
-        var cands=(segMap[nk]||[]).filter(function(s){return!used.has(JSON.stringify(s));});
-        cur=cands[0];safety++;
-      }while(cur&&safety<300);
-      path+='Z';parts.push(path);
+    // Build adjacency: end point -> next edge
+    var adj = {};
+    edges.forEach(function(e){
+      var k = e[2]+','+e[3];
+      if(!adj[k]) adj[k] = [];
+      adj[k].push(e);
     });
-    return parts.join(' ');
+    // Chain edges into polygon
+    var start = edges[0];
+    var pts = [[start[0],start[1]]];
+    var cur = start;
+    for(var i=0;i<edges.length-1;i++){
+      var k = cur[2]+','+cur[3];
+      var next = adj[k] && adj[k][0];
+      if(!next) break;
+      pts.push([next[0],next[1]]);
+      cur = next;
+    }
+    return 'M'+pts.map(function(p){return p[0]+','+p[1];}).join('L')+'Z';
   }
 
   Q.register('jigsaw',function(){
-    var puz=Q.pick(PUZZLES),sz=puz.sz;
-    var hC={},vC={};
-    for(var r=0;r<sz-1;r++){hC[r]={};for(var c=0;c<sz;c++)hC[r][c]=Math.random()>.5?1:-1;}
-    for(var r=0;r<sz;r++){vC[r]={};for(var c=0;c<sz-1;c++)vC[r][c]=Math.random()>.5?1:-1;}
-    return{type:'jigsaw',category:'spatialAwareness',categoryLabel:'Jigsaw',
-      difficulty:sz===4?0.9:1.2,question:'Drag the pieces into the grid!',
-      sz:sz,pieces:puz.pieces,hC:hC,vC:vC,
-      answer:'complete',options:[],explanation:'Drag each piece to its correct position.',visual:'custom'};
+    var puz = Q.pick(PUZZLES);
+    return {type:'jigsaw',category:'spatialAwareness',categoryLabel:'Jigsaw',
+      difficulty:puz.sz===4?0.9:1.2, question:'Drag the pieces into the grid!',
+      sz:puz.sz, pieces:puz.pieces,
+      answer:'complete',options:[],explanation:'Drag each piece to its correct slot.',visual:'custom'};
   },3);
 
   Q.registerRenderer('jigsaw',{
     render:function(q,idx){
-      var sz=q.sz,svgW=sz*CELL;
-      var svgSize=Math.min(230,Math.round(window.innerWidth*0.6));
-      var slots='',lines='';
-      q.pieces.forEach(function(cells,pi){
-        var d=buildPath(cells,q.hC,q.vC);
-        slots+='<path d="'+d+'" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-dasharray="5,3" id="jslot-'+idx+'-'+pi+'"/>';
-      });
+      var sz=q.sz, W=sz*CS;
+      var dispW = Math.min(220, Math.floor(window.innerWidth*0.58));
+      var scale = dispW/W;
+
+      // Drop zone SVG — just grid lines and ghost outlines
+      var dzContent = '';
+      // Grid lines
       for(var i=0;i<=sz;i++){
-        lines+='<line x1="0" y1="'+(i*CELL)+'" x2="'+svgW+'" y2="'+(i*CELL)+'" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';
-        lines+='<line x1="'+(i*CELL)+'" y1="0" x2="'+(i*CELL)+'" y2="'+svgW+'" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';
+        dzContent += '<line x1="'+(i*CS)+'" y1="0" x2="'+(i*CS)+'" y2="'+W+'" stroke="rgba(255,255,255,.15)" stroke-width="1"/>';
+        dzContent += '<line x1="0" y1="'+(i*CS)+'" x2="'+W+'" y2="'+(i*CS)+'" stroke="rgba(255,255,255,.15)" stroke-width="1"/>';
       }
-      var tray='';
+      // Ghost slots
       q.pieces.forEach(function(cells,pi){
-        var d=buildPath(cells,q.hC,q.vC);
-        var color=COLORS[pi%COLORS.length];
-        var rs=cells.map(function(c){return c[0];}),cs2=cells.map(function(c){return c[1];});
-        var minR=Math.min.apply(null,rs),maxR=Math.max.apply(null,rs);
-        var minC=Math.min.apply(null,cs2),maxC=Math.max.apply(null,cs2);
-        var pad=CELL*0.38,scale=svgSize/svgW;
-        var vx=minC*CELL-pad,vy=minR*CELL-pad,vw=(maxC-minC+1)*CELL+pad*2,vh=(maxR-minR+1)*CELL+pad*2;
-        var ps=Math.min(72,Math.max(44,vw*scale*1.6)),ph=ps*(vh/vw);
-        tray+='<div class="jig-pw" id="jpw-'+idx+'-'+pi+'" data-ji="'+idx+'" data-jp="'+pi+'" style="touch-action:none">'
-          +'<svg width="'+ps.toFixed(0)+'" height="'+ph.toFixed(0)+'" viewBox="'+vx+' '+vy+' '+vw+' '+vh+'" style="display:block;filter:drop-shadow(0 3px 6px rgba(0,0,0,.35))">'
-          +'<path d="'+d+'" fill="'+color+'" stroke="rgba(255,255,255,0.55)" stroke-width="2.5"/>'
+        var d = makePath(cells);
+        dzContent += '<path d="'+d+'" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="4,3" id="jslot-'+idx+'-'+pi+'"/>';
+      });
+
+      // Tray pieces
+      var tray = '';
+      q.pieces.forEach(function(cells,pi){
+        var color = COLORS[pi%COLORS.length];
+        var d = makePath(cells);
+        var rs=cells.map(function(c){return c[0];}), cs2=cells.map(function(c){return c[1];});
+        var minR=Math.min.apply(null,rs), maxR=Math.max.apply(null,rs);
+        var minC=Math.min.apply(null,cs2), maxC=Math.max.apply(null,cs2);
+        var pad=6;
+        var vx=minC*CS-pad, vy=minR*CS-pad, vw=(maxC-minC+1)*CS+pad*2, vh=(maxR-minR+1)*CS+pad*2;
+        var pw=Math.round(vw*scale*1.1), ph=Math.round(vh*scale*1.1);
+        tray += '<div class="jig-pw" id="jpw-'+idx+'-'+pi+'" data-ji="'+idx+'" data-jp="'+pi+'" style="touch-action:none;display:inline-block">'
+          +'<svg width="'+pw+'" height="'+ph+'" viewBox="'+vx+' '+vy+' '+vw+' '+vh+'" style="display:block;overflow:visible;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4))">'
+          +'<path d="'+d+'" fill="'+color+'" stroke="white" stroke-width="2" stroke-linejoin="round"/>'
           +'</svg></div>';
       });
-      return'<div class="qcard" style="gap:8px">'
+
+      return '<div class="qcard" style="gap:8px">'
         +'<div class="category">JIGSAW</div>'
         +'<div class="question">'+q.question+'</div>'
-        +'<div style="background:#e2ddd4;border-radius:14px;padding:6px;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae;display:inline-block" id="jdz-'+idx+'">'
-          +'<svg id="jsvg-'+idx+'" width="'+svgSize+'" height="'+svgSize+'" viewBox="0 0 '+svgW+' '+svgW+'" style="display:block;border-radius:8px">'+lines+slots+'</svg>'
+        +'<div id="jdz-'+idx+'" style="background:#e2ddd4;border-radius:14px;padding:6px;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae;display:inline-block">'
+          +'<svg id="jsvg-'+idx+'" width="'+dispW+'" height="'+dispW+'" viewBox="0 0 '+W+' '+W+'" style="display:block;border-radius:8px">'+dzContent+'</svg>'
         +'</div>'
-        +'<div class="jig-tray2" id="jtray-'+idx+'">'+tray+'</div>'
-        +'<div class="jig-status" id="jst-'+idx+'">Drag a piece onto the grid</div>'
+        +'<div class="jig-tray2" id="jtray-'+idx+'" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:4px 0">'+tray+'</div>'
+        +'<div class="jig-status" id="jst-'+idx+'">Drag a piece into its spot</div>'
         +'<div id="wa-'+idx+'"></div><div class="explanation" id="exp-'+idx+'"></div>'
         +_gameBranding()+_scrollHint(idx)+'</div>';
     },
@@ -481,36 +484,36 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
       var actEl=slideEl.querySelector('#wa-'+idx);if(actEl&&ctx.addShareBtn)ctx.addShareBtn(actEl,q);
       var svgEl=document.getElementById('jsvg-'+idx),dzEl=document.getElementById('jdz-'+idx),statEl=document.getElementById('jst-'+idx);
       if(!svgEl)return;
-      var sz=q.sz,svgW=sz*CELL,placed=0,done=false,drag=null;
+      var sz=q.sz,W=sz*CS,placed=0,drag=null,done=false;
+
       function getXY(e){var t=e.touches?e.touches[0]:(e.changedTouches?e.changedTouches[0]:e);return{x:t.clientX,y:t.clientY};}
-      slideEl.querySelectorAll('.jig-pw[data-ji="'+idx+'"]').forEach(function(pw){
-        pw.addEventListener('mousedown',startDrag);
-        pw.addEventListener('touchstart',startDrag,{passive:false});
-      });
+
       function startDrag(e){
         e.preventDefault();e.stopPropagation();
         var pw=e.currentTarget;if(pw.classList.contains('jig-pw-placed'))return;
         var pi=parseInt(pw.dataset.jp),xy=getXY(e),rect=pw.getBoundingClientRect();
         var clone=pw.cloneNode(true);
-        clone.style.cssText='position:fixed;z-index:9999;pointer-events:none;transform:scale(1.12);transform-origin:center;filter:drop-shadow(0 8px 16px rgba(0,0,0,.45))';
+        clone.style.cssText='position:fixed;z-index:9999;pointer-events:none;transform-origin:center';
         clone.style.left=rect.left+'px';clone.style.top=rect.top+'px';
         document.body.appendChild(clone);
-        pw.style.opacity='0.25';
+        pw.style.opacity='0.2';
         drag={pi:pi,pw:pw,clone:clone,offX:xy.x-rect.left,offY:xy.y-rect.top};
-        document.addEventListener('mousemove',onMove);
+        document.addEventListener('mousemove',onMove,{passive:false});
         document.addEventListener('touchmove',onMove,{passive:false});
         document.addEventListener('mouseup',onUp);
         document.addEventListener('touchend',onUp);
       }
+
       function onMove(e){
         if(!drag)return;e.preventDefault();
         var xy=getXY(e);
         drag.clone.style.left=(xy.x-drag.offX)+'px';
         drag.clone.style.top=(xy.y-drag.offY)+'px';
         var r=dzEl.getBoundingClientRect();
-        var over=xy.x>r.left&&xy.x<r.right&&xy.y>r.top&&xy.y<r.bottom;
-        dzEl.style.boxShadow=over?'0 5px 0 #22c55e,0 0 0 2px #22c55e':'0 5px 0 #c0b9ae';
+        dzEl.style.boxShadow=(xy.x>r.left&&xy.x<r.right&&xy.y>r.top&&xy.y<r.bottom)
+          ?'0 5px 0 #22c55e,0 0 0 2px #22c55e':'0 5px 0 #c0b9ae';
       }
+
       function onUp(e){
         if(!drag)return;
         document.removeEventListener('mousemove',onMove);document.removeEventListener('touchmove',onMove);
@@ -518,36 +521,46 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
         dzEl.style.boxShadow='0 5px 0 #c0b9ae';
         var xy=getXY(e);
         drag.clone.remove();drag.pw.style.opacity='1';
-        var svgRect=svgEl.getBoundingClientRect(),scale=svgRect.width/svgW;
-        var svgX=(xy.x-svgRect.left)/scale,svgY=(xy.y-svgRect.top)/scale;
+
+        // Convert drop point to SVG coords
+        var svgRect=svgEl.getBoundingClientRect(),scale=svgRect.width/W;
+        var svgX=(xy.x-svgRect.left)/scale, svgY=(xy.y-svgRect.top)/scale;
+
+        // Check each unplaced piece — find which one's centroid is closest to drop point
+        // But we only care about THIS piece (drag.pi) — check if drop is near its solution centroid
         var cells=q.pieces[drag.pi];
-        var avgC=cells.reduce(function(s,c){return s+c[1];},0)/cells.length;
-        var avgR=cells.reduce(function(s,c){return s+c[0];},0)/cells.length;
-        var centX=(avgC+0.5)*CELL,centY=(avgR+0.5)*CELL;
+        var centX=cells.reduce(function(s,c){return s+c[1];},0)/cells.length*CS + CS/2;
+        var centY=cells.reduce(function(s,c){return s+c[0];},0)/cells.length*CS + CS/2;
         var dist=Math.sqrt((svgX-centX)*(svgX-centX)+(svgY-centY)*(svgY-centY));
-        if(dist<SNAP_DIST){
-          snapIn(drag.pi,drag.pw);
-        }else{
+
+        if(dist < SNAP){
+          snapIn(drag.pi, drag.pw);
+        } else {
           var r=dzEl.getBoundingClientRect();
           if(xy.x>r.left&&xy.x<r.right&&xy.y>r.top&&xy.y<r.bottom){
-            statEl.textContent="Not quite — try a different spot!";
             H.error&&H.error();
+            statEl.textContent="Not quite — try the matching outline!";
           }
         }
         drag=null;
       }
+
       function snapIn(pi,pw){
         H.medium&&H.medium();
         var cells=q.pieces[pi],color=COLORS[pi%COLORS.length];
-        var p=document.createElementNS('http://www.w3.org/2000/svg','path');
-        p.setAttribute('d',buildPath(cells,q.hC,q.vC));
-        p.setAttribute('fill',color);p.setAttribute('stroke','rgba(255,255,255,0.5)');p.setAttribute('stroke-width','2');
-        svgEl.appendChild(p);
+        var d=makePath(cells);
+        var path=document.createElementNS('http://www.w3.org/2000/svg','path');
+        path.setAttribute('d',d);path.setAttribute('fill',color);
+        path.setAttribute('stroke','white');path.setAttribute('stroke-width','2');
+        path.setAttribute('stroke-linejoin','round');
+        svgEl.appendChild(path);
         var slot=document.getElementById('jslot-'+idx+'-'+pi);if(slot)slot.style.display='none';
         pw.classList.add('jig-pw-placed');
-        placed++;statEl.textContent=placed+' / '+q.pieces.length+' placed';
+        placed++;
+        statEl.textContent=placed+' / '+q.pieces.length+' placed';
         if(placed===q.pieces.length)setTimeout(function(){finish(true);},300);
       }
+
       function finish(won){
         done=true;
         var ms=Date.now()-ctx.answerStartRef.get(),data=ctx.IQData.recordAnswer(q.category,won,q.difficulty,ms);
@@ -555,10 +568,17 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
         if(won){H.streak&&H.streak();statEl.textContent='Puzzle complete!';ctx.flashEl.className='flash green show';ctx.spawnConfetti(20);}
         setTimeout(function(){ctx.flashEl.className='flash';},350);
         var expEl=slideEl.querySelector('#exp-'+idx),hintEl=document.getElementById('hint-'+idx);
-        if(expEl){expEl.textContent=won?'All pieces locked in!':'Drag each piece to its correct slot.';expEl.classList.add('show');}
+        if(expEl){expEl.textContent=won?'All pieces fit!':'Drag each piece to its matching outline.';expEl.classList.add('show');}
         setTimeout(function(){if(hintEl)hintEl.classList.add('show');},500);
         ctx.updateUI(data);ctx.checkMore();ctx.answerStartRef.set(Date.now());
       }
+
+      // Attach drag listeners
+      slideEl.querySelectorAll('.jig-pw[data-ji="'+idx+'"]').forEach(function(pw){
+        pw.addEventListener('mousedown',startDrag);
+        pw.addEventListener('touchstart',startDrag,{passive:false});
+      });
+
       ctx.answerStartRef.set(Date.now());
     }
   });
