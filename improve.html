@@ -638,14 +638,16 @@ document.addEventListener('click',e=>{
 });
 
 // ── Auto-scroll countdown ──
-var _asTimer=null,_asIdx=-1,_asRaf=null,_asOverlay=null;
+var _asTimer=null,_asIdx=-1,_asRaf=null,_asOverlay=null,_asSlide=-1;
 function startAutoScroll(idx){
   cancelAutoScroll();
   _asIdx=idx;
+  var sH=slideHeight();
+  _asSlide=sH?Math.round(feed.scrollTop/sH):-1;
   if(_asOverlay)_asOverlay.remove();
   var ov=document.createElement('div');
   ov.id='as-overlay';
-  ov.style.cssText='position:fixed;bottom:calc(72px + env(safe-area-inset-bottom,0px) + 14px);left:0;right:0;display:flex;justify-content:center;z-index:60;pointer-events:none;opacity:0;transition:opacity .25s;';
+  ov.style.cssText='position:fixed;bottom:calc(72px + env(safe-area-inset-bottom,0px) + 14px);left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:5px;z-index:60;pointer-events:none;opacity:0;transition:opacity .25s;';
   ov.innerHTML='<div style="display:flex;align-items:center;gap:10px;background:#0474fc;border:2.5px solid rgba(255,255,255,.4);border-radius:26px;padding:10px 22px 10px 12px;box-shadow:0 4px 14px rgba(4,116,252,.45),0 4px 0 #0358c4;pointer-events:auto;cursor:pointer;animation:asPulse 2s ease-in-out infinite" id="as-pill">'
     +'<div style="width:32px;height:32px;flex-shrink:0;position:relative">'
     +'<svg viewBox="0 0 32 32" style="width:32px;height:32px;transform:rotate(-90deg)"><circle cx="16" cy="16" r="13" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="3"/><circle cx="16" cy="16" r="13" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="81.68" stroke-dashoffset="0" stroke-linecap="round" id="as-fg-ring"/></svg>'
@@ -653,8 +655,8 @@ function startAutoScroll(idx){
     +'</div>'
     +'<span style="font-size:15px;font-weight:900;color:#fff;white-space:nowrap" id="as-lbl-txt">Next in 3s</span>'
     +'<svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#fff;fill:none;stroke-width:3;flex-shrink:0;animation:bounce 1s infinite"><polyline points="6 9 12 15 18 9"/></svg>'
-    +'</div>';
-  // Add pulse keyframe if not already present
+    +'</div>'
+    +'<div style="font-size:11px;font-weight:800;color:rgba(255,255,255,.45);pointer-events:none">or swipe down ↓</div>';
   if(!document.getElementById('as-pulse-style')){
     var st=document.createElement('style');st.id='as-pulse-style';
     st.textContent='@keyframes asPulse{0%,100%{box-shadow:0 4px 14px rgba(4,116,252,.45),0 4px 0 #0358c4}50%{box-shadow:0 4px 20px rgba(4,116,252,.7),0 4px 0 #0358c4}}';
@@ -663,14 +665,14 @@ function startAutoScroll(idx){
   document.body.appendChild(ov);
   _asOverlay=ov;
   ov.querySelector('#as-pill').addEventListener('click',function(){skipAutoScroll(idx);});
-  // Fade in immediately
   requestAnimationFrame(function(){ov.style.opacity='1';});
-  // Start countdown right away — no delay
   var dur=3000,start=Date.now(),circ=81.68;
   var fgEl=ov.querySelector('#as-fg-ring');
   var numEl=ov.querySelector('#as-num-txt');
   var lblEl=ov.querySelector('#as-lbl-txt');
   function tick(){
+    var curSlide=slideHeight()?Math.round(feed.scrollTop/slideHeight()):-1;
+    if(curSlide!==-1&&curSlide!==_asSlide){cancelAutoScroll();return;}
     var elapsed=Date.now()-start,pct=Math.min(elapsed/dur,1);
     if(fgEl)fgEl.style.strokeDashoffset=(circ*pct).toFixed(1);
     var left=Math.ceil((dur-elapsed)/1000);
@@ -683,7 +685,7 @@ function startAutoScroll(idx){
 }
 function cancelAutoScroll(){
   if(_asRaf)cancelAnimationFrame(_asRaf);
-  _asRaf=null;_asIdx=-1;
+  _asRaf=null;_asIdx=-1;_asSlide=-1;
   if(_asOverlay){_asOverlay.style.opacity='0';var ov=_asOverlay;setTimeout(function(){ov.remove();},300);_asOverlay=null;}
 }
 function doAutoScroll(idx){
@@ -696,7 +698,6 @@ window.skipAutoScroll=function(idx){
   cancelAutoScroll();
   doAutoScroll(idx);
 };
-// Cancel autoscroll if user manually scrolls
 feed.addEventListener('touchstart',function(){cancelAutoScroll();},{passive:true});
 
 ageSlider.oninput=()=>{ageDisplay.textContent=ageSlider.value;Haptics.light()};
