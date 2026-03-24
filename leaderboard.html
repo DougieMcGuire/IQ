@@ -294,7 +294,7 @@ function avatarHTML(u,size){
   if(src)return'<img src="'+esc(src)+'" alt="" loading="lazy">';
   var g=uidToGrad(u.uid);
   var init=((u.username||'A')[0]||'A').toUpperCase();
-  return'<span style="background:linear-gradient(135deg,'+g[0]+','+g[1]+');width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:'+(size>40?'18':'14')+'px">'+esc(init)+'</span>';
+  return'<span style="background:linear-gradient(135deg,'+g[0]+','+g[1]+');width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:'+(size>40?'18':'14')+'px">'+esc(init)+'<\/span>';
 }
 
 const SORT={iq:{field:'iq',label:'IQ',color:'var(--purple)',min:1,fmt:v=>v},bestStreak:{field:'bestStreak',label:'Streak',color:'var(--gold-dk)',min:0,fmt:v=>v},level:{field:'level',label:'Level',color:'var(--blue)',min:1,fmt:v=>'Lvl '+v}};
@@ -373,36 +373,36 @@ function renderYR(sorted,myIdx,cfg){
   var bar=document.getElementById('yr');
   if(!myUid||myIdx===-1||isHidden){bar.classList.remove('show');return}
   bar.classList.add('show');document.getElementById('yr-num').textContent='#'+(myIdx+1);
-  document.getElementById('yr-rv').innerHTML='<div class="yr-val" style="color:'+cfg.color+'">'+cfg.fmt(sorted[myIdx][cfg.field])+'</div><div class="yr-vlbl">'+cfg.label+'</div>';
+  document.getElementById('yr-rv').innerHTML='<div class="yr-val" style="color:'+cfg.color+'">'+cfg.fmt(sorted[myIdx][cfg.field])+'<\/div><div class="yr-vlbl">'+cfg.label+'<\/div>';
 }
 
 function renderPodium(top3,cfg){
   var pod=document.getElementById('podium');
-  if(!top3.length){pod.innerHTML='<div style="padding:20px;text-align:center;color:rgba(255,255,255,.35);font-size:13px;font-weight:700;width:100%">No players ranked yet</div>';return}
+  if(!top3.length){pod.innerHTML='<div style="padding:20px;text-align:center;color:rgba(255,255,255,.35);font-size:13px;font-weight:700;width:100%">No players ranked yet<\/div>';return}
   pod.innerHTML=[1,2,3].map(rank=>{
-    var u=top3[rank-1];if(!u)return'<div class="pod r'+rank+'"></div>';
+    var u=top3[rank-1];if(!u)return'<div class="pod r'+rank+'"><\/div>';
     var isMe=u.uid===myUid;
     return'<div class="pod r'+rank+' an d'+rank+'"><div class="pod-aw">'
-      +(rank===1?'<div class="pod-crown"><svg viewBox="0 0 28 22" fill="none"><path d="M14 2l4 7 8-3.5-5 10.5H7L2 5.5l8 3.5 4-7z" fill="#f59e0b" stroke="#d97706" stroke-width="1.2" stroke-linejoin="round"/></svg></div>':'')
-      +'<div class="pod-av" style="'+(!(u.avatarIMG||u.pic)?'background:linear-gradient(135deg,'+uidToGrad(u.uid).join(',')+')':'')+'">'+avatarHTML(u,rank===1?56:44)+'</div></div>'
-      +'<div class="pod-col"><div class="pod-badge">'+rank+'</div>'
-      +'<div class="pod-name">'+esc(u.username||'Anon')+(isMe?' (you)':'')+'</div>'
-      +'<div class="pod-val" style="color:'+cfg.color+'">'+cfg.fmt(u[cfg.field])+'</div></div></div>';
+      +(rank===1?'<div class="pod-crown"><svg viewBox="0 0 28 22" fill="none"><path d="M14 2l4 7 8-3.5-5 10.5H7L2 5.5l8 3.5 4-7z" fill="#f59e0b" stroke="#d97706" stroke-width="1.2" stroke-linejoin="round"/><\/svg><\/div>':'')
+      +'<div class="pod-av" style="'+(!(u.avatarIMG||u.pic)?'background:linear-gradient(135deg,'+uidToGrad(u.uid).join(',')+')':'')+'">'+avatarHTML(u,rank===1?56:44)+'<\/div><\/div>'
+      +'<div class="pod-col"><div class="pod-badge">'+rank+'<\/div>'
+      +'<div class="pod-name">'+esc(u.username||'Anon')+(isMe?' (you)':'')+'<\/div>'
+      +'<div class="pod-val" style="color:'+cfg.color+'">'+cfg.fmt(u[cfg.field])+'<\/div><\/div><\/div>';
   }).join('');
 }
 
 function renderList(rest,myIdx,cfg){
   var list=document.getElementById('rows');
-  if(!rest.length){list.innerHTML='<div class="empty"><div class="empty-ic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>Not enough players yet — keep training!</div>';return}
+  if(!rest.length){list.innerHTML='<div class="empty"><div class="empty-ic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/><\/svg><\/div>Not enough players yet — keep training!<\/div>';return}
   list.innerHTML=rest.map((u,i)=>{
     var rank=i+4,isMe=u.uid===myUid,acc=u.answered>0?Math.round(u.correct/u.answered*100):0;
     return'<div class="row'+(isMe?' me':'')+' an" style="animation-delay:'+(Math.min(i,8)*0.03)+'s">'
-      +'<div class="row-rank">'+rank+'</div>'
-      +'<div class="row-av" style="'+(!(u.avatarIMG||u.pic)?'background:linear-gradient(135deg,'+uidToGrad(u.uid).join(',')+')':'')+'">'+avatarHTML(u,36)+'</div>'
-      +'<div class="row-info"><div class="row-name">'+esc(u.username||'Anon')+(isMe?'<span class="you-tag">YOU</span>':'')+'</div>'
-      +'<div class="row-sub"><span>IQ '+(u.iq||'--')+'</span><span>'+acc+'%</span><span>Lvl '+(u.level||1)+'</span></div></div>'
-      +'<div><div class="row-val" style="color:'+cfg.color+'">'+cfg.fmt(u[cfg.field])+'</div>'
-      +'<div class="row-vlbl">'+cfg.label+'</div></div></div>';
+      +'<div class="row-rank">'+rank+'<\/div>'
+      +'<div class="row-av" style="'+(!(u.avatarIMG||u.pic)?'background:linear-gradient(135deg,'+uidToGrad(u.uid).join(',')+')':'')+'">'+avatarHTML(u,36)+'<\/div>'
+      +'<div class="row-info"><div class="row-name">'+esc(u.username||'Anon')+(isMe?'<span class="you-tag">YOU<\/span>':'')+'<\/div>'
+      +'<div class="row-sub"><span>IQ '+(u.iq||'--')+'<\/span><span>'+acc+'%<\/span><span>Lvl '+(u.level||1)+'<\/span><\/div><\/div>'
+      +'<div><div class="row-val" style="color:'+cfg.color+'">'+cfg.fmt(u[cfg.field])+'<\/div>'
+      +'<div class="row-vlbl">'+cfg.label+'<\/div><\/div><\/div>';
   }).join('');
 }
 
