@@ -560,22 +560,53 @@ function playEntrance(){
 
 loadProfile();loadAvatar();playEntrance();
 
-// Clamp scroll — prevent scrolling past content in either direction
-var _sc=document.querySelector('.scroll');
-_sc.addEventListener('scroll',function(){
-  var maxScroll=_sc.scrollHeight-_sc.clientHeight;
-  if(_sc.scrollTop<0)_sc.scrollTop=0;
-  if(_sc.scrollTop>maxScroll)_sc.scrollTop=maxScroll;
-},{passive:false});
-// Also prevent touchmove from going past bounds
-var _lastY=0;
-_sc.addEventListener('touchstart',function(e){_lastY=e.touches[0].clientY;},{passive:true});
-_sc.addEventListener('touchmove',function(e){
-  var y=e.touches[0].clientY,dy=y-_lastY;
-  var atTop=_sc.scrollTop<=0,atBottom=_sc.scrollTop>=_sc.scrollHeight-_sc.clientHeight;
-  if((atTop&&dy>0)||(atBottom&&dy<0))e.preventDefault();
-  _lastY=y;
-},{passive:false});
+// Elastic overscroll — pull past bounds with resistance then snap back
+(function(){
+  var sc=document.querySelector('.scroll');
+  var hero=document.querySelector('.hero');
+  var cbg=document.querySelector('.content-bg');
+  var pulling=false,startY=0,over=0,dir=0;
+  var RESIST=.3,MAX=80;
+
+  function applyOver(px){
+    // Positive = pulling down at top (show blue), negative = pulling up at bottom
+    sc.style.transform=px?'translateY('+px+'px)':'';
+  }
+
+  sc.addEventListener('touchstart',function(e){
+    startY=e.touches[0].clientY;pulling=false;over=0;dir=0;
+  },{passive:true});
+
+  sc.addEventListener('touchmove',function(e){
+    var y=e.touches[0].clientY,dy=y-startY;
+    var atTop=sc.scrollTop<=0;
+    var atBot=sc.scrollTop>=sc.scrollHeight-sc.clientHeight-1;
+
+    if(!pulling){
+      if(atTop&&dy>0){pulling=true;dir=1;e.preventDefault();}
+      else if(atBot&&dy<0){pulling=true;dir=-1;e.preventDefault();}
+      else return;
+    }
+
+    if(pulling){
+      e.preventDefault();
+      var raw=dir===1?(y-startY):-(startY-y);
+      if(raw<0)raw=0;
+      over=Math.min(MAX,raw*RESIST);
+      applyOver(dir===1?over:-over);
+    }
+  },{passive:false});
+
+  function snapBack(){
+    sc.style.transition='transform .35s cubic-bezier(.22,1,.36,1)';
+    applyOver(0);
+    setTimeout(function(){sc.style.transition='';},360);
+    pulling=false;over=0;dir=0;
+  }
+
+  sc.addEventListener('touchend',snapBack,{passive:true});
+  sc.addEventListener('touchcancel',snapBack,{passive:true});
+})();
 </script>
 </body>
 </html>
