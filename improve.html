@@ -75,24 +75,24 @@
     .explain,.explanation{background:rgba(255,255,255,.1);border-radius:14px;padding:10px 14px;font-size:12px;font-weight:700;color:rgba(255,255,255,.75);line-height:1.5;text-align:center;display:none;width:100%;border:2px solid rgba(255,255,255,.15);}
     .explain.show,.explanation.show{display:block;animation:su .3s}
     @keyframes su{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-    .scroll-hint{position:absolute;bottom:14px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:6px;transition:opacity .4s;pointer-events:none;opacity:0;z-index:10}
+    .scroll-hint{position:absolute;bottom:12px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:6px;transition:opacity .4s;pointer-events:none;opacity:0;z-index:10}
     .scroll-hint.show{opacity:1;pointer-events:auto}
-    .scroll-hint-inner{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.28);border:2px solid rgba(255,255,255,.4);border-radius:20px;padding:8px 18px;box-shadow:0 3px 0 rgba(0,0,0,.12);cursor:pointer}
+    .scroll-hint-inner{display:flex;align-items:center;gap:7px;background:rgba(4,116,252,.85);border:2px solid rgba(4,116,252,.95);border-radius:22px;padding:8px 18px;box-shadow:0 3px 0 rgba(0,0,0,.15);cursor:pointer}
     .scroll-hint-inner:active{transform:scale(.95)}
     .scroll-hint-inner svg.chevron{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2.8;animation:bounce 1.2s infinite;flex-shrink:0}
     .scroll-hint-inner span{font-size:13px;font-weight:900;color:#fff;letter-spacing:.3px;white-space:nowrap}
     @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
     /* Auto-scroll countdown ring */
-    .autoscroll{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.35);border:2px solid rgba(255,255,255,.5);border-radius:22px;padding:7px 16px 7px 8px;cursor:pointer;opacity:0;transition:opacity .3s;pointer-events:none}
+    .autoscroll{display:flex;align-items:center;gap:8px;background:rgba(4,116,252,.9);border:2px solid rgba(255,255,255,.3);border-radius:22px;padding:8px 18px 8px 10px;cursor:pointer;opacity:0;transition:opacity .3s;pointer-events:none;box-shadow:0 3px 0 rgba(0,0,0,.15)}
     .autoscroll.show{opacity:1;pointer-events:auto}
     .autoscroll:active{transform:scale(.95)}
-    .as-ring{width:26px;height:26px;flex-shrink:0;position:relative}
-    .as-ring svg{width:26px;height:26px;transform:rotate(-90deg)}
-    .as-ring circle{fill:none;stroke-width:3;cx:13;cy:13;r:10}
-    .as-bg{stroke:rgba(255,255,255,.2)}
-    .as-fg{stroke:#fff;stroke-dasharray:62.83;stroke-dashoffset:0;stroke-linecap:round;transition:stroke-dashoffset linear}
-    .as-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff}
-    .as-label{font-size:12px;font-weight:900;color:#fff;white-space:nowrap}
+    .as-ring{width:28px;height:28px;flex-shrink:0;position:relative}
+    .as-ring svg{width:28px;height:28px;transform:rotate(-90deg)}
+    .as-ring circle{fill:none;stroke-width:3;cx:14;cy:14;r:11}
+    .as-bg{stroke:rgba(255,255,255,.25)}
+    .as-fg{stroke:#fff;stroke-dasharray:69.12;stroke-dashoffset:0;stroke-linecap:round}
+    .as-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff}
+    .as-label{font-size:13px;font-weight:900;color:#fff;white-space:nowrap}
     .branding{width:100%;text-align:center;font-size:11px;font-weight:900;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase;margin-top:8px;padding-top:10px;border-top:2px solid rgba(255,255,255,.1)}
     .game-branding{width:100%;display:flex;justify-content:center;margin-top:8px;padding-top:10px;border-top:2px solid rgba(255,255,255,.1)}
     .game-branding a{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2);border-radius:20px;padding:5px 14px 5px 7px;text-decoration:none;transition:all .15s;box-shadow:0 2px 0 rgba(0,0,0,.08);}
@@ -664,7 +664,7 @@ function startAutoScroll(idx){
   setTimeout(function(){
     if(_asIdx!==idx)return;
     asEl.classList.add('show');
-    var dur=3000,start=Date.now(),circ=62.83;
+    var dur=3000,start=Date.now(),circ=69.12;
     fgEl.style.transition='none';
     fgEl.style.strokeDashoffset='0';
     numEl.textContent='3';
@@ -716,7 +716,7 @@ function renderDef(q,idx){
   if(q.visual==='sequence'||q.visual==='letterSequence'){const parts=q.sequence.map((n,i)=>{if(n==='?')return`<span class="blank">?</span>`;return`<span>${n}</span>${i<q.sequence.length-1?'<span class="arrow">→</span>':''}`});if(q.sequence[q.sequence.length-1]!=='?')parts.push('<span class="arrow">→</span><span class="blank">?</span>');v=`<div class="sequence">${parts.join('')}</div>`}
   else if(q.visual==='matrix'){v=`<div class="matrix">${q.grid.map(c=>`<div class="matrix-cell${c==='?'?' blank':''}">${c}</div>`).join('')}</div>`}
   const wide=q.options.some(o=>String(o).length>20);
-  return`<div class="qcard"><div class="category">${q.categoryLabel}</div><div class="question">${q.question}</div>${v}<div class="options${wide?' wide':''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">${q.options.map(o=>`<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}</div><div class="feedback" id="fb-${idx}"></div><div class="explain" id="exp-${idx}">${q.explanation}</div><div class="game-branding"><a href="https://cebear.com" target="_blank" rel="noopener"><div class="game-branding-bear"><img src="logo.png" alt=""></div><span class="game-branding-text">cebear.com</span></a></div></div><div class="scroll-hint" id="hint-${idx}"><div class="autoscroll" id="as-${idx}" onclick="skipAutoScroll(${idx})"><div class="as-ring"><svg viewBox="0 0 26 26"><circle class="as-bg" /><circle class="as-fg" id="as-fg-${idx}" /></svg><div class="as-num" id="as-num-${idx}">3</div></div><span class="as-label">Next in 3s</span></div><div class="scroll-hint-inner" onclick="skipAutoScroll(${idx})"><svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><span>Swipe for next</span></div></div>`;
+  return`<div class="qcard"><div class="category">${q.categoryLabel}</div><div class="question">${q.question}</div>${v}<div class="options${wide?' wide':''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">${q.options.map(o=>`<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}</div><div class="feedback" id="fb-${idx}"></div><div class="explain" id="exp-${idx}">${q.explanation}</div><div class="game-branding"><a href="https://cebear.com" target="_blank" rel="noopener"><div class="game-branding-bear"><img src="logo.png" alt=""></div><span class="game-branding-text">cebear.com</span></a></div></div><div class="scroll-hint" id="hint-${idx}"><div class="autoscroll" id="as-${idx}" onclick="skipAutoScroll(${idx})"><div class="as-ring"><svg viewBox="0 0 28 28"><circle class="as-bg" /><circle class="as-fg" id="as-fg-${idx}" /></svg><div class="as-num" id="as-num-${idx}">3</div></div><span class="as-label">Next in 3s</span></div><div class="scroll-hint-inner" onclick="skipAutoScroll(${idx})"><svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><span>Swipe for next</span></div></div>`;
 }
 
 function init(){IQData.setAge(25);Q.setAge(25);if(IQData.needsOnboarding()||IQData.needsCalibration())IQData.markCalibrated(100);updateUI(IQData.load());startFeed();if(sharedShortId)_loadSharedQuestion();}
