@@ -317,6 +317,7 @@ window.addEventListener('message',function(e){
   if(t==='tasksUpdated'){var f=document.querySelector('#screen-tasks iframe');f&&f.contentWindow&&f.contentWindow.postMessage({type:'tasksUpdated'},'*');}
   if(t==='xpAwarded'){var f2=document.querySelector('#screen-improve iframe');f2&&f2.contentWindow&&f2.contentWindow.postMessage({type:'xpAwarded',xp:e.data.xp},'*');}
   if(t==='avatarEditorClose'||t==='avatarSaved'){/* handled by profile iframe */}
+  if(t==='darkModeChanged'){localStorage.setItem('cb_dark',e.data.on?'on':'off');applyAppDarkMode(e.data.on);}
 });
 
 // ── Navigation ────────────────────────────────────────────────────────────────
@@ -444,14 +445,6 @@ function applyAppDarkMode(on){
 // Apply on load
 if(localStorage.getItem('cb_dark')==='on')applyAppDarkMode(true);
 // Listen for settings changes from profile iframe
-window.addEventListener('message',function(e){
-  if(!e.data)return;
-  if(e.data.type==='darkModeChanged'){
-    localStorage.setItem('cb_dark',e.data.on?'on':'off');
-    applyAppDarkMode(e.data.on);
-  }
-});
-
 // ── Preload improve.html for instant nav ──────────────────────────────────────
 if('requestIdleCallback' in window){
   requestIdleCallback(function(){
