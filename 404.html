@@ -10,14 +10,12 @@
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     html,body{width:100%;min-height:100dvh;font-family:'Nunito',sans-serif;background:var(--navy);color:var(--cream);overflow-x:hidden}
 
-    /* ── Loading state ── */
     #loading{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:100;transition:opacity .3s}
     #loading.hide{opacity:0;pointer-events:none}
     .ld-bear{width:56px;height:56px;display:flex;align-items:center;justify-content:center;animation:bob 1.2s ease-in-out infinite}
     .ld-bear img{width:100%;height:100%;object-fit:contain}
     @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 
-    /* ── 404 page ── */
     #not-found{display:none;min-height:100dvh;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;gap:16px}
     #not-found.show{display:flex}
     .nf-code{font-size:clamp(80px,22vw,120px);font-weight:900;line-height:1;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -26,7 +24,6 @@
     .nf-btn{margin-top:8px;background:var(--gold);color:var(--navy);border:none;border-radius:16px;padding:14px 36px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;cursor:pointer;text-decoration:none;display:inline-block;box-shadow:0 4px 0 var(--goldd);transition:transform .1s}
     .nf-btn:active{transform:translateY(4px);box-shadow:none}
 
-    /* ── User not found ── */
     #user-not-found{display:none;min-height:100dvh;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;gap:14px}
     #user-not-found.show{display:flex}
     .unf-avatar{width:80px;height:80px;border-radius:50%;background:rgba(240,234,214,.08);border:3px solid rgba(240,234,214,.12);display:flex;align-items:center;justify-content:center}
@@ -35,20 +32,20 @@
     .unf-title{font-size:18px;font-weight:900;color:var(--cream)}
     .unf-sub{font-size:14px;font-weight:700;color:rgba(240,234,214,.4);max-width:280px;line-height:1.5}
 
-    /* ── Profile page ── */
     #profile-page{display:none;min-height:100dvh;flex-direction:column}
     #profile-page.show{display:flex}
 
-    /* Hero — cream */
     .prof-hero{background:var(--cream);padding:calc(env(safe-area-inset-top,20px) + 16px) 20px 24px;display:flex;flex-direction:column;align-items:center;position:relative}
+    body.in-iframe .prof-hero{padding-top:16px}
     .prof-back{position:absolute;top:calc(env(safe-area-inset-top,20px) + 10px);left:16px;background:rgba(27,45,91,.08);border:none;border-radius:10px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:var(--navy);cursor:pointer;display:flex;align-items:center;gap:5px;text-decoration:none;transition:opacity .15s}
     .prof-back:active{opacity:.7}
     .prof-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+    body.in-iframe .prof-back{display:none}
 
-    /* Challenge button */
     .prof-challenge{position:absolute;top:calc(env(safe-area-inset-top,20px) + 10px);right:16px;background:var(--gold);border:none;border-radius:10px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;color:var(--navy);cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 2px 0 var(--goldd);transition:transform .1s}
     .prof-challenge:active{transform:translateY(2px);box-shadow:none}
     .prof-challenge svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5}
+    body.in-iframe .prof-challenge{top:10px;right:16px}
 
     .prof-av{width:min(100px,24vw);height:min(100px,24vw);border-radius:50%;background:var(--navy);overflow:hidden;display:flex;align-items:center;justify-content:center;border:4px solid var(--navy);box-shadow:0 4px 16px rgba(27,45,91,.2);margin-bottom:10px}
     .prof-av img{width:100%;height:100%;object-fit:cover;display:none}
@@ -59,7 +56,6 @@
     .prof-iq-lbl{font-size:13px;font-weight:900;color:#a0acc4;letter-spacing:5px;text-transform:uppercase;margin-bottom:8px}
     .prof-pct{background:var(--navy);color:var(--cream);font-size:12px;font-weight:900;padding:5px 18px;border-radius:20px;margin-bottom:4px}
 
-    /* Navy section */
     .prof-body{flex:1;background:var(--navy);border-radius:28px 28px 0 0;padding:24px 16px 40px;margin-top:-2px}
     .prof-inner{max-width:420px;margin:0 auto}
     .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
@@ -81,7 +77,6 @@
     .ab-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
     .ab-val{font-size:16px;font-weight:900;color:var(--cream);min-width:32px;text-align:right}
 
-    /* Play on Cebear CTA */
     .prof-cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:var(--gold);color:var(--navy);border:none;border-radius:16px;padding:15px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;text-transform:uppercase;letter-spacing:1px;box-shadow:0 4px 0 var(--goldd);transition:transform .1s;text-decoration:none;margin-top:20px;position:relative;overflow:hidden}
     .prof-cta:active{transform:translateY(4px);box-shadow:none}
     .prof-cta::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);animation:shimmer 3s infinite}
@@ -94,19 +89,16 @@
     .anim{animation:su .35s ease both}
     .d1{animation-delay:.05s}.d2{animation-delay:.1s}.d3{animation-delay:.15s}.d4{animation-delay:.2s}
 
-    /* Toast */
     .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--green);color:#fff;padding:10px 22px;border-radius:14px;font-size:14px;font-weight:800;opacity:0;pointer-events:none;transition:all .3s;z-index:500;white-space:nowrap}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   </style>
 </head>
 <body>
 
-<!-- Loading -->
 <div id="loading">
   <div class="ld-bear"><img src="logo.png" alt="Cebear"></div>
 </div>
 
-<!-- Generic 404 -->
 <div id="not-found">
   <div class="nf-code">404</div>
   <div class="nf-title">Page not found</div>
@@ -114,7 +106,6 @@
   <a href="/" class="nf-btn">Back to Cebear</a>
 </div>
 
-<!-- User not found -->
 <div id="user-not-found">
   <div class="unf-avatar">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg>
@@ -125,7 +116,6 @@
   <a href="/" class="nf-btn" style="margin-top:8px">Back to Cebear</a>
 </div>
 
-<!-- Profile page -->
 <div id="profile-page">
   <div class="prof-hero">
     <a href="/" class="prof-back">
@@ -195,7 +185,10 @@ firebase.initializeApp({
 });
 var db = firebase.firestore();
 
-// ── IQ percentile helpers ─────────────────────────────────────────────────────
+// Detect iframe context
+var inIframe = window.parent !== window;
+if (inIframe) document.body.classList.add('in-iframe');
+
 function iqToPercentile(iq) {
   if (!iq) return 50;
   var table = [[55,0.1],[70,2],[85,16],[100,50],[115,84],[130,98],[145,99.9]];
@@ -231,7 +224,6 @@ function showToast(msg) {
   setTimeout(function(){ t.classList.remove('show'); }, 2200);
 }
 
-function hide(id) { document.getElementById(id).classList.remove('show'); }
 function show(id) {
   ['loading','not-found','user-not-found','profile-page'].forEach(function(i){
     var el = document.getElementById(i);
@@ -241,40 +233,33 @@ function show(id) {
   document.getElementById(id).classList.add('show');
 }
 
-// ── Detect path ───────────────────────────────────────────────────────────────
-var path = window.location.pathname; // e.g. "/@dougie" or "/some/random/404"
+// ── Detect source: ?_u=username (iframe) or /@username (direct) ──
+var path = window.location.pathname;
+var params = new URLSearchParams(window.location.search);
+var iframeUser = params.get('_u');
 
-// Match /@username — the @ must immediately follow the leading slash
 var atMatch = path.match(/^\/@([a-zA-Z0-9_.-]+)$/);
-// Also handle plain /@ with nothing after it
-var bareAt  = path.match(/^\/@\s*$/);
+var bareAt = path.match(/^\/@\s*$/);
 
-if (!atMatch && !bareAt) {
-  // Not a profile URL — just show 404
+var username = iframeUser || (atMatch ? atMatch[1] : null);
+
+if (!username && !bareAt && !iframeUser) {
   show('not-found');
-} else if (bareAt || !atMatch[1]) {
-  // Has @ but no username
+} else if (!username) {
   show('user-not-found');
   document.getElementById('unf-handle').textContent = '@…';
 } else {
-  // Has a username — try to look it up
-  var username = atMatch[1];
   document.getElementById('unf-handle').textContent = '@' + username;
-
-  // Update page title while loading
   document.title = '@' + username + ' — Cebear';
 
-  // Query Firestore for user with this username (case-insensitive via lowercase field)
-  // We store username as-is, so we try both the exact value and a lowercase index
   db.collection('users')
     .where('username', '==', username)
     .limit(1)
     .get()
     .then(function(snap) {
       if (snap.empty) {
-        // Try case-insensitive fallback
         return db.collection('users')
-          .where('usernameLower', '==', username.toLowerCase())
+          .where('username', '==', username.toLowerCase())
           .limit(1)
           .get();
       }
@@ -293,33 +278,31 @@ if (!atMatch && !bareAt) {
     });
 }
 
-// ── Render a user's public profile ────────────────────────────────────────────
 function renderProfile(user) {
-  var uname  = user.username || 'Anonymous';
-  var iq     = user.iq || 0;
-  var pic    = user.pic || '';
+  var uname = user.username || 'Anonymous';
+  var iq = user.iq || 0;
+  var avatarIMG = user.avatarIMG || '';
+  var pic = user.pic || '';
   var answered = user.answered || 0;
-  var correct  = user.correct  || 0;
+  var correct = user.correct || 0;
   var bestStreak = user.bestStreak || 0;
-  var level    = user.level || 1;
+  var level = user.level || 1;
   var accuracy = answered > 0 ? Math.round(correct / answered * 100) : 0;
 
   document.title = '@' + uname + ' — Cebear';
 
-  // Avatar
+  // Avatar — prefer avatarIMG (baked avatar), fall back to pic
   var avEl = document.getElementById('prof-av');
   var avImg = document.getElementById('prof-av-img');
-  if (pic) {
-    avImg.src = pic;
+  var imgSrc = avatarIMG || pic;
+  if (imgSrc) {
+    avImg.src = imgSrc;
     avImg.onload = function(){ avEl.classList.add('has-pic'); };
-    avImg.onerror = function(){ /* keep placeholder */ };
   }
 
-  // Handle + IQ
   document.getElementById('prof-username').textContent = '@' + uname;
   document.getElementById('prof-iq').textContent = iq || '--';
 
-  // Percentile badge
   if (iq) {
     var pct = iqToPercentile(iq);
     var pctEl = document.getElementById('prof-pct');
@@ -327,32 +310,29 @@ function renderProfile(user) {
     pctEl.style.display = 'inline-block';
   }
 
-  // Stats
   document.getElementById('prof-answered').textContent = answered;
   document.getElementById('prof-accuracy').textContent = accuracy + '%';
   document.getElementById('prof-streak').textContent = bestStreak;
   document.getElementById('prof-level').textContent = level;
 
-  // Abilities
   var abCard = document.getElementById('prof-abilities');
   abCard.innerHTML = '';
   var abilities = user.abilities || {};
   AB.forEach(function(a) {
     var val = abilities[a.key] !== undefined ? abilities[a.key] : Math.floor(Math.random() * 40 + 30);
-    var pct = Math.max(6, Math.min(100, val));
+    var pct2 = Math.max(6, Math.min(100, val));
     var row = document.createElement('div');
     row.className = 'ab-row';
     row.innerHTML =
       '<div class="ab-dot" style="background:' + a.color + '"></div>' +
       '<div class="ab-mid">' +
         '<div class="ab-name">' + a.name + '</div>' +
-        '<div class="ab-bar"><div class="ab-fill" style="background:' + a.color + ';width:0%" data-val="' + pct + '"></div></div>' +
+        '<div class="ab-bar"><div class="ab-fill" style="background:' + a.color + ';width:0%" data-val="' + pct2 + '"></div></div>' +
       '</div>' +
-      '<div class="ab-val">' + pct + '</div>';
+      '<div class="ab-val">' + pct2 + '</div>';
     abCard.appendChild(row);
   });
 
-  // Animate bars after DOM paint
   requestAnimationFrame(function(){
     setTimeout(function(){
       abCard.querySelectorAll('.ab-fill').forEach(function(b){
@@ -361,7 +341,7 @@ function renderProfile(user) {
     }, 120);
   });
 
-  // Challenge button — copies a link to this profile
+  // Challenge button
   var challengeBtn = document.getElementById('challenge-btn');
   challengeBtn.style.display = 'flex';
   challengeBtn.addEventListener('click', function() {
@@ -381,13 +361,14 @@ function renderProfile(user) {
     }
   });
 
-  // Set meta tags for social sharing
-  setMeta('og:title', '@' + uname + ' — IQ ' + (iq||'?') + ' on Cebear');
-  setMeta('og:description', 'Can you beat @' + uname + '\'s IQ score? Train your brain on Cebear!');
-  setMeta('og:url', window.location.href);
-  setMeta('twitter:card', 'summary');
-  setMeta('twitter:title', '@' + uname + ' — IQ ' + (iq||'?') + ' on Cebear');
-  setMeta('twitter:description', 'Challenge @' + uname + ' on Cebear!');
+  if (!inIframe) {
+    setMeta('og:title', '@' + uname + ' — IQ ' + (iq||'?') + ' on Cebear');
+    setMeta('og:description', 'Can you beat @' + uname + '\'s IQ score? Train your brain on Cebear!');
+    setMeta('og:url', window.location.href);
+    setMeta('twitter:card', 'summary');
+    setMeta('twitter:title', '@' + uname + ' — IQ ' + (iq||'?') + ' on Cebear');
+    setMeta('twitter:description', 'Challenge @' + uname + ' on Cebear!');
+  }
 
   show('profile-page');
 }
