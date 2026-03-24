@@ -10,7 +10,7 @@
   .wl-endpoints{display:flex;justify-content:space-between;align-items:center;width:100%;padding:0 2px;margin:4px 0}.wl-ep-box{text-align:center}.wl-ep-lbl{font-size:9px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;color:rgba(240,234,214,.28);margin-bottom:3px}.wl-ep-tiles{display:flex;gap:3px}.wl-ep-tile{width:clamp(22px,6vw,30px);height:clamp(22px,6vw,30px);border-radius:6px;background:rgba(240,234,214,.09);display:flex;align-items:center;justify-content:center;font-size:clamp(10px,3vw,14px);font-weight:900;color:rgba(240,234,214,.45)}.wl-arrow{font-size:20px;color:rgba(240,234,214,.15);align-self:center}.wl-current{display:flex;gap:5px;justify-content:center;margin:6px 0}.wl-cur-tile{width:clamp(32px,8.5vw,44px);height:clamp(32px,8.5vw,44px);border-radius:8px;background:rgba(240,234,214,.1);border:2px solid rgba(240,234,214,.2);display:flex;align-items:center;justify-content:center;font-size:clamp(14px,4vw,19px);font-weight:900;color:var(--cream);cursor:pointer;transition:all .12s}.wl-cur-tile.wl-sel{background:rgba(232,168,23,.2);border-color:var(--gold);color:var(--gold)}.wl-cur-tile.wl-match{background:rgba(63,186,79,.15);border-color:var(--green);color:var(--green);pointer-events:none}.wl-alpha{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin:6px 0;max-width:320px}.wl-lbtn{min-width:clamp(28px,7.5vw,38px);height:clamp(32px,8.5vw,42px);border:none;border-radius:8px;background:rgba(240,234,214,.14);color:var(--cream);font-family:'Nunito',sans-serif;font-size:clamp(12px,3.2vw,15px);font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .08s,transform .08s;padding:0 5px;box-shadow:0 3px 0 rgba(0,0,0,.3);user-select:none}.wl-lbtn:active{background:rgba(240,234,214,.3);transform:translateY(3px);box-shadow:none}.wl-lbtn.wl-same{background:rgba(240,234,214,.04);color:rgba(240,234,214,.18);pointer-events:none;box-shadow:none}.wl-moves{font-size:12px;font-weight:800;text-align:center;color:rgba(240,234,214,.3);min-height:16px}.wl-status{font-size:13px;font-weight:800;text-align:center;min-height:18px}.wl-hist{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:2px 0;min-height:16px}.wl-hist-w{font-size:10px;font-weight:800;color:rgba(240,234,214,.2);padding:2px 6px;background:rgba(240,234,214,.05);border-radius:4px}
   .game-fullbtn{display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(240,234,214,.07);border:1px solid rgba(240,234,214,.14);border-radius:12px;padding:8px 16px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;color:rgba(240,234,214,.55);cursor:pointer;width:100%;margin-top:6px;transition:all .15s;text-decoration:none}.game-fullbtn:active{background:rgba(240,234,214,.14);transform:scale(.97)}.game-fullbtn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;flex-shrink:0}
   .game-branding{width:100%;display:flex;justify-content:center;margin-top:8px;padding-top:10px;border-top:1px solid rgba(240,234,214,.06)}.game-branding a{display:inline-flex;align-items:center;gap:5px;background:rgba(240,234,214,.07);border:1px solid rgba(240,234,214,.12);border-radius:20px;padding:5px 12px 5px 8px;text-decoration:none;transition:all .15s}.game-branding a:active{transform:scale(.96)}.game-branding-bear{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}.game-branding-bear img{width:20px;height:20px;object-fit:contain}.game-branding-text{font-size:11px;font-weight:900;color:rgba(240,234,214,.5);letter-spacing:1.5px;text-transform:uppercase}
-  .scroll-hint{position:relative;bottom:auto;left:auto;right:auto;font-size:13px;font-weight:900;display:flex;flex-direction:column;align-items:center;gap:4px;transition:opacity .4s;pointer-events:none;opacity:0;margin-top:8px}.scroll-hint.show{opacity:1}.scroll-hint-inner{display:flex;align-items:center;gap:7px;background:rgba(0,0,0,.05);border:1.5px solid rgba(0,0,0,.08);border-radius:20px;padding:6px 14px}.scroll-hint-inner svg{width:14px;height:14px;stroke:rgba(0,0,0,.3);fill:none;stroke-width:2.8;animation:bounce 1.2s infinite}.scroll-hint-inner span{font-size:11px;font-weight:800;color:rgba(0,0,0,.35);letter-spacing:.3px}@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}@keyframes pop{0%{transform:scale(1)}30%{transform:scale(1.12)}60%{transform:scale(.97)}100%{transform:scale(1)}}
+  .scroll-hint{position:relative;bottom:auto;left:auto;right:auto;font-size:13px;font-weight:900;display:flex;flex-direction:column;align-items:center;gap:4px;transition:opacity .4s;pointer-events:none;opacity:0;margin-top:8px}.scroll-hint.show{opacity:1}.scroll-hint-inner{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.28);border:2px solid rgba(255,255,255,.4);border-radius:20px;padding:6px 14px}.scroll-hint-inner svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.8;animation:bounce 1.2s infinite}.scroll-hint-inner span{font-size:12px;font-weight:900;color:#fff;letter-spacing:.3px}@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}@keyframes pop{0%{transform:scale(1)}30%{transform:scale(1.12)}60%{transform:scale(.97)}100%{transform:scale(1)}}
   .pc3-grid{display:grid;gap:5px;background:#e2ddd4;padding:7px;border-radius:16px;margin:4px auto;border:3px solid #d6cfc0;box-shadow:0 5px 0 #c0b9ae}.pc3-cell{border-radius:10px;background:#fff;border:2.5px solid #e8e2d6;position:relative;cursor:pointer;user-select:none;transition:border-color .15s,background .15s,box-shadow .15s;box-shadow:0 3px 0 #d6cfc0;overflow:hidden;aspect-ratio:1}.pc3-cell:not([style*='pointer-events:none']):active{transform:translateY(3px);box-shadow:none}.pc3-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.6);min-height:18px}.pc3-moves{font-size:11px;font-weight:700;text-align:center;color:rgba(255,255,255,.3);min-height:14px}
   .jig-pw{cursor:grab;user-select:none;touch-action:none;transition:opacity .15s}.jig-pw:active{cursor:grabbing}.jig-pw.jig-pw-placed{opacity:.15;pointer-events:none}.jig-status{font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.55);min-height:18px}
   `;
@@ -488,22 +488,14 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
 
 // ── Flappy Bird ───────────────────────────────────────────────────────────────
 (function(){
-  var TARGET = 10;
+  var TARGET = 7;
 
   Q.register('flappy', function(){
-    var speeds = [
-      { label: 'Chill',  speed: 0.9, gap: 138, interval: 140, d: 0.7 },
-      { label: 'Normal', speed: 1.1, gap: 126, interval: 120, d: 1.0 },
-      { label: 'Hard',   speed: 1.4, gap: 112, interval: 105, d: 1.4 },
-    ];
-    // Favor chill/normal — hard is rare
-    var roll = Math.random(), tier = roll < 0.45 ? 0 : roll < 0.85 ? 1 : 2;
-    var s = speeds[tier];
     return {
       type: 'flappy', category: 'mentalAgility', categoryLabel: 'Flappy Bird',
-      difficulty: s.d, question: 'Get past ' + TARGET + ' pipes! (' + s.label + ')',
+      difficulty: 1.0, question: 'Get past ' + TARGET + ' pipes!',
       answer: 'complete', options: [], explanation: 'Timing and rhythm.',
-      visual: 'custom', ps: s.speed, gap: s.gap, pi: s.interval
+      visual: 'custom', ps: 1.4, gap: 128, pi: 90
     };
   }, 3);
 
@@ -521,7 +513,6 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
         + '<div id="fbs-' + idx + '" style="font-size:13px;font-weight:800;text-align:center;color:rgba(255,255,255,.6);min-height:18px"></div>'
         + '<div id="wa-' + idx + '"></div>'
         + '<div class="explanation" id="exp-' + idx + '"></div>'
-        + _fullGameBtn('Play Endless Flappy', 'flappy')
         + _gameBranding() + _scrollHint(idx)
         + '</div>';
     },
@@ -544,52 +535,31 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
       var g = cv.getContext('2d');
       g.scale(2, 2);
 
-      // Tuned for dopamine — floaty, forgiving, satisfying
-      var GRAV = 0.16, FLP = -3.2, MXV = 3.8;
-      var PW = 42, PS = q.ps * 0.92, GAP = q.gap + 8, PII = q.pi;
-      var BX = 60, BR = 13;
-
-      var by, bv, ba, pp, sc, fc, dead, won, raf, on;
-      var bestScore = 0;
+      var GRAV = 0.2, FLP = -3.5, MXV = 4;
+      var PW = 42, PS = q.ps, GAP = q.gap, PII = q.pi;
+      var BX = 60, BR = 12;
+      var by, bv, ba, pp, sc, fc, dead, won, raf, on, best = 0;
 
       function reset(){ by = H * 0.4; bv = 0; ba = 0; pp = []; sc = 0; fc = 0; dead = false; won = false; on = false; }
       reset();
 
       function flap(){ if (!dead && !won){ bv = FLP; Hp.light && Hp.light(); } }
-
-      function addP(){
-        var mn = 55, mx = H - GAP - 55;
-        pp.push({ x: W, t: mn + Math.random() * (mx - mn), s: false });
-      }
-
-      // ── Drawing ──
+      function addP(){ pp.push({ x: W, t: 50 + Math.random() * (H - GAP - 100), s: false }); }
 
       function drawBird(x, y, a){
         g.save(); g.translate(x, y); g.rotate(a);
-        // Shadow
-        g.fillStyle = 'rgba(0,0,0,.1)';
-        g.beginPath(); g.arc(1, 2, BR, 0, Math.PI * 2); g.fill();
-        // Body
         g.fillStyle = '#fff';
         g.beginPath(); g.arc(0, 0, BR, 0, Math.PI * 2); g.fill();
-        // Wing
-        var wy = Math.sin(fc * 0.25) * 3;
-        g.fillStyle = 'rgba(4,116,252,.15)';
-        g.beginPath(); g.ellipse(-4, wy, 8, 5, -0.15, 0, Math.PI * 2); g.fill();
-        // Eye
         g.fillStyle = '#1e293b';
-        g.beginPath(); g.arc(4, -3, 3, 0, Math.PI * 2); g.fill();
-        g.fillStyle = '#fff';
-        g.beginPath(); g.arc(5, -4, 1.2, 0, Math.PI * 2); g.fill();
-        // Beak
+        g.beginPath(); g.arc(4, -3, 2.5, 0, Math.PI * 2); g.fill();
         g.fillStyle = '#f59e0b';
-        g.beginPath(); g.moveTo(BR - 4, -2); g.lineTo(BR + 5, 1); g.lineTo(BR - 4, 4); g.closePath(); g.fill();
+        g.beginPath(); g.moveTo(BR - 3, -1.5); g.lineTo(BR + 5, 1); g.lineTo(BR - 3, 3.5); g.closePath(); g.fill();
         g.restore();
       }
 
       function drawPipe(x, top){
         var bot = top + GAP, cap = 8, ov = 4, r = 6;
-        g.fillStyle = 'rgba(0,0,0,.08)';
+        g.fillStyle = 'rgba(0,0,0,.06)';
         g.beginPath(); g.roundRect(x + 2, -4, PW, top - cap + 6, r); g.fill();
         g.beginPath(); g.roundRect(x + 2, bot + cap - 2, PW, H - bot - cap + 6, r); g.fill();
         g.fillStyle = '#fff';
@@ -597,42 +567,29 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
         g.beginPath(); g.roundRect(x - ov, top - cap, PW + ov * 2, cap, [0, 0, r, r]); g.fill();
         g.beginPath(); g.roundRect(x, bot + cap, PW, H - bot - cap + 4, r); g.fill();
         g.beginPath(); g.roundRect(x - ov, bot, PW + ov * 2, cap, [r, r, 0, 0]); g.fill();
-        g.fillStyle = 'rgba(4,116,252,.06)';
-        g.fillRect(x + 3, 0, 2, top - cap);
-        g.fillRect(x + 3, bot + cap, 2, H);
       }
 
       function draw(){
         g.fillStyle = '#0474fc';
         g.fillRect(0, 0, W, H);
-        // Subtle vignette
-        g.fillStyle = 'rgba(0,0,0,.04)';
-        g.fillRect(0, 0, W, 3);
-        g.fillRect(0, H - 3, W, 3);
         for (var i = 0; i < pp.length; i++) drawPipe(pp[i].x, pp[i].t);
-        // Floor
-        g.fillStyle = 'rgba(255,255,255,.1)';
+        g.fillStyle = 'rgba(255,255,255,.08)';
         g.fillRect(0, H - 2, W, 2);
-        // Bird
-        var ta = Math.min(Math.max(bv * 0.08, -0.35), 0.7);
-        ba += (ta - ba) * 0.1;
+        var ta = Math.min(Math.max(bv * 0.08, -0.3), 0.7);
+        ba += (ta - ba) * 0.12;
         drawBird(BX, by, ba);
-        // Score
         g.textAlign = 'center';
-        g.font = '900 22px Nunito, sans-serif';
-        g.fillStyle = 'rgba(255,255,255,.2)';
-        g.fillText(sc + '/' + TARGET, W / 2, 26);
+        g.font = '900 20px Nunito, sans-serif';
         g.fillStyle = '#fff';
-        g.fillText(sc + '/' + TARGET, W / 2 - 0.5, 25.5);
+        g.fillText(sc + '/' + TARGET, W / 2, 25);
       }
 
-      // Static preview
-      pp = [{ x: 120, t: 80, s: false }, { x: 220, t: 150, s: false }];
-      draw();
-      pp = [];
+      // Preview
+      pp = [{ x: 130, t: 90, s: false }, { x: 220, t: 140, s: false }];
+      draw(); pp = [];
 
       function hit(){
-        var bT = by - BR * 0.6, bB = by + BR * 0.6;
+        var bT = by - BR * 0.55, bB = by + BR * 0.55;
         if (bB >= H - 4 || bT <= 2) return true;
         for (var i = 0; i < pp.length; i++){
           var p = pp[i];
@@ -648,14 +605,13 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
         bv = Math.min(bv + GRAV, MXV);
         by += bv;
         if (by < BR + 2){ by = BR + 2; bv = 0; }
-
         if (fc % PII === 0) addP();
         for (var i = pp.length - 1; i >= 0; i--){
           pp[i].x -= PS;
           if (!pp[i].s && pp[i].x + PW < BX){
             pp[i].s = true; sc++;
-            if (sc > bestScore) bestScore = sc;
-            if(sc % 5 === 0){Hp.streak&&Hp.streak();}else{Hp.success&&Hp.success();}
+            if (sc > best) best = sc;
+            Hp.success && Hp.success();
             if (sc >= TARGET){ won = true; end(true); return; }
           }
           if (pp[i].x < -PW - 10) pp.splice(i, 1);
@@ -666,34 +622,19 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
       function loop(){ tick(); draw(); if (!dead && !won) raf = requestAnimationFrame(loop); else drawOver(); }
 
       function drawOver(){
-        g.fillStyle = dead ? 'rgba(0,0,0,.32)' : 'rgba(34,197,94,.12)';
+        g.fillStyle = dead ? 'rgba(0,0,0,.3)' : 'rgba(34,197,94,.1)';
         g.fillRect(0, 0, W, H);
         g.textAlign = 'center';
+        g.fillStyle = '#fff';
         if (won){
-          g.font = '900 28px Nunito, sans-serif';
-          g.fillStyle = '#fff';
+          g.font = '900 26px Nunito, sans-serif';
           g.fillText('🎉 Nice!', W / 2, H * 0.38);
-          g.font = '800 14px Nunito, sans-serif';
-          g.fillStyle = 'rgba(255,255,255,.7)';
-          g.fillText(sc + ' pipes cleared!', W / 2, H * 0.38 + 24);
         } else {
-          g.font = '900 24px Nunito, sans-serif';
-          g.fillStyle = '#fff';
-          g.fillText('Game Over', W / 2, H * 0.32);
-          g.font = '900 36px Nunito, sans-serif';
-          g.fillText(sc, W / 2, H * 0.32 + 38);
-          g.font = '800 12px Nunito, sans-serif';
+          g.font = '900 22px Nunito, sans-serif';
+          g.fillText('Score: ' + sc, W / 2, H * 0.35);
+          g.font = '800 13px Nunito, sans-serif';
           g.fillStyle = 'rgba(255,255,255,.5)';
-          g.fillText('Best: ' + bestScore, W / 2, H * 0.32 + 56);
-          // Retry button
-          var bw = 110, bh = 38, bx2 = W/2-bw/2, by2 = H*0.32+72;
-          g.fillStyle = '#fff';
-          g.beginPath(); g.roundRect(bx2, by2, bw, bh, 14); g.fill();
-          g.fillStyle = 'rgba(0,0,0,.06)';
-          g.beginPath(); g.roundRect(bx2, by2+bh-4, bw, 4, [0,0,14,14]); g.fill();
-          g.fillStyle = '#0474fc';
-          g.font = '900 14px Nunito, sans-serif';
-          g.fillText('Tap to Retry', W/2, by2+24);
+          g.fillText('Tap to retry', W / 2, H * 0.35 + 28);
         }
       }
 
