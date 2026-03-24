@@ -475,7 +475,6 @@
 </script>
 <script src="questions.js?v=99"></script>
 <script src="games/gamesnew.js"></script>
-<script src="sharecard.js"></script>
 <script src="dopamine-loader.js?v=99"></script>
 <script src="games/logic.js?v=99"></script>
 <script type="module">
@@ -529,10 +528,10 @@ async function _loadSharedQuestion(){
     if(cr){realDiv.innerHTML=cr.render(sharedQ,0);if(placeholder)feed.replaceChild(realDiv,placeholder);else feed.prepend(realDiv);const qcard=realDiv.querySelector('.qcard');if(qcard){
       // Show result banner if sender has result data, otherwise generic challenge banner
       var bannerHTML='';
-      if(sharedResult&&window.ShareCard){
-        bannerHTML=ShareCard.renderResultBanner(senderInfo&&senderInfo.username,sharedResult);
+      var sn=senderInfo&&senderInfo.username;
+      if(sharedResult&&sharedResult.text){
+        bannerHTML='<div class="shared-q-banner" style="gap:8px"><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:900;color:'+(sharedResult.won?'#22c55e':'#ef4444')+'">@'+(sn||'Someone')+' '+sharedResult.text+'</div><div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);margin-top:2px">Can you beat this?</div></div></div>';
       }else{
-        const sn=senderInfo&&senderInfo.username;
         bannerHTML='<div class="shared-q-banner"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span>'+(sn?'<strong style="color:var(--gold)">'+sn+'</strong> sent you this!':'Someone challenged you!')+'</span></div>';
       }
       const banner=document.createElement('div');banner.innerHTML=bannerHTML;
@@ -579,36 +578,26 @@ function _getSharesDb(){
 
 async function createShareLink(qData,btn,resultData){
   btn.innerHTML=`<svg viewBox="0 0 24 24" style="animation:spin .6s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>`;
-  try{let fromData=null;try{const fb=inIframe?window.parent.firebase:null,u=fb?fb.auth().currentUser:null;if(u){const d=IQData.load();fromData={uid:u.uid,username:d.username||u.displayName||'Someone',pic:u.photoURL||d.pic||''};}}catch{}const db=_getSharesDb();const shortId=_genShortId();const payload={q:qData,created:serverTimestamp()};if(fromData)payload.from=fromData;if(resultData)payload.result=resultData;await setDoc(doc(db,'shares',shortId),payload);return location.origin+'/improve.html?s='+shortId;}
+  try{let fromData=null;try{const fb=inIframe?window.parent.firebase:null,u=fb?fb.auth().currentUser:null;if(u){const d=IQData.load();fromData={uid:u.uid,username:d.username||u.displayName||'Someone',pic:u.photoURL||d.pic||''};}}catch{}const db=_getSharesDb();const shortId=_genShortId();const payload={q:qData,created:serverTimestamp()};if(fromData)payload.from=fromData;if(resultData)payload.result=resultData;await setDoc(doc(db,'shares',shortId),payload);return location.origin+'/s/'+shortId;}
   catch(err){console.warn('createShareLink failed:',err);return location.origin+'/improve.html?q='+encodeURIComponent(JSON.stringify(qData));}
 }
 
 function addShareBtn(cardEl,q,extraResult){var actions=document.createElement('div');actions.className='card-actions';var btn=document.createElement('button');btn.className='share-q-btn';btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share';
-  btn._extraResult=extraResult||null;
   btn.addEventListener('click',async function(e){e.stopPropagation();if(btn.dataset.busy==='1')return;btn.dataset.busy='1';
     try{if(typeof Haptics!=='undefined')Haptics.light();}catch(eh){}
     try{
-      // Build qData
       var qData={type:q.type,question:q.question,options:q.options||[],answer:q.answer,category:q.category,categoryLabel:q.categoryLabel,difficulty:q.difficulty};
       ['explanation','visual','sequence','grid','cards','pairs','board','scrambled','word','hint','equations','correctOrder','botLevel','maxGuesses','words','categories','start','end','steps','tubes','numColors','size','cells','src','snk','targetAngle','zoneSize','speed','useZone'].forEach(function(k){if(q[k]!=null)qData[k]=q[k];});
-      // Show spinner
       btn.innerHTML='<svg viewBox="0 0 24 24" style="animation:spin .6s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>';
-      // Create share link
       var shareUrl=await createShareLink(qData,btn,null);
-      // Use ShareCard if available
-      var result='failed';
-      var er=btn._extraResult;
-      if(window.ShareCard&&er){
-        result=await ShareCard.share(q.type,er.won,er,shareUrl);
-      }else if(window.ShareCard){
-        result=await ShareCard.share(q.type,true,{},shareUrl);
-      }else if(navigator.share){
-        try{await navigator.share({url:shareUrl,title:'Cebear',text:'Can you beat this? — Cebear'});result='shared';}catch(se){result='cancelled';}
+      var gameName=q.categoryLabel||'Brain Challenge';
+      var text=gameName+' on Cebear — can you beat me?';
+      if(navigator.share){
+        try{await navigator.share({url:shareUrl,title:gameName+' — Cebear',text:text});}catch(se){}
+        btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Shared!';
       }else{
-        await navigator.clipboard.writeText(shareUrl);result='copied';
-      }
-      if(result==='shared'||result==='copied'){
-        btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>'+(result==='copied'?'Copied!':'Shared!');
+        await navigator.clipboard.writeText(text+'\n'+shareUrl);
+        btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Copied!';
       }
     }catch(err){
       console.warn('share error:',err);
