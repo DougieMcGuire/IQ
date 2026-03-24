@@ -560,47 +560,56 @@ function playEntrance(){
 
 loadProfile();loadAvatar();playEntrance();
 
-// Elastic overscroll — pull past bounds with resistance then snap back
+// Elastic overscroll — Apple-style rubber band
 (function(){
   var sc=document.querySelector('.scroll');
-  var hero=document.querySelector('.hero');
-  var cbg=document.querySelector('.content-bg');
-  var pulling=false,startY=0,over=0,dir=0;
-  var RESIST=.3,MAX=80;
+  var pulling=false,startY=0,curY=0,over=0,dir=0,locked=false;
+  var MAX=90;
+
+  // Logarithmic resistance — feels natural, harder the further you pull
+  function resist(raw){return MAX*(1-Math.exp(-raw*0.008));}
 
   function applyOver(px){
-    // Positive = pulling down at top (show blue), negative = pulling up at bottom
-    sc.style.transform=px?'translateY('+px+'px)':'';
+    if(px===0){sc.style.transform='';return;}
+    sc.style.transform='translateY('+px+'px)';
   }
 
   sc.addEventListener('touchstart',function(e){
-    startY=e.touches[0].clientY;pulling=false;over=0;dir=0;
+    // Kill any ongoing snap animation
+    sc.style.transition='';
+    startY=e.touches[0].clientY;
+    curY=startY;pulling=false;over=0;dir=0;locked=false;
   },{passive:true});
 
   sc.addEventListener('touchmove',function(e){
-    var y=e.touches[0].clientY,dy=y-startY;
+    curY=e.touches[0].clientY;
+    var dy=curY-startY;
     var atTop=sc.scrollTop<=0;
     var atBot=sc.scrollTop>=sc.scrollHeight-sc.clientHeight-1;
 
-    if(!pulling){
-      if(atTop&&dy>0){pulling=true;dir=1;e.preventDefault();}
-      else if(atBot&&dy<0){pulling=true;dir=-1;e.preventDefault();}
-      else return;
+    if(!pulling&&!locked){
+      // Determine if we should start rubber banding
+      if(atTop&&dy>2){pulling=true;dir=1;startY=curY;}
+      else if(atBot&&dy<-2){pulling=true;dir=-1;startY=curY;}
+      else{locked=true;return;}
     }
+
+    if(locked)return;
 
     if(pulling){
       e.preventDefault();
-      var raw=dir===1?(y-startY):-(startY-y);
-      if(raw<0)raw=0;
-      over=Math.min(MAX,raw*RESIST);
+      var raw=Math.abs(curY-startY);
+      over=resist(raw);
       applyOver(dir===1?over:-over);
     }
   },{passive:false});
 
   function snapBack(){
-    sc.style.transition='transform .35s cubic-bezier(.22,1,.36,1)';
+    if(!pulling&&over===0)return;
+    sc.style.transition='transform .4s cubic-bezier(.25,1,.5,1)';
     applyOver(0);
-    setTimeout(function(){sc.style.transition='';},360);
+    var done=function(){sc.style.transition='';sc.removeEventListener('transitionend',done);};
+    sc.addEventListener('transitionend',done);
     pulling=false;over=0;dir=0;
   }
 
