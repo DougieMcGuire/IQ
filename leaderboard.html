@@ -164,6 +164,21 @@
     .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:8px 18px;border-radius:14px;font-size:13px;font-weight:800;opacity:0;transition:opacity .3s;z-index:300;pointer-events:none;box-shadow:0 4px 0 var(--green-dk)}
     .toast.show{opacity:1}
 
+    /* ── Profile overlay ── */
+    .prof-ov{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:none;align-items:flex-end;justify-content:center}
+    .prof-ov.open{display:flex}
+    .prof-sheet{width:100%;max-width:480px;height:92dvh;background:var(--bg);border-radius:20px 20px 0 0;overflow:hidden;animation:sheetUp .3s cubic-bezier(.22,1,.36,1) both;display:flex;flex-direction:column}
+    @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .prof-sheet-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;flex-shrink:0;border-bottom:2px solid var(--cb)}
+    .prof-sheet-title{font-size:15px;font-weight:900;color:var(--text)}
+    .prof-sheet-close{background:none;border:2.5px solid var(--cb);border-radius:10px;padding:5px 12px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:var(--dim);cursor:pointer}
+    .prof-sheet-close:active{background:#f1f5f9}
+    .prof-sheet iframe{flex:1;width:100%;border:none;background:#1b2d5b}
+    body.dark .prof-sheet{background:#1e293b}
+    body.dark .prof-sheet-hdr{border-bottom-color:#334155}
+    body.dark .prof-sheet-title{color:#e2e8f0}
+    body.dark .prof-sheet-close{border-color:#334155;color:#94a3b8}
+
     @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
     @keyframes zoomIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
     @keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -234,6 +249,15 @@
     </div>
     <div class="sec" id="rest-lbl" style="display:none">Everyone <span id="total-count" style="color:var(--dim);font-weight:700"></span></div>
     <div class="rows" id="rows"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+  </div>
+</div>
+<div class="prof-ov" id="prof-ov">
+  <div class="prof-sheet">
+    <div class="prof-sheet-hdr">
+      <div class="prof-sheet-title" id="prof-sheet-title">Profile</div>
+      <button class="prof-sheet-close" id="prof-close">Close</button>
+    </div>
+    <iframe id="prof-iframe" src="" title="User profile"></iframe>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -383,6 +407,31 @@ function renderList(rest,myIdx,cfg){
 }
 
 function esc(s){return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// ── Profile overlay ──
+function openProfile(username){
+  if(!username)return;
+  Haptics?.medium?.();
+  var ov=document.getElementById('prof-ov'),iframe=document.getElementById('prof-iframe'),title=document.getElementById('prof-sheet-title');
+  title.textContent='@'+username;
+  iframe.src='404.html?_u='+encodeURIComponent(username);
+  ov.classList.add('open');
+}
+function closeProfile(){
+  var ov=document.getElementById('prof-ov'),iframe=document.getElementById('prof-iframe');
+  ov.classList.remove('open');
+  setTimeout(function(){iframe.src='';},300);
+}
+document.getElementById('prof-close').addEventListener('click',closeProfile);
+document.getElementById('prof-ov').addEventListener('click',function(e){if(e.target===this)closeProfile();});
+
+// Delegate clicks on rows and podium
+document.addEventListener('click',function(e){
+  var row=e.target.closest('.row');
+  if(row){var nameEl=row.querySelector('.row-name');if(nameEl){var name=nameEl.textContent.replace(/YOU$/,'').trim();if(name)openProfile(name);return;}}
+  var pod=e.target.closest('.pod');
+  if(pod){var nameEl2=pod.querySelector('.pod-name');if(nameEl2){var name2=nameEl2.textContent.replace(/\s*\(you\)/,'').trim();if(name2)openProfile(name2);return;}}
+});}
 
 async function init(){
   await authReady;myUid=IQData.getCurrentUser()?.uid||null;
