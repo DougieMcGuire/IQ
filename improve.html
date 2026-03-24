@@ -511,10 +511,23 @@ async function _loadSharedQuestion(){
     const db=await _getSharesDb();
     const snap=await getDoc(doc(db,'shares',sharedShortId));
     if(!snap.exists()){const ph=feed.querySelector('.slide[data-slide-idx="0"]');if(ph)ph.innerHTML=`<div class="qcard"><div class="question" style="color:rgba(255,255,255,.5)">Challenge not found.</div></div>`;return;}
-    const data=snap.data();sharedQ=data.q||null;if(data.from){senderInfo=data.from;initSenderUI();}if(!sharedQ)return;
+    const data=snap.data();sharedQ=data.q||null;if(data.from){senderInfo=data.from;initSenderUI();}
+    var sharedResult=data.result||null;
+    if(!sharedQ)return;
     const placeholder=feed.querySelector('.slide[data-slide-idx="0"]'),realDiv=document.createElement('div');realDiv.className='slide';realDiv.dataset.slideIdx=0;
     const cr=Q._renderers&&Q._renderers[sharedQ.type];
-    if(cr){realDiv.innerHTML=cr.render(sharedQ,0);if(placeholder)feed.replaceChild(realDiv,placeholder);else feed.prepend(realDiv);const qcard=realDiv.querySelector('.qcard');if(qcard){const banner=document.createElement('div');banner.className='shared-q-banner';const sn=senderInfo&&senderInfo.username;banner.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span>'+(sn?'<strong style="color:var(--gold)">'+sn+'</strong> sent you this!':'Someone challenged you!')+'</span>';qcard.insertBefore(banner,qcard.firstChild);}try{cr.attach(realDiv,sharedQ,0,{feed,flashEl,confettiEl,IQData,getEncouragement,updateUI,checkMore:handleScroll,spawnConfetti,answerStartRef:{get:()=>answerStart,set:v=>{answerStart=v}},Haptics,notifyGamePlayed:window.notifyGamePlayed,onAnswer:window.onAnswerForTasks,addShareBtn,startAutoScroll});}catch(e){console.warn(e)}}
+    if(cr){realDiv.innerHTML=cr.render(sharedQ,0);if(placeholder)feed.replaceChild(realDiv,placeholder);else feed.prepend(realDiv);const qcard=realDiv.querySelector('.qcard');if(qcard){
+      // Show result banner if sender has result data, otherwise generic challenge banner
+      var bannerHTML='';
+      if(sharedResult&&window.ShareCard){
+        bannerHTML=ShareCard.renderResultBanner(senderInfo&&senderInfo.username,sharedResult);
+      }else{
+        const sn=senderInfo&&senderInfo.username;
+        bannerHTML='<div class="shared-q-banner"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span>'+(sn?'<strong style="color:var(--gold)">'+sn+'</strong> sent you this!':'Someone challenged you!')+'</span></div>';
+      }
+      const banner=document.createElement('div');banner.innerHTML=bannerHTML;
+      if(banner.firstChild)qcard.insertBefore(banner.firstChild,qcard.firstChild);
+    }try{cr.attach(realDiv,sharedQ,0,{feed,flashEl,confettiEl,IQData,getEncouragement,updateUI,checkMore:handleScroll,spawnConfetti,answerStartRef:{get:()=>answerStart,set:v=>{answerStart=v}},Haptics,notifyGamePlayed:window.notifyGamePlayed,onAnswer:window.onAnswerForTasks,addShareBtn,startAutoScroll});}catch(e){console.warn(e)}}
     else{realDiv.innerHTML=renderDef(sharedQ,0);if(placeholder)feed.replaceChild(realDiv,placeholder);else feed.prepend(realDiv);const qcard=realDiv.querySelector('.qcard');if(qcard)addShareBtn(qcard,sharedQ);}
     answerStart=Date.now();
   }catch(e){console.warn('loadSharedQuestion failed:',e);}
@@ -548,30 +561,37 @@ function _genShortId(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvw
 let _sharesDb=null;
 async function _getSharesDb(){if(_sharesDb)return _sharesDb;const{initializeApp,getApps}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");const{getFirestore:gFS}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");const cfg={apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend"};const app=getApps().length?getApps()[0]:initializeApp(cfg);_sharesDb=gFS(app);return _sharesDb;}
 
-async function createShareLink(qData,btn){
+async function createShareLink(qData,btn,resultData){
   btn.innerHTML=`<svg viewBox="0 0 24 24" style="animation:spin .6s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>`;
-  try{let fromData=null;try{const fb=inIframe?window.parent.firebase:null,u=fb?fb.auth().currentUser:null;if(u){const d=IQData.load();fromData={uid:u.uid,username:d.username||u.displayName||'Someone',pic:u.photoURL||d.pic||''};}}catch{}const db=await _getSharesDb();const shortId=_genShortId();const payload={q:qData,created:serverTimestamp()};if(fromData)payload.from=fromData;await setDoc(doc(db,'shares',shortId),payload);return location.origin+'/improve.html?s='+shortId;}
+  try{let fromData=null;try{const fb=inIframe?window.parent.firebase:null,u=fb?fb.auth().currentUser:null;if(u){const d=IQData.load();fromData={uid:u.uid,username:d.username||u.displayName||'Someone',pic:u.photoURL||d.pic||''};}}catch{}const db=await _getSharesDb();const shortId=_genShortId();const payload={q:qData,created:serverTimestamp()};if(fromData)payload.from=fromData;if(resultData)payload.result=resultData;await setDoc(doc(db,'shares',shortId),payload);return location.origin+'/improve.html?s='+shortId;}
   catch(err){console.warn('createShareLink failed:',err);return location.origin+'/improve.html?q='+encodeURIComponent(JSON.stringify(qData));}
 }
 
-function addShareBtn(cardEl,q,extraResult){const actions=document.createElement('div');actions.className='card-actions';const btn=document.createElement('button');btn.className='share-q-btn';btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share`;btn.addEventListener('click',async e=>{e.stopPropagation();if(btn.dataset.busy==='1')return;btn.dataset.busy='1';Haptics&&Haptics.light&&Haptics.light();try{const qData={type:q.type,question:q.question,options:q.options||[],answer:q.answer,category:q.category,categoryLabel:q.categoryLabel,difficulty:q.difficulty,explanation:q.explanation||'',visual:q.visual||null,sequence:q.sequence||null,grid:q.grid||null,cards:q.cards||null,pairs:q.pairs||null,board:q.board||null,scrambled:q.scrambled||null,word:q.word||null,hint:q.hint||null,equations:q.equations||null,correctOrder:q.correctOrder||null,botLevel:q.botLevel!=null?q.botLevel:null,maxGuesses:q.maxGuesses||null,words:q.words||null,categories:q.categories||null,start:q.start||null,end:q.end||null,steps:q.steps||null,tubes:q.tubes||null,numColors:q.numColors||null,size:q.size||null,cells:q.cells||null,src:q.src!=null?q.src:null,snk:q.snk!=null?q.snk:null,targetAngle:q.targetAngle!=null?q.targetAngle:null,zoneSize:q.zoneSize||null,speed:q.speed||null,useZone:q.useZone!=null?q.useZone:null};Object.keys(qData).forEach(k=>{if(qData[k]===null||qData[k]===undefined)delete qData[k]});
-    btn.innerHTML=`<svg viewBox="0 0 24 24" style="animation:spin .6s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>`;
-    const shareUrl=await createShareLink(qData,btn);
-    // Use ShareCard if available
-    if(window.ShareCard){
-      const won=extraResult?extraResult.won:true;
-      const extra=extraResult||{};
-      const result=await ShareCard.shareWithCard(q.type,q,won,extra,shareUrl);
-      if(result==='shared'||result==='copied'){
-        btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>${result==='copied'?'Copied!':'Shared!'}`;
-        if(result==='copied')btn.classList.add('copied');
-      }
-    }else{
-      if(navigator.share){navigator.share({url:shareUrl,title:'Cebear Brain Challenge',text:'Can you answer this brain teaser? — Cebear'}).catch(()=>{});btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Shared!`;}
-      else{await navigator.clipboard.writeText(shareUrl);btn.classList.add('copied');btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Copied!`;}
+function addShareBtn(cardEl,q,extraResult){const actions=document.createElement('div');actions.className='card-actions';const btn=document.createElement('button');btn.className='share-q-btn';btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share`;
+  // Store extraResult on the button for later use
+  btn._extraResult=extraResult||null;
+  btn.addEventListener('click',async e=>{e.stopPropagation();if(btn.dataset.busy==='1')return;btn.dataset.busy='1';Haptics&&Haptics.light&&Haptics.light();
+  try{const qData={type:q.type,question:q.question,options:q.options||[],answer:q.answer,category:q.category,categoryLabel:q.categoryLabel,difficulty:q.difficulty,explanation:q.explanation||'',visual:q.visual||null,sequence:q.sequence||null,grid:q.grid||null,cards:q.cards||null,pairs:q.pairs||null,board:q.board||null,scrambled:q.scrambled||null,word:q.word||null,hint:q.hint||null,equations:q.equations||null,correctOrder:q.correctOrder||null,botLevel:q.botLevel!=null?q.botLevel:null,maxGuesses:q.maxGuesses||null,words:q.words||null,categories:q.categories||null,start:q.start||null,end:q.end||null,steps:q.steps||null,tubes:q.tubes||null,numColors:q.numColors||null,size:q.size||null,cells:q.cells||null,src:q.src!=null?q.src:null,snk:q.snk!=null?q.snk:null,targetAngle:q.targetAngle!=null?q.targetAngle:null,zoneSize:q.zoneSize||null,speed:q.speed||null,useZone:q.useZone!=null?q.useZone:null};Object.keys(qData).forEach(k=>{if(qData[k]===null||qData[k]===undefined)delete qData[k]});
+    // Build result data if we have it
+    var er=btn._extraResult,resultData=null,shareText='';
+    if(er&&window.ShareCard){
+      resultData=ShareCard.buildResultData(q.type,er.won,er);
+      var d=IQData.load();
+      shareText=ShareCard.buildShareText(q.type,er.won,er,d.username);
     }
+    btn.innerHTML=`<svg viewBox="0 0 24 24" style="animation:spin .6s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>`;
+    const shareUrl=await createShareLink(qData,btn,resultData);
+    var g=window.ShareCard?ShareCard.GAMES[q.type]:null;
+    var title=g?g.icon+' '+g.name+' — Cebear':'Cebear Brain Challenge';
+    var text=shareText||'Can you beat this? — Cebear';
+    if(navigator.share){navigator.share({url:shareUrl,title:title,text:text}).catch(()=>{});btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Shared!`;}
+    else{await navigator.clipboard.writeText(text+'\n'+shareUrl);btn.classList.add('copied');btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Copied!`;}
     setTimeout(()=>{btn.classList.remove('copied');btn.dataset.busy='';btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share`},2500);
-  }catch(err){btn.dataset.busy='';btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share`;}});actions.appendChild(btn);cardEl.insertBefore(actions,cardEl.querySelector('.game-branding')||cardEl.querySelector('.branding'));}
+  }catch(err){btn.dataset.busy='';btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share`;}});
+  actions.appendChild(btn);cardEl.insertBefore(actions,cardEl.querySelector('.game-branding')||cardEl.querySelector('.branding'));
+  // Return btn so games can update extraResult after finish
+  return btn;
+}
 
 const feed=document.getElementById('feed'),iqVal=document.getElementById('iq-val'),streakVal=document.getElementById('streak-val'),streakPill=document.getElementById('streak-pill'),streakPopup=document.getElementById('streak-popup'),streakNum=document.getElementById('streak-num'),onboard=document.getElementById('onboard'),ageSlider=document.getElementById('age-slider'),ageDisplay=document.getElementById('age-display'),flashEl=document.getElementById('flash'),confettiEl=document.getElementById('confetti'),xpBar=document.getElementById('xp-bar'),levelLabel=document.getElementById('level-label'),xpLabel=document.getElementById('xp-label');
 const SESSION_KEY='bd_session_today';
