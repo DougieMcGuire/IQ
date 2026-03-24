@@ -584,10 +584,15 @@ function addShareBtn(cardEl,q,extraResult){const actions=document.createElement(
     var g=window.ShareCard?ShareCard.GAMES[q.type]:null;
     var title=g?g.icon+' '+g.name+' — Cebear':'Cebear Brain Challenge';
     var text=shareText||'Can you beat this? — Cebear';
-    if(navigator.share){navigator.share({url:shareUrl,title:title,text:text}).catch(()=>{});btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Shared!`;}
-    else{await navigator.clipboard.writeText(text+'\n'+shareUrl);btn.classList.add('copied');btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Copied!`;}
+    if(navigator.share){
+      try{await navigator.share({url:shareUrl,title:title,text:text});}catch(se){/* user cancelled — fine */}
+      btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Shared!`;
+    }else{
+      await navigator.clipboard.writeText(text+'\n'+shareUrl);btn.classList.add('copied');
+      btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Copied!`;
+    }
     setTimeout(()=>{btn.classList.remove('copied');btn.dataset.busy='';btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share`},2500);
-  }catch(err){btn.dataset.busy='';btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share`;}});
+  }catch(err){console.warn('share error:',err);btn.dataset.busy='';btn.innerHTML=`<svg viewBox="0 0 24 24" style="width:12px;height:12px"><circle cx="12" cy="12" r="10" fill="#ef4444"/></svg>Error`;btn.style.color='#fca5a5';setTimeout(()=>{btn.style.color='';btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share`;},2000);}});
   actions.appendChild(btn);cardEl.insertBefore(actions,cardEl.querySelector('.game-branding')||cardEl.querySelector('.branding'));
   // Return btn so games can update extraResult after finish
   return btn;
