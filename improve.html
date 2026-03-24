@@ -3,7 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-  <title>Cebear</title>
+  <title>Cebear — Brain Training Challenge</title>
+  <meta name="description" content="Can you beat this brain challenge? Train your IQ on Cebear!">
+  <meta property="og:title" content="Cebear — Brain Training Challenge">
+  <meta property="og:description" content="Can you beat this brain challenge? Train your IQ on Cebear — it's free!">
+  <meta property="og:image" content="https://cebear.com/og-share.png">
+  <meta property="og:url" content="https://cebear.com">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Cebear — Brain Training Challenge">
+  <meta name="twitter:description" content="Can you beat this? Train your brain on Cebear!">
+  <meta name="twitter:image" content="https://cebear.com/og-share.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -508,7 +518,7 @@ if(senderParam){try{senderInfo=JSON.parse(senderParam)}catch{}}
 async function _loadSharedQuestion(){
   if(!sharedShortId)return;
   try{
-    const db=await _getSharesDb();
+    const db=_getSharesDb();
     const snap=await getDoc(doc(db,'shares',sharedShortId));
     if(!snap.exists()){const ph=feed.querySelector('.slide[data-slide-idx="0"]');if(ph)ph.innerHTML=`<div class="qcard"><div class="question" style="color:rgba(255,255,255,.5)">Challenge not found.</div></div>`;return;}
     const data=snap.data();sharedQ=data.q||null;if(data.from){senderInfo=data.from;initSenderUI();}
@@ -559,11 +569,17 @@ function renderInstallCard(idx){const div=document.createElement('div');div.clas
 
 function _genShortId(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';let id='';const arr=new Uint8Array(7);crypto.getRandomValues(arr);arr.forEach(b=>id+=chars[b%chars.length]);return id;}
 let _sharesDb=null;
-async function _getSharesDb(){if(_sharesDb)return _sharesDb;const{initializeApp,getApps}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");const{getFirestore:gFS}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");const cfg={apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend"};const app=getApps().length?getApps()[0]:initializeApp(cfg);_sharesDb=gFS(app);return _sharesDb;}
+function _getSharesDb(){
+  if(_sharesDb)return _sharesDb;
+  const cfg={apiKey:"AIzaSyBQDs2EXmb0YodZob6Hz4cSTm_hB146-No",authDomain:"braindeer-backend.firebaseapp.com",projectId:"braindeer-backend"};
+  const app=getApps().length?getApps()[0]:initializeApp(cfg);
+  _sharesDb=getFirestore(app);
+  return _sharesDb;
+}
 
 async function createShareLink(qData,btn,resultData){
   btn.innerHTML=`<svg viewBox="0 0 24 24" style="animation:spin .6s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>`;
-  try{let fromData=null;try{const fb=inIframe?window.parent.firebase:null,u=fb?fb.auth().currentUser:null;if(u){const d=IQData.load();fromData={uid:u.uid,username:d.username||u.displayName||'Someone',pic:u.photoURL||d.pic||''};}}catch{}const db=await _getSharesDb();const shortId=_genShortId();const payload={q:qData,created:serverTimestamp()};if(fromData)payload.from=fromData;if(resultData)payload.result=resultData;await setDoc(doc(db,'shares',shortId),payload);return location.origin+'/improve.html?s='+shortId;}
+  try{let fromData=null;try{const fb=inIframe?window.parent.firebase:null,u=fb?fb.auth().currentUser:null;if(u){const d=IQData.load();fromData={uid:u.uid,username:d.username||u.displayName||'Someone',pic:u.photoURL||d.pic||''};}}catch{}const db=_getSharesDb();const shortId=_genShortId();const payload={q:qData,created:serverTimestamp()};if(fromData)payload.from=fromData;if(resultData)payload.result=resultData;await setDoc(doc(db,'shares',shortId),payload);return location.origin+'/improve.html?s='+shortId;}
   catch(err){console.warn('createShareLink failed:',err);return location.origin+'/improve.html?q='+encodeURIComponent(JSON.stringify(qData));}
 }
 
