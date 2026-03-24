@@ -232,7 +232,7 @@
       </div>
       <div class="yr-rv" id="yr-rv"></div>
     </div>
-    <div class="sec" id="rest-lbl" style="display:none">Everyone</div>
+    <div class="sec" id="rest-lbl" style="display:none">Everyone <span id="total-count" style="color:var(--dim);font-weight:700"></span></div>
     <div class="rows" id="rows"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
   </div>
 </div>
@@ -245,7 +245,7 @@ import{doc,getDoc,setDoc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12
 if(window.parent!==window)parent.authCheck();
 
 // ── Cache: localStorage, stale-while-revalidate ──
-const CK='cb_lb_v2',STALE=3*60000,MAX_AGE=30*60000;
+const CK='cb_lb_v3',STALE=60000,MAX_AGE=10*60000;
 function getCache(){try{var d=JSON.parse(localStorage.getItem(CK));if(d&&d._t)return d;return null}catch{return null}}
 function setCache(users){try{localStorage.setItem(CK,JSON.stringify({users,_t:Date.now()}))}catch{}}
 function cacheAge(){var c=getCache();return c?(Date.now()-c._t):Infinity}
@@ -273,7 +273,7 @@ function avatarHTML(u,size){
   return'<span style="background:linear-gradient(135deg,'+g[0]+','+g[1]+');width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:'+(size>40?'18':'14')+'px">'+esc(init)+'</span>';
 }
 
-const SORT={iq:{field:'iq',label:'IQ',color:'var(--purple)',min:50,fmt:v=>v},bestStreak:{field:'bestStreak',label:'Streak',color:'var(--gold-dk)',min:1,fmt:v=>v},level:{field:'level',label:'Level',color:'var(--blue)',min:1,fmt:v=>'Lvl '+v}};
+const SORT={iq:{field:'iq',label:'IQ',color:'var(--purple)',min:1,fmt:v=>v},bestStreak:{field:'bestStreak',label:'Streak',color:'var(--gold-dk)',min:0,fmt:v=>v},level:{field:'level',label:'Level',color:'var(--blue)',min:1,fmt:v=>'Lvl '+v}};
 let cs='iq',allUsers=[],myUid=null,isHidden=false;
 
 function toast(m,c){var t=document.getElementById('toast');t.textContent=m;t.style.background=c||'var(--green)';t.style.boxShadow='0 4px 0 '+(c==='var(--red)'?'var(--red-dk)':'var(--green-dk)');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
@@ -285,7 +285,6 @@ document.getElementById('tabs').addEventListener('click',e=>{
 });
 document.getElementById('ref-btn').addEventListener('click',()=>{
   Haptics?.medium?.();
-  if(cacheAge()<STALE){toast('Up to date','var(--dim)');return}
   fetchSnapshot(true);
 });
 
@@ -312,19 +311,27 @@ async function pushMe(){
 }
 window.updateLeaderboardSnapshot=pushMe;
 
-async function migrate(){
-  try{var{collection,getDocs,query,limit}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");var snap=await getDocs(query(collection(db,'users'),limit(500)));var users=snap.docs.map(d=>({uid:d.id,...d.data()})).filter(u=>!u.hideFromLeaderboard&&(u.iq||0)>0).map(u=>({uid:u.uid||'',username:u.username||'Anon',iq:u.iq||0,level:u.level||1,bestStreak:u.bestStreak||0,answered:u.answered||0,correct:u.correct||0,avatarIMG:u.avatarIMG||'',pic:u.pic||'',hidden:false,updatedAt:Date.now()})).filter(u=>u.uid);users.sort((a,b)=>(b.iq||0)-(a.iq||0));await setDoc(doc(db,'leaderboard','snapshot'),{users,updatedAt:Date.now(),migrated:true});return users}catch{return[]}
-}
-
 async function fetchSnapshot(forced=false){
-  // Stale-while-revalidate: show cache immediately, refresh in background
   var cached=getCache();
   if(!forced&&cached&&cached.users){allUsers=cached.users;render();if(cacheAge()<STALE)return;}
   try{
-    var ref=doc(db,'leaderboard','snapshot');var snap=await getDoc(ref);
-    if(snap.exists()){allUsers=(snap.data().users||[]).filter(u=>!u.hidden&&(u.iq||0)>=50&&(u.answered||0)>=5);setCache(allUsers)}
-    else{var m=await migrate();allUsers=m.filter(u=>(u.iq||0)>=50&&(u.answered||0)>=5);setCache(allUsers)}
-  }catch{toast('Load failed','var(--red)');if(cached?.users)allUsers=cached.users}
+    // Fetch ALL users directly from Firestore — no limit
+    var{collection,getDocs}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    var snap=await getDocs(collection(db,'users'));
+    var users=snap.docs.map(d=>({uid:d.id,...d.data()}))
+      .filter(u=>!u.hideFromLeaderboard&&(u.iq||0)>0&&u.uid)
+      .map(u=>({uid:u.uid,username:u.username||u.displayName||'Anon',iq:u.iq||0,level:u.level||1,bestStreak:u.bestStreak||0,answered:u.answered||0,correct:u.correct||0,avatarIMG:u.avatarIMG||'',pic:u.pic||'',hidden:false}));
+    users.sort((a,b)=>(b.iq||0)-(a.iq||0));
+    allUsers=users;setCache(allUsers);
+    // Also update the snapshot doc for faster future loads
+    try{await setDoc(doc(db,'leaderboard','snapshot'),{users:users.slice(0,500),updatedAt:Date.now()})}catch{}
+  }catch(err){
+    // Fallback to snapshot doc
+    try{var ref=doc(db,'leaderboard','snapshot');var sn=await getDoc(ref);
+    if(sn.exists()){allUsers=(sn.data().users||[]).filter(u=>!u.hidden);setCache(allUsers)}}catch{}
+    if(!allUsers.length&&cached?.users)allUsers=cached.users;
+    toast('Refresh failed','var(--red)');
+  }
   render();
 }
 
@@ -335,6 +342,7 @@ function render(){
   var myIdx=myUid&&!isHidden?sorted.findIndex(u=>u.uid===myUid):-1;
   renderYR(sorted,myIdx,cfg);renderPodium(sorted.slice(0,3),cfg);renderList(sorted.slice(3),myIdx,cfg);
   document.getElementById('rest-lbl').style.display=sorted.length>3?'block':'none';
+  var tc=document.getElementById('total-count');if(tc)tc.textContent='('+sorted.length+' players)';
 }
 
 function renderYR(sorted,myIdx,cfg){
