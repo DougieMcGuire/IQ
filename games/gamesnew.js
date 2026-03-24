@@ -492,11 +492,13 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
 
   Q.register('flappy', function(){
     var speeds = [
-      { label: 'Chill',  speed: 1.0, gap: 130, interval: 130, d: 0.8 },
-      { label: 'Normal', speed: 1.3, gap: 120, interval: 115, d: 1.1 },
-      { label: 'Hard',   speed: 1.6, gap: 110, interval: 100, d: 1.5 },
+      { label: 'Chill',  speed: 0.9, gap: 138, interval: 140, d: 0.7 },
+      { label: 'Normal', speed: 1.1, gap: 126, interval: 120, d: 1.0 },
+      { label: 'Hard',   speed: 1.4, gap: 112, interval: 105, d: 1.4 },
     ];
-    var tier = Q.rand(0, 2), s = speeds[tier];
+    // Favor chill/normal — hard is rare
+    var roll = Math.random(), tier = roll < 0.45 ? 0 : roll < 0.85 ? 1 : 2;
+    var s = speeds[tier];
     return {
       type: 'flappy', category: 'mentalAgility', categoryLabel: 'Flappy Bird',
       difficulty: s.d, question: 'Get past ' + TARGET + ' pipes! (' + s.label + ')',
@@ -542,23 +544,21 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
       var g = cv.getContext('2d');
       g.scale(2, 2);
 
-      var GRAV = 0.22, FLP = -3.6, MXV = 4.5;
-      var PW = 42, PS = q.ps, GAP = q.gap, PII = q.pi;
+      // Tuned for dopamine — floaty, forgiving, satisfying
+      var GRAV = 0.16, FLP = -3.2, MXV = 3.8;
+      var PW = 42, PS = q.ps * 0.92, GAP = q.gap + 8, PII = q.pi;
       var BX = 60, BR = 13;
-      var GND = H - 28; // ground level
 
       var by, bv, ba, pp, sc, fc, dead, won, raf, on;
-      // Clouds
-      var clouds = [];
-      for (var ci = 0; ci < 4; ci++) clouds.push({x: Math.random()*W, y: 15+Math.random()*60, w: 30+Math.random()*25});
+      var bestScore = 0;
 
       function reset(){ by = H * 0.4; bv = 0; ba = 0; pp = []; sc = 0; fc = 0; dead = false; won = false; on = false; }
       reset();
 
-      function flap(){ if (!dead && !won){ bv = FLP; Hp.tilePop && Hp.tilePop(); } }
+      function flap(){ if (!dead && !won){ bv = FLP; Hp.light && Hp.light(); } }
 
       function addP(){
-        var mn = 45, mx = GND - GAP - 45;
+        var mn = 55, mx = H - GAP - 55;
         pp.push({ x: W, t: mn + Math.random() * (mx - mn), s: false });
       }
 
@@ -566,108 +566,64 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
 
       function drawBird(x, y, a){
         g.save(); g.translate(x, y); g.rotate(a);
-
         // Shadow
         g.fillStyle = 'rgba(0,0,0,.1)';
         g.beginPath(); g.arc(1, 2, BR, 0, Math.PI * 2); g.fill();
-
-        // Body — white circle
+        // Body
         g.fillStyle = '#fff';
         g.beginPath(); g.arc(0, 0, BR, 0, Math.PI * 2); g.fill();
-
-        // Wing flap
-        var wy = Math.sin(fc * 0.25) * 2.5;
-        g.fillStyle = 'rgba(4,116,252,.2)';
+        // Wing
+        var wy = Math.sin(fc * 0.25) * 3;
+        g.fillStyle = 'rgba(4,116,252,.15)';
         g.beginPath(); g.ellipse(-4, wy, 8, 5, -0.15, 0, Math.PI * 2); g.fill();
-
         // Eye
         g.fillStyle = '#1e293b';
         g.beginPath(); g.arc(4, -3, 3, 0, Math.PI * 2); g.fill();
         g.fillStyle = '#fff';
         g.beginPath(); g.arc(5, -4, 1.2, 0, Math.PI * 2); g.fill();
-
         // Beak
         g.fillStyle = '#f59e0b';
-        g.beginPath();
-        g.moveTo(BR - 4, -2);
-        g.lineTo(BR + 5, 1);
-        g.lineTo(BR - 4, 4);
-        g.closePath();
-        g.fill();
-
+        g.beginPath(); g.moveTo(BR - 4, -2); g.lineTo(BR + 5, 1); g.lineTo(BR - 4, 4); g.closePath(); g.fill();
         g.restore();
       }
 
       function drawPipe(x, top){
         var bot = top + GAP, cap = 8, ov = 4, r = 6;
-
-        // White pipe with shadow — matches the white button/card style
-        // Shadow first
         g.fillStyle = 'rgba(0,0,0,.08)';
         g.beginPath(); g.roundRect(x + 2, -4, PW, top - cap + 6, r); g.fill();
         g.beginPath(); g.roundRect(x + 2, bot + cap - 2, PW, H - bot - cap + 6, r); g.fill();
-
-        // Top pipe body
         g.fillStyle = '#fff';
         g.beginPath(); g.roundRect(x, -4, PW, top - cap + 4, r); g.fill();
-        // Top cap — wider
         g.beginPath(); g.roundRect(x - ov, top - cap, PW + ov * 2, cap, [0, 0, r, r]); g.fill();
-
-        // Bottom pipe body
         g.beginPath(); g.roundRect(x, bot + cap, PW, H - bot - cap + 4, r); g.fill();
-        // Bottom cap
         g.beginPath(); g.roundRect(x - ov, bot, PW + ov * 2, cap, [r, r, 0, 0]); g.fill();
-
-        // Subtle inner line for depth
         g.fillStyle = 'rgba(4,116,252,.06)';
         g.fillRect(x + 3, 0, 2, top - cap);
         g.fillRect(x + 3, bot + cap, 2, H);
       }
 
       function draw(){
-        // Sky gradient
-        var sky = g.createLinearGradient(0, 0, 0, H);
-        sky.addColorStop(0, '#0474fc');
-        sky.addColorStop(1, '#0358c4');
-        g.fillStyle = sky;
+        g.fillStyle = '#0474fc';
         g.fillRect(0, 0, W, H);
-
-        // Clouds
-        g.fillStyle = 'rgba(255,255,255,.08)';
-        for (var ci = 0; ci < clouds.length; ci++){
-          var cl = clouds[ci];
-          g.beginPath(); g.ellipse(cl.x, cl.y, cl.w, 10, 0, 0, Math.PI*2); g.fill();
-          cl.x -= 0.15;
-          if (cl.x < -cl.w) cl.x = W + cl.w;
-        }
-
-        // Pipes
+        // Subtle vignette
+        g.fillStyle = 'rgba(0,0,0,.04)';
+        g.fillRect(0, 0, W, 3);
+        g.fillRect(0, H - 3, W, 3);
         for (var i = 0; i < pp.length; i++) drawPipe(pp[i].x, pp[i].t);
-
-        // Ground
-        g.fillStyle = '#16a34a';
-        g.fillRect(0, GND, W, H - GND);
-        g.fillStyle = '#22c55e';
-        g.fillRect(0, GND, W, 4);
-        // Grass tufts
-        g.fillStyle = '#15803d';
-        for (var gi = 0; gi < W; gi += 8){
-          g.fillRect(gi, GND + 4, 3, 2 + Math.sin(gi*0.5)*1.5);
-        }
-
+        // Floor
+        g.fillStyle = 'rgba(255,255,255,.1)';
+        g.fillRect(0, H - 2, W, 2);
         // Bird
-        var ta = Math.min(Math.max(bv * 0.09, -0.4), 0.9);
-        ba += (ta - ba) * 0.12;
+        var ta = Math.min(Math.max(bv * 0.08, -0.35), 0.7);
+        ba += (ta - ba) * 0.1;
         drawBird(BX, by, ba);
-
-        // Score — top center, bigger
+        // Score
         g.textAlign = 'center';
-        g.font = '900 24px Nunito, sans-serif';
-        g.fillStyle = 'rgba(255,255,255,.15)';
-        g.fillText(sc + '/' + TARGET, W / 2, 28);
-        g.fillStyle = '#fff';
         g.font = '900 22px Nunito, sans-serif';
-        g.fillText(sc + '/' + TARGET, W / 2, 27);
+        g.fillStyle = 'rgba(255,255,255,.2)';
+        g.fillText(sc + '/' + TARGET, W / 2, 26);
+        g.fillStyle = '#fff';
+        g.fillText(sc + '/' + TARGET, W / 2 - 0.5, 25.5);
       }
 
       // Static preview
@@ -677,7 +633,7 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
 
       function hit(){
         var bT = by - BR * 0.6, bB = by + BR * 0.6;
-        if (bB >= GND || bT <= 2) return true;
+        if (bB >= H - 4 || bT <= 2) return true;
         for (var i = 0; i < pp.length; i++){
           var p = pp[i];
           if (BX + BR < p.x || BX - BR > p.x + PW) continue;
@@ -698,7 +654,8 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
           pp[i].x -= PS;
           if (!pp[i].s && pp[i].x + PW < BX){
             pp[i].s = true; sc++;
-            if(sc===5){Hp.streak&&Hp.streak();}else{Hp.medium&&Hp.medium();}
+            if (sc > bestScore) bestScore = sc;
+            if(sc % 5 === 0){Hp.streak&&Hp.streak();}else{Hp.success&&Hp.success();}
             if (sc >= TARGET){ won = true; end(true); return; }
           }
           if (pp[i].x < -PW - 10) pp.splice(i, 1);
@@ -709,25 +666,34 @@ window._openFullGame=function(gt){var ov=document.createElement('div');ov.style.
       function loop(){ tick(); draw(); if (!dead && !won) raf = requestAnimationFrame(loop); else drawOver(); }
 
       function drawOver(){
-        g.fillStyle = dead ? 'rgba(0,0,0,.35)' : 'rgba(255,255,255,.12)';
+        g.fillStyle = dead ? 'rgba(0,0,0,.32)' : 'rgba(34,197,94,.12)';
         g.fillRect(0, 0, W, H);
         g.textAlign = 'center';
-        g.font = '900 26px Nunito, sans-serif';
-        g.fillStyle = '#fff';
-        g.fillText(won ? '🎉 Nice!' : 'Game Over', W / 2, H * 0.35);
-        g.font = '800 15px Nunito, sans-serif';
-        g.fillStyle = 'rgba(255,255,255,.7)';
-        g.fillText(sc + ' / ' + TARGET + ' pipes', W / 2, H * 0.35 + 26);
-        if (dead){
-          // Draw retry button
-          var bw = 100, bh = 36, bx = W/2-bw/2, by2 = H*0.35+44;
+        if (won){
+          g.font = '900 28px Nunito, sans-serif';
           g.fillStyle = '#fff';
-          g.beginPath(); g.roundRect(bx, by2, bw, bh, 12); g.fill();
-          g.fillStyle = 'rgba(0,0,0,.08)';
-          g.beginPath(); g.roundRect(bx, by2+bh-4, bw, 4, [0,0,12,12]); g.fill();
+          g.fillText('🎉 Nice!', W / 2, H * 0.38);
+          g.font = '800 14px Nunito, sans-serif';
+          g.fillStyle = 'rgba(255,255,255,.7)';
+          g.fillText(sc + ' pipes cleared!', W / 2, H * 0.38 + 24);
+        } else {
+          g.font = '900 24px Nunito, sans-serif';
+          g.fillStyle = '#fff';
+          g.fillText('Game Over', W / 2, H * 0.32);
+          g.font = '900 36px Nunito, sans-serif';
+          g.fillText(sc, W / 2, H * 0.32 + 38);
+          g.font = '800 12px Nunito, sans-serif';
+          g.fillStyle = 'rgba(255,255,255,.5)';
+          g.fillText('Best: ' + bestScore, W / 2, H * 0.32 + 56);
+          // Retry button
+          var bw = 110, bh = 38, bx2 = W/2-bw/2, by2 = H*0.32+72;
+          g.fillStyle = '#fff';
+          g.beginPath(); g.roundRect(bx2, by2, bw, bh, 14); g.fill();
+          g.fillStyle = 'rgba(0,0,0,.06)';
+          g.beginPath(); g.roundRect(bx2, by2+bh-4, bw, 4, [0,0,14,14]); g.fill();
           g.fillStyle = '#0474fc';
-          g.font = '900 13px Nunito, sans-serif';
-          g.fillText('Try Again', W/2, by2+22);
+          g.font = '900 14px Nunito, sans-serif';
+          g.fillText('Tap to Retry', W/2, by2+24);
         }
       }
 
