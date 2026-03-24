@@ -75,12 +75,24 @@
     .explain,.explanation{background:rgba(255,255,255,.1);border-radius:14px;padding:10px 14px;font-size:12px;font-weight:700;color:rgba(255,255,255,.75);line-height:1.5;text-align:center;display:none;width:100%;border:2px solid rgba(255,255,255,.15);}
     .explain.show,.explanation.show{display:block;animation:su .3s}
     @keyframes su{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-    .scroll-hint{position:absolute;bottom:14px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:opacity .4s;pointer-events:none;opacity:0}
-    .scroll-hint.show{opacity:1}
-    .scroll-hint-inner{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.28);border:2px solid rgba(255,255,255,.4);border-radius:20px;padding:8px 18px;box-shadow:0 3px 0 rgba(0,0,0,.12);}
-    .scroll-hint-inner svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2.8;animation:bounce 1.2s infinite;flex-shrink:0}
+    .scroll-hint{position:absolute;bottom:14px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:6px;transition:opacity .4s;pointer-events:none;opacity:0;z-index:10}
+    .scroll-hint.show{opacity:1;pointer-events:auto}
+    .scroll-hint-inner{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.28);border:2px solid rgba(255,255,255,.4);border-radius:20px;padding:8px 18px;box-shadow:0 3px 0 rgba(0,0,0,.12);cursor:pointer}
+    .scroll-hint-inner:active{transform:scale(.95)}
+    .scroll-hint-inner svg.chevron{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2.8;animation:bounce 1.2s infinite;flex-shrink:0}
     .scroll-hint-inner span{font-size:13px;font-weight:900;color:#fff;letter-spacing:.3px;white-space:nowrap}
     @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+    /* Auto-scroll countdown ring */
+    .autoscroll{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.35);border:2px solid rgba(255,255,255,.5);border-radius:22px;padding:7px 16px 7px 8px;cursor:pointer;opacity:0;transition:opacity .3s;pointer-events:none}
+    .autoscroll.show{opacity:1;pointer-events:auto}
+    .autoscroll:active{transform:scale(.95)}
+    .as-ring{width:26px;height:26px;flex-shrink:0;position:relative}
+    .as-ring svg{width:26px;height:26px;transform:rotate(-90deg)}
+    .as-ring circle{fill:none;stroke-width:3;cx:13;cy:13;r:10}
+    .as-bg{stroke:rgba(255,255,255,.2)}
+    .as-fg{stroke:#fff;stroke-dasharray:62.83;stroke-dashoffset:0;stroke-linecap:round;transition:stroke-dashoffset linear}
+    .as-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff}
+    .as-label{font-size:12px;font-weight:900;color:#fff;white-space:nowrap}
     .branding{width:100%;text-align:center;font-size:11px;font-weight:900;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase;margin-top:8px;padding-top:10px;border-top:2px solid rgba(255,255,255,.1)}
     .game-branding{width:100%;display:flex;justify-content:center;margin-top:8px;padding-top:10px;border-top:2px solid rgba(255,255,255,.1)}
     .game-branding a{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2);border-radius:20px;padding:5px 14px 5px 7px;text-decoration:none;transition:all .15s;box-shadow:0 2px 0 rgba(0,0,0,.08);}
@@ -512,7 +524,7 @@ async function _loadSharedQuestion(){
     const data=snap.data();sharedQ=data.q||null;if(data.from){senderInfo=data.from;initSenderUI();}if(!sharedQ)return;
     const placeholder=feed.querySelector('.slide[data-slide-idx="0"]'),realDiv=document.createElement('div');realDiv.className='slide';realDiv.dataset.slideIdx=0;
     const cr=Q._renderers&&Q._renderers[sharedQ.type];
-    if(cr){realDiv.innerHTML=cr.render(sharedQ,0);if(placeholder)feed.replaceChild(realDiv,placeholder);else feed.prepend(realDiv);const qcard=realDiv.querySelector('.qcard');if(qcard){const banner=document.createElement('div');banner.className='shared-q-banner';const sn=senderInfo&&senderInfo.username;banner.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span>'+(sn?'<strong style="color:var(--gold)">'+sn+'</strong> sent you this!':'Someone challenged you!')+'</span>';qcard.insertBefore(banner,qcard.firstChild);}try{cr.attach(realDiv,sharedQ,0,{feed,flashEl,confettiEl,IQData,getEncouragement,updateUI,checkMore:handleScroll,spawnConfetti,answerStartRef:{get:()=>answerStart,set:v=>{answerStart=v}},Haptics,notifyGamePlayed:window.notifyGamePlayed,onAnswer:window.onAnswerForTasks,addShareBtn});}catch(e){console.warn(e)}}
+    if(cr){realDiv.innerHTML=cr.render(sharedQ,0);if(placeholder)feed.replaceChild(realDiv,placeholder);else feed.prepend(realDiv);const qcard=realDiv.querySelector('.qcard');if(qcard){const banner=document.createElement('div');banner.className='shared-q-banner';const sn=senderInfo&&senderInfo.username;banner.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span>'+(sn?'<strong style="color:var(--gold)">'+sn+'</strong> sent you this!':'Someone challenged you!')+'</span>';qcard.insertBefore(banner,qcard.firstChild);}try{cr.attach(realDiv,sharedQ,0,{feed,flashEl,confettiEl,IQData,getEncouragement,updateUI,checkMore:handleScroll,spawnConfetti,answerStartRef:{get:()=>answerStart,set:v=>{answerStart=v}},Haptics,notifyGamePlayed:window.notifyGamePlayed,onAnswer:window.onAnswerForTasks,addShareBtn,startAutoScroll});}catch(e){console.warn(e)}}
     else{realDiv.innerHTML=renderDef(sharedQ,0);if(placeholder)feed.replaceChild(realDiv,placeholder);else feed.prepend(realDiv);const qcard=realDiv.querySelector('.qcard');if(qcard)addShareBtn(qcard,sharedQ);}
     answerStart=Date.now();
   }catch(e){console.warn('loadSharedQuestion failed:',e);}
@@ -594,7 +606,7 @@ function shouldInsertInstallCard(){if(!isMobile||isStandalone)return false;cards
 
 function addSharedSlide(idx){const q=sharedQ,div=document.createElement('div');div.className='slide';div.dataset.slideIdx=idx;function makeBanner(){const b=document.createElement('div');b.className='shared-q-banner';const sn=senderInfo&&senderInfo.username;b.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span>'+(sn?'<strong style="color:var(--gold)">'+sn+'</strong> challenged you!':'Someone challenged you!')+'</span>';return b;}
 const cr=Q._renderers&&Q._renderers[q.type];
-if(cr){div.innerHTML=cr.render(q,idx);feed.appendChild(div);const qcard=div.querySelector('.qcard');if(qcard)qcard.insertBefore(makeBanner(),qcard.firstChild);try{cr.attach(div,q,idx,{feed,flashEl,confettiEl,IQData,getEncouragement,updateUI,checkMore:handleScroll,spawnConfetti,answerStartRef:{get:()=>answerStart,set:v=>{answerStart=v}},Haptics,notifyGamePlayed:window.notifyGamePlayed,onAnswer:window.onAnswerForTasks,addShareBtn});}catch(e){console.warn(e)}return;}
+if(cr){div.innerHTML=cr.render(q,idx);feed.appendChild(div);const qcard=div.querySelector('.qcard');if(qcard)qcard.insertBefore(makeBanner(),qcard.firstChild);try{cr.attach(div,q,idx,{feed,flashEl,confettiEl,IQData,getEncouragement,updateUI,checkMore:handleScroll,spawnConfetti,answerStartRef:{get:()=>answerStart,set:v=>{answerStart=v}},Haptics,notifyGamePlayed:window.notifyGamePlayed,onAnswer:window.onAnswerForTasks,addShareBtn,startAutoScroll});}catch(e){console.warn(e)}return;}
 div.innerHTML=renderDef(q,idx);feed.appendChild(div);const qcard=div.querySelector('.qcard');if(qcard){qcard.insertBefore(makeBanner(),qcard.firstChild);addShareBtn(qcard,q);}}
 
 function addSlide(){
@@ -608,7 +620,7 @@ function addSlide(){
   if(!q){div.innerHTML=renderFB();(_sen?.parentNode===feed)?feed.insertBefore(div,_sen):feed.appendChild(div);return}
   try{
     const cr=Q._renderers?.[q.type];
-    if(cr){div.innerHTML=cr.render(q,idx);(_sen?.parentNode===feed)?feed.insertBefore(div,_sen):feed.appendChild(div);try{cr.attach(div,q,idx,{feed,flashEl,confettiEl,IQData,getEncouragement,updateUI,checkMore:handleScroll,spawnConfetti,answerStartRef:{get:()=>answerStart,set:v=>{answerStart=v}},Haptics,notifyGamePlayed:window.notifyGamePlayed,onAnswer:window.onAnswerForTasks,addShareBtn})}catch{}}
+    if(cr){div.innerHTML=cr.render(q,idx);(_sen?.parentNode===feed)?feed.insertBefore(div,_sen):feed.appendChild(div);try{cr.attach(div,q,idx,{feed,flashEl,confettiEl,IQData,getEncouragement,updateUI,checkMore:handleScroll,spawnConfetti,answerStartRef:{get:()=>answerStart,set:v=>{answerStart=v}},Haptics,notifyGamePlayed:window.notifyGamePlayed,onAnswer:window.onAnswerForTasks,addShareBtn,startAutoScroll})}catch{}}
     else{div.innerHTML=renderDef(q,idx);(_sen?.parentNode===feed)?feed.insertBefore(div,_sen):feed.appendChild(div);const qcard=div.querySelector('.qcard');if(qcard)addShareBtn(qcard,q);}
   }catch{div.innerHTML=renderFB();(_sen?.parentNode===feed)?feed.insertBefore(div,_sen):feed.appendChild(div)}
   answerStart=Date.now();
@@ -632,9 +644,59 @@ document.addEventListener('click',e=>{
   const session=updateSessionStats(isC,ms);updateTaskProgress(result.streak,isC,ms,session);onGuestAnswer();
   updateUI(result);handleScroll();
   setTimeout(()=>document.getElementById(`exp-${idx}`)?.classList.add('show'),250);
-  setTimeout(()=>document.getElementById(`hint-${idx}`)?.classList.add('show'),500);
+  setTimeout(()=>startAutoScroll(idx),1500);
   answerStart=Date.now();
 });
+
+// ── Auto-scroll countdown ──
+var _asTimer=null,_asIdx=-1,_asRaf=null;
+function startAutoScroll(idx){
+  cancelAutoScroll();
+  _asIdx=idx;
+  var hintEl=document.getElementById('hint-'+idx);
+  if(!hintEl)return;
+  hintEl.classList.add('show');
+  var asEl=document.getElementById('as-'+idx);
+  var fgEl=document.getElementById('as-fg-'+idx);
+  var numEl=document.getElementById('as-num-'+idx);
+  if(!asEl||!fgEl||!numEl)return;
+  // Show countdown after 0.5s
+  setTimeout(function(){
+    if(_asIdx!==idx)return;
+    asEl.classList.add('show');
+    var dur=3000,start=Date.now(),circ=62.83;
+    fgEl.style.transition='none';
+    fgEl.style.strokeDashoffset='0';
+    numEl.textContent='3';
+    function tick(){
+      var elapsed=Date.now()-start,pct=Math.min(elapsed/dur,1);
+      fgEl.style.strokeDashoffset=(circ*pct).toFixed(1);
+      var left=Math.ceil((dur-elapsed)/1000);
+      numEl.textContent=Math.max(left,0);
+      var lbl=asEl.querySelector('.as-label');
+      if(lbl)lbl.textContent=left>0?'Next in '+left+'s':'Scrolling...';
+      if(pct>=1){doAutoScroll(idx);return;}
+      if(_asIdx===idx)_asRaf=requestAnimationFrame(tick);
+    }
+    _asRaf=requestAnimationFrame(tick);
+  },500);
+}
+function cancelAutoScroll(){
+  if(_asRaf)cancelAnimationFrame(_asRaf);
+  _asRaf=null;_asIdx=-1;
+}
+function doAutoScroll(idx){
+  cancelAutoScroll();
+  var sH=slideHeight(),next=idx+1;
+  feed.scrollTo({top:next*sH,behavior:'smooth'});
+  Haptics.light();
+}
+window.skipAutoScroll=function(idx){
+  cancelAutoScroll();
+  doAutoScroll(idx);
+};
+// Cancel autoscroll if user manually scrolls
+feed.addEventListener('touchstart',function(){cancelAutoScroll();},{passive:true});
 
 ageSlider.oninput=()=>{ageDisplay.textContent=ageSlider.value;Haptics.light()};
 document.getElementById('start-btn').addEventListener('click',()=>{Haptics.medium();IQData.setAge(parseInt(ageSlider.value));Q.setAge(parseInt(ageSlider.value));onboard.classList.remove('show');IQData.needsCalibration()?startCal():startFeed()});
@@ -654,7 +716,7 @@ function renderDef(q,idx){
   if(q.visual==='sequence'||q.visual==='letterSequence'){const parts=q.sequence.map((n,i)=>{if(n==='?')return`<span class="blank">?</span>`;return`<span>${n}</span>${i<q.sequence.length-1?'<span class="arrow">→</span>':''}`});if(q.sequence[q.sequence.length-1]!=='?')parts.push('<span class="arrow">→</span><span class="blank">?</span>');v=`<div class="sequence">${parts.join('')}</div>`}
   else if(q.visual==='matrix'){v=`<div class="matrix">${q.grid.map(c=>`<div class="matrix-cell${c==='?'?' blank':''}">${c}</div>`).join('')}</div>`}
   const wide=q.options.some(o=>String(o).length>20);
-  return`<div class="qcard"><div class="category">${q.categoryLabel}</div><div class="question">${q.question}</div>${v}<div class="options${wide?' wide':''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">${q.options.map(o=>`<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}</div><div class="feedback" id="fb-${idx}"></div><div class="explain" id="exp-${idx}">${q.explanation}</div><div class="game-branding"><a href="https://cebear.com" target="_blank" rel="noopener"><div class="game-branding-bear"><img src="logo.png" alt=""></div><span class="game-branding-text">cebear.com</span></a></div></div><div class="scroll-hint" id="hint-${idx}"><div class="scroll-hint-inner"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><span>Swipe for next</span></div></div>`;
+  return`<div class="qcard"><div class="category">${q.categoryLabel}</div><div class="question">${q.question}</div>${v}<div class="options${wide?' wide':''}" data-idx="${idx}" data-ans="${esc(q.answer)}" data-cat="${q.category}" data-diff="${q.difficulty}">${q.options.map(o=>`<button class="opt" data-v="${esc(o)}">${o}</button>`).join('')}</div><div class="feedback" id="fb-${idx}"></div><div class="explain" id="exp-${idx}">${q.explanation}</div><div class="game-branding"><a href="https://cebear.com" target="_blank" rel="noopener"><div class="game-branding-bear"><img src="logo.png" alt=""></div><span class="game-branding-text">cebear.com</span></a></div></div><div class="scroll-hint" id="hint-${idx}"><div class="autoscroll" id="as-${idx}" onclick="skipAutoScroll(${idx})"><div class="as-ring"><svg viewBox="0 0 26 26"><circle class="as-bg" /><circle class="as-fg" id="as-fg-${idx}" /></svg><div class="as-num" id="as-num-${idx}">3</div></div><span class="as-label">Next in 3s</span></div><div class="scroll-hint-inner" onclick="skipAutoScroll(${idx})"><svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><span>Swipe for next</span></div></div>`;
 }
 
 function init(){IQData.setAge(25);Q.setAge(25);if(IQData.needsOnboarding()||IQData.needsCalibration())IQData.markCalibrated(100);updateUI(IQData.load());startFeed();if(sharedShortId)_loadSharedQuestion();}
