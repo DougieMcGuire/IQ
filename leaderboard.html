@@ -431,7 +431,7 @@ document.addEventListener('click',function(e){
   if(row){var nameEl=row.querySelector('.row-name');if(nameEl){var name=nameEl.textContent.replace(/YOU$/,'').trim();if(name)openProfile(name);return;}}
   var pod=e.target.closest('.pod');
   if(pod){var nameEl2=pod.querySelector('.pod-name');if(nameEl2){var name2=nameEl2.textContent.replace(/\s*\(you\)/,'').trim();if(name2)openProfile(name2);return;}}
-});}
+});
 
 async function init(){
   await authReady;myUid=IQData.getCurrentUser()?.uid||null;
