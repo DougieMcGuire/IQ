@@ -173,7 +173,7 @@
     .prof-sheet-title{font-size:15px;font-weight:900;color:var(--text)}
     .prof-sheet-close{background:none;border:2.5px solid var(--cb);border-radius:10px;padding:5px 12px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:var(--dim);cursor:pointer}
     .prof-sheet-close:active{background:#f1f5f9}
-    .prof-sheet iframe{flex:1;width:100%;border:none;background:#1b2d5b}
+    .prof-sheet iframe{flex:1;width:100%;border:none;background:#0474fc}
     body.dark .prof-sheet{background:#1e293b}
     body.dark .prof-sheet-hdr{border-bottom-color:#334155}
     body.dark .prof-sheet-title{color:#e2e8f0}
@@ -406,7 +406,7 @@ function renderList(rest,myIdx,cfg){
   }).join('');
 }
 
-function esc(s){return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function esc(s){return String(s).replace(/\x3c/g,'\x26lt;').replace(/\x3e/g,'\x26gt;').replace(/"/g,'\x26quot;')}
 
 // ── Profile overlay ──
 function openProfile(username){
